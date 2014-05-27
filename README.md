@@ -8,6 +8,6 @@ gWTO2
 This library connects directly to the archive. We want to avoid using all.sbinfo
 file, which is unstable and updates only once a day.
 
-### pwvdatos.dat
+### pwvdatos.pandas
 
-Data file,
+Pandas dataframe file, with oppacities for pwv-frequency pairs.
