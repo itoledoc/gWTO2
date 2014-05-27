@@ -9,11 +9,9 @@ import datetime
 import csv
 import numpy as np
 import ephem
-import subprocess
 from observability import observable
 from readEPT import read_data
 from sb_dat_handler import checkaots, update_sbdata, priority
-from QueryUtil import CalibratorCatalog
 
 from PyQt4.QtGui import *
 from PyQt4.QtCore import *
