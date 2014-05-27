@@ -48,7 +48,6 @@ class MainWindow(QMainWindow, Ui_MainWindow):
         self.sb_database = read_data()
         self.sb_database, self.target_dat, self.versions = checkaots(
             self.sb_database, self.alma.date)
-        # self.catalogue = CalibratorCatalog(self.alma.date.datetime(), self.alma)
         print self.alma.date, self.config_array, self.pwv, self.min_trans
         print self.min_ha, self.max_ha, self.min_elev
     
