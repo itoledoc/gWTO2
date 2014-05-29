@@ -14,9 +14,10 @@ class DataBase(object):
     def __init__(self, source=None, path='./'):
         self.path = path
         if source is None:
-            self.projects, self.not_ready_prj = get_projects()
+            self.projects, self.not_ready_prj, self.scheduling = query_archive()
         else:
-            self.projects, self.not_ready_prj = get_projects(source)
+            self.projects, self.not_ready_prj, self.scheduling = query_archive(
+                source)
         self.projects['obsproj'] = pd.Series(
             np.zeros(len(self.projects), dtype=object),
             index=self.projects.index)
@@ -44,22 +45,25 @@ class ObsProject(object):
         sched_uid_7m = []
         sched_uid_tp = []
         for sg in self.ObsProgram.ObsPlan.ObsUnitSet:
-            # science_goal_uid = sg.attrib['entityPartId']
             for ous in sg.ObsUnitSet:
-                for mous in ous.ObsUnitSet:
-                    array_requested = mous.ObsUnitControl.attrib[
-                        'arrayRequested']
-                    try:
-                        for sbs in mous.SchedBlockRef:
-                            if array_requested == 'TWELVE-M':
-                                sched_uid_12m.append(sbs.attrib['entityId'])
-                            elif array_requested == 'SEVEN-M':
-                                sched_uid_7m.append(sbs.attrib['entityId'])
-                            elif array_requested == 'TP-Array':
-                                sched_uid_tp.append(sbs.attrib['entityId'])
-                    except AttributeError:
-                        # Member OUS does not have any SB created yet.
-                        continue
+                try:
+                    for mous in ous.ObsUnitSet:
+                        array_requested = mous.ObsUnitControl.attrib[
+                            'arrayRequested']
+                        try:
+                            for sbs in mous.SchedBlockRef:
+                                if array_requested == 'TWELVE-M':
+                                    sched_uid_12m.append(sbs.attrib['entityId'])
+                                elif array_requested == 'SEVEN-M':
+                                    sched_uid_7m.append(sbs.attrib['entityId'])
+                                elif array_requested == 'TP-Array':
+                                    sched_uid_tp.append(sbs.attrib['entityId'])
+                        except AttributeError:
+                            # Member OUS does not have any SB created yet.
+                            continue
+                except AttributeError:
+                    print ous.attrib
+                    continue
         return sched_uid_7m, sched_uid_12m, sched_uid_tp
 
     def import_sched_blocks(self):
@@ -77,7 +81,7 @@ class SchedBlocK(object):
             self.__setattr__(key, data.__dict__[key])
 
 
-def get_projects(source=None, path='./'):
+def query_archive(source=None, path='./'):
 
     """
 
@@ -85,7 +89,6 @@ def get_projects(source=None, path='./'):
     :param path:
     :return:
     """
-
     connection = cx_Oracle.connect(conx_strin)
     cursor = connection.cursor()
     sql1 = "SELECT PRJ_ARCHIVE_UID,DELETED,PI,PRJ_NAME,ARRAY,PRJ_CODE, " \
@@ -93,12 +96,16 @@ def get_projects(source=None, path='./'):
            "PRJ_ASSIGNED_PRIORITY,PRJ_LETTER_GRADE,DOMAIN_ENTITY_STATE," \
            "OBS_PROJECT_ID,PROJECT_WAS_TIMED_OUT " \
            "FROM ALMA.BMMV_OBSPROJECT obs1, ALMA.OBS_PROJECT_STATUS obs2  " \
-           "WHERE (PRJ_CODE LIKE '2013%A' OR PRJ_CODE LIKE '2013%S' OR " \
-           "PRJ_CODE LIKE '2013%T') " \
+           "WHERE regexp_like (CODE, '^201[23]\.1.*\.[AST]') " \
            "AND (PRJ_LETTER_GRADE='A' OR PRJ_LETTER_GRADE='B' " \
            "OR PRJ_LETTER_GRADE='C') " \
            "AND OBS2.OBS_PROJECT_ID = OBS1.PRJ_ARCHIVE_UID"
 
+    sql3 = "SELECT * FROM SCHEDULING_AOS.OBSPROJECT " \
+           "WHERE regexp_like (CODE, '^201[23]\.1.*\.[AST]')"
+    cursor.execute(sql3)
+    scheduling = pd.DataFrame(cursor.fetchall(),
+                              columns=[rec[0] for rec in cursor.description])
     states = ["Approved", "Phase1Submitted", "Broken", "Completed", "Canceled"]
 
     if source is None:
@@ -108,7 +115,7 @@ def get_projects(source=None, path='./'):
         projects = df1.query(
             'DOMAIN_ENTITY_STATE not in states').set_index('PRJ_CODE')
         not_ready_projects = df1.query(
-                'DOMAIN_ENTITY_STATE in states').set_index('PRJ_CODE')
+            'DOMAIN_ENTITY_STATE in states').set_index('PRJ_CODE')
     else:
         if type(source) is not str and type(source) is not list:
             print "The filename should be a string or a list"
@@ -159,7 +166,7 @@ def get_projects(source=None, path='./'):
     projects['timestamp'] = timestamp
     cursor.close()
     connection.close()
-    return projects, not_ready_projects
+    return projects, not_ready_projects, scheduling
 
 
 def get_schedblocks(uid_list, path='./'):
