@@ -6,11 +6,11 @@ gWTO2
 Under GNU License.
 Currently runs on linux systems with python2.7.x versions
 required libraries:
-    * cx_Oracle
-    * numpy
-    * pandas
-    * pyephem
-    * PyQt4
+* cx_Oracle
+* numpy
+* pandas
+* pyephem
+* PyQt4
 
 ### readProjects.py
 
