@@ -37,34 +37,43 @@ class ObsProject(object):
         tree = objectify.parse(io_file)
         io_file.close()
         data = tree.getroot()
+        self.status = data.attrib['status']
         for key in data.__dict__:
             self.__setattr__(key, data.__dict__[key])
 
     def assoc_sched_blocks(self):
-        sched_uid_12m = []
-        sched_uid_7m = []
-        sched_uid_tp = []
-        for sg in self.ObsProgram.ObsPlan.ObsUnitSet:
-            for ous in sg.ObsUnitSet:
-                try:
-                    for mous in ous.ObsUnitSet:
-                        array_requested = mous.ObsUnitControl.attrib[
-                            'arrayRequested']
-                        try:
-                            for sbs in mous.SchedBlockRef:
-                                if array_requested == 'TWELVE-M':
-                                    sched_uid_12m.append(sbs.attrib['entityId'])
-                                elif array_requested == 'SEVEN-M':
-                                    sched_uid_7m.append(sbs.attrib['entityId'])
-                                elif array_requested == 'TP-Array':
-                                    sched_uid_tp.append(sbs.attrib['entityId'])
-                        except AttributeError:
-                            # Member OUS does not have any SB created yet.
-                            continue
-                except AttributeError:
-                    print ous.attrib
-                    continue
-        return sched_uid_7m, sched_uid_12m, sched_uid_tp
+        result = {}
+
+        try:
+            for sg in self.ObsProgram.ObsPlan.ObsUnitSet:
+                sched_uid_12m = []
+                sched_uid_7m = []
+                sched_uid_tp = []
+                sgid = sg.attrib['entityPartId']
+                for ous in sg.ObsUnitSet:
+                    try:
+                        for mous in ous.ObsUnitSet:
+                            array_requested = mous.ObsUnitControl.attrib[
+                                'arrayRequested']
+                            try:
+                                for sbs in mous.SchedBlockRef:
+                                    if array_requested == 'TWELVE-M':
+                                        sched_uid_12m.append(sbs.attrib['entityId'])
+                                    elif array_requested == 'SEVEN-M':
+                                        sched_uid_7m.append(sbs.attrib['entityId'])
+                                    elif array_requested == 'TP-Array':
+                                        sched_uid_tp.append(sbs.attrib['entityId'])
+                            except AttributeError:
+                                # Member OUS does not have any SB created yet.
+                                continue
+                    except AttributeError:
+                        print ous.attrib
+                        continue
+                result[sgid] = [sched_uid_12m, sched_uid_7m, sched_uid_tp]
+        except AttributeError:
+            print self.code
+
+        return result
 
     def import_sched_blocks(self):
         pass

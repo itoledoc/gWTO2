@@ -12,7 +12,8 @@ list10 = ["2013.1.00033.S", "2013.1.00034.S", "2013.1.00088.S", "2013.1.00159.S"
           "2013.1.00366.S", "2013.1.00403.S", "2013.1.00487.S", "2013.1.00518.S", "2013.1.00524.S", "2013.1.00663.S",
           "2013.1.00815.S", "2013.1.00828.S", "2013.1.00988.S", "2013.1.01035.S", "2013.1.01113.S", "2013.1.01268.S"]
 
-array =['ACA', 'SEVEN-M', 'TWELVE-M', 'TP-Array']
+array = ['SEVEN-M', 'TWELVE-M', 'TP-Array']
+confarray = [' ', 'C34', ' ']
 
 datas = rp.DataBase(list10)
 
@@ -24,11 +25,15 @@ for i in datas.projects.index:
             c += 1
             continue
         for s2 in s:
-            sql = "SELECT SB_NAME, ARCHIVE_UID, RECEIVER_BAND, FREQUENCY, REQUESTEDARRAY " \
-                   "FROM ALMA.BMMV_SCHEDBLOCK WHERE ARCHIVE_UID = '%s'" % s2
+            sql = "SELECT SB_NAME, ARCHIVE_UID, RECEIVER_BAND, FREQUENCY, " \
+                  "REQUESTEDARRAY FROM ALMA.BMMV_SCHEDBLOCK " \
+                  "WHERE ARCHIVE_UID = '%s'" % s2
             cursor.execute(sql)
             datos = cursor.fetchall()[0]
-            print "%s\t%s\t%s\t%s\t%s\t%s\t%s\t%s\t%s\t%s\t%s" % (i, datas.projects.ix[i].prj_uid, datos[0], datos[1], datos[2], datos[3], array[c], "OTHER", 100, 100, "C32-1,C32-2,C32-3,C32-4,C32-5,C32-6")
-            c += 1
+            print "%s\t%s\t%s\t%s\t%s\t%.2f\t%s\t%s\t%s\t%s\t%s" % \
+                  (i, datas.projects.ix[i].PRJ_ARCHIVE_UID, datos[0], datos[1],
+                   datos[2], float(datos[3]), array[c], "OTHER", 100, 100,
+                   confarray[c])
+        c += 1
 
 connection.close()
