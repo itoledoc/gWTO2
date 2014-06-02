@@ -162,7 +162,6 @@ class CalibratorCatalog(object):
             query = cursor.fetchall()
             for r in query:
                 row = np.array([r], dtype=self.sctype)
-                print row
                 self.catalogue = np.concatenate([self.catalogue, row])
             np.save('catalogue', query)
 
@@ -385,7 +384,8 @@ class CalibratorCatalog(object):
                 radius = src['searchRadius']
                 if not use_new_qc:
                     candidates = self.query(
-                        ra=src['queryCenterLong'], dec=src['queryCenterLat'], min_flux=1.0, radius=radius,
+                        ra=src['queryCenterLong'], dec=src['queryCenterLat'],
+                        min_flux=1.0, radius=radius,
                         exp_freq=freq * 1e9, tdy=1)
                 else:
                     candidates = self.query(
