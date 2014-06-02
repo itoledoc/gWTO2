@@ -3,7 +3,7 @@ from lxml import objectify
 import pandas as pd
 prj = '{Alma/ObsPrep/ObsProject}'
 
-'''
+"""
 obsprojects = datas.projects.obsproj.values
 for i in obsprojects:
     sb = i.assoc_sched_blocks()
@@ -15,23 +15,20 @@ for i in obsprojects:
             continue
         rp.get_schedblocks(bl)
 
-
-sgoals = conf_table.SG_ID.tolist()
-for sg in sgoals:
-    q = conf_table.query('SG_ID == sg')
-    if len(q) != 2:
-        continue
-    ar = []
-    for i in q.index.tolist():
-        ar.append(q.ix[i, 'minAR'])
-    if ar[0] != ar[1]:
-        conf_table.ix[q.ix[q.index.tolist()[0], 'SB_UID'], 'sb12m'] = 2
-        conf_table.ix[q.ix[q.index.tolist()[1], 'SB_UID'], 'sb12m'] = 2
-
-'''
+"""
 
 
 def configuration_check(datas):
+    """
+    Extract information need to run the script that correct min and max AR for
+    SBs.
+
+    :param datas: dataframe table of type projects (readProjects.Database)
+    :return: conf_table: dataframe with all the info needed for the AR correction
+                         script
+             None: if datas has no projects with 12m SBs
+    """
+
     codes = datas.projects.index.tolist()
     c = 0
     ok = False
@@ -50,7 +47,12 @@ def configuration_check(datas):
         if not ok:
             c += 1
 
-    sgoalids = sbs_start.keys()
+    try:
+        sgoalids = sbs_start.keys()
+    except NameError:
+        print "Couldn't find a valid project with twelve meter SBs. Check input"
+        return None
+
     first = True
     for sgoalid in sgoalids:
         if len(sbs_start[sgoalid][0]) == 0:
@@ -59,7 +61,6 @@ def configuration_check(datas):
         for sb in sblist:
             row = get_data(sgoalid, sb,
                            obspro=datas.projects.ix[start, 'obsproj'])
-            print row
             if first:
                 conf_table = pd.DataFrame(
                     [row],
@@ -67,11 +68,9 @@ def configuration_check(datas):
                              'sb_name', 'AR', 'LAS', 'repFreqSG', 'repFreqSB',
                              'useACA', 'sb12m','minAR', 'maxAR'],
                     index=[sb])
-                print conf_table
                 first = False
             else:
                 conf_table.loc[sb] = row
-                print conf_table
 
     for code in codes[c+1:]:
         sbs = datas.projects.ix[code, 'obsproj'].assoc_sched_blocks()
@@ -92,6 +91,15 @@ def configuration_check(datas):
 
 def get_data(sgoalid, sb, obspro, path='./'):
 
+    """
+
+    :param sgoalid: str. Science Goal entityPartyId
+    :param sb: str. SB uid
+    :param obspro: readProject.ObsProject. Method with obspoject.xml info
+    :param path: str. Path to the xml files
+    :return: list.
+    """
+
     try:
         for sg in obspro.ObsProgram.ScienceGoal:
             if sg.ObsUnitSetRef.attrib['partId'] == sgoalid:
@@ -108,7 +116,7 @@ def get_data(sgoalid, sb, obspro, path='./'):
     arraySb = schedblock.findall(
         './/' + prj + 'ObsUnitControl')[0].attrib['arrayRequested']
     sb_uid = schedblock.SchedBlockEntity.attrib['entityId']
-    sb_name = schedblock.findall('.//' + prj +'name')[0].pyval
+    sb_name = schedblock.findall('.//' + prj + 'name')[0].pyval
     AR = scgoal.PerformanceParameters.desiredAngularResolution.pyval
     LAS = scgoal.PerformanceParameters.desiredLargestScale.pyval
     repFreqSG = scgoal.PerformanceParameters.representativeFrequency.pyval
@@ -121,3 +129,17 @@ def get_data(sgoalid, sb, obspro, path='./'):
     return (obspro.code.pyval, sgoalid, obspro.status, arraySb, sb_uid, sb_name,
             AR, LAS, repFreqSG, repFreqSB, useACA, sb12m, minAR, maxAR)
 
+
+def final_table(conf_table):
+    sgoals = conf_table.SG_ID.tolist()
+    for sg in sgoals:
+        q = conf_table.query('SG_ID == sg')
+        if len(q) != 2:
+            continue
+        ar = []
+        for i in q.index.tolist():
+            ar.append(q.ix[i, 'minAR'])
+        if ar[0] != ar[1]:
+            conf_table.ix[q.ix[q.index.tolist()[0], 'SB_UID'], 'sb12m'] = 2
+            conf_table.ix[q.ix[q.index.tolist()[1], 'SB_UID'], 'sb12m'] = 2
+    return conf_table

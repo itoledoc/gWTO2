@@ -4,15 +4,37 @@ import numpy as np
 import pandas as pd
 import csv
 import cx_Oracle
+import os
 from lxml import objectify
 
-conx_strin = 'almasu/alma4dba@ALMA_ONLINE.OSF.CL'
+conx_string = 'almasu/alma4dba@ALMA_ONLINE.OSF.CL'
 
 
 class DataBase(object):
 
-    def __init__(self, source=None, path='./'):
-        self.path = path
+    def __init__(self, source=None, default='./'):
+
+        self.path = os.environ['HOME'] + default
+        self.sbxml = self.path + '/sbxml'
+        self.obsxml = self.path + '/obsxml'
+        self.new = False
+        self.preferences = pd.Series(
+            ['projects.pandas', 'source.list', 'not_ready_prj.pandas',
+             'scheduling.pandas', 'special.list', 'pwvdata.pandas'],
+            index=[
+                'project_table', 'source', 'not_ready_prj_table',
+                'scheduling_table', 'special', 'pwv_data'])
+
+        try:
+            wto_ls = os.listdir(self.path)
+        except OSError:
+            print self.path + " not found, creating preferences dir"
+            os.mkdir(self.path)
+            os.mkdir(self.sbxml)
+            os.mkdir(self.obsxml)
+            self.new = True
+
+
         if source is None:
             self.projects, self.not_ready_prj, self.scheduling = query_archive()
         else:
@@ -67,7 +89,7 @@ class ObsProject(object):
                                 # Member OUS does not have any SB created yet.
                                 continue
                     except AttributeError:
-                        print ous.attrib
+                        print ous.base
                         continue
                 result[sgid] = [sched_uid_12m, sched_uid_7m, sched_uid_tp]
         except AttributeError:
@@ -98,7 +120,7 @@ def query_archive(source=None, path='./'):
     :param path:
     :return:
     """
-    connection = cx_Oracle.connect(conx_strin)
+    connection = cx_Oracle.connect(conx_string)
     cursor = connection.cursor()
     sql1 = "SELECT PRJ_ARCHIVE_UID,DELETED,PI,PRJ_NAME,ARRAY,PRJ_CODE, " \
            "CODE,PRJ_TIME_OF_CREATION,PRJ_SCIENTIFIC_RANK,PRJ_VERSION," \
@@ -180,7 +202,7 @@ def query_archive(source=None, path='./'):
 
 def get_schedblocks(uid_list, path='./'):
 
-    connection = cx_Oracle.connect(conx_strin)
+    connection = cx_Oracle.connect(conx_string)
     cursor = connection.cursor()
 
     for uid in uid_list:
