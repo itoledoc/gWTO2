@@ -73,10 +73,16 @@ class DataBase(object):
                                       self.preferences.scheduling_table)
             self.new = False
 
+    def clean_ready(self):
+        # TODO: Check if status has changed (use update_project)
+        # TODO: Read cycle1 table, create cycle2 table
+        # TODO: Return a table obsproject_r
+        pass
+
     def update_project(self):
 
-        # TODO : Ingest project status changes into self.projects
-        # TODO : Remove new projects in self.projects from self.not_ready_prj
+        # TODO: Ingest project status changes into self.projects
+        # TODO: Remove new projects in self.projects from self.not_ready_prj
 
         """
 
@@ -119,21 +125,28 @@ class DataBase(object):
                    "AND (PRJ_LETTER_GRADE='A' OR PRJ_LETTER_GRADE='B' " \
                    "OR PRJ_LETTER_GRADE='C') " \
                    "AND OBS2.OBS_PROJECT_ID = OBS1.PRJ_ARCHIVE_UID " \
-                   "AND OBS1.PRJ_ARCHIVE_UID = '%s'" % n[0]
+                   "AND OBS1.PRJ_ARCHIVE_UID = '%s'" % puid
             cursor.execute(sql1)
+
             try:
                 new_row = list(cursor.fetchall()[0])
             except IndexError:
-                print n, 'Not usable'
                 continue
+
             code = new_row[5]
             sched_entry = self.scheduling.query(
                 'OBSPROJECT_UID == puid')
 
+            # if not in scheduling and status is not near ready, add to
+            # not_ready_prj
             if len(sched_entry) == 0 and sched_entry.loc[0, 'STATUS'] in states:
                 self.not_ready_prj.ix[code] = new_row
                 continue
 
+            # if
+            if (code in self.not_ready_prj.CODE.tolist() and
+                    new_row[11] not in states):
+                self.not_ready_prj = self.not_ready_prj.query('CODE != code')
             new_row.append(n[1])
             xml_content = n[2].read()
             filename = self.obsxml + code + '.xml'
