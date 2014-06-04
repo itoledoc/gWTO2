@@ -7,7 +7,7 @@ import cx_Oracle
 import os
 from lxml import objectify
 
-conx_string = 'almasu/alma4dba@ALMA_ONLINE.OSF.CL'
+conx_string = 'almasu/alma4dba@ALMA_ONLINE.SCO.CL'
 
 
 class DataBase(object):
@@ -45,18 +45,15 @@ class DataBase(object):
             self.new = True
 
         if self.preferences.source is None and self.new:
-            self.projects, self.not_ready_prj, self.scheduling = query_archive(
-                path=self.obsxml)
+            self.projects, self.not_ready_prj = query_archive(path=self.obsxml)
         elif self.new:
-            self.projects, self.not_ready_prj, self.scheduling = query_archive(
-                source, path=self.obsxml)
+            self.projects, self.not_ready_prj = query_archive(source,
+                                                              path=self.obsxml)
         else:
             self.projects = pd.read_pickle(
                 self.path + '/' + self.preferences.project_table)
             self.not_ready_prj = pd.read_pickle(
                 self.path + '/' + self.preferences.not_ready_prj_table)
-            self.scheduling = pd.read_pickle(
-                self.path + '/' + self.preferences.scheduling_table)
 
         if self.new:
             self.projects['obsproj'] = pd.Series(
@@ -65,15 +62,14 @@ class DataBase(object):
             for p in self.projects.index:
                 obspro = ObsProject(p + '.xml', path=self.obsxml)
                 self.projects.loc[p, 'obsproj'] = obspro
-
             self.projects.to_pickle(self.path + '/' +
                                     self.preferences.project_table)
             self.not_ready_prj.to_pickle(self.path + '/' +
                                          self.preferences.not_ready_prj_table)
-            self.scheduling.to_pickle(self.path + '/' +
-                                      self.preferences.scheduling_table)
             self.new = False
 
+        self.sciecegoals = pd.DataFrame(
+            columns=['CODE', 'scienceGoalId', 'name'])
 
     def clean_ready(self):
         # TODO: Check if status has changed (use update_project)
@@ -102,11 +98,7 @@ class DataBase(object):
         cursor = connection.cursor()
         cursor.execute(sqln)
         new_data = cursor.fetchall()
-        sql3 = "SELECT * FROM SCHEDULING_AOS.OBSPROJECT " \
-               "WHERE regexp_like (CODE, '^201[23].*\.[AST]')"
-        cursor.execute(sql3)
-        self.scheduling = pd.DataFrame(
-            cursor.fetchall(), columns=[rec[0] for rec in cursor.description])
+
         for n in new_data:
             update = n[1] > newest
 
@@ -136,20 +128,11 @@ class DataBase(object):
                 continue
 
             code = new_row[5]
-            sched_entry = self.scheduling.query(
-                'OBSPROJECT_UID == puid')
-
-            print sched_entry
-            # if not in scheduling add to not_ready_prj
-            if len(sched_entry) == 0:
-                self.not_ready_prj.ix[code] = new_row
-                continue
-
-            elif sched_entry.iloc[0].STATUS in states:
-                self.not_ready_prj.ix[code] = new_row
-                continue
 
             # if it was in not_ready_prj, move to projects
+            if new_row[11] in states:
+                self.not_ready_prj.ix[code] = new_row
+                continue
             if (code in self.not_ready_prj.CODE.tolist() and
                     new_row[11] not in states):
                 self.not_ready_prj = self.not_ready_prj.query('CODE != code')
@@ -165,74 +148,6 @@ class DataBase(object):
             self.projects.ix[code] = new_row
 
         connection.close()
-        return 0
-
-    def row_sciencegoals(self, code, new=False):
-        proj = self.projects.query('CODE == code').ix[0]
-        obsproj = proj.obsproj
-        assoc_sbs = obsproj.assoc_sched_blocks()
-        try:
-            for sg in range(len(obsproj.ObsProgram.ScienceGoal)):
-                code = code
-                sciencegoal = obsproj.ObsProgram.ScienceGoal[sg]
-                partId = sciencegoal.ObsUnitSetRef.attrib['partId']
-                AR = sciencegoal.PerformanceParameters.desiredAngularResolution.pyval
-                ARunit = sciencegoal.PerformanceParameters.desiredAngularResolution.attrib['unit']
-                LAS = sciencegoal.PerformanceParameters.desiredLargestScale.pyval
-                LASunit = sciencegoal.PerformanceParameters.desiredLargestScale.attrib['unit']
-                bands = sciencegoal.requiredReceiverBands.pyval
-                try:
-                    ss = sciencegoal.SpectralSetupParameters.SpectralScan
-                    isSpectralScan = True
-                except AttributeError:
-                    isSpectralScan = False
-                useACA = sciencegoal.PerformanceParameters.useACA.pyval
-                useTP = sciencegoal.PerformanceParameters.useTP.pyval
-                if partId in assoc_sbs:
-                    BL = assoc_sbs[partId][0]
-                    ACA = assoc_sbs[partId][1]
-                    TP = assoc_sbs[partId][2]
-                else:
-                    BL, ACA, TP = [], [], []
-                sbs = BL + ACA + TP
-                if new:
-                    self.sciencegoals = pd.DataFrame(
-                        [(code, partId, AR, LAS, bands, isSpectralScan, useACA,
-                          useTP, BL, ACA, TP)],
-                        columns=['CODE', 'partId', 'AR', 'LAS', 'bands',
-                                 'isSpectralScan', 'useACA', 'useTP', 'BL', 'ACA',
-                                 'TP'],
-                        index=[code])
-                    for sb in sbs:
-                        if new:
-                            self.schedblocks = pd.DataFrame(
-                                [(code, partId, AR, LAS, bands, sb)],
-                                columns=['CODE', 'partId', 'AR', 'LAS', 'bands', 'SB_UID'],
-                                index=[sb])
-                            new = False
-                        else:
-                            self.schedblocks.ix[sb] = (code, partId, AR, LAS, bands, sb)
-
-                else:
-                    self.sciencegoals.ix[code] = (code, partId, AR, LAS, bands, isSpectralScan, useACA,
-                          useTP, BL, ACA, TP)
-                    for sb in sbs:
-                        self.schedblocks.ix[sb] = (code, partId, AR, LAS, bands, sb)
-        except AttributeError:
-            print "Project %s has not ObsUnitSets" % code
-            return 0
-        return 0
-
-    def populate_sciencegoals(self):
-        try:
-            type(self.sciencegoals)
-            new = False
-        except AttributeError:
-            new = True
-        codes = self.projects.CODE.tolist()
-        for c in codes:
-            self.row_sciencegoals(c, new=new)
-            new = False
         return 0
 
 
@@ -286,12 +201,11 @@ class ObsProject(object):
                                 # Member OUS does not have any SB created yet.
                                 continue
                     except AttributeError:
-                        print('Project %s has no member OUS in at least one '
-                              'SG_OUS' % self.code)
+                        print ous.base
                         continue
                 result[sgid] = [sched_uid_12m, sched_uid_7m, sched_uid_tp]
         except AttributeError:
-            print "Project %s has no Science Goal OUS" % self.code
+            print self.code
 
         return result
 
@@ -333,21 +247,8 @@ def query_archive(source=None, path='./'):
            "OR PRJ_LETTER_GRADE='C') " \
            "AND OBS2.OBS_PROJECT_ID = OBS1.PRJ_ARCHIVE_UID"
 
-    sql3 = "SELECT * FROM SCHEDULING_AOS.OBSPROJECT " \
-           "WHERE regexp_like (CODE, '^201[23].*\.[AST]')"
-    cursor.execute(sql3)
-    scheduling = pd.DataFrame(cursor.fetchall(),
-                              columns=[rec[0] for rec in cursor.description])
     states = ["Approved", "Phase1Submitted", "Broken", "Completed", "Canceled",
               "Rejected"]
-
-    sql4 = "SELECT PROJECTUID,ASSOCIATEDEXEC " \
-               "FROM ALMA.BMMV_OBSPROPOSAL " \
-               "WHERE (CYCLE='2012.1' OR CYCLE='2013.1' OR CYCLE='2013.A' " \
-               "OR CYCLE='2012.A')"
-    cursor.execute(sql4)
-    executive = pd.DataFrame(cursor.fetchall(),
-                             columns=['PRJ_ARCHIVE_UID', 'EXEC'])
 
     if source is None:
         cursor.execute(sql1)
@@ -407,7 +308,7 @@ def query_archive(source=None, path='./'):
     projects['timestamp'] = timestamp
     cursor.close()
     connection.close()
-    return projects, not_ready_projects, scheduling
+    return projects, not_ready_projects
 
 
 def get_schedblocks(uid_list, path='./'):

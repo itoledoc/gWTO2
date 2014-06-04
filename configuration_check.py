@@ -13,8 +13,27 @@ for i in obsprojects:
         bl = sb[k][0]
         if len(bl) == 0:
             continue
-        rp.get_schedblocks(bl)
+        rp.get_schedblocks(bl, path=datas.sbxml)
 
+for i in obsprojects:
+    sb = i.assoc_sched_blocks()
+    if sb is None:
+        continue
+    for k in sb.keys():
+        bl = sb[k][1]
+        if len(bl) == 0:
+            continue
+        rp.get_schedblocks(bl, path=datas.sbxml)
+
+for i in obsprojects:
+    sb = i.assoc_sched_blocks()
+    if sb is None:
+        continue
+    for k in sb.keys():
+        bl = sb[k][2]
+        if len(bl) == 0:
+            continue
+        rp.get_schedblocks(bl, path=datas.sbxml)
 """
 
 
