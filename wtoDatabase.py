@@ -21,6 +21,13 @@ class WtoDatabase(object):
         self.wto_path = os.environ['WTO']
         self.sbxml = self.path + 'sbxml/'
         self.obsxml = self.path + 'obsxml/'
+        self.preferences = pd.Series(
+            ['obsprojects.pandas', source,
+             'scheduling.pandas', 'special.list', 'pwvdata.pandas',
+             'executive.pandas', 'sbxml_table.pandas'],
+            index=['obsproject_table', 'source',
+                   'scheduling_table', 'special', 'pwv_data',
+                   'executive_table', 'sbxml_table'])
         self.source = source
         self.new = forcenew
         self.states = ["Approved", "Phase1Submitted", "Broken", "Completed",
@@ -28,12 +35,31 @@ class WtoDatabase(object):
 
         self.connection = cx_Oracle.connect(conx_string)
         self.cursor = self.connection.cursor()
+
+        self.sqlsched = str("SELECT * FROM SCHEDULING_AOS.OBSPROJECT "
+                            "WHERE regexp_like (CODE, '^201[23].*\.[AST]')")
+        self.cursor.execute(self.sqlsched)
+        self.scheduling = pd.DataFrame(
+            self.cursor.fetchall(),
+            columns=[rec[0] for rec in self.cursor.description])
+
+        if not self.new:
+            try:
+                self.obsprojects = pd.read_pickle(
+                    self.path + self.preferences.obsproject_table)
+                self.update_obsproject()
+            except IOError:
+                self.new = True
+
         if self.new:
             call(['rm', '-rf', self.path])
+            call(['cp', self.wto_path + 'conf/c1c2.csv', self.path + '.'])
             print self.path + ": creating preferences dir"
             os.mkdir(self.path)
             os.mkdir(self.sbxml)
             os.mkdir(self.obsxml)
+            self.query_obsproject()
+
 
     def update_obsproject(self):
         newest = self.obsprojects.timestamp.max()
@@ -50,11 +76,24 @@ class WtoDatabase(object):
                 try:
                     code = self.obsproject.query(
                         'PRJ_ARCHIVE_UID == puid').ix[0, 'CODE']
+                    self.cursor.execute(
+                        self.sql1 + " AND OBS1.CODE = %s'" % code)
+                    row = self.cursor.fetchall()[0]
+                    row.append(self.obsproject.ix[code, 'EXEC'])
+                    row.append(self.obsproject.ix[code, 'obsproj'])
                 except IndexError:
                     self.cursor.execute(
-                        "SELECT CODE FROM ALMA.BMMV_OBSPROJECT "
-                        "WHERE PRJ_ARCHIVE_UID = '%s'" % puid)
-                    code = self.cursor.fetchall()
+                        self.sql1 + " AND OBS1.PRJ_ARCHIVE_UID = %s'" % puid)
+                    row = self.cursor.fetchall()[0]
+                    self.cursor.execute(
+                        "SELECT ASSOCIATEDEXEC FROM ALMA.BMMV_OBSPROPOSAL "
+                        "WHERE PROJECTUID = '%s'" % puid)
+                    row.append(self.cursor.fetchall()[0][0])
+                    row.append(pd.Timestamp('2000-01-01'))
+                    row.append(self.obsproject.ix[0, 'obsproj'])
+                    code = row[4]
+                    self.obsproject.ix[code] = row
+                self.get_obsproject(code)
 
     def query_obsproject(self):
         states = self.states
@@ -62,7 +101,7 @@ class WtoDatabase(object):
             "SELECT PRJ_ARCHIVE_UID,DELETED,PI,PRJ_NAME, "
             "CODE,PRJ_TIME_OF_CREATION,PRJ_SCIENTIFIC_RANK,PRJ_VERSION,"
             "PRJ_ASSIGNED_PRIORITY,PRJ_LETTER_GRADE,DOMAIN_ENTITY_STATE,"
-            "OBS_PROJECT_ID,PROJECT_WAS_TIMED_OUT "
+            "OBS_PROJECT_ID "
             "FROM ALMA.BMMV_OBSPROJECT obs1, ALMA.OBS_PROJECT_STATUS obs2  "
             "WHERE regexp_like (CODE, '^201[23].*\.[AST]') "
             "AND (PRJ_LETTER_GRADE='A' OR PRJ_LETTER_GRADE='B' "
@@ -76,16 +115,16 @@ class WtoDatabase(object):
             "OR CYCLE='2012.A')")
 
         self.cursor.execute(sql2)
-        executive = pd.DataFrame(
+        self.executive = pd.DataFrame(
             self.cursor.fetchall(), columns=['PRJ_ARCHIVE_UID', 'EXEC'])
 
         if self.source is None:
-            self.cursor.execute(sql1)
+            self.cursor.execute(self.sql1)
             df1 = pd.DataFrame(
                 self.cursor.fetchall(),
                 columns=[rec[0] for rec in self.cursor.description])
             self.obsproject = pd.merge(
-                df1.query('DOMAIN_ENTITY_STATE not in states'), executive,
+                df1.query('DOMAIN_ENTITY_STATE not in states'), self.executive,
                 on='PRJ_ARCHIVE_UID').set_index('CODE', drop=False)
         else:
             if type(self.source) is not str and type(self.source) is not list:
@@ -102,7 +141,7 @@ class WtoDatabase(object):
                 for l in read_csv:
                     if type(self.source) is str:
                         l = l[0]
-                    sql3 = sql1 + ' AND OBS1.PRJ_CODE = ' + '\'%s\'' % l
+                    sql3 = self.sql1 + ' AND OBS1.PRJ_CODE = ' + '\'%s\'' % l
                     self.cursor.execute(sql3)
                     if c == 0:
                         df2 = pd.DataFrame(
@@ -115,7 +154,7 @@ class WtoDatabase(object):
 
                 self.obsproject = pd.merge(
                     df2.query('DOMAIN_ENTITY_STATE not in states'),
-                    executive,
+                    self.executive,
                     on='PRJ_ARCHIVE_UID').set_index('CODE', drop=False)
             except IOError:
                 print "Source filename does not exist"
@@ -131,6 +170,8 @@ class WtoDatabase(object):
         codes = self.obsproject.CODE.tolist()
         for c in codes:
             self.get_obsproject(c)
+        self.obsproject.to_pickle(
+            self.path + self.preferences.obsproject_table)
 
     def get_obsproject(self, code):
         self.cursor.execute(
