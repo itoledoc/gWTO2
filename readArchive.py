@@ -6,13 +6,14 @@ import csv
 import cx_Oracle
 import os
 from lxml import objectify
+from subprocess import call
 
 conx_string = 'almasu/alma4dba@ALMA_ONLINE.OSF.CL'
 
 
 class DataBase(object):
 
-    def __init__(self, default='/.wto', source=None):
+    def __init__(self, default='/.wto', source=None, forcenew=False):
 
         """
 
@@ -22,10 +23,12 @@ class DataBase(object):
         self.path = os.environ['HOME'] + default
         self.sbxml = self.path + '/sbxml/'
         self.obsxml = self.path + '/obsxml/'
-        self.new = False
+        self.new = forcenew
 
         try:
-            wto_ls = os.listdir(self.path)
+            if self.new:
+                call(['rm', '-rf', self.path])
+            os.listdir(self.path)
             self.preferences = pd.read_csv(self.path + '/preferences.dat',
                                            sep=':', index_col=0).ix[:, 0]
             self.preferences.source = source
@@ -34,21 +37,25 @@ class DataBase(object):
             os.mkdir(self.path)
             os.mkdir(self.sbxml)
             os.mkdir(self.obsxml)
+            gwto_path = os.environ['HOME'] + '/Work/gWTO2/'
+            call(['cp', gwto_path + 'conf/c1c2.csv', self.path + '/.'])
             self.preferences = pd.Series(
                 ['projects.pandas', source, 'not_ready_prj.pandas',
-                 'scheduling.pandas', 'special.list', 'pwvdata.pandas'],
+                 'scheduling.pandas', 'special.list', 'pwvdata.pandas',
+                 'executive.pandas', 'sbxml_table.pandas'],
                 index=[
                     'project_table', 'source', 'not_ready_prj_table',
-                    'scheduling_table', 'special', 'pwv_data'])
+                    'scheduling_table', 'special', 'pwv_data',
+                    'executive_table', 'sbxml_table'])
             self.preferences.to_csv(self.path + '/preferences.dat', sep=':',
                                     header=True)
             self.new = True
 
         if self.preferences.source is None and self.new:
-            self.projects, self.not_ready_prj, self.scheduling = query_archive(
+            self.projects, self.not_ready_prj, self.scheduling, self.executive, self.xml_sb_entitiesOSF = query_archive(
                 path=self.obsxml)
         elif self.new:
-            self.projects, self.not_ready_prj, self.scheduling = query_archive(
+            self.projects, self.not_ready_prj, self.scheduling, self.executive, self.xml_sb_entitiesOSF = query_archive(
                 source, path=self.obsxml)
         else:
             self.projects = pd.read_pickle(
@@ -57,7 +64,12 @@ class DataBase(object):
                 self.path + '/' + self.preferences.not_ready_prj_table)
             self.scheduling = pd.read_pickle(
                 self.path + '/' + self.preferences.scheduling_table)
-
+            self.executive = pd.read_pickle(
+                self.path + '/' + self.preferences.executive_table)
+            self.schedblock_xml = pd.read_pickle(
+                self.path + '/' + self.preferences.sbxml_table)
+            self.update_project()
+            self.populate_sciencegoals()
         if self.new:
             self.projects['obsproj'] = pd.Series(
                 np.zeros(len(self.projects), dtype=object),
@@ -72,8 +84,38 @@ class DataBase(object):
                                          self.preferences.not_ready_prj_table)
             self.scheduling.to_pickle(self.path + '/' +
                                       self.preferences.scheduling_table)
+            self.executive.to_pickle(self.path + '/' +
+                                     self.preferences.executive_table)
+            self.update_project()
+            self.populate_sciencegoals()
+            self.schedblock_xml = pd.merge(
+                self.sg_schedblocks, self.xml_sb_entitiesOSF, on='SB_UID'
+            ).set_index('SB_UID')
+            self.populate_schedblock_xml()
             self.new = False
 
+    def populate_schedblock_xml(self):
+        self.schedblock_xml['xml'] = pd.Series(
+            np.zeros(len(self.schedblock_xml), dtype=object),
+            index=self.schedblock_xml.index)
+        print "Fist download of SB xml files... this might take a while"
+        for uid in self.schedblock_xml.index.tolist():
+            connection = cx_Oracle.connect(conx_string)
+            cursor = connection.cursor()
+            cursor.execute("SELECT TIMESTAMP, XMLTYPE.getClobVal(xml) "
+                       "from ALMA.xml_schedblock_entities "
+                       "where archive_uid = '%s'" % uid)
+            xmlfile = uid.replace('://', '___').replace('/','_')
+            data = cursor.fetchall()[0]
+            xml_content = data[1].read()
+            filename = self.sbxml + xmlfile + '.xml'
+            io_file = open(filename, 'w')
+            io_file.write(xml_content)
+            io_file.close()
+            sbxmlobj = SchedBlocK(xmlfile + '.xml', path=self.sbxml)
+            self.schedblock_xml.loc[uid, 'xml'] = sbxmlobj
+        self.schedblock_xml.to_pickle(
+            self.path + '/' + self.preferences.sbxml_table)
 
     def clean_ready(self):
         # TODO: Check if status has changed (use update_project)
@@ -94,25 +136,36 @@ class DataBase(object):
         states = ["Approved", "Phase1Submitted", "Broken", "Completed",
                   "Canceled", "Rejected"]
         newest = self.projects.timestamp.max()
-        sqln = "SELECT ARCHIVE_UID, TIMESTAMP, XMLTYPE.getClobVal(xml) " \
-               "FROM ALMA.xml_obsproject_entities " \
-               "WHERE TIMESTAMP > to_date('%s', 'YYYY-MM-DD HH24:MI:SS')" % \
-               str(newest).split('.')[0]
         connection = cx_Oracle.connect(conx_string)
         cursor = connection.cursor()
-        cursor.execute(sqln)
-        new_data = cursor.fetchall()
         sql3 = "SELECT * FROM SCHEDULING_AOS.OBSPROJECT " \
                "WHERE regexp_like (CODE, '^201[23].*\.[AST]')"
         cursor.execute(sql3)
         self.scheduling = pd.DataFrame(
             cursor.fetchall(), columns=[rec[0] for rec in cursor.description])
+        cursor.execute("SELECT ARCHIVE_UID, TIMESTAMP FROM "
+                       "ALMA.XML_SCHEDBLOCK_ENTITIES")
+        self.xml_sb_entitiesOSF = pd.DataFrame(
+            cursor.fetchall(), columns=['SB_UID', 'timestamp_sb_osf'])
+        sqln = "SELECT ARCHIVE_UID, TIMESTAMP " \
+               "FROM ALMA.xml_obsproject_entities " \
+               "WHERE TIMESTAMP > to_date('%s', 'YYYY-MM-DD HH24:MI:SS')" % \
+               str(newest).split('.')[0]
+
+        cursor.execute(sqln)
+        new_data = cursor.fetchall()
+        changes = []
         for n in new_data:
             update = n[1] > newest
 
             if not update:
                 continue
-
+            changes.append(n[0])
+            sqln2 = "SELECT XMLTYPE.getClobVal(xml) " \
+                    "FROM ALMA.xml_obsproject_entities " \
+                    "WHERE ARCHIVE_UID = '%s'" % n[0]
+            cursor.execute(sqln2)
+            xml_content = cursor.fetchall()[0][0].read()
             puid = n[0]
             index = self.projects.query('PRJ_ARCHIVE_UID == n[0]')
             sql1 = "SELECT PRJ_ARCHIVE_UID,DELETED,PI,PRJ_NAME,ARRAY," \
@@ -136,6 +189,7 @@ class DataBase(object):
                 continue
 
             code = new_row[5]
+            self.row_sciencegoals(code)
             sched_entry = self.scheduling.query(
                 'OBSPROJECT_UID == puid')
 
@@ -155,7 +209,7 @@ class DataBase(object):
                 self.not_ready_prj = self.not_ready_prj.query('CODE != code')
 
             new_row.append(n[1])
-            xml_content = n[2].read()
+
             filename = self.obsxml + code + '.xml'
             io_file = open(filename, 'w')
             io_file.write(xml_content)
@@ -163,11 +217,21 @@ class DataBase(object):
             obspro = ObsProject(code + '.xml', path=self.obsxml)
             new_row.append(obspro)
             self.projects.ix[code] = new_row
-
+        self.projects.to_pickle(self.path + '/' +
+                                self.preferences.project_table)
+        self.not_ready_prj.to_pickle(self.path + '/' +
+                                     self.preferences.not_ready_prj_table)
+        self.scheduling.to_pickle(self.path + '/' +
+                                  self.preferences.scheduling_table)
         connection.close()
+        self.update_sbs(changes)
         return 0
 
-    def row_sciencegoals(self, code, new=False):
+    def update_sbs(self, changes):
+        if len(changes) == 0:
+            return 0
+
+    def row_sciencegoals(self, code, new=False, update=False):
         proj = self.projects.query('CODE == code').ix[0]
         obsproj = proj.obsproj
         assoc_sbs = obsproj.assoc_sched_blocks()
@@ -200,24 +264,28 @@ class DataBase(object):
                         [(code, partId, AR, LAS, bands, isSpectralScan, useACA,
                           useTP, BL, ACA, TP)],
                         columns=['CODE', 'partId', 'AR', 'LAS', 'bands',
-                                 'isSpectralScan', 'useACA', 'useTP', 'BL', 'ACA',
-                                 'TP'],
+                                 'isSpectralScan', 'useACA', 'useTP', 'BL',
+                                 'ACA', 'TP'],
                         index=[code])
                     for sb in sbs:
                         if new:
-                            self.schedblocks = pd.DataFrame(
+                            self.sg_schedblocks = pd.DataFrame(
                                 [(code, partId, AR, LAS, bands, sb)],
-                                columns=['CODE', 'partId', 'AR', 'LAS', 'bands', 'SB_UID'],
+                                columns=['CODE', 'partId', 'AR', 'LAS', 'bands',
+                                         'SB_UID'],
                                 index=[sb])
                             new = False
                         else:
-                            self.schedblocks.ix[sb] = (code, partId, AR, LAS, bands, sb)
+                            self.sg_schedblocks.ix[sb] = (
+                                code, partId, AR, LAS, bands, sb)
 
                 else:
-                    self.sciencegoals.ix[code] = (code, partId, AR, LAS, bands, isSpectralScan, useACA,
-                          useTP, BL, ACA, TP)
+                    self.sciencegoals.ix[code] = (
+                        code, partId, AR, LAS, bands, isSpectralScan, useACA,
+                        useTP, BL, ACA, TP)
                     for sb in sbs:
-                        self.schedblocks.ix[sb] = (code, partId, AR, LAS, bands, sb)
+                        self.sg_schedblocks.ix[sb] = (
+                            code, partId, AR, LAS, bands, sb)
         except AttributeError:
             print "Project %s has not ObsUnitSets" % code
             return 0
@@ -405,9 +473,13 @@ def query_archive(source=None, path='./'):
         io_file.close()
 
     projects['timestamp'] = timestamp
+    cursor.execute("SELECT ARCHIVE_UID, TIMESTAMP FROM "
+                   "ALMA.XML_SCHEDBLOCK_ENTITIES")
+    osf_xml_sb_entities = pd.DataFrame(cursor.fetchall(),
+                                       columns=['SB_UID', 'timestamp_sb_osf'])
     cursor.close()
     connection.close()
-    return projects, not_ready_projects, scheduling
+    return projects, not_ready_projects, scheduling, executive, osf_xml_sb_entities
 
 
 def get_schedblocks(uid_list, path='./'):
