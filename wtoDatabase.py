@@ -59,8 +59,8 @@ class WtoDatabase(object):
                     self.path + self.preferences.obsproject_table)
                 self.sciencegoals = pd.read_pickle(
                     self.path + self.preferences.sciencegoals_table)
-                #self.schedblocks = pd.read_pickle(
-                #    self.path + self.preferences.sbxml_table)
+                self.schedblocks = pd.read_pickle(
+                    self.path + self.preferences.sbxml_table)
                 self.update()
             except IOError, e:
                 print e
@@ -185,6 +185,15 @@ class WtoDatabase(object):
             for code in changes:
                 print "Project %s updated" % code
                 self.row_sciencegoals(code)
+                pidlist = self.sciencegoals.query(
+                    'CODE == code').partId.tolist()
+                for pid in pidlist:
+                    sblist = self.sciencegoals.ix[pid].SBS
+                    for sb in sblist:
+                        self.row_schedblocks(sb, pid)
+
+            self.schedblocks.to_pickle(
+                self.path + self.preferences.sbxml_table)
             self.sciencegoals.to_pickle(
                 self.path + self.preferences.sciencegoals_table)
             self.obsproject.to_pickle(
@@ -206,11 +215,16 @@ class WtoDatabase(object):
     def populate_schedblocks(self):
         new = True
         sbpartid = self.sciencegoals.index.tolist()
+        sizel = len(sbpartid)
+        c = 1
         for pid in sbpartid:
             sblist = self.sciencegoals.ix[pid].SBS
             for sb in sblist:
                 self.row_schedblocks(sb, pid, new=new)
                 new = False
+            print "%d/%d ScienceGoals SBs ingested" % (c, sizel)
+            c += 1
+
         self.schedblocks.to_pickle(
             self.path + self.preferences.sbxml_table)
 

@@ -301,7 +301,6 @@ class DataBase(object):
         for c in codes:
             self.row_sciencegoals(c, new=new)
             new = False
-        return 0
 
 
 class ObsProject(object):
@@ -330,9 +329,7 @@ class ObsProject(object):
 
         try:
             for sg in self.ObsProgram.ObsPlan.ObsUnitSet:
-                sched_uid_12m = []
-                sched_uid_7m = []
-                sched_uid_tp = []
+                sched_uid = []
                 sgid = sg.attrib['entityPartId']
                 for ous in sg.ObsUnitSet:
                     try:
@@ -342,13 +339,13 @@ class ObsProject(object):
                             try:
                                 for sbs in mous.SchedBlockRef:
                                     if array_requested in 'TWELVE-M':
-                                        sched_uid_12m.append(
+                                        sched_uid.append(
                                             sbs.attrib['entityId'])
                                     elif array_requested == 'SEVEN-M':
-                                        sched_uid_7m.append(
+                                        sched_uid.append(
                                             sbs.attrib['entityId'])
                                     elif array_requested == 'TP-Array':
-                                        sched_uid_tp.append(
+                                        sched_uid.append(
                                             sbs.attrib['entityId'])
                             except AttributeError:
                                 # Member OUS does not have any SB created yet.
@@ -357,7 +354,7 @@ class ObsProject(object):
                         print('Project %s has no member OUS in at least one '
                               'SG_OUS' % self.code)
                         continue
-                result[sgid] = [sched_uid_12m, sched_uid_7m, sched_uid_tp]
+                result[sgid] = sched_uid
         except AttributeError:
             print "Project %s has no Science Goal OUS" % self.code
 
