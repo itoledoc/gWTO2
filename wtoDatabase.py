@@ -29,24 +29,51 @@ class WtoDatabase(object):
         self.connection = cx_Oracle.connect(conx_string)
         self.cursor = self.connection.cursor()
         if self.new:
-                call(['rm', '-rf', self.path])
+            call(['rm', '-rf', self.path])
+            print self.path + ": creating preferences dir"
+            os.mkdir(self.path)
+            os.mkdir(self.sbxml)
+            os.mkdir(self.obsxml)
+
+    def update_obsproject(self):
+        newest = self.obsprojects.timestamp.max()
+        self.cursor.execute(
+            "SELECT ARCHIVE_UID, TIMESTAMP FROM ALMA.XML_SCHEDBLOCK_ENTITIES"
+            "WHERE TIMESTAMP > to_date('%s', 'YYYY-MM-DD HH24:MI:SS')" %
+            str(newest).split('.')[0])
+        new_data = self.cursor.fetchall()
+        if len(new_data) == 0:
+            return 0
+        else:
+            for n in new_data:
+                puid = n[0]
+                try:
+                    code = self.obsproject.query(
+                        'PRJ_ARCHIVE_UID == puid').ix[0, 'CODE']
+                except IndexError:
+                    self.cursor.execute(
+                        "SELECT CODE FROM ALMA.BMMV_OBSPROJECT "
+                        "WHERE PRJ_ARCHIVE_UID = '%s'" % puid)
+                    code = self.cursor.fetchall()
 
     def query_obsproject(self):
+        states = self.states
+        self.sql1 = str(
+            "SELECT PRJ_ARCHIVE_UID,DELETED,PI,PRJ_NAME, "
+            "CODE,PRJ_TIME_OF_CREATION,PRJ_SCIENTIFIC_RANK,PRJ_VERSION,"
+            "PRJ_ASSIGNED_PRIORITY,PRJ_LETTER_GRADE,DOMAIN_ENTITY_STATE,"
+            "OBS_PROJECT_ID,PROJECT_WAS_TIMED_OUT "
+            "FROM ALMA.BMMV_OBSPROJECT obs1, ALMA.OBS_PROJECT_STATUS obs2  "
+            "WHERE regexp_like (CODE, '^201[23].*\.[AST]') "
+            "AND (PRJ_LETTER_GRADE='A' OR PRJ_LETTER_GRADE='B' "
+            "OR PRJ_LETTER_GRADE='C') "
+            "AND obs2.OBS_PROJECT_ID = obs1.PRJ_ARCHIVE_UID")
 
-        sql1 = "SELECT PRJ_ARCHIVE_UID,DELETED,PI,PRJ_NAME, " \
-               "CODE,PRJ_TIME_OF_CREATION,PRJ_SCIENTIFIC_RANK,PRJ_VERSION," \
-               "PRJ_ASSIGNED_PRIORITY,PRJ_LETTER_GRADE,DOMAIN_ENTITY_STATE," \
-               "OBS_PROJECT_ID,PROJECT_WAS_TIMED_OUT " \
-               "FROM ALMA.BMMV_OBSPROJECT obs1, ALMA.OBS_PROJECT_STATUS obs2  "\
-               "WHERE regexp_like (CODE, '^201[23].*\.[AST]') " \
-               "AND (PRJ_LETTER_GRADE='A' OR PRJ_LETTER_GRADE='B' " \
-               "OR PRJ_LETTER_GRADE='C') " \
-               "AND obs2.OBS_PROJECT_ID = obs1.PRJ_ARCHIVE_UID"
-
-        sql2 = "SELECT PROJECTUID,ASSOCIATEDEXEC " \
-               "FROM ALMA.BMMV_OBSPROPOSAL " \
-               "WHERE (CYCLE='2012.1' OR CYCLE='2013.1' OR CYCLE='2013.A' " \
-               "OR CYCLE='2012.A')"
+        sql2 = str(
+            "SELECT PROJECTUID,ASSOCIATEDEXEC "
+            "FROM ALMA.BMMV_OBSPROPOSAL "
+            "WHERE (CYCLE='2012.1' OR CYCLE='2013.1' OR CYCLE='2013.A' "
+            "OR CYCLE='2012.A')")
 
         self.cursor.execute(sql2)
         executive = pd.DataFrame(
@@ -87,7 +114,8 @@ class WtoDatabase(object):
                     c += 1
 
                 self.obsproject = pd.merge(
-                    df2.query('DOMAIN_ENTITY_STATE not in states'), executive,
+                    df2.query('DOMAIN_ENTITY_STATE not in states'),
+                    executive,
                     on='PRJ_ARCHIVE_UID').set_index('CODE', drop=False)
             except IOError:
                 print "Source filename does not exist"
@@ -100,19 +128,26 @@ class WtoDatabase(object):
         self.obsproject['obsproj'] = pd.Series(
             np.zeros(len(self.obsproject), dtype=object),
             index=self.obsproject.index)
+        codes = self.obsproject.CODE.tolist()
+        for c in codes:
+            self.get_obsproject(c)
 
     def get_obsproject(self, code):
         self.cursor.execute(
             "SELECT TIMESTAMP, XMLTYPE.getClobVal(xml) "
             "FROM ALMA.XML_OBSPROJECT_ENTITIES "
-            "WHERE ARCHIVE_UID = '%s'" % self.obsproject.ix[code])
+            "WHERE ARCHIVE_UID = '%s'" %
+            self.obsproject.ix[code, 'PRJ_ARCHIVE_UID'])
         data = self.cursor.fetchall()[0]
         xml_content = data[1].read()
+        xmlfilename = code + '.xml'
         self.obsproject.loc[code, 'timestamp'] = data[0]
-        filename = self.obsxml + code + '.xml'
+        filename = self.obsxml + xmlfilename
         io_file = open(filename, 'w')
         io_file.write(xml_content)
         io_file.close()
+        self.obsproject.loc[code, 'obsproj'] = ObsProject(
+            xmlfilename, path=self.obsxml)
 
 
 class ObsProject(object):

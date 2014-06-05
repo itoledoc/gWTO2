@@ -341,7 +341,7 @@ class ObsProject(object):
                                 'arrayRequested']
                             try:
                                 for sbs in mous.SchedBlockRef:
-                                    if array_requested == 'TWELVE-M':
+                                    if array_requested in 'TWELVE-M':
                                         sched_uid_12m.append(
                                             sbs.attrib['entityId'])
                                     elif array_requested == 'SEVEN-M':
