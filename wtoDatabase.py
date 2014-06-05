@@ -275,11 +275,12 @@ class WtoDatabase(object):
         return 0
 
     def get_obsproject(self, code):
+        print "hola", self.obsproject.ix[code, 'PRJ_ARCHIVE_UID']
         self.cursor.execute(
             "SELECT TIMESTAMP, XMLTYPE.getClobVal(xml) "
             "FROM ALMA.XML_OBSPROJECT_ENTITIES "
-            "WHERE ARCHIVE_UID = '%s'" %
-            self.obsproject.ix[code, 'PRJ_ARCHIVE_UID'])
+            "WHERE ARCHIVE_UID = '%s'" % self.obsproject.ix[
+                code, 'PRJ_ARCHIVE_UID'])
         data = self.cursor.fetchall()[0]
         xml_content = data[1].read()
         xmlfilename = code + '.xml'
@@ -323,10 +324,10 @@ class WtoDatabase(object):
             self.obsproject[self.obsproject.CODE.str.contains('^2012')],
             toc2, on='CODE')[['CODE']]
         check_c2 = self.obsproject[
-            self.obsproject.CODE.str.contains('^2012')][['CODE']]
+            self.obsproject.CODE.str.contains('^2013')][['CODE']]
         checked = pd.concat([check_c1, check_c2])
         self.obsproject = pd.merge(
-            self.obsproject, checked, on='CODE').set_index('CODE', drop=False)
+            self.obsproject, checked, on='CODE', copy=False).set_index('CODE', drop=False)
 
 
 class ObsProject(object):
