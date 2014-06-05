@@ -72,7 +72,6 @@ class WtoDatabase(object):
             os.mkdir(self.path)
             os.mkdir(self.sbxml)
             os.mkdir(self.obsxml)
-            call(['cp', self.wto_path + 'conf/c1c2.csv', self.path + '.'])
             self.query_obsproject()
             self.populate_sciencegoals_sbxml()
             self.populate_schedblocks()
@@ -142,6 +141,9 @@ class WtoDatabase(object):
         codes = self.obsproject.CODE.tolist()
         for c in codes:
             self.get_obsproject(c)
+        print len(self.obsproject)
+        self.filter_c1()
+        print len(self.obsproject)
         self.obsproject.to_pickle(
             self.path + self.preferences.obsproject_table)
 
@@ -154,6 +156,7 @@ class WtoDatabase(object):
             str(newest).split('.')[0])
         self.cursor.execute(sql)
         new_data = self.cursor.fetchall()
+
         if len(new_data) == 0:
             return 0
         else:
@@ -193,7 +196,7 @@ class WtoDatabase(object):
                     for sb in sblist:
                         print "Updating sb %s of project %s" % (sb, code)
                         self.row_schedblocks(sb, pid)
-
+            self.filter_c1()
             self.schedblocks.to_pickle(
                 self.path + self.preferences.sbxml_table)
             self.sciencegoals.to_pickle(
@@ -208,6 +211,7 @@ class WtoDatabase(object):
         except AttributeError:
             new = True
         codes = self.obsproject.CODE.tolist()
+        print len(codes)
         for c in codes:
             self.row_sciencegoals(c, new=new)
             new = False
@@ -259,7 +263,7 @@ class WtoDatabase(object):
                         columns=['CODE', 'partId', 'AR', 'LAS', 'bands',
                                  'isSpectralScan', 'useACA', 'useTP', 'SBS'],
                         index=[partid])
-                    nes = False
+                    new = False
                 else:
                     self.sciencegoals.ix[partid] = (
                         code, partid, ar, las, bands, isspectralscan,
@@ -308,6 +312,21 @@ class WtoDatabase(object):
                  index=[sb_uid])
         else:
             self.schedblocks.ix[sb_uid] = (sb_uid, partid, data[0][0], xml)
+
+    def filter_c1(self):
+        c1c2 = pd.read_csv(
+            self.wto_path + 'conf/c1c2.csv', sep=',', header=0)
+        c1c2.columns = pd.Index([u'CODE', u'Region', u'ARC', u'C2', u'P2G'],
+                                dtype='object')
+        toc2 = c1c2[c1c2.fillna('no').C2.str.contains('^Yes')]
+        check_c1 = pd.merge(
+            self.obsproject[self.obsproject.CODE.str.contains('^2012')],
+            toc2, on='CODE')[['CODE']]
+        check_c2 = self.obsproject[
+            self.obsproject.CODE.str.contains('^2012')][['CODE']]
+        checked = pd.concat([check_c1, check_c2])
+        self.obsproject = pd.merge(
+            self.obsproject, checked, on='CODE').set_index('CODE', drop=False)
 
 
 class ObsProject(object):
