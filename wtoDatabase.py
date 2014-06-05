@@ -22,12 +22,22 @@ class WtoDatabase(object):
         self.sbxml = self.path + 'sbxml/'
         self.obsxml = self.path + 'obsxml/'
         self.preferences = pd.Series(
-            ['obsprojects.pandas', source,
+            ['obsproject.pandas', source, 'sciencegoals.pandas',
              'scheduling.pandas', 'special.list', 'pwvdata.pandas',
              'executive.pandas', 'sbxml_table.pandas'],
-            index=['obsproject_table', 'source',
+            index=['obsproject_table', 'source', 'sciencegoals_table',
                    'scheduling_table', 'special', 'pwv_data',
                    'executive_table', 'sbxml_table'])
+        self.sql1 = str(
+            "SELECT PRJ_ARCHIVE_UID,DELETED,PI,PRJ_NAME, "
+            "CODE,PRJ_TIME_OF_CREATION,PRJ_SCIENTIFIC_RANK,PRJ_VERSION,"
+            "PRJ_ASSIGNED_PRIORITY,PRJ_LETTER_GRADE,DOMAIN_ENTITY_STATE,"
+            "OBS_PROJECT_ID "
+            "FROM ALMA.BMMV_OBSPROJECT obs1, ALMA.OBS_PROJECT_STATUS obs2  "
+            "WHERE regexp_like (CODE, '^201[23].*\.[AST]') "
+            "AND (PRJ_LETTER_GRADE='A' OR PRJ_LETTER_GRADE='B' "
+            "OR PRJ_LETTER_GRADE='C') "
+            "AND obs2.OBS_PROJECT_ID = obs1.PRJ_ARCHIVE_UID")
         self.source = source
         self.new = forcenew
         self.states = ["Approved", "Phase1Submitted", "Broken", "Completed",
@@ -45,68 +55,29 @@ class WtoDatabase(object):
 
         if not self.new:
             try:
-                self.obsprojects = pd.read_pickle(
+                self.obsproject = pd.read_pickle(
                     self.path + self.preferences.obsproject_table)
-                self.update_obsproject()
-            except IOError:
+                self.sciencegoals = pd.read_pickle(
+                    self.path + self.preferences.sciencegoals_table)
+                #self.schedblocks = pd.read_pickle(
+                #    self.path + self.preferences.sbxml_table)
+                self.update()
+            except IOError, e:
+                print e
                 self.new = True
 
         if self.new:
             call(['rm', '-rf', self.path])
-            call(['cp', self.wto_path + 'conf/c1c2.csv', self.path + '.'])
             print self.path + ": creating preferences dir"
             os.mkdir(self.path)
             os.mkdir(self.sbxml)
             os.mkdir(self.obsxml)
+            call(['cp', self.wto_path + 'conf/c1c2.csv', self.path + '.'])
             self.query_obsproject()
-
-
-    def update_obsproject(self):
-        newest = self.obsprojects.timestamp.max()
-        self.cursor.execute(
-            "SELECT ARCHIVE_UID, TIMESTAMP FROM ALMA.XML_SCHEDBLOCK_ENTITIES"
-            "WHERE TIMESTAMP > to_date('%s', 'YYYY-MM-DD HH24:MI:SS')" %
-            str(newest).split('.')[0])
-        new_data = self.cursor.fetchall()
-        if len(new_data) == 0:
-            return 0
-        else:
-            for n in new_data:
-                puid = n[0]
-                try:
-                    code = self.obsproject.query(
-                        'PRJ_ARCHIVE_UID == puid').ix[0, 'CODE']
-                    self.cursor.execute(
-                        self.sql1 + " AND OBS1.CODE = %s'" % code)
-                    row = self.cursor.fetchall()[0]
-                    row.append(self.obsproject.ix[code, 'EXEC'])
-                    row.append(self.obsproject.ix[code, 'obsproj'])
-                except IndexError:
-                    self.cursor.execute(
-                        self.sql1 + " AND OBS1.PRJ_ARCHIVE_UID = %s'" % puid)
-                    row = self.cursor.fetchall()[0]
-                    self.cursor.execute(
-                        "SELECT ASSOCIATEDEXEC FROM ALMA.BMMV_OBSPROPOSAL "
-                        "WHERE PROJECTUID = '%s'" % puid)
-                    row.append(self.cursor.fetchall()[0][0])
-                    row.append(pd.Timestamp('2000-01-01'))
-                    row.append(self.obsproject.ix[0, 'obsproj'])
-                    code = row[4]
-                    self.obsproject.ix[code] = row
-                self.get_obsproject(code)
+            self.populate_sciencegoals_sbxml()
 
     def query_obsproject(self):
         states = self.states
-        self.sql1 = str(
-            "SELECT PRJ_ARCHIVE_UID,DELETED,PI,PRJ_NAME, "
-            "CODE,PRJ_TIME_OF_CREATION,PRJ_SCIENTIFIC_RANK,PRJ_VERSION,"
-            "PRJ_ASSIGNED_PRIORITY,PRJ_LETTER_GRADE,DOMAIN_ENTITY_STATE,"
-            "OBS_PROJECT_ID "
-            "FROM ALMA.BMMV_OBSPROJECT obs1, ALMA.OBS_PROJECT_STATUS obs2  "
-            "WHERE regexp_like (CODE, '^201[23].*\.[AST]') "
-            "AND (PRJ_LETTER_GRADE='A' OR PRJ_LETTER_GRADE='B' "
-            "OR PRJ_LETTER_GRADE='C') "
-            "AND obs2.OBS_PROJECT_ID = obs1.PRJ_ARCHIVE_UID")
 
         sql2 = str(
             "SELECT PROJECTUID,ASSOCIATEDEXEC "
@@ -173,6 +144,119 @@ class WtoDatabase(object):
         self.obsproject.to_pickle(
             self.path + self.preferences.obsproject_table)
 
+    def update(self):
+        newest = self.obsproject.timestamp.max()
+        changes = []
+        sql = str(
+            "SELECT ARCHIVE_UID, TIMESTAMP FROM ALMA.XML_OBSPROJECT_ENTITIES "
+            "WHERE TIMESTAMP > to_date('%s', 'YYYY-MM-DD HH24:MI:SS')" %
+            str(newest).split('.')[0])
+        self.cursor.execute(sql)
+        new_data = self.cursor.fetchall()
+        if len(new_data) == 0:
+            return 0
+        else:
+            for n in new_data:
+                puid = n[0]
+                try:
+                    code = self.obsproject.query(
+                        'PRJ_ARCHIVE_UID == puid').ix[0, 'CODE']
+                    self.cursor.execute(
+                        self.sql1 + " AND OBS1.CODE = '%s'" % code)
+                    row = list(self.cursor.fetchall()[0])
+                    row.append(self.obsproject.ix[code, 'EXEC'])
+                    row.append(self.obsproject.ix[code, 'obsproj'])
+                    changes.append(code)
+                except IndexError:
+                    self.cursor.execute(
+                        self.sql1 + " AND OBS1.PRJ_ARCHIVE_UID = '%s'" % puid)
+                    row = self.cursor.fetchall()[0]
+                    self.cursor.execute(
+                        "SELECT ASSOCIATEDEXEC FROM ALMA.BMMV_OBSPROPOSAL "
+                        "WHERE PROJECTUID = '%s'" % puid)
+
+                    row.append(self.cursor.fetchall()[0][0])
+                    row.append(pd.Timestamp('2000-01-01'))
+                    row.append(self.obsproject.ix[0, 'obsproj'])
+                    code = row[4]
+                    self.obsproject.ix[code] = row
+                    changes.append(code)
+                self.get_obsproject(code)
+            for code in changes:
+                print "Project %s updated" % code
+                self.row_sciencegoals(code)
+            self.sciencegoals.to_pickle(
+                self.path + self.preferences.sciencegoals_table)
+            self.obsproject.to_pickle(
+                self.path + self.preferences.obsproject_table)
+
+    def populate_sciencegoals_sbxml(self):
+        try:
+            type(self.sciencegoals)
+            new = False
+        except AttributeError:
+            new = True
+        codes = self.obsproject.CODE.tolist()
+        for c in codes:
+            self.row_sciencegoals(c, new=new)
+            new = False
+        self.sciencegoals.to_pickle(
+            self.path + self.preferences.sciencegoals_table)
+
+    def populate_schedblocks(self):
+        new = True
+        sbpartid = self.sciencegoals.index.tolist()
+        for pid in sbpartid:
+            sblist = self.sciencegoals.ix[pid].SBS
+            for sb in sblist:
+                self.row_schedblocks(sb, pid, new=new)
+                new = False
+        self.schedblocks.to_pickle(
+            self.path + self.preferences.sbxml_table)
+
+    def row_sciencegoals(self, code, new=False):
+        proj = self.obsproject.query('CODE == code').ix[0]
+        obsproj = proj.obsproj
+        assoc_sbs = obsproj.assoc_sched_blocks()
+        try:
+            for sg in range(len(obsproj.ObsProgram.ScienceGoal)):
+                code = code
+                sciencegoal = obsproj.ObsProgram.ScienceGoal[sg]
+                partid = sciencegoal.ObsUnitSetRef.attrib['partId']
+                ar = sciencegoal.PerformanceParameters.desiredAngularResolution.pyval
+                arunit = sciencegoal.PerformanceParameters.desiredAngularResolution.attrib['unit']
+                las = sciencegoal.PerformanceParameters.desiredLargestScale.pyval
+                lasunit = sciencegoal.PerformanceParameters.desiredLargestScale.attrib['unit']
+                bands = sciencegoal.requiredReceiverBands.pyval
+                try:
+                    ss = sciencegoal.SpectralSetupParameters.SpectralScan
+                    isspectralscan = True
+                except AttributeError:
+                    isspectralscan = False
+                useaca = sciencegoal.PerformanceParameters.useACA.pyval
+                usetp = sciencegoal.PerformanceParameters.useTP.pyval
+
+                if new:
+                    self.sciencegoals = pd.DataFrame(
+                        [(code, partid, ar, las, bands, isspectralscan,
+                          useaca, usetp, assoc_sbs[partid])],
+                        columns=['CODE', 'partId', 'AR', 'LAS', 'bands',
+                                 'isSpectralScan', 'useACA', 'useTP', 'SBS'],
+                        index=[partid])
+                    nes = False
+                else:
+                    self.sciencegoals.ix[partid] = (
+                        code, partid, ar, las, bands, isspectralscan,
+                        useaca, usetp, assoc_sbs[partid])
+
+        except AttributeError:
+            print "Project %s has not ObsUnitSets" % code
+            return 0
+        return 0
+
+    def query_schedblock(self):
+        pass
+
     def get_obsproject(self, code):
         self.cursor.execute(
             "SELECT TIMESTAMP, XMLTYPE.getClobVal(xml) "
@@ -189,6 +273,28 @@ class WtoDatabase(object):
         io_file.close()
         self.obsproject.loc[code, 'obsproj'] = ObsProject(
             xmlfilename, path=self.obsxml)
+
+    def row_schedblocks(self, sb_uid, partid, new=False):
+
+        sql = "SELECT TIMESTAMP, XMLTYPE.getClobVal(xml) " \
+              "FROM ALMA.xml_schedblock_entities " \
+              "WHERE archive_uid = '%s'" % sb_uid
+        self.cursor.execute(sql)
+        data = self.cursor.fetchall()
+        xml_content = data[0][1].read()
+        filename = sb_uid.replace(':', '_').replace('/', '_') +\
+            '.xml'
+        io_file = open(self.sbxml + filename, 'w')
+        io_file.write(xml_content)
+        io_file.close()
+        xml = SchedBlocK(filename, self.sbxml)
+        if new:
+             self.schedblocks = pd.DataFrame(
+                 [(sb_uid, partid, data[0][0], xml)],
+                 columns=['SB_UID', 'partId', 'timestamp', 'sb_xml'],
+                 index=[sb_uid])
+        else:
+            self.schedblocks.ix[sb_uid] = (sb_uid, partid, data[0][0], xml)
 
 
 class ObsProject(object):
@@ -217,9 +323,7 @@ class ObsProject(object):
 
         try:
             for sg in self.ObsProgram.ObsPlan.ObsUnitSet:
-                sched_uid_12m = []
-                sched_uid_7m = []
-                sched_uid_tp = []
+                sched_uid = []
                 sgid = sg.attrib['entityPartId']
                 for ous in sg.ObsUnitSet:
                     try:
@@ -229,13 +333,13 @@ class ObsProject(object):
                             try:
                                 for sbs in mous.SchedBlockRef:
                                     if array_requested in 'TWELVE-M':
-                                        sched_uid_12m.append(
+                                        sched_uid.append(
                                             sbs.attrib['entityId'])
                                     elif array_requested == 'SEVEN-M':
-                                        sched_uid_7m.append(
+                                        sched_uid.append(
                                             sbs.attrib['entityId'])
                                     elif array_requested == 'TP-Array':
-                                        sched_uid_tp.append(
+                                        sched_uid.append(
                                             sbs.attrib['entityId'])
                             except AttributeError:
                                 # Member OUS does not have any SB created yet.
@@ -244,11 +348,24 @@ class ObsProject(object):
                         print('Project %s has no member OUS in at least one '
                               'SG_OUS' % self.code)
                         continue
-                result[sgid] = [sched_uid_12m, sched_uid_7m, sched_uid_tp]
+                result[sgid] = sched_uid
         except AttributeError:
             print "Project %s has no Science Goal OUS" % self.code
-
         return result
 
     def import_sched_blocks(self):
         pass
+
+
+class SchedBlocK(object):
+
+    def __init__(self, xml_file, path='./'):
+        """
+
+        :param xml_file:
+        :param path:
+        """
+        io_file = open(path + xml_file)
+        tree = objectify.parse(io_file)
+        io_file.close()
+        self.data = tree.getroot()
