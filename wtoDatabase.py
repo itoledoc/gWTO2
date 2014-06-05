@@ -75,6 +75,7 @@ class WtoDatabase(object):
             call(['cp', self.wto_path + 'conf/c1c2.csv', self.path + '.'])
             self.query_obsproject()
             self.populate_sciencegoals_sbxml()
+            self.populate_schedblocks()
 
     def query_obsproject(self):
         states = self.states
@@ -190,6 +191,7 @@ class WtoDatabase(object):
                 for pid in pidlist:
                     sblist = self.sciencegoals.ix[pid].SBS
                     for sb in sblist:
+                        print "Updating sb %s of project %s" % (sb, code)
                         self.row_schedblocks(sb, pid)
 
             self.schedblocks.to_pickle(
@@ -267,9 +269,6 @@ class WtoDatabase(object):
             print "Project %s has not ObsUnitSets" % code
             return 0
         return 0
-
-    def query_schedblock(self):
-        pass
 
     def get_obsproject(self, code):
         self.cursor.execute(
