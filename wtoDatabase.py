@@ -229,7 +229,7 @@ class WtoDatabase(object):
 
         newest = self.schedblocks.timestamp.max()
         sql = str(
-            "SELECT ARCHIVE_UID, TIMESTAMP FROM ALMA.XML_OBSPROJECT_ENTITIES "
+            "SELECT ARCHIVE_UID, TIMESTAMP FROM ALMA.XML_SCHEDBLOCK_ENTITIES "
             "WHERE TIMESTAMP > to_date('%s', 'YYYY-MM-DD HH24:MI:SS')" %
             str(newest).split('.')[0])
         print newest
@@ -249,6 +249,8 @@ class WtoDatabase(object):
                 except IndexError:
                     continue
                 self.row_schedblocks(sbuid, pid)
+            self.schedblocks.to_pickle(
+                self.path + self.preferences.sbxml_table)
 
     def populate_sciencegoals_sbxml(self):
         try:
