@@ -280,6 +280,7 @@ class WtoDatabase(object):
         sb_uid_list = self.schedblocks.SB_UID.tolist()
         for s in sb_uid_list:
             self.row_schedblock_info(s, new=new)
+            new = False
         self.schedblock_info.to_pickle(
             self.path + self.preferences.sbinfo_table)
 
