@@ -74,6 +74,7 @@ class WtoDatabase(object):
                     self.path + self.preferences.sciencegoals_table)
                 self.schedblocks = pd.read_pickle(
                     self.path + self.preferences.sbxml_table)
+                self.filter_c1()
                 self.update()
             except IOError, e:
                 print e
@@ -177,35 +178,34 @@ class WtoDatabase(object):
             str(newest).split('.')[0])
         self.cursor.execute(sql)
         new_data = self.cursor.fetchall()
-        print newest
-        print new_data
-
         if len(new_data) == 0:
             return 0
         else:
             for n in new_data:
+                if n[1] <= newest:
+                    continue
                 puid = n[0]
                 try:
                     code = self.obsproject.query(
                         'PRJ_ARCHIVE_UID == puid').ix[0, 'CODE']
-                    self.cursor.execute(
-                        self.sql1 + " AND OBS1.CODE = '%s'" % code)
-                    row = list(self.cursor.fetchall()[0])
-                    row.append(self.obsproject.ix[code, 'EXEC'])
-                    row.append(self.obsproject.ix[code, 'obsproj'])
-                    changes.append(code)
+                    if code in self.checked.CODE.tolist():
+                        changes.append(code)
+                    else:
+                        continue
                 except IndexError:
                     self.cursor.execute(
                         self.sql1 + " AND OBS1.PRJ_ARCHIVE_UID = '%s'" % puid)
                     row = list(self.cursor.fetchall()[0])
+                    code = row[4]
+                    if code not in self.checked.CODE.tolist():
+                        continue
                     self.cursor.execute(
                         "SELECT ASSOCIATEDEXEC FROM ALMA.BMMV_OBSPROPOSAL "
                         "WHERE PROJECTUID = '%s'" % puid)
-
                     row.append(self.cursor.fetchall()[0][0])
-                    row.append(pd.Timestamp('2000-01-01'))
+                    row.append(n[1])
                     row.append(self.obsproject.ix[0, 'obsproj'])
-                    code = row[4]
+
                     self.obsproject.ix[code] = row
                     changes.append(code)
                 self.get_obsproject(code)
@@ -347,8 +347,10 @@ class WtoDatabase(object):
             toc2, on='CODE')[['CODE']]
         check_c2 = self.obsproject[
             self.obsproject.CODE.str.contains('^2013')][['CODE']]
-        checked = pd.concat([check_c1, check_c2])
-        temp = pd.merge(self.obsproject, checked, on='CODE', copy=False).set_index('CODE', drop=False)
+        self.checked = pd.concat([check_c1, check_c2])
+        temp = pd.merge(
+            self.obsproject, self.checked, on='CODE',
+            copy=False).set_index('CODE', drop=False)
         self.obsproject = temp
 
 class ObsProject(object):
