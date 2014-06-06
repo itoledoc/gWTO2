@@ -365,9 +365,9 @@ class WtoDatabase(object):
             './/' + prj + 'ObsUnitControl')[0].attrib['arrayRequested']
         repfreq = xml.data.SchedulingConstraints.representativeFrequency.pyval
         RA = xml.data.SchedulingConstraints.representativeCoordinates.findall(
-            val + 'longitude')[0]
+            val + 'longitude')[0].pyval
         DEC = xml.data.SchedulingConstraints.representativeCoordinates.findall(
-            val + 'latitude')[0]
+            val + 'latitude')[0].pyval
         name = xml.data.findall('.//' + prj + 'name')[0].pyval
         if new:
             self.schedblock_info = pd.DataFrame(
