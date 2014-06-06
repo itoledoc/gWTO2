@@ -11,7 +11,8 @@ from subprocess import call
 
 conx_string = 'almasu/alma4dba@ALMA_ONLINE.OSF.CL'
 conx_string_sco = 'almasu/alma4dba@ALMA_ONLINE.SCO.CL'
-
+prj = '{Alma/ObsPrep/ObsProject}'
+val = '{Alma/ValueTypes}'
 
 class WtoDatabase(object):
 
@@ -24,10 +25,10 @@ class WtoDatabase(object):
         self.preferences = pd.Series(
             ['obsproject.pandas', source, 'sciencegoals.pandas',
              'scheduling.pandas', 'special.list', 'pwvdata.pandas',
-             'executive.pandas', 'sbxml_table.pandas'],
+             'executive.pandas', 'sbxml_table.pandas', 'sbinfo.pandas'],
             index=['obsproject_table', 'source', 'sciencegoals_table',
                    'scheduling_table', 'special', 'pwv_data',
-                   'executive_table', 'sbxml_table'])
+                   'executive_table', 'sbxml_table', 'sbinfo_table'])
         self.sql1 = str(
             "SELECT PRJ_ARCHIVE_UID,DELETED,PI,PRJ_NAME, "
             "CODE,PRJ_TIME_OF_CREATION,PRJ_SCIENTIFIC_RANK,PRJ_VERSION,"
@@ -74,6 +75,8 @@ class WtoDatabase(object):
                     self.path + self.preferences.sciencegoals_table)
                 self.schedblocks = pd.read_pickle(
                     self.path + self.preferences.sbxml_table)
+                self.schedblock_info = pd.read_pickle(
+                    self.path + self.preferences.sbinfo_table)
                 self.filter_c1()
                 self.update()
             except IOError, e:
@@ -89,6 +92,7 @@ class WtoDatabase(object):
             self.query_obsproject()
             self.populate_sciencegoals_sbxml()
             self.populate_schedblocks()
+            self.populate_schedblock_info()
 
     def query_obsproject(self):
         states = self.states
@@ -219,6 +223,7 @@ class WtoDatabase(object):
                     for sb in sblist:
                         print "Updating sb %s of project %s" % (sb, code)
                         self.row_schedblocks(sb, pid)
+                        self.row_schedblock_info(sb)
             self.filter_c1()
             self.schedblocks.to_pickle(
                 self.path + self.preferences.sbxml_table)
@@ -226,6 +231,8 @@ class WtoDatabase(object):
                 self.path + self.preferences.sciencegoals_table)
             self.obsproject.to_pickle(
                 self.path + self.preferences.obsproject_table)
+            self.schedblock_info.to_pickle(
+                self.path + self.preferences.sbinfo_table)
 
         newest = self.schedblocks.timestamp.max()
         sql = str(
@@ -234,7 +241,6 @@ class WtoDatabase(object):
             str(newest).split('.')[0])
         self.cursor.execute(sql)
         new_data = self.cursor.fetchall()
-        print newest, new_data
         if len(new_data) == 0:
             return 0
         else:
@@ -249,8 +255,11 @@ class WtoDatabase(object):
                 except IndexError:
                     continue
                 self.row_schedblocks(sbuid, pid)
+                self.row_schedblock_info(sbuid)
             self.schedblocks.to_pickle(
                 self.path + self.preferences.sbxml_table)
+            self.schedblock_info.to_pickle(
+                self.path + self.preferences.sbinfo_table)
 
     def populate_sciencegoals_sbxml(self):
         try:
@@ -265,6 +274,14 @@ class WtoDatabase(object):
             new = False
         self.sciencegoals.to_pickle(
             self.path + self.preferences.sciencegoals_table)
+
+    def populate_schedblock_info(self):
+        new = True
+        sb_uid_list = self.schedblocks.SB_UID.tolist()
+        for s in sb_uid_list:
+            self.row_schedblock_info(s, new=new)
+        self.schedblock_info.to_pickle(
+            self.path + self.preferences.sbinfo_table)
 
     def populate_schedblocks(self):
         new = True
@@ -338,6 +355,27 @@ class WtoDatabase(object):
         io_file.write(xml_content)
         io_file.close()
         self.obsproject.loc[code, 'obsproj'] = xmlfilename
+
+    def row_schedblock_info(self, sb_uid, new=False):
+        sb = self.schedblocks.ix[sb_uid]
+        pid = sb.partId
+        xml = SchedBlocK(sb.sb_xml, self.sbxml)
+        array = xml.data.findall(
+            './/' + prj + 'ObsUnitControl')[0].attrib['arrayRequested']
+        repfreq = xml.data.SchedulingConstraints.representativeFrequency.pyval
+        RA = xml.data.SchedulingConstraints.representativeCoordinates.findall(
+            val + 'longitude')[0]
+        DEC = xml.data.SchedulingConstraints.representativeCoordinates.findall(
+            val + 'latitude')[0]
+        name = xml.data.findall('.//' + prj + 'name')[0].pyval
+        if new:
+            self.schedblock_info = pd.DataFrame(
+                [(sb_uid, pid, name, repfreq, array, RA, DEC)],
+                columns=['SB_UID', 'partId', 'name', 'repfreq', 'array',
+                         'RA', 'DEC'])
+        else:
+            self.schedblock_info.ix[sb_uid] = (
+                sb_uid, pid, name, repfreq, array, RA, DEC)
 
     def row_schedblocks(self, sb_uid, partid, new=False):
 
@@ -450,3 +488,16 @@ class SchedBlocK(object):
         tree = objectify.parse(io_file)
         io_file.close()
         self.data = tree.getroot()
+
+# Funtion to find outsync SBs...
+# import cx_Oracle
+# connection = cx_Oracle.connect(conx_string_sco)
+# cursor = connection.cursor()
+# cursor.execute(
+#     "SELECT ARCHIVE_UID, TIMESTAMP FROM ALMA.XML_SCHEDBLOCK_ENTITIES")
+# sco = pd.DataFrame(
+#     cursor.fetchall(), columns=[rec[0] for rec in cursor.description])
+# avoid = pd.merge(
+#     datas.schedblocks, sco, left_on='SB_UID',right_on='ARCHIVE_UID'
+# ).query('timestamp < TIMESTAMP').sort('TIMESTAMP', ascending=False
+# ).set_index('SB_UID', drop=False)
