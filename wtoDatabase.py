@@ -177,6 +177,8 @@ class WtoDatabase(object):
             str(newest).split('.')[0])
         self.cursor.execute(sql)
         new_data = self.cursor.fetchall()
+        print newest
+        print new_data
 
         if len(new_data) == 0:
             return 0
