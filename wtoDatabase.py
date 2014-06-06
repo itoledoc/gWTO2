@@ -227,6 +227,28 @@ class WtoDatabase(object):
             self.obsproject.to_pickle(
                 self.path + self.preferences.obsproject_table)
 
+        newest = self.schedblocks.timestamp.max()
+        sql = str(
+            "SELECT ARCHIVE_UID, TIMESTAMP FROM ALMA.XML_OBSPROJECT_ENTITIES "
+            "WHERE TIMESTAMP > to_date('%s', 'YYYY-MM-DD HH24:MI:SS')" %
+            str(newest).split('.')[0])
+        self.cursor.execute(sql)
+        new_data = self.cursor.fetchall()
+        if len(new_data) == 0:
+            return 0
+        else:
+            for n in new_data:
+                if n[1] <= newest:
+                    continue
+                sbuid = n[0]
+                print "Updating sb %s" % sbuid
+                try:
+                    pid = self.sciencegoals.query(
+                        'SB_UID == sbuid').ix[0, 'partId']
+                except IndexError:
+                    continue
+                self.row_schedblocks(sbuid, pid)
+
     def populate_sciencegoals_sbxml(self):
         try:
             type(self.sciencegoals)
