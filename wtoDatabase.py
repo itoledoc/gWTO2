@@ -46,10 +46,23 @@ class WtoDatabase(object):
         self.connection = cx_Oracle.connect(conx_string)
         self.cursor = self.connection.cursor()
 
-        self.sqlsched = str("SELECT * FROM SCHEDULING_AOS.OBSPROJECT "
-                            "WHERE regexp_like (CODE, '^201[23].*\.[AST]')")
-        self.cursor.execute(self.sqlsched)
-        self.scheduling = pd.DataFrame(
+        self.sqlsched_proj = str(
+            "SELECT * FROM SCHEDULING_AOS.OBSPROJECT "
+            "WHERE regexp_like (CODE, '^201[23].*\.[AST]')")
+        self.cursor.execute(self.sqlsched_proj)
+        self.scheduling_proj = pd.DataFrame(
+            self.cursor.fetchall(),
+            columns=[rec[0] for rec in self.cursor.description])
+
+        self.sqlsched_sb = str(
+            "SELECT ou.OBSUNIT_UID,sb.NAME,sb.REPR_BAND,"
+            "sb.SCHEDBLOCK_CTRL_EXEC_COUNT,sb.SCHEDBLOCK_CTRL_STATE,"
+            "sb.MIN_ANG_RESOLUTION,sb.MAX_ANG_RESOLUTION,"
+            "ou.OBSUNIT_PROJECT_UID "
+            "FROM SCHEDULING_AOS.SCHEDBLOCK sb, SCHEDULING_AOS.OBSUNIT ou "
+            "WHERE sb.SCHEDBLOCKID = ou.OBSUNITID AND sb.CSV = 0")
+        self.cursor.execute(self.sqlsched_sb)
+        self.scheduling_sb = pd.DataFrame(
             self.cursor.fetchall(),
             columns=[rec[0] for rec in self.cursor.description])
 
@@ -148,6 +161,14 @@ class WtoDatabase(object):
             self.path + self.preferences.obsproject_table)
 
     def update(self):
+        self.cursor.execute(self.sqlsched_proj)
+        self.scheduling_proj = pd.DataFrame(
+            self.cursor.fetchall(),
+            columns=[rec[0] for rec in self.cursor.description])
+        self.cursor.execute(self.sqlsched_sb)
+        self.scheduling_sb = pd.DataFrame(
+            self.cursor.fetchall(),
+            columns=[rec[0] for rec in self.cursor.description])
         newest = self.obsproject.timestamp.max()
         changes = []
         sql = str(
@@ -174,7 +195,7 @@ class WtoDatabase(object):
                 except IndexError:
                     self.cursor.execute(
                         self.sql1 + " AND OBS1.PRJ_ARCHIVE_UID = '%s'" % puid)
-                    row = self.cursor.fetchall()[0]
+                    row = list(self.cursor.fetchall()[0])
                     self.cursor.execute(
                         "SELECT ASSOCIATEDEXEC FROM ALMA.BMMV_OBSPROPOSAL "
                         "WHERE PROJECTUID = '%s'" % puid)
@@ -236,7 +257,7 @@ class WtoDatabase(object):
 
     def row_sciencegoals(self, code, new=False):
         proj = self.obsproject.query('CODE == code').ix[0]
-        obsproj = proj.obsproj
+        obsproj = ObsProject(proj.obsproj, self.obsxml)
         assoc_sbs = obsproj.assoc_sched_blocks()
         try:
             for sg in range(len(obsproj.ObsProgram.ScienceGoal)):
@@ -289,8 +310,7 @@ class WtoDatabase(object):
         io_file = open(filename, 'w')
         io_file.write(xml_content)
         io_file.close()
-        self.obsproject.loc[code, 'obsproj'] = ObsProject(
-            xmlfilename, path=self.obsxml)
+        self.obsproject.loc[code, 'obsproj'] = xmlfilename
 
     def row_schedblocks(self, sb_uid, partid, new=False):
 
@@ -305,12 +325,12 @@ class WtoDatabase(object):
         io_file = open(self.sbxml + filename, 'w')
         io_file.write(xml_content)
         io_file.close()
-        xml = SchedBlocK(filename, self.sbxml)
+        xml = filename
         if new:
-             self.schedblocks = pd.DataFrame(
-                 [(sb_uid, partid, data[0][0], xml)],
-                 columns=['SB_UID', 'partId', 'timestamp', 'sb_xml'],
-                 index=[sb_uid])
+            self.schedblocks = pd.DataFrame(
+                [(sb_uid, partid, data[0][0], xml)],
+                columns=['SB_UID', 'partId', 'timestamp', 'sb_xml'],
+                index=[sb_uid])
         else:
             self.schedblocks.ix[sb_uid] = (sb_uid, partid, data[0][0], xml)
 
@@ -326,9 +346,8 @@ class WtoDatabase(object):
         check_c2 = self.obsproject[
             self.obsproject.CODE.str.contains('^2013')][['CODE']]
         checked = pd.concat([check_c1, check_c2])
-        self.obsproject = pd.merge(
-            self.obsproject, checked, on='CODE', copy=False).set_index('CODE', drop=False)
-
+        temp = pd.merge(self.obsproject, checked, on='CODE', copy=False).set_index('CODE', drop=False)
+        self.obsproject = temp
 
 class ObsProject(object):
 
