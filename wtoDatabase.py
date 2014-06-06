@@ -298,7 +298,7 @@ class WtoDatabase(object):
         return 0
 
     def get_obsproject(self, code):
-        print "hola", self.obsproject.ix[code, 'PRJ_ARCHIVE_UID']
+        print "Downloading Project %s obsproject.xml" % code
         self.cursor.execute(
             "SELECT TIMESTAMP, XMLTYPE.getClobVal(xml) "
             "FROM ALMA.XML_OBSPROJECT_ENTITIES "
