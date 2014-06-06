@@ -495,10 +495,17 @@ class SchedBlocK(object):
 # connection = cx_Oracle.connect(conx_string_sco)
 # cursor = connection.cursor()
 # cursor.execute(
-#     "SELECT ARCHIVE_UID, TIMESTAMP FROM ALMA.XML_SCHEDBLOCK_ENTITIES")
+#    "SELECT ARCHIVE_UID, TIMESTAMP FROM ALMA.XML_SCHEDBLOCK_ENTITIES")
 # sco = pd.DataFrame(
-#     cursor.fetchall(), columns=[rec[0] for rec in cursor.description])
+#    cursor.fetchall(), columns=[rec[0] for rec in cursor.description])
 # avoid = pd.merge(
-#     datas.schedblocks, sco, left_on='SB_UID',right_on='ARCHIVE_UID'
+#    datas.schedblocks, sco, left_on='SB_UID',right_on='ARCHIVE_UID'
 # ).query('timestamp < TIMESTAMP').sort('TIMESTAMP', ascending=False
 # ).set_index('SB_UID', drop=False)
+
+# allsbinfo method
+# allsbinfo = pd.merge(datas.obsproject, pd.merge(datas.sciencegoals, datas.schedblock_info, on='partId'), on='CODE')[['CODE', 'PRJ_ARCHIVE_UID', 'name', 'SB_UID', 'bands', 'repfreq', 'array', 'EXEC', 'RA', 'DEC']]
+# allsbinfo['conf'] = pd.Series(pd.np.zeros(len(allsbinfo)), dtype='a25')
+# allsbinfo.loc[allsbinfo.array == "TWELVE-M", 'conf'] = 'C34'
+# allsbinfo.loc[allsbinfo.array != "TWELVE-M", 'conf'] = ''
+# allsbinfo.sort('CODE').to_csv('/home/aod/wto_conf/all.3.sbinfo', sep='\t', header=0, index=0)
