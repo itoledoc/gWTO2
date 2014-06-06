@@ -232,6 +232,7 @@ class WtoDatabase(object):
             "SELECT ARCHIVE_UID, TIMESTAMP FROM ALMA.XML_OBSPROJECT_ENTITIES "
             "WHERE TIMESTAMP > to_date('%s', 'YYYY-MM-DD HH24:MI:SS')" %
             str(newest).split('.')[0])
+        print newest
         self.cursor.execute(sql)
         new_data = self.cursor.fetchall()
         if len(new_data) == 0:
