@@ -67,7 +67,7 @@ class WtoDatabase(object):
         self.scheduling_sb = pd.DataFrame(
             self.cursor.fetchall(),
             columns=[rec[0] for rec in self.cursor.description]
-        ).set_index('OBSUNIT_PROJECT_ID', drop=False)
+        ).set_index('OBSUNIT_PROJECT_UID', drop=False)
 
         if not self.new:
             try:
@@ -172,7 +172,7 @@ class WtoDatabase(object):
         self.scheduling_proj = pd.DataFrame(
             self.cursor.fetchall(),
             columns=[rec[0] for rec in self.cursor.description]
-        ).set_index('OBSUNIT_PROJECT_ID', drop=False)
+        ).set_index('OBSUNIT_PROJECT_UID', drop=False)
         self.cursor.execute(self.sqlsched_sb)
         self.scheduling_sb = pd.DataFrame(
             self.cursor.fetchall(),
