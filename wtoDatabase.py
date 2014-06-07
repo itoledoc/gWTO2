@@ -53,7 +53,8 @@ class WtoDatabase(object):
         self.cursor.execute(self.sqlsched_proj)
         self.scheduling_proj = pd.DataFrame(
             self.cursor.fetchall(),
-            columns=[rec[0] for rec in self.cursor.description])
+            columns=[rec[0] for rec in self.cursor.description]
+        ).set_index('CODE', drop=False)
 
         self.sqlsched_sb = str(
             "SELECT ou.OBSUNIT_UID,sb.NAME,sb.REPR_BAND,"
@@ -65,7 +66,8 @@ class WtoDatabase(object):
         self.cursor.execute(self.sqlsched_sb)
         self.scheduling_sb = pd.DataFrame(
             self.cursor.fetchall(),
-            columns=[rec[0] for rec in self.cursor.description])
+            columns=[rec[0] for rec in self.cursor.description]
+        ).set_index('OBSUNIT_PROJECT_ID', drop=False)
 
         if not self.new:
             try:
@@ -169,11 +171,13 @@ class WtoDatabase(object):
         self.cursor.execute(self.sqlsched_proj)
         self.scheduling_proj = pd.DataFrame(
             self.cursor.fetchall(),
-            columns=[rec[0] for rec in self.cursor.description])
+            columns=[rec[0] for rec in self.cursor.description]
+        ).set_index('OBSUNIT_PROJECT_ID', drop=False)
         self.cursor.execute(self.sqlsched_sb)
         self.scheduling_sb = pd.DataFrame(
             self.cursor.fetchall(),
-            columns=[rec[0] for rec in self.cursor.description])
+            columns=[rec[0] for rec in self.cursor.description]
+        ).set_index('CODE', drop=False)
         newest = self.obsproject.timestamp.max()
         changes = []
         sql = str(
