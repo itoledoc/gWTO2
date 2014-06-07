@@ -67,7 +67,7 @@ class WtoDatabase(object):
         self.scheduling_sb = pd.DataFrame(
             self.cursor.fetchall(),
             columns=[rec[0] for rec in self.cursor.description]
-        ).set_index('OBSUNIT_PROJECT_UID', drop=False)
+        ).set_index('OBSUNIT_UID', drop=False)
 
         if not self.new:
             try:
@@ -177,7 +177,7 @@ class WtoDatabase(object):
         self.scheduling_sb = pd.DataFrame(
             self.cursor.fetchall(),
             columns=[rec[0] for rec in self.cursor.description]
-        ).set_index('OBSUNIT_PROJECT_UID', drop=False)
+        ).set_index('OBSUNIT_UID', drop=False)
         newest = self.obsproject.timestamp.max()
         changes = []
         sql = str(
