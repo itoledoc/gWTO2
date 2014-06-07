@@ -201,15 +201,12 @@ class WtoDatabase(object):
                         self.sql1 + " AND OBS1.PRJ_ARCHIVE_UID = '%s'" % puid)
                     row = list(self.cursor.fetchall()[0])
                     code = row[4]
-                    if code not in self.checked.CODE.tolist():
-                        continue
                     self.cursor.execute(
                         "SELECT ASSOCIATEDEXEC FROM ALMA.BMMV_OBSPROPOSAL "
                         "WHERE PROJECTUID = '%s'" % puid)
                     row.append(self.cursor.fetchall()[0][0])
                     row.append(n[1])
                     row.append(self.obsproject.ix[0, 'obsproj'])
-
                     self.obsproject.ix[code] = row
                     changes.append(code)
                 self.get_obsproject(code)
@@ -248,12 +245,12 @@ class WtoDatabase(object):
                 if n[1] <= newest:
                     continue
                 sbuid = n[0]
-                print "Updating sb %s" % sbuid
                 try:
-                    pid = self.sciencegoals.query(
+                    pid = self.schedblocks.query(
                         'SB_UID == sbuid').ix[0, 'partId']
                 except IndexError:
                     continue
+                print "Updating SB %s" % sbuid
                 self.row_schedblocks(sbuid, pid)
                 self.row_schedblock_info(sbuid)
             self.schedblocks.to_pickle(
@@ -495,11 +492,11 @@ class SchedBlocK(object):
 # connection = cx_Oracle.connect(conx_string_sco)
 # cursor = connection.cursor()
 # cursor.execute(
-#    "SELECT ARCHIVE_UID, TIMESTAMP FROM ALMA.XML_SCHEDBLOCK_ENTITIES")
+#     "SELECT ARCHIVE_UID, TIMESTAMP FROM ALMA.XML_SCHEDBLOCK_ENTITIES")
 # sco = pd.DataFrame(
-#    cursor.fetchall(), columns=[rec[0] for rec in cursor.description])
+#     cursor.fetchall(), columns=[rec[0] for rec in cursor.description])
 # avoid = pd.merge(
-#    datas.schedblocks, sco, left_on='SB_UID',right_on='ARCHIVE_UID'
+#     datas.schedblocks, sco, left_on='SB_UID',right_on='ARCHIVE_UID'
 # ).query('timestamp < TIMESTAMP').sort('TIMESTAMP', ascending=False
 # ).set_index('SB_UID', drop=False)
 
@@ -509,3 +506,4 @@ class SchedBlocK(object):
 # allsbinfo.loc[allsbinfo.array == "TWELVE-M", 'conf'] = 'C34'
 # allsbinfo.loc[allsbinfo.array != "TWELVE-M", 'conf'] = ''
 # allsbinfo.sort('CODE').to_csv('/home/aod/wto_conf/all.3.sbinfo', sep='\t', header=0, index=0)
+
