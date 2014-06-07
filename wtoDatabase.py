@@ -172,12 +172,12 @@ class WtoDatabase(object):
         self.scheduling_proj = pd.DataFrame(
             self.cursor.fetchall(),
             columns=[rec[0] for rec in self.cursor.description]
-        ).set_index('OBSUNIT_PROJECT_UID', drop=False)
+        ).set_index('CODE', drop=False)
         self.cursor.execute(self.sqlsched_sb)
         self.scheduling_sb = pd.DataFrame(
             self.cursor.fetchall(),
             columns=[rec[0] for rec in self.cursor.description]
-        ).set_index('CODE', drop=False)
+        ).set_index('OBSUNIT_PROJECT_UID', drop=False)
         newest = self.obsproject.timestamp.max()
         changes = []
         sql = str(
