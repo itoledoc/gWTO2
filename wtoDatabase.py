@@ -374,7 +374,7 @@ class WtoDatabase(object):
             self.schedblock_info = pd.DataFrame(
                 [(sb_uid, pid, name, repfreq, array, RA, DEC)],
                 columns=['SB_UID', 'partId', 'name', 'repfreq', 'array',
-                         'RA', 'DEC'])
+                         'RA', 'DEC'], index=[sb_uid])
         else:
             self.schedblock_info.ix[sb_uid] = (
                 sb_uid, pid, name, repfreq, array, RA, DEC)
