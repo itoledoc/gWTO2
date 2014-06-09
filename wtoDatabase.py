@@ -201,9 +201,14 @@ class WtoDatabase(object):
                     else:
                         continue
                 except IndexError:
-                    self.cursor.execute(
-                        self.sql1 + " AND OBS1.PRJ_ARCHIVE_UID = '%s'" % puid)
-                    row = list(self.cursor.fetchall()[0])
+                    try:
+                        self.cursor.execute(
+                            self.sql1 + " AND OBS1.PRJ_ARCHIVE_UID = '%s'" %
+                            puid)
+                        row = list(self.cursor.fetchall()[0])
+                    except IndexError:
+                        print "%s must be a CSV project. Not ingesting"
+                        continue
                     code = row[4]
                     self.cursor.execute(
                         "SELECT ASSOCIATEDEXEC FROM ALMA.BMMV_OBSPROPOSAL "
