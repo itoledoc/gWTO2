@@ -207,7 +207,7 @@ class WtoDatabase(object):
                             puid)
                         row = list(self.cursor.fetchall()[0])
                     except IndexError:
-                        print "%s must be a CSV project. Not ingesting"
+                        print "%s must be a CSV project. Not ingesting" % puid
                         continue
                     code = row[4]
                     self.cursor.execute(
