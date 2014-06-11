@@ -14,6 +14,7 @@ conx_string_sco = 'almasu/alma4dba@ALMA_ONLINE.SCO.CL'
 prj = '{Alma/ObsPrep/ObsProject}'
 val = '{Alma/ValueTypes}'
 
+
 class WtoDatabase(object):
 
     def __init__(self, default='/.wto/', source=None, forcenew=False):
@@ -375,14 +376,15 @@ class WtoDatabase(object):
         DEC = xml.data.SchedulingConstraints.representativeCoordinates.findall(
             val + 'latitude')[0].pyval
         name = xml.data.findall('.//' + prj + 'name')[0].pyval
+        status = xml.data.attrib['status']
         if new:
             self.schedblock_info = pd.DataFrame(
-                [(sb_uid, pid, name, repfreq, array, RA, DEC)],
-                columns=['SB_UID', 'partId', 'name', 'repfreq', 'array',
-                         'RA', 'DEC'], index=[sb_uid])
+                [(sb_uid, pid, name, status, repfreq, array, RA, DEC)],
+                columns=['SB_UID', 'partId', 'name', 'status_xml',
+                         'repfreq', 'array', 'RA', 'DEC'], index=[sb_uid])
         else:
             self.schedblock_info.ix[sb_uid] = (
-                sb_uid, pid, name, repfreq, array, RA, DEC)
+                sb_uid, pid, name, status, repfreq, array, RA, DEC)
 
     def row_schedblocks(self, sb_uid, partid, new=False):
 

@@ -1,161 +1,161 @@
-3,Region,Supporting ARC(node),Transfered to C2,P2G
-2012.1.00143.S,cancelled,cancelled,cancelled,cancelled
-2012.1.00144.S,cancelled,cancelled,cancelled,cancelled
-2012.1.00119.S,CL,NA,Yes,Mark R.
-2012.1.00133.S,CL,NA,,
-2012.1.00334.S,CL,NA,Yes,Richard S.
-2012.1.00382.S,CL,NA,Yes,Gerald S.
-2012.1.00394.S,CL,NA,Yes,Mark R.
-2012.1.00402.S,CL,EU,Yes,Andy
-2012.1.00437.S,CL,NA,Yes,Harvey
-2012.1.00463.S,CL,EU,Yes,Eelco
-2012.1.00474.S,CL,NA,Yes,Gerald S.
-2012.1.00482.S,CL,NA,Yes,Richard S.
-2012.1.00538.S,CL,NA,Yes,Richard S.
-2012.1.00542.S,CL,EA,Yes,Eiji A.
-2012.1.00550.S,CL,Nordic,Yes,Evanthia
-2012.1.00683.S,CL,EA,,
-2012.1.00707.S,CL,EU (Leiden),Yes,Liz
-2012.1.00743.S,CL,NA,,
-2012.1.00769.S,CL,NA,,
-2012.1.00781.S,CL,NA,Yes,Gerald S.
-2012.1.00857.S,CL,EU,Yes,Suzanna
-2012.1.00962.S,CL,German,Yes,Eelco
-2012.1.00983.S,CL,Bologna,Yes,Evanthia
-2012.1.00013.S,EA,EA,Yes,Yu-Nung
-2012.1.00033.S,EA,EA,Yes,Eiji A.
-2012.1.00034.S,EA,EA,Yes,Hiroshi
-2012.1.00080.S,EA,EA,Yes,Eiji A.
-2012.1.00088.S,EA,EA,Yes,Hiroshi
-2012.1.00122.S,EA,EA,Yes,Yu-Nung
-2012.1.00139.S,EA,EA,Yes,James
-2012.1.00146.S,EA,EA,Yes,Cinthya
-2012.1.00165.S,EA,EA,Yes,Hiroshi
-2012.1.00187.S,EA,EA,Yes,Hiroshi
-2012.1.00225.S,EA,EA,Yes,Yiping
-2012.1.00239.S,EA,EA,Yes,Yiping
-2012.1.00242.S,EA,,,
-2012.1.00245.S,EA,EA,Yes,Hiroshi
-2012.1.00285.S,EA,,,
-2012.1.00304.S,EA,EA,Yes,Yu-Nung
-2012.1.00317.S,EA,,Yes,Alfonso
-2012.1.00374.S,EA,EA,Yes,Hiroshi
-2012.1.00377.S,EA,,,
-2012.1.00584.T,EA,EA,Yes,Cinthya
-2012.1.00602.S,EA,EA,Yes,Yiping
-2012.1.00603.S,EA,EA,Yes,Cinthya
-2012.1.00621.S,EA,,,
-2012.1.00623.S,EA,,,
-2012.1.00631.S,EA,,,
-2012.1.00641.S,EA,,,
-2012.1.00647.S,EA,,Yes,Eiji A.
-2012.1.00657.S,EA,EA,Yes,Eiji A.
-2012.1.00729.S,EA,EA,Yes,Hiroshi
-2012.1.00756.S,EA,EA,Yes,Hiroshi
-2012.1.00761.S,EA,EA,Yes,Eiji A.
-2012.1.00762.S,EA,EA,Yes,Cinthya
-2012.1.00786.S,EA,EA,Yes,James
-2012.1.00789.S,EA,,,
-2012.1.00799.S,EA,EA,Yes,Cinthya
-2012.1.00940.S,EA,EA,,Eiji A.
-2012.1.00945.S,EA,EA,Yes,Yiping
-2012.1.00979.S,EA,,,
-2012.1.01000.S,EA,,,
-2012.1.01004.S,EA,,,
-2012.1.01020.S,EA,EA,Yes,James
-2012.1.01057.S,EA,,Yes,Alfonso
-2012.1.01123.S,EA,,,
-2012.1.00037.S,EU,EU,Yes,Suzanna
-2012.1.00064.S,EU,EU,Yes,Suzanna
-2012.1.00097.S,EU,Nordic,Yes,Liz
-2012.1.00142.S,EU,ESO,Yes,Andy
-2012.1.00158.S,EU,Dutch,Yes,Eelco
-2012.1.00173.S,EU,UK,Yes,Andy
-2012.1.00175.S,EU,EU,change request pending,Evanthia
-2012.1.00237.S,EU,IRAM,Yes,Eelco
-2012.1.00303.S,EU,IRAM,Yes,Evanthia
-2012.1.00306.S,EU,IRAM,Yes,Andy
-2012.1.00307.S,EU,EU=>NA,,(NA ARC)
-2012.1.00324.S,EU,Nordic,Yes,Evanthia
-2012.1.00327.S,EU,IRAM,Yes,Evanthia
-2012.1.00352.S,EU,EU,Yes,Suzanna
-2012.1.00366.S,EU,Italian,Yes,Liz
-2012.1.00385.S,EU,UK,Yes,Eelco
-2012.1.00411.S,EU,cancelled,cancelled,cancelled
-2012.1.00435.S,EU,Dutch,Yes,Andy
-2012.1.00441.S,EU,ESO,Yes,Liz
-2012.1.00453.S,EU,IRAM,Yes,Eelco
-2012.1.00469.S,EU,IRAM,Yes,Evanthia
-2012.1.00479.S,EU,German,Yes,Evanthia
-2012.1.00524.S,EU,Nordic,Yes,Liz
-2012.1.00543.S,EU,IRAM,Yes,Andy
-2012.1.00624.S,EU,EU,Yes,Suzanna
-2012.1.00650.S,EU,IRAM,Yes,Andy
-2012.1.00712.S,EU,Nordic,Yes,Eelco
-2012.1.00775.S,EU,IRAM,Yes,Eelco
-2012.1.00784.S,EU,UK,Yes,Evanthia
-2012.1.00812.S,EU,EU->EA,Yes,Yiping
-2012.1.00826.S,EU,EU,Yes,Suzanna
-2012.1.00844.S,EU,IRAM,Yes,Andy
-2012.1.00882.S,EU,IRAM,Yes,Andy
-2012.1.00885.S,EU,IRAM,Yes,Andy
-2012.1.00900.S,EU,Nordic,Yes,Andy
-2012.1.00978.S,EU,German,Yes,Andy
-2012.1.00994.S,EU,Bologna,Yes,Andy
-2012.1.00997.S,EU,EU,Yes,Suzanna
-2012.1.01011.S,EU,IRAM,Yes,Liz
-2012.1.01029.S,EU,UK,Yes,Andy
-2012.A.00041.S,EU,EU,Yes,Eelco
+Project code,Region,Supporting ARC(node),Transfered to C2,P2G
 2012.1.00001.S,NA,NA,Yes,Andreas
 2012.1.00008.S,NA,NA,Yes,Gerald 
+2012.1.00013.S,EA,EA,Yes,Yu-Nung
+2012.1.00021.S,XX,EU,Yes,Mark R.
+2012.1.00033.S,EA,EA,Yes,Eiji A.
+2012.1.00034.S,EA,EA,Yes,Hiroshi
+2012.1.00037.S,EU,EU,Yes,Suzanna
 2012.1.00046.S,NA,EA,Yes,Yu-Nung
+2012.1.00064.S,EU,EU,Yes,Suzanna
 2012.1.00075.S,NA,NA,,
 2012.1.00077.S,NA,NA,Yes,Harvey
+2012.1.00080.S,EA,EA,Yes,Eiji A.
+2012.1.00088.S,EA,EA,Yes,Hiroshi
+2012.1.00097.S,EU,Nordic,Yes,Liz
 2012.1.00105.S,NA,NA,Yes,Mark R.
 2012.1.00108.S,NA,NA,Yes,Richard S.
 2012.1.00116.S,NA,NA,Yes,Harvey
+2012.1.00119.S,CL,NA,Yes,Mark R.
+2012.1.00122.S,EA,EA,Yes,Yu-Nung
 2012.1.00123.S,NA,NA,Yes,Harvey
+2012.1.00133.S,CL,NA,,
+2012.1.00139.S,EA,EA,Yes,James
+2012.1.00142.S,EU,ESO,Yes,Andy
+2012.1.00143.S,cancelled,cancelled,cancelled,cancelled
+2012.1.00144.S,cancelled,cancelled,cancelled,cancelled
+2012.1.00146.S,EA,EA,Yes,Cinthya
+2012.1.00158.S,EU,Dutch,Yes,Eelco
+2012.1.00165.S,EA,EA,Yes,Hiroshi
+2012.1.00173.S,EU,UK,Yes,Andy
+2012.1.00175.S,EU,EU,change request pending,Evanthia
 2012.1.00178.S,NA,NA,Yes,Harvey
 2012.1.00182.S,NA,NA,Yes,Gerald S
 2012.1.00185.S,NA,NA,Yes,Richard S.
+2012.1.00187.S,EA,EA,Yes,Hiroshi
 2012.1.00193.S,NA,NA,Yes,Mark R.
 2012.1.00196.S,NA,NA,Yes,Gerald S.
 2012.1.00198.S,NA,NA,Yes,Gerald S.
 2012.1.00208.S,NA,NA,Yes,Gerald S.
 2012.1.00219.S,NA,NA,Yes,Richard S.
+2012.1.00225.S,EA,EA,Yes,Yiping
+2012.1.00237.S,EU,IRAM,Yes,Eelco
+2012.1.00239.S,EA,EA,Yes,Yiping
 2012.1.00240.S,NA,NA,Yes,Harvey
+2012.1.00242.S,EA,,,
+2012.1.00245.S,EA,EA,Yes,Hiroshi
+2012.1.00285.S,EA,,,
+2012.1.00303.S,EU,IRAM,Yes,Evanthia
+2012.1.00304.S,EA,EA,Yes,Yu-Nung
+2012.1.00306.S,EU,IRAM,Yes,Andy
+2012.1.00307.S,EU,EU=>NA,,(NA ARC)
+2012.1.00317.S,EA,EA,Yes,Alfonso
 2012.1.00320.S,NA,EA,Yes,Yu-Nung
 2012.1.00321.S,NA,EA,Yes,Alfonso
+2012.1.00324.S,EU,Nordic,Yes,Evanthia
+2012.1.00327.S,EU,IRAM,Yes,Evanthia
 2012.1.00332.S,NA,EA,Yes,Alfonso
+2012.1.00334.S,CL,NA,Yes,Richard S.
 2012.1.00336.S,NA,NA,Yes,Richard S.
 2012.1.00346.S,NA,NA,Yes,Gerald S.
+2012.1.00352.S,EU,EU,Yes,Suzanna
+2012.1.00366.S,EU,Italian,Yes,Liz
 2012.1.00368.S,NA,NA,Yes,Mark R.
+2012.1.00374.S,EA,EA,Yes,Hiroshi
+2012.1.00377.S,EA,EA,Yes,Yu-Nung
+2012.1.00382.S,CL,NA,Yes,Gerald S.
+2012.1.00385.S,EU,UK,Yes,Eelco
+2012.1.00394.S,CL,NA,Yes,Mark R.
 2012.1.00395.S,NA,NA,Yes,Mark R.
 2012.1.00400.S,NA,NA,Yes,Richard S.
+2012.1.00402.S,CL,EU,Yes,Andy
+2012.1.00411.S,EU,cancelled,cancelled,cancelled
 2012.1.00413.S,NA,NA,Yes,Richard S.
 2012.1.00422.S,NA,NA,Yes,Mark R.
 2012.1.00426.S,NA,NA,Yes,Richard S.
+2012.1.00435.S,EU,Dutch,Yes,Andy
+2012.1.00437.S,CL,NA,Yes,Harvey
+2012.1.00441.S,EU,ESO,Yes,Liz
+2012.1.00453.S,EU,IRAM,Yes,Eelco
+2012.1.00463.S,CL,EU,Yes,Eelco
+2012.1.00469.S,EU,IRAM,Yes,Evanthia
+2012.1.00474.S,CL,NA,Yes,Gerald S.
+2012.1.00479.S,EU,German,Yes,Evanthia
+2012.1.00482.S,CL,NA,Yes,Richard S.
 2012.1.00496.S,NA,NA,Yes (tunings fixed),Mark R.
 2012.1.00498.S,NA,NA,Yes  ,Gerald S.
 2012.1.00501.S,NA,NA,Yes,Richard S.
 2012.1.00522.S,NA,NA,Yes,Richard S.
+2012.1.00524.S,EU,Nordic,Yes,Liz
+2012.1.00538.S,CL,NA,Yes,Richard S.
 2012.1.00539.S,NA,NA,Yes,Gerald S.
+2012.1.00542.S,CL,EA,Yes,Eiji A.
+2012.1.00543.S,EU,IRAM,Yes,Andy
+2012.1.00550.S,CL,Nordic,Yes,Evanthia
+2012.1.00584.T,EA,EA,Yes,Cinthya
 2012.1.00596.S,NA,NA,Yes,Harvey
+2012.1.00602.S,EA,EA,Yes,Yiping
+2012.1.00603.S,EA,EA,Yes,Cinthya
 2012.1.00604.S,NA,NA,Yes,Richard S.
 2012.1.00610.S,NA,NA,Yes,Gerald S.
 2012.1.00611.S,NA,NA,Yes,Gerald S.
+2012.1.00621.S,EA,,,
+2012.1.00623.S,EA,,,
+2012.1.00624.S,EU,EU,Yes,Suzanna
 2012.1.00628.T,NA,NA,Yes,Mark R.
+2012.1.00631.S,EA,,,
 2012.1.00635.S,NA,NA,,
+2012.1.00641.S,EA,,,
+2012.1.00647.S,EA,,Yes,Eiji A.
+2012.1.00650.S,EU,IRAM,Yes,Andy
+2012.1.00657.S,EA,EA,Yes,Eiji A.
 2012.1.00671.S,NA,NA,Yes,Mark R.
 2012.1.00678.S,NA,NA,Yes,Harvey
+2012.1.00683.S,CL,EA,,
+2012.1.00707.S,CL,EU (Leiden),Yes,Liz
+2012.1.00712.S,EU,Nordic,Yes,Eelco
 2012.1.00725.S,NA,NA,Yes,Gerald S.
+2012.1.00729.S,EA,EA,Yes,Hiroshi
+2012.1.00743.S,CL,NA,,
+2012.1.00756.S,EA,EA,Yes,Hiroshi
+2012.1.00761.S,EA,EA,Yes,Eiji A.
+2012.1.00762.S,EA,EA,Yes,Cinthya
+2012.1.00769.S,CL,NA,,
+2012.1.00775.S,EU,IRAM,Yes,Eelco
+2012.1.00781.S,CL,NA,Yes,Gerald S.
+2012.1.00784.S,EU,UK,Yes,Evanthia
+2012.1.00786.S,EA,EA,Yes,James
+2012.1.00789.S,EA,,,
+2012.1.00799.S,EA,EA,Yes,Cinthya
+2012.1.00812.S,EU,EU->EA,Yes,Yiping
+2012.1.00826.S,EU,EU,Yes,Suzanna
 2012.1.00837.S,NA,NA,Yes,Gerald S.
+2012.1.00844.S,EU,IRAM,Yes,Andy
 2012.1.00853.S,NA,NA,,
+2012.1.00857.S,CL,EU,Yes,Suzanna
 2012.1.00870.S,NA,NA,,
+2012.1.00882.S,EU,IRAM,Yes,Andy
+2012.1.00885.S,EU,IRAM,Yes,Andy
+2012.1.00900.S,EU,Nordic,Yes,Andy
+2012.1.00940.S,EA,EA,,Eiji A.
+2012.1.00945.S,EA,EA,Yes,Yiping
+2012.1.00962.S,CL,German,Yes,Eelco
+2012.1.00973.S,XX,EA,,
+2012.1.00978.S,EU,German,Yes,Andy
+2012.1.00979.S,EA,,,
+2012.1.00983.S,CL,Bologna,Yes,Evanthia
 2012.1.00984.S,NA,NA,Yes,Mark R.
 2012.1.00993.S,NA,NA,Yes,Harvey
+2012.1.00994.S,EU,Bologna,Yes,Andy
+2012.1.00997.S,EU,EU,Yes,Suzanna
+2012.1.01000.S,EA,,,
+2012.1.01004.S,EA,,,
+2012.1.01011.S,EU,IRAM,Yes,Liz
+2012.1.01020.S,EA,EA,Yes,James
 2012.1.01022.S,NA,NA,Yes,Harvey
+2012.1.01029.S,EU,UK,Yes,Andy
+2012.1.01057.S,EA,,Yes,Alfonso
 2012.1.01069.S,NA,NA,Yes,Gerald S.
 2012.1.01099.S,NA,NA,,
-2012.1.00021.S,XX,EU,Yes,Mark R.
-2012.1.00973.S,XX,EA,,
+2012.1.01123.S,EA,,,
+2012.A.00041.S,EU,EU,Yes,Eelco
