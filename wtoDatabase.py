@@ -8,6 +8,7 @@ import cx_Oracle
 import os
 from lxml import objectify
 from subprocess import call
+import arrayResolution2p as ares
 
 conx_string = 'almasu/alma4dba@ALMA_ONLINE.OSF.CL'
 conx_string_sco = 'almasu/alma4dba@ALMA_ONLINE.SCO.CL'
@@ -191,7 +192,9 @@ class WtoDatabase(object):
             return 0
         else:
             for n in new_data:
+                print "Changes? %s, %s" % (n[0], n[1])
                 if n[1] <= newest:
+                    print "\t Not Changes to apply (1)"
                     continue
                 puid = n[0]
                 try:
@@ -200,6 +203,7 @@ class WtoDatabase(object):
                     if code in self.checked.CODE.tolist():
                         changes.append(code)
                     else:
+                        print "\t Not Changes to apply (2)"
                         continue
                 except IndexError:
                     try:
@@ -208,7 +212,7 @@ class WtoDatabase(object):
                             puid)
                         row = list(self.cursor.fetchall()[0])
                     except IndexError:
-                        print "%s must be a CSV project. Not ingesting" % puid
+                        print "\t %s must be a CSV project. Not ingesting" % puid
                         continue
                     code = row[4]
                     self.cursor.execute(
@@ -219,9 +223,10 @@ class WtoDatabase(object):
                     row.append(self.obsproject.ix[0, 'obsproj'])
                     self.obsproject.ix[code] = row
                     changes.append(code)
-                self.get_obsproject(code)
+
             for code in changes:
-                print "Project %s updated" % code
+                print "\t Project %s updated" % code
+                self.get_obsproject(code)
                 self.row_sciencegoals(code)
                 pidlist = self.sciencegoals.query(
                     'CODE == code').partId.tolist()
@@ -317,9 +322,9 @@ class WtoDatabase(object):
                 sciencegoal = obsproj.ObsProgram.ScienceGoal[sg]
                 partid = sciencegoal.ObsUnitSetRef.attrib['partId']
                 ar = sciencegoal.PerformanceParameters.desiredAngularResolution.pyval
-                arunit = sciencegoal.PerformanceParameters.desiredAngularResolution.attrib['unit']
+                # arunit = sciencegoal.PerformanceParameters.desiredAngularResolution.attrib['unit']
                 las = sciencegoal.PerformanceParameters.desiredLargestScale.pyval
-                lasunit = sciencegoal.PerformanceParameters.desiredLargestScale.attrib['unit']
+                # lasunit = sciencegoal.PerformanceParameters.desiredLargestScale.attrib['unit']
                 bands = sciencegoal.requiredReceiverBands.pyval
                 try:
                     ss = sciencegoal.SpectralSetupParameters.SpectralScan
@@ -424,6 +429,7 @@ class WtoDatabase(object):
             self.obsproject, self.checked, on='CODE',
             copy=False).set_index('CODE', drop=False)
         self.obsproject = temp
+
 
 class ObsProject(object):
 
