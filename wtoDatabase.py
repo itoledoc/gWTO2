@@ -8,7 +8,7 @@ import cx_Oracle
 import os
 from lxml import objectify
 from subprocess import call
-import arrayResolution2p as ares
+import arrayResolution2p as ARes
 
 conx_string = 'almasu/alma4dba@ALMA_ONLINE.OSF.CL'
 conx_string_sco = 'almasu/alma4dba@ALMA_ONLINE.SCO.CL'
@@ -27,10 +27,12 @@ class WtoDatabase(object):
         self.preferences = pd.Series(
             ['obsproject.pandas', source, 'sciencegoals.pandas',
              'scheduling.pandas', 'special.list', 'pwvdata.pandas',
-             'executive.pandas', 'sbxml_table.pandas', 'sbinfo.pandas'],
+             'executive.pandas', 'sbxml_table.pandas', 'sbinfo.pandas',
+             'newar.pandas'],
             index=['obsproject_table', 'source', 'sciencegoals_table',
                    'scheduling_table', 'special', 'pwv_data',
-                   'executive_table', 'sbxml_table', 'sbinfo_table'])
+                   'executive_table', 'sbxml_table', 'sbinfo_table',
+                   'newar_table'])
         self.sql1 = str(
             "SELECT PRJ_ARCHIVE_UID,DELETED,PI,PRJ_NAME, "
             "CODE,PRJ_TIME_OF_CREATION,PRJ_SCIENTIFIC_RANK,PRJ_VERSION,"
@@ -81,6 +83,8 @@ class WtoDatabase(object):
                     self.path + self.preferences.sbxml_table)
                 self.schedblock_info = pd.read_pickle(
                     self.path + self.preferences.sbinfo_table)
+                self.newar = pd.read_pickle(
+                    self.path + self.preferences.newar_table)
                 self.filter_c1()
                 self.update()
             except IOError, e:
@@ -93,12 +97,13 @@ class WtoDatabase(object):
             os.mkdir(self.path)
             os.mkdir(self.sbxml)
             os.mkdir(self.obsxml)
-            self.query_obsproject()
+            self.start_wto()
             self.populate_sciencegoals_sbxml()
             self.populate_schedblocks()
             self.populate_schedblock_info()
+            self.populate_newar()
 
-    def query_obsproject(self):
+    def start_wto(self):
         states = self.states
 
         sql2 = str(
@@ -236,6 +241,7 @@ class WtoDatabase(object):
                         print "Updating sb %s of project %s" % (sb, code)
                         self.row_schedblocks(sb, pid)
                         self.row_schedblock_info(sb)
+                        self.row_newar(sb)
             self.filter_c1()
             self.schedblocks.to_pickle(
                 self.path + self.preferences.sbxml_table)
@@ -245,6 +251,8 @@ class WtoDatabase(object):
                 self.path + self.preferences.obsproject_table)
             self.schedblock_info.to_pickle(
                 self.path + self.preferences.sbinfo_table)
+            self.newar.to_pickle(
+                self.path + self.preferences.newar_table)
 
         newest = self.schedblocks.timestamp.max()
         sql = str(
@@ -268,10 +276,13 @@ class WtoDatabase(object):
                 print "Updating SB %s" % sbuid
                 self.row_schedblocks(sbuid, pid)
                 self.row_schedblock_info(sbuid)
+                self.row_newar(sbuid)
             self.schedblocks.to_pickle(
                 self.path + self.preferences.sbxml_table)
             self.schedblock_info.to_pickle(
                 self.path + self.preferences.sbinfo_table)
+            self.newar.to_pickle(
+                self.path + self.preferences.newar_table)
 
     def populate_sciencegoals_sbxml(self):
         try:
@@ -312,6 +323,33 @@ class WtoDatabase(object):
         self.schedblocks.to_pickle(
             self.path + self.preferences.sbxml_table)
 
+    def populate_newar(self):
+        new = True
+        sblist = self.schedblock_info.SB_UID.tolist()
+        for sbuid in sblist:
+            self.row_newar(sbuid, new=new)
+            new = False
+
+        self.newar.to_pickle(
+            self.path + self.preferences.newar_table)
+
+    def get_obsproject(self, code):
+        print "Downloading Project %s obsproject.xml" % code
+        self.cursor.execute(
+            "SELECT TIMESTAMP, XMLTYPE.getClobVal(xml) "
+            "FROM ALMA.XML_OBSPROJECT_ENTITIES "
+            "WHERE ARCHIVE_UID = '%s'" % self.obsproject.ix[
+                code, 'PRJ_ARCHIVE_UID'])
+        data = self.cursor.fetchall()[0]
+        xml_content = data[1].read()
+        xmlfilename = code + '.xml'
+        self.obsproject.loc[code, 'timestamp'] = data[0]
+        filename = self.obsxml + xmlfilename
+        io_file = open(filename, 'w')
+        io_file.write(xml_content)
+        io_file.close()
+        self.obsproject.loc[code, 'obsproj'] = xmlfilename
+
     def row_sciencegoals(self, code, new=False):
         proj = self.obsproject.query('CODE == code').ix[0]
         obsproj = ObsProject(proj.obsproj, self.obsxml)
@@ -351,23 +389,6 @@ class WtoDatabase(object):
             print "Project %s has not ObsUnitSets" % code
             return 0
         return 0
-
-    def get_obsproject(self, code):
-        print "Downloading Project %s obsproject.xml" % code
-        self.cursor.execute(
-            "SELECT TIMESTAMP, XMLTYPE.getClobVal(xml) "
-            "FROM ALMA.XML_OBSPROJECT_ENTITIES "
-            "WHERE ARCHIVE_UID = '%s'" % self.obsproject.ix[
-                code, 'PRJ_ARCHIVE_UID'])
-        data = self.cursor.fetchall()[0]
-        xml_content = data[1].read()
-        xmlfilename = code + '.xml'
-        self.obsproject.loc[code, 'timestamp'] = data[0]
-        filename = self.obsxml + xmlfilename
-        io_file = open(filename, 'w')
-        io_file.write(xml_content)
-        io_file.close()
-        self.obsproject.loc[code, 'obsproj'] = xmlfilename
 
     def row_schedblock_info(self, sb_uid, new=False):
         sb = self.schedblocks.ix[sb_uid]
@@ -413,9 +434,59 @@ class WtoDatabase(object):
         else:
             self.schedblocks.ix[sb_uid] = (sb_uid, partid, data[0][0], xml)
 
+    def row_newar(self, sbuid, new=False):
+        sbinfo = self.schedblock_info.ix[sbuid]
+        sb = self.schedblocks.ix[sbuid]
+        pid = sb.partId
+        sg = self.sciencegoals.ix[pid]
+        repfreq = sbinfo.repfreq
+        useACA = sg.useACA
+        if useACA:
+            useACA = 'Y'
+        else:
+            useACA = 'N'
+        ar = sg.AR
+        las = sg.LAS
+        name = sbinfo['name']
+        sbnum = 1
+        if name.endswith('TC'):
+            name_e = name[:-2] + 'TE'
+            try:
+                sbinfo2 = self.schedblock_info.query('name == name_e').ix[0]
+                sbnum = 2
+                sbuid2 = sbinfo2.SB_UID
+            except IndexError:
+                print "Can't find TE for sb %s" % name
+                sbnum = 1
+        if name.endswith('TE'):
+            name_e = name[:-2] + 'TC'
+            try:
+                sbinfo2 = self.schedblock_info.query('name == name_e').ix[0]
+                sbnum = 2
+                sbuid2 = sbuid
+                sbuid = sbinfo2.SB_UID
+            except IndexError:
+                sbnum = 1
+
+        newAR = ARes.arrayRes([self.wto_path, ar, las, repfreq, useACA, sbnum])
+        newAR.silentRun()
+        minar, maxar, minar2, maxar2 = newAR.run()
+
+        if new:
+            self.newar = pd.DataFrame(
+                [(minar, maxar)], columns=['minAR', 'maxAR'], index=[sbuid])
+            if sbnum == 2:
+                self.newar.ix[sbuid2] = (minar2, maxar2)
+            new = False
+        else:
+            self.newar.ix[sbuid] = (minar, maxar)
+            if sbnum == 2:
+                self.newar.ix[sbuid2] = (minar2, maxar2)
+
     def filter_c1(self):
         c1c2 = pd.read_csv(
-            self.wto_path + 'conf/c1c2.csv', sep=',', header=0)
+            self.wto_path + 'conf/c1c2.csv', sep=',', header=0,
+            usecols=range(5))
         c1c2.columns = pd.Index([u'CODE', u'Region', u'ARC', u'C2', u'P2G'],
                                 dtype='object')
         toc2 = c1c2[c1c2.fillna('no').C2.str.contains('^Yes')]

@@ -705,6 +705,7 @@ class arrayRes:
             print("One Array:")
             print("Min Resolution : %5.2f "%(self.minAR[0]))
             print("Max Resolution : %5.2f "%(self.maxAR[0]))
+            return self.minAR[0], self.maxAR[0], 0., 0.
 
         elif self.nof12m == 2:
             print("Extended Array:")
@@ -713,7 +714,7 @@ class arrayRes:
             print("Compact Array:")
             print("Min Resolution minAR_c %5.2f "%(self.minAR[1]))
             print("Max Resolution maxAR_c %5.2f "%(self.maxAR[1]))
-
+            return self.minAR[0], self.maxAR[0], self.minAR[1], self.maxAR[1]
 
         #====== Standalone program =========================
 if __name__ == "__main__":
