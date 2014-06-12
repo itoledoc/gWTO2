@@ -62,7 +62,7 @@ class WtoDatabase(object):
         self.sqlstates = "SELECT DOMAIN_ENTITY_STATE,DOMAIN_ENTITY_ID," \
                          "OBS_PROJECT_ID FROM ALMA.SCHED_BLOCK_STATUS"
         self.cursor.execute(self.sqlstates)
-        self.states = pd.DataFrame(
+        self.sbstates = pd.DataFrame(
             self.cursor.fetchall(),
             columns=[rec[0] for rec in self.cursor.description]
         ).set_index('DOMAIN_ENTITY_ID')
@@ -137,6 +137,7 @@ class WtoDatabase(object):
             df1 = pd.DataFrame(
                 self.cursor.fetchall(),
                 columns=[rec[0] for rec in self.cursor.description])
+            print(len(df1.query('DOMAIN_ENTITY_STATE not in states')))
             self.obsproject = pd.merge(
                 df1.query('DOMAIN_ENTITY_STATE not in states'), self.executive,
                 on='PRJ_ARCHIVE_UID').set_index('CODE', drop=False)
@@ -184,7 +185,6 @@ class WtoDatabase(object):
         codes = self.obsproject.CODE.tolist()
         for c in codes:
             self.get_obsproject(c)
-        print len(self.obsproject)
         self.filter_c1()
         print len(self.obsproject)
         self.obsproject.to_pickle(
@@ -203,7 +203,7 @@ class WtoDatabase(object):
             columns=[rec[0] for rec in self.cursor.description]
         ).set_index('OBSUNIT_UID', drop=False)
         self.cursor.execute(self.sqlstates)
-        self.states = pd.DataFrame(
+        self.sbstates = pd.DataFrame(
             self.cursor.fetchall(),
             columns=[rec[0] for rec in self.cursor.description]
         ).set_index('DOMAIN_ENTITY_ID')
@@ -221,9 +221,8 @@ class WtoDatabase(object):
             str(newest).split('.')[0])
         self.cursor.execute(sql)
         new_data = self.cursor.fetchall()
-        if len(new_data) == 0:
-            return 0
-        else:
+
+        if len(new_data) > 0:
             for n in new_data:
                 print "Changes? %s, %s, newest %s" % (n[0], n[1], newest)
                 if n[1] <= newest:
@@ -293,9 +292,9 @@ class WtoDatabase(object):
             str(newest).split('.')[0])
         self.cursor.execute(sql)
         new_data = self.cursor.fetchall()
-        if len(new_data) == 0:
-            return 0
-        else:
+
+        if len(new_data) > 0:
+            print new_data
             for n in new_data:
                 if n[1] <= newest:
                     continue
@@ -554,7 +553,7 @@ class WtoDatabase(object):
         m4 = pd.merge(m3, self.scheduling_sb, left_index=True,
                       right_index=True, how='left', copy=False)
         m5 = pd.merge(
-            m4, self.states, left_index=True, right_index=True, how='left',
+            m4, self.sbstates, left_index=True, right_index=True, how='left',
             copy=False)
         qa0group = self.qa0.groupby(['SCHEDBLOCKUID', 'QA0STATUS'])
         qa0count = qa0group.count()
