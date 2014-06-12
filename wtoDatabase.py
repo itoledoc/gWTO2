@@ -59,6 +59,21 @@ class WtoDatabase(object):
             self.cursor.fetchall(),
             columns=[rec[0] for rec in self.cursor.description]
         ).set_index('CODE', drop=False)
+        self.sqlstates = "SELECT DOMAIN_ENTITY_STATE,DOMAIN_ENTITY_ID," \
+                         "OBS_PROJECT_ID FROM ALMA.SCHED_BLOCK_STATUS"
+        self.cursor.execute(self.sqlstates)
+        self.states = pd.DataFrame(
+            self.cursor.fetchall(),
+            columns=[rec[0] for rec in self.cursor.description]
+        ).set_index('DOMAIN_ENTITY_ID')
+        self.sqlqa0 = "SELECT SCHEDBLOCKUID,QA0STATUS " \
+                      "FROM ALMA.AQUA_EXECBLOCK " \
+                      "WHERE regexp_like (OBSPROJECTCODE, '^201[23].*\.[AST]')"
+        self.cursor.execute(self.sqlqa0)
+        self.qa0 = pd.DataFrame(
+            self.cursor.fetchall(),
+            columns=[rec[0] for rec in self.cursor.description]
+        ).set_index('SCHEDBLOCKUID', drop=False)
 
         self.sqlsched_sb = str(
             "SELECT ou.OBSUNIT_UID,sb.NAME,sb.REPR_BAND,"
@@ -102,6 +117,7 @@ class WtoDatabase(object):
             self.populate_schedblocks()
             self.populate_schedblock_info()
             self.populate_newar()
+            self.create_summary()
 
     def start_wto(self):
         states = self.states
@@ -175,6 +191,7 @@ class WtoDatabase(object):
             self.path + self.preferences.obsproject_table)
 
     def update(self):
+
         self.cursor.execute(self.sqlsched_proj)
         self.scheduling_proj = pd.DataFrame(
             self.cursor.fetchall(),
@@ -185,6 +202,17 @@ class WtoDatabase(object):
             self.cursor.fetchall(),
             columns=[rec[0] for rec in self.cursor.description]
         ).set_index('OBSUNIT_UID', drop=False)
+        self.cursor.execute(self.sqlstates)
+        self.states = pd.DataFrame(
+            self.cursor.fetchall(),
+            columns=[rec[0] for rec in self.cursor.description]
+        ).set_index('DOMAIN_ENTITY_ID')
+        self.cursor.execute(self.sqlqa0)
+        self.qa0 = pd.DataFrame(
+            self.cursor.fetchall(),
+            columns=[rec[0] for rec in self.cursor.description]
+        ).set_index('SCHEDBLOCKUID', drop=False)
+
         newest = self.obsproject.timestamp.max()
         changes = []
         sql = str(
@@ -287,6 +315,7 @@ class WtoDatabase(object):
                 self.path + self.preferences.sbinfo_table)
             self.newar.to_pickle(
                 self.path + self.preferences.newar_table)
+        self.create_summary()
 
     def populate_sciencegoals_sbxml(self):
         try:
@@ -408,14 +437,20 @@ class WtoDatabase(object):
             val + 'latitude')[0].pyval
         name = xml.data.findall('.//' + prj + 'name')[0].pyval
         status = xml.data.attrib['status']
+        schedconstr = xml.data.SchedulingConstraints
+        minar_old = schedconstr.minAcceptableAngResolution.pyval
+        maxar_old = schedconstr.maxAcceptableAngResolution.pyval
         if new:
             self.schedblock_info = pd.DataFrame(
-                [(sb_uid, pid, name, status, repfreq, array, ra, dec)],
+                [(sb_uid, pid, name, status, repfreq, array, ra, dec,
+                 minar_old, maxar_old)],
                 columns=['SB_UID', 'partId', 'name', 'status_xml',
-                         'repfreq', 'array', 'RA', 'DEC'], index=[sb_uid])
+                         'repfreq', 'array', 'RA', 'DEC', 'minAR_old',
+                         'maxAR_old'], index=[sb_uid])
         else:
             self.schedblock_info.ix[sb_uid] = (
-                sb_uid, pid, name, status, repfreq, array, ra, dec)
+                sb_uid, pid, name, status, repfreq, array, ra, dec, minar_old,
+                maxar_old)
 
     def row_schedblocks(self, sb_uid, partid, new=False):
 
@@ -506,6 +541,44 @@ class WtoDatabase(object):
             copy=False).set_index('CODE', drop=False)
         self.obsproject = temp
 
+    def create_summary(self):
+        m1 = pd.merge(
+            self.schedblock_info, self.newar, left_index=True, right_index=True)
+        m2 = pd.merge(m1, self.sciencegoals, on='partId', how='left')
+        m3 = pd.merge(
+            m2, self.obsproject, on='CODE', how='left').set_index('SB_UID',
+                                                                  drop=False)
+        m3 = m3[['CODE', 'partId', 'SB_UID', 'name', 'status_xml', 'bands',
+                 'repfreq', 'array', 'RA', 'DEC', 'minAR', 'maxAR',
+                 'PRJ_SCIENTIFIC_RANK', 'PRJ_LETTER_GRADE', 'EXEC']]
+        m4 = pd.merge(m3, self.scheduling_sb, left_index=True,
+                      right_index=True, how='left', copy=False)
+        m5 = pd.merge(
+            m4, self.states, left_index=True, right_index=True, how='left',
+            copy=False)
+        qa0group = self.qa0.groupby(['SCHEDBLOCKUID', 'QA0STATUS'])
+        qa0count = qa0group.count()
+        qa0count.columns = pd.Index(
+            [u'SCHEDBLOCKUIDcol', u'QA0STATUScol'], dtype='object')
+        qunset = qa0count.query(
+            'QA0STATUS == "Unset"')[['SCHEDBLOCKUIDcol']].unstack()
+        qpass = qa0count.query(
+            'QA0STATUS == "Pass"')[['SCHEDBLOCKUIDcol']].unstack()
+        m6 = pd.merge(
+            m5, qunset, left_index=True, right_index=True, how='left',
+            copy=False)
+        self.sb_summary = pd.merge(
+            m6, qpass, left_index=True, right_index=True, how='left',
+            copy=False)
+        self.sb_summary.columns = pd.Index(
+            [u'CODE', u'partId', u'SB_UID', u'name', u'status_xml', u'bands',
+             u'repfreq', u'array', u'RA', u'DEC', u'minAR', u'maxAR',
+             u'PRJ_SCIENTIFIC_RANK', u'PRJ_LETTER_GRADE', u'EXEC',
+             u'OBSUNIT_UID', u'NAME', u'REPR_BAND',
+             u'SCHEDBLOCK_CTRL_EXEC_COUNT', u'SCHEDBLOCK_CTRL_STATE',
+             u'MIN_ANG_RESOLUTION', u'MAX_ANG_RESOLUTION',
+             u'OBSUNIT_PROJECT_UID', u'DOMAIN_ENTITY_STATE', u'OBS_PROJECT_ID',
+             u'QA0Unset', u'QA0Pass'], dtype='object')
 
 class ObsProject(object):
 

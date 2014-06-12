@@ -167,7 +167,6 @@ class arrayRes:
         """Read the detailed Resolution, LAS for the Cycle 1 configuration"""
 
         directory = self.args[0] + 'conf/'
-        print directory
 
         self.data = []
 
