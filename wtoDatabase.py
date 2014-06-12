@@ -197,7 +197,7 @@ class WtoDatabase(object):
             return 0
         else:
             for n in new_data:
-                print "Changes? %s, %s" % (n[0], n[1])
+                print "Changes? %s, %s, newest %s" % (n[0], n[1], newest)
                 if n[1] <= newest:
                     print "\t Not Changes to apply (1)"
                     continue
@@ -217,9 +217,13 @@ class WtoDatabase(object):
                             puid)
                         row = list(self.cursor.fetchall()[0])
                     except IndexError:
-                        print "\t %s must be a CSV project. Not ingesting" % puid
+                        print("\t %s must be a CSV project. Not ingesting" %
+                              puid)
                         continue
                     code = row[4]
+                    if code not in self.checked.CODE.tolist():
+                        print("\t %s didn't pass filter C1" % code)
+                        continue
                     self.cursor.execute(
                         "SELECT ASSOCIATEDEXEC FROM ALMA.BMMV_OBSPROPOSAL "
                         "WHERE PROJECTUID = '%s'" % puid)
@@ -230,7 +234,7 @@ class WtoDatabase(object):
                     changes.append(code)
 
             for code in changes:
-                print "\t Project %s updated" % code
+                print "Updating Project %s" % code
                 self.get_obsproject(code)
                 self.row_sciencegoals(code)
                 pidlist = self.sciencegoals.query(
@@ -238,7 +242,7 @@ class WtoDatabase(object):
                 for pid in pidlist:
                     sblist = self.sciencegoals.ix[pid].SBS
                     for sb in sblist:
-                        print "Updating sb %s of project %s" % (sb, code)
+                        print "\tUpdating sb %s of project %s" % (sb, code)
                         self.row_schedblocks(sb, pid)
                         self.row_schedblock_info(sb)
                         self.row_newar(sb)
@@ -359,10 +363,11 @@ class WtoDatabase(object):
                 code = code
                 sciencegoal = obsproj.ObsProgram.ScienceGoal[sg]
                 partid = sciencegoal.ObsUnitSetRef.attrib['partId']
-                ar = sciencegoal.PerformanceParameters.desiredAngularResolution.pyval
-                # arunit = sciencegoal.PerformanceParameters.desiredAngularResolution.attrib['unit']
-                las = sciencegoal.PerformanceParameters.desiredLargestScale.pyval
-                # lasunit = sciencegoal.PerformanceParameters.desiredLargestScale.attrib['unit']
+                perfparam = sciencegoal.PerformanceParameters
+                ar = perfparam.desiredAngularResolution.pyval
+                # arunit = perfparam.desiredAngularResolution.attrib['unit']
+                las = perfparam.desiredLargestScale.pyval
+                # lasunit = perfparam.desiredLargestScale.attrib['unit']
                 bands = sciencegoal.requiredReceiverBands.pyval
                 try:
                     ss = sciencegoal.SpectralSetupParameters.SpectralScan
@@ -397,20 +402,20 @@ class WtoDatabase(object):
         array = xml.data.findall(
             './/' + prj + 'ObsUnitControl')[0].attrib['arrayRequested']
         repfreq = xml.data.SchedulingConstraints.representativeFrequency.pyval
-        RA = xml.data.SchedulingConstraints.representativeCoordinates.findall(
+        ra = xml.data.SchedulingConstraints.representativeCoordinates.findall(
             val + 'longitude')[0].pyval
-        DEC = xml.data.SchedulingConstraints.representativeCoordinates.findall(
+        dec = xml.data.SchedulingConstraints.representativeCoordinates.findall(
             val + 'latitude')[0].pyval
         name = xml.data.findall('.//' + prj + 'name')[0].pyval
         status = xml.data.attrib['status']
         if new:
             self.schedblock_info = pd.DataFrame(
-                [(sb_uid, pid, name, status, repfreq, array, RA, DEC)],
+                [(sb_uid, pid, name, status, repfreq, array, ra, dec)],
                 columns=['SB_UID', 'partId', 'name', 'status_xml',
                          'repfreq', 'array', 'RA', 'DEC'], index=[sb_uid])
         else:
             self.schedblock_info.ix[sb_uid] = (
-                sb_uid, pid, name, status, repfreq, array, RA, DEC)
+                sb_uid, pid, name, status, repfreq, array, ra, dec)
 
     def row_schedblocks(self, sb_uid, partid, new=False):
 
@@ -575,7 +580,7 @@ class SchedBlocK(object):
         io_file.close()
         self.data = tree.getroot()
 
-# Funtion to find outsync SBs...
+# Function to find outsync SBs...
 # import cx_Oracle
 # connection = cx_Oracle.connect(conx_string_sco)
 # cursor = connection.cursor()
@@ -589,9 +594,14 @@ class SchedBlocK(object):
 # ).set_index('SB_UID', drop=False)
 
 # allsbinfo method
-# allsbinfo = pd.merge(datas.obsproject, pd.merge(datas.sciencegoals, datas.schedblock_info, on='partId'), on='CODE')[['CODE', 'PRJ_ARCHIVE_UID', 'name', 'SB_UID', 'bands', 'repfreq', 'array', 'EXEC', 'RA', 'DEC']]
+# allsbinfo = pd.merge(
+#     datas.obsproject,
+#     pd.merge(datas.sciencegoals, datas.schedblock_info, on='partId'),
+#              on='CODE')[['CODE', 'PRJ_ARCHIVE_UID', 'name', 'SB_UID',
+#                          'bands', 'repfreq', 'array', 'EXEC', 'RA', 'DEC']]
 # allsbinfo['conf'] = pd.Series(pd.np.zeros(len(allsbinfo)), dtype='a25')
 # allsbinfo.loc[allsbinfo.array == "TWELVE-M", 'conf'] = 'C34'
 # allsbinfo.loc[allsbinfo.array != "TWELVE-M", 'conf'] = ''
-# allsbinfo.sort('CODE').to_csv('/home/aod/wto_conf/all.3.sbinfo', sep='\t', header=0, index=0)
+# allsbinfo.sort('CODE').to_csv('/home/aod/wto_conf/all.3.sbinfo',
+#                               sep='\t', header=0, index=0)
 
