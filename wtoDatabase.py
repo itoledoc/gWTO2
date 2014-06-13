@@ -294,7 +294,6 @@ class WtoDatabase(object):
         new_data = self.cursor.fetchall()
 
         if len(new_data) > 0:
-            print new_data
             for n in new_data:
                 if n[1] <= newest:
                     continue
@@ -439,17 +438,18 @@ class WtoDatabase(object):
         schedconstr = xml.data.SchedulingConstraints
         minar_old = schedconstr.minAcceptableAngResolution.pyval
         maxar_old = schedconstr.maxAcceptableAngResolution.pyval
+        execount = xml.data.SchedBlockControl.executionCount.pyval
         if new:
             self.schedblock_info = pd.DataFrame(
                 [(sb_uid, pid, name, status, repfreq, array, ra, dec,
-                 minar_old, maxar_old)],
+                 minar_old, maxar_old, execount)],
                 columns=['SB_UID', 'partId', 'name', 'status_xml',
                          'repfreq', 'array', 'RA', 'DEC', 'minAR_old',
-                         'maxAR_old'], index=[sb_uid])
+                         'maxAR_old', 'execount'], index=[sb_uid])
         else:
             self.schedblock_info.ix[sb_uid] = (
                 sb_uid, pid, name, status, repfreq, array, ra, dec, minar_old,
-                maxar_old)
+                maxar_old, execount)
 
     def row_schedblocks(self, sb_uid, partid, new=False):
 
@@ -479,6 +479,11 @@ class WtoDatabase(object):
         pid = sb.partId
         sg = self.sciencegoals.ix[pid]
         repfreq = sbinfo.repfreq
+        dec = sbinfo.DEC
+        c_bmax = 0.862 / pd.np.cos(pd.np.radians(-23.0262015) -
+                                   pd.np.radians(dec))
+        c_freq = repfreq / 100.
+        corr = c_freq / c_bmax
         useACA = sg.useACA
         if useACA:
             useACA = 'Y'
@@ -513,14 +518,18 @@ class WtoDatabase(object):
 
         if new:
             self.newar = pd.DataFrame(
-                [(minar, maxar)], columns=['minAR', 'maxAR'], index=[sbuid])
+                [(minar, maxar, minar * corr, maxar * corr)],
+                columns=['minAR', 'maxAR', 'arrayMinAR', 'arrayMaxAR'],
+                index=[sbuid])
             if sbnum == 2:
-                self.newar.ix[sbuid2] = (minar2, maxar2)
+                self.newar.ix[sbuid2] = (minar2, maxar2, minar2 * corr,
+                                         maxar2 * corr)
             new = False
         else:
-            self.newar.ix[sbuid] = (minar, maxar)
+            self.newar.ix[sbuid] = (minar, maxar, minar * corr, maxar * corr)
             if sbnum == 2:
-                self.newar.ix[sbuid2] = (minar2, maxar2)
+                self.newar.ix[sbuid2] = (minar2, maxar2, minar2 * corr,
+                                         maxar2 * corr)
 
     def filter_c1(self):
         c1c2 = pd.read_csv(
@@ -547,8 +556,9 @@ class WtoDatabase(object):
         m3 = pd.merge(
             m2, self.obsproject, on='CODE', how='left').set_index('SB_UID',
                                                                   drop=False)
-        m3 = m3[['CODE', 'partId', 'SB_UID', 'name', 'status_xml', 'bands',
+        m3 = m3[['CODE', 'OBS_PROJECT_ID', 'partId', 'SB_UID', 'name', 'status_xml', 'bands',
                  'repfreq', 'array', 'RA', 'DEC', 'minAR', 'maxAR',
+                 'arrayMinAR', 'arrayMaxAR', 'execount',
                  'PRJ_SCIENTIFIC_RANK', 'PRJ_LETTER_GRADE', 'EXEC']]
         m4 = pd.merge(m3, self.scheduling_sb, left_index=True,
                       right_index=True, how='left', copy=False)
@@ -570,14 +580,15 @@ class WtoDatabase(object):
             m6, qpass, left_index=True, right_index=True, how='left',
             copy=False)
         self.sb_summary.columns = pd.Index(
-            [u'CODE', u'partId', u'SB_UID', u'name', u'status_xml', u'bands',
+            [u'CODE', u'OBS_PROJECT_ID1', u'partId', u'SB_UID', u'name', u'status_xml', u'bands',
              u'repfreq', u'array', u'RA', u'DEC', u'minAR', u'maxAR',
-             u'PRJ_SCIENTIFIC_RANK', u'PRJ_LETTER_GRADE', u'EXEC',
-             u'OBSUNIT_UID', u'NAME', u'REPR_BAND',
-             u'SCHEDBLOCK_CTRL_EXEC_COUNT', u'SCHEDBLOCK_CTRL_STATE',
-             u'MIN_ANG_RESOLUTION', u'MAX_ANG_RESOLUTION',
-             u'OBSUNIT_PROJECT_UID', u'DOMAIN_ENTITY_STATE', u'OBS_PROJECT_ID',
-             u'QA0Unset', u'QA0Pass'], dtype='object')
+             u'arrayMinAR', u'arrayMaxAR', u'execount', u'PRJ_SCIENTIFIC_RANK',
+             u'PRJ_LETTER_GRADE', u'EXEC', u'OBSUNIT_UID', u'NAME',
+             u'REPR_BAND', u'SCHEDBLOCK_CTRL_EXEC_COUNT',
+             u'SCHEDBLOCK_CTRL_STATE', u'MIN_ANG_RESOLUTION',
+             u'MAX_ANG_RESOLUTION', u'OBSUNIT_PROJECT_UID',
+             u'DOMAIN_ENTITY_STATE', u'OBS_PROJECT_ID', u'QA0Unset',
+             u'QA0Pass'], dtype='object')
 
 class ObsProject(object):
 
