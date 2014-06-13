@@ -45,7 +45,7 @@ class WtoDatabase(object):
             "AND obs2.OBS_PROJECT_ID = obs1.PRJ_ARCHIVE_UID")
         self.source = source
         self.new = forcenew
-        self.states = ["Approved", "Phase1Submitted", "Broken", "Completed",
+        self.states = ["Approved", "Phase1Submitted", "Broken",
                        "Canceled", "Rejected"]
 
         self.connection = cx_Oracle.connect(conx_string)
@@ -589,6 +589,25 @@ class WtoDatabase(object):
              u'MAX_ANG_RESOLUTION', u'OBSUNIT_PROJECT_UID',
              u'DOMAIN_ENTITY_STATE', u'OBS_PROJECT_ID', u'QA0Unset',
              u'QA0Pass'], dtype='object')
+
+    def create_allsb(self, split=False):
+        allsb = self.sb_summary[
+            ['CODE', 'OBS_PROJECT_ID', 'name', 'SB_UID', 'bands', 'array',
+             'EXEC', 'RA', 'DEC']]
+        allsb['conf'] = pd.Series(pd.np.zeros(len(allsb)), index=allsb.index)
+        allsb.loc[allsb.array == 'TWELVE-M', 'conf'] = 'C34'
+        allsb.loc[allsb.array != 'TWELVE-M', 'conf'] = ''
+        if split:
+            allsb1 = allsb[allsb.CODE.str.startswith('2012')]
+            allsb2 = allsb[allsb.CODE.str.startswith('2013')]
+            allsb1.sort('CODE').to_csv(
+                self.path + 'allsbC1.info', sep='\t', header=False, index=False)
+            allsb2.sort('CODE').to_csv(
+                self.path + 'allsbC2.info', sep='\t', header=False, index=False)
+        else:
+            allsb.sort('CODE').to_csv(
+                self.path + 'allsb.info', sep='\t', header=False, index=False)
+
 
 class ObsProject(object):
 
