@@ -493,43 +493,51 @@ class WtoDatabase(object):
         las = sg.LAS
         name = sbinfo['name']
         sbnum = 1
+        sbuidE = sbuid
         if name.endswith('TC'):
             name_e = name[:-2] + 'TE'
             try:
-                sbinfo2 = self.schedblock_info.query('name == name_e').ix[0]
+                sbinfoE = self.schedblock_info.query('name == name_e').ix[0]
                 sbnum = 2
-                sbuid2 = sbinfo2.SB_UID
+                sbuidE = sbinfoE.SB_UID
+                sbuidC = sbuid
             except IndexError:
                 print "Can't find TE for sb %s" % name
                 sbnum = 1
         if name.endswith('TE'):
             name_e = name[:-2] + 'TC'
             try:
-                sbinfo2 = self.schedblock_info.query('name == name_e').ix[0]
+                sbinfoC = self.schedblock_info.query('name == name_e').ix[0]
                 sbnum = 2
-                sbuid2 = sbuid
-                sbuid = sbinfo2.SB_UID
+                sbuidC = sbinfoC.SB_UID
             except IndexError:
                 sbnum = 1
 
         newAR = ARes.arrayRes([self.wto_path, ar, las, repfreq, useACA, sbnum])
         newAR.silentRun()
-        minar, maxar, minar2, maxar2 = newAR.run()
+        minarE, maxarE, minarC, maxarC = newAR.run()
 
-        if new:
+        if new and sbnum == 1:
             self.newar = pd.DataFrame(
-                [(minar, maxar, minar * corr, maxar * corr)],
+                [(minarE, maxarE, minarE * corr, maxarE * corr)],
                 columns=['minAR', 'maxAR', 'arrayMinAR', 'arrayMaxAR'],
-                index=[sbuid])
-            if sbnum == 2:
-                self.newar.ix[sbuid2] = (minar2, maxar2, minar2 * corr,
-                                         maxar2 * corr)
-            new = False
+                index=[sbuidE])
+        elif new and sbnum == 2:
+            self.newar = pd.DataFrame(
+                [(minarE, maxarE, minarE * corr, maxarE * corr)],
+                columns=['minAR', 'maxAR', 'arrayMinAR', 'arrayMaxAR'],
+                index=[sbuidE])
+            self.newar.ix[sbuidC] = (minarC, maxarC, minarC * corr,
+                                     maxarC * corr)
         else:
-            self.newar.ix[sbuid] = (minar, maxar, minar * corr, maxar * corr)
+            if sbnum == 1:
+                self.newar.ix[sbuidE] = (minarE, maxarE, minarE * corr,
+                                        maxarE * corr)
             if sbnum == 2:
-                self.newar.ix[sbuid2] = (minar2, maxar2, minar2 * corr,
-                                         maxar2 * corr)
+                self.newar.ix[sbuidE] = (minarE, maxarE, minarE * corr,
+                                         maxarE * corr)
+                self.newar.ix[sbuidC] = (minarC, maxarC, minarC * corr,
+                                         maxarC * corr)
 
     def filter_c1(self):
         c1c2 = pd.read_csv(
@@ -556,7 +564,8 @@ class WtoDatabase(object):
         m3 = pd.merge(
             m2, self.obsproject, on='CODE', how='left').set_index('SB_UID',
                                                                   drop=False)
-        m3 = m3[['CODE', 'OBS_PROJECT_ID', 'partId', 'SB_UID', 'name', 'status_xml', 'bands',
+        m3 = m3[['CODE', 'OBS_PROJECT_ID', 'partId', 'SB_UID', 'name',
+                 'status_xml', 'bands',
                  'repfreq', 'array', 'RA', 'DEC', 'minAR', 'maxAR',
                  'arrayMinAR', 'arrayMaxAR', 'execount',
                  'PRJ_SCIENTIFIC_RANK', 'PRJ_LETTER_GRADE', 'EXEC']]
@@ -580,7 +589,8 @@ class WtoDatabase(object):
             m6, qpass, left_index=True, right_index=True, how='left',
             copy=False)
         self.sb_summary.columns = pd.Index(
-            [u'CODE', u'OBS_PROJECT_ID1', u'partId', u'SB_UID', u'name', u'status_xml', u'bands',
+            [u'CODE', u'OBS_PROJECT_ID1', u'partId', u'SB_UID', u'name',
+             u'status_xml', u'bands',
              u'repfreq', u'array', u'RA', u'DEC', u'minAR', u'maxAR',
              u'arrayMinAR', u'arrayMaxAR', u'execount', u'PRJ_SCIENTIFIC_RANK',
              u'PRJ_LETTER_GRADE', u'EXEC', u'OBSUNIT_UID', u'NAME',
@@ -592,8 +602,8 @@ class WtoDatabase(object):
 
     def create_allsb(self, split=False):
         allsb = self.sb_summary[
-            ['CODE', 'OBS_PROJECT_ID', 'name', 'SB_UID', 'bands', 'array',
-             'EXEC', 'RA', 'DEC']]
+            ['CODE', 'OBS_PROJECT_ID', 'name', 'SB_UID', 'bands', 'repfreq',
+             'array', 'EXEC', 'RA', 'DEC']]
         allsb['conf'] = pd.Series(pd.np.zeros(len(allsb)), index=allsb.index)
         allsb.loc[allsb.array == 'TWELVE-M', 'conf'] = 'C34'
         allsb.loc[allsb.array != 'TWELVE-M', 'conf'] = ''
