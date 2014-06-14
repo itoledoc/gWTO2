@@ -704,7 +704,7 @@ class arrayRes:
             #print("One Array:")
             #print("Min Resolution : %5.2f "%(self.minAR[0]))
             #print("Max Resolution : %5.2f "%(self.maxAR[0]))
-            return self.minAR[0], self.maxAR[0], 0., 0.
+            return self.minAR[0], self.maxAR[0], 0, 0
 
         elif self.nof12m == 2:
             #print("Extended Array:")
