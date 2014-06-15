@@ -144,7 +144,30 @@ class WtoDatabase(object):
         The obsproject dataframe is filtered by Cycle 1 projects carried over
         to Cycle 2. Dataframe structures:
 
+        ===============
+        self.obsproject
+        ===============
+        PRJ_ARCHIVE_UID                  String
+        DELETED                           int64
+        PI                               String
+        PRJ_NAME                         String
+        ** CODE                          String
+        PRJ_TIME_OF_CREATION             String
+        PRJ_SCIENTIFIC_RANK               int64
+        PRJ_VERSION                      String
+        PRJ_ASSIGNED_PRIORITY            String
+        PRJ_LETTER_GRADE                 String
+        DOMAIN_ENTITY_STATE              String
+        OBS_PROJECT_ID                   String
+        EXEC                             String
+        timestamp                datetime64[ns]
+        obsproj                          String
 
+        ==============
+        self.executive
+        ==============
+        ** PRJ_ARCHIVE_UID object
+        EXEC               object
 
         :return: None only in case of failure. Else, nothing
         """
@@ -254,10 +277,10 @@ class WtoDatabase(object):
                 if n[1] <= newest:
                     print "\t Not Changes to apply (1)"
                     continue
-                puid = n[0]
+                self.__puid = n[0]
                 try:
                     code = self.obsproject.query(
-                        'PRJ_ARCHIVE_UID == @puid').ix[0, 'CODE']
+                        'PRJ_ARCHIVE_UID == @self.__puid').ix[0, 'CODE']
                     if code in self.checked.CODE.tolist():
                         changes.append(code)
                     else:
@@ -267,11 +290,11 @@ class WtoDatabase(object):
                     try:
                         self.cursor.execute(
                             self.sql1 + " AND OBS1.PRJ_ARCHIVE_UID = '%s'" %
-                            puid)
+                            self.__puid)
                         row = list(self.cursor.fetchall()[0])
                     except IndexError:
                         print("\t %s must be a CSV project. Not ingesting" %
-                              puid)
+                              self.__puid)
                         continue
                     code = row[4]
                     if code not in self.checked.CODE.tolist():
@@ -279,7 +302,7 @@ class WtoDatabase(object):
                         continue
                     self.cursor.execute(
                         "SELECT ASSOCIATEDEXEC FROM ALMA.BMMV_OBSPROPOSAL "
-                        "WHERE PROJECTUID = '%s'" % puid)
+                        "WHERE PROJECTUID = '%s'" % self.__puid)
                     row.append(self.cursor.fetchall()[0][0])
                     row.append(n[1])
                     row.append(self.obsproject.ix[0, 'obsproj'])
