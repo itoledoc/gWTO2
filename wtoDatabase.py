@@ -580,6 +580,13 @@ class WtoDatabase(object):
         n_tg = len(xml.data.Target)
         n_ss = len(xml.data.SpectralSpec)
 
+        for n in range(n_fs):
+            self.row_fieldsource(xml.data.FieldSource[n])
+        for n in range(n_tg):
+            self.row_target(xml.data.Target[n])
+        for n in range(n_ss):
+            self.row_spectralconf(xml.data.SpectralSpec[n])
+
         if new:
             self.schedblock_info = pd.DataFrame(
                 [(sb_uid, pid, name, status, repfreq, array, ra, dec,
