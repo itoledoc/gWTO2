@@ -525,7 +525,8 @@ class WtoDatabase(object):
         schedconstr = xml.data.SchedulingConstraints
         schedcontrol = xml.data.SchedBlockControl
         preconditions = xml.data.Preconditions
-        weather = preconditions.WeatherConstraints
+        weather = preconditions.findall('.//' + prj + 'WeatherConstraints')[0]
+
         ampliparam = xml.data.AmplitudeCalParameters
         amplitude = ampliparam.attrib['entityPartId']
         phaseparam = xml.data.PhaseCalParameters
