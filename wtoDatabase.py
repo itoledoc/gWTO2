@@ -527,12 +527,26 @@ class WtoDatabase(object):
         preconditions = xml.data.Preconditions
         weather = preconditions.findall('.//' + prj + 'WeatherConstraints')[0]
 
-        ampliparam = xml.data.AmplitudeCalParameters
-        amplitude = ampliparam.attrib['entityPartId']
-        phaseparam = xml.data.PhaseCalParameters
-        phase = phaseparam.attrib['entityPartId']
-        basebandparam = xml.data.BandpassCalParameters
-        baseband = basebandparam.attrib['entityPartId']
+        try:
+            ampliparam = xml.data.AmplitudeCalParameters
+            amplitude = ampliparam.attrib['entityPartId']
+        except AttributeError:
+            ampliparam = pd.NaT
+            amplitude = pd.NaT
+
+        try:
+            phaseparam = xml.data.PhaseCalParameters
+            phase = phaseparam.attrib['entityPartId']
+        except AttributeError:
+            phaseparam = pd.NaT
+            phase = pd.NaT
+
+        try:
+            basebandparam = xml.data.BandpassCalParameters
+            baseband = basebandparam.attrib['entityPartId']
+        except AttributeError:
+            basebandparam = pd.NaT
+            baseband = pd.NaT
         try:
             polarparam = xml.data.PolarizationCalParameters
             polarization = polarparam.attrib['entityPartId']
@@ -545,10 +559,11 @@ class WtoDatabase(object):
         except AttributeError:
             pass  # it doesn't do anything
         scienceparam = xml.data.ScienceParameters
-        science = scienceparam.attrib['entityPardId']
-        integrationtime = science.integrationTime.pyval
-        subscandur = science.subScanDuration.pyval
-        sbuscandur_unit = science.subScanDuration.attrib['unit']
+        science = scienceparam.attrib['entityPartId']
+        integrationtime = scienceparam.integrationTime.pyval
+        integrationtime_unit = scienceparam.integrationTime.attrib['unit']
+        subscandur = scienceparam.subScanDuration.pyval
+        sbuscandur_unit = scienceparam.subScanDuration.attrib['unit']
 
         repfreq = schedconstr.representativeFrequency.pyval
         ra = schedconstr.representativeCoordinates.findall(
