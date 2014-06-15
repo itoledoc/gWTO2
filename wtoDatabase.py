@@ -20,6 +20,17 @@ class WtoDatabase(object):
 
     def __init__(self, default='/.wto/', source=None, forcenew=False):
 
+        """
+
+
+        :param default: Path for data cache
+        :param source: File or list of strings with the codes of the projects
+            to be ingested by WtoDatabase
+        :param forcenew: Force cache cleaning and reload from archive
+        """
+        self.source = source
+        self.new = forcenew
+        # Default Paths and Preferences
         self.path = os.environ['HOME'] + default
         self.wto_path = os.environ['WTO']
         self.sbxml = self.path + 'sbxml/'
@@ -33,6 +44,10 @@ class WtoDatabase(object):
                    'scheduling_table', 'special', 'pwv_data',
                    'executive_table', 'sbxml_table', 'sbinfo_table',
                    'newar_table'])
+        self.states = ["Approved", "Phase1Submitted", "Broken",
+                       "Canceled", "Rejected"]
+
+        # Global SQL search expressions
         self.sql1 = str(
             "SELECT PRJ_ARCHIVE_UID,DELETED,PI,PRJ_NAME, "
             "CODE,PRJ_TIME_OF_CREATION,PRJ_SCIENTIFIC_RANK,PRJ_VERSION,"
@@ -43,38 +58,15 @@ class WtoDatabase(object):
             "AND (PRJ_LETTER_GRADE='A' OR PRJ_LETTER_GRADE='B' "
             "OR PRJ_LETTER_GRADE='C') "
             "AND obs2.OBS_PROJECT_ID = obs1.PRJ_ARCHIVE_UID")
-        self.source = source
-        self.new = forcenew
-        self.states = ["Approved", "Phase1Submitted", "Broken",
-                       "Canceled", "Rejected"]
-
-        self.connection = cx_Oracle.connect(conx_string)
-        self.cursor = self.connection.cursor()
-
         self.sqlsched_proj = str(
             "SELECT * FROM SCHEDULING_AOS.OBSPROJECT "
             "WHERE regexp_like (CODE, '^201[23].*\.[AST]')")
-        self.cursor.execute(self.sqlsched_proj)
-        self.scheduling_proj = pd.DataFrame(
-            self.cursor.fetchall(),
-            columns=[rec[0] for rec in self.cursor.description]
-        ).set_index('CODE', drop=False)
-        self.sqlstates = "SELECT DOMAIN_ENTITY_STATE,DOMAIN_ENTITY_ID," \
-                         "OBS_PROJECT_ID FROM ALMA.SCHED_BLOCK_STATUS"
-        self.cursor.execute(self.sqlstates)
-        self.sbstates = pd.DataFrame(
-            self.cursor.fetchall(),
-            columns=[rec[0] for rec in self.cursor.description]
-        ).set_index('DOMAIN_ENTITY_ID')
-        self.sqlqa0 = "SELECT SCHEDBLOCKUID,QA0STATUS " \
-                      "FROM ALMA.AQUA_EXECBLOCK " \
-                      "WHERE regexp_like (OBSPROJECTCODE, '^201[23].*\.[AST]')"
-        self.cursor.execute(self.sqlqa0)
-        self.qa0 = pd.DataFrame(
-            self.cursor.fetchall(),
-            columns=[rec[0] for rec in self.cursor.description]
-        ).set_index('SCHEDBLOCKUID', drop=False)
-
+        self.sqlstates = str(
+            "SELECT DOMAIN_ENTITY_STATE,DOMAIN_ENTITY_ID,OBS_PROJECT_ID "
+            "FROM ALMA.SCHED_BLOCK_STATUS")
+        self.sqlqa0 = str(
+            "SELECT SCHEDBLOCKUID,QA0STATUS FROM ALMA.AQUA_EXECBLOCK "
+            "WHERE regexp_like (OBSPROJECTCODE, '^201[23].*\.[AST]')")
         self.sqlsched_sb = str(
             "SELECT ou.OBSUNIT_UID,sb.NAME,sb.REPR_BAND,"
             "sb.SCHEDBLOCK_CTRL_EXEC_COUNT,sb.SCHEDBLOCK_CTRL_STATE,"
@@ -82,12 +74,37 @@ class WtoDatabase(object):
             "ou.OBSUNIT_PROJECT_UID "
             "FROM SCHEDULING_AOS.SCHEDBLOCK sb, SCHEDULING_AOS.OBSUNIT ou "
             "WHERE sb.SCHEDBLOCKID = ou.OBSUNITID AND sb.CSV = 0")
+
+        # Global Oracle Connection
+        self.connection = cx_Oracle.connect(conx_string)
+        self.cursor = self.connection.cursor()
+
+        # Populate different dataframes related to projects and SBs statuses
+        self.cursor.execute(self.sqlsched_proj)
+        self.scheduling_proj = pd.DataFrame(
+            self.cursor.fetchall(),
+            columns=[rec[0] for rec in self.cursor.description]
+        ).set_index('CODE', drop=False)
+
+        self.cursor.execute(self.sqlstates)
+        self.sbstates = pd.DataFrame(
+            self.cursor.fetchall(),
+            columns=[rec[0] for rec in self.cursor.description]
+        ).set_index('DOMAIN_ENTITY_ID')
+
+        self.cursor.execute(self.sqlqa0)
+        self.qa0 = pd.DataFrame(
+            self.cursor.fetchall(),
+            columns=[rec[0] for rec in self.cursor.description]
+        ).set_index('SCHEDBLOCKUID', drop=False)
+
         self.cursor.execute(self.sqlsched_sb)
         self.scheduling_sb = pd.DataFrame(
             self.cursor.fetchall(),
             columns=[rec[0] for rec in self.cursor.description]
         ).set_index('OBSUNIT_UID', drop=False)
 
+        # Initialize with saved data and update, Default behavior.
         if not self.new:
             try:
                 self.obsproject = pd.read_pickle(
@@ -106,6 +123,7 @@ class WtoDatabase(object):
                 print e
                 self.new = True
 
+        # Create main dataframes
         if self.new:
             call(['rm', '-rf', self.path])
             print self.path + ": creating preferences dir"
@@ -120,6 +138,16 @@ class WtoDatabase(object):
             self.create_summary()
 
     def start_wto(self):
+
+        """
+        Procedures to initalize executive and obsproject dataframes.
+        The obsproject dataframe is filtered by Cycle 1 projects carried over
+        to Cycle 2. Dataframe structures:
+
+
+
+        :return: None only in case of failure. Else, nothing
+        """
         states = self.states
 
         sql2 = str(
@@ -137,9 +165,9 @@ class WtoDatabase(object):
             df1 = pd.DataFrame(
                 self.cursor.fetchall(),
                 columns=[rec[0] for rec in self.cursor.description])
-            print(len(df1.query('DOMAIN_ENTITY_STATE not in states')))
+            print(len(df1.query('DOMAIN_ENTITY_STATE not in @states')))
             self.obsproject = pd.merge(
-                df1.query('DOMAIN_ENTITY_STATE not in states'), self.executive,
+                df1.query('DOMAIN_ENTITY_STATE not in @states'), self.executive,
                 on='PRJ_ARCHIVE_UID').set_index('CODE', drop=False)
         else:
             if type(self.source) is not str and type(self.source) is not list:
@@ -151,7 +179,6 @@ class WtoDatabase(object):
                     read_csv = csv.reader(fp)
                 else:
                     read_csv = self.source
-
                 c = 0
                 for l in read_csv:
                     if type(self.source) is str:
@@ -166,9 +193,8 @@ class WtoDatabase(object):
                         df2.ix[c] = pd.Series(
                             self.cursor.fetchall()[0], index=df2.columns)
                     c += 1
-
                 self.obsproject = pd.merge(
-                    df2.query('DOMAIN_ENTITY_STATE not in states'),
+                    df2.query('DOMAIN_ENTITY_STATE not in @states'),
                     self.executive,
                     on='PRJ_ARCHIVE_UID').set_index('CODE', drop=False)
             except IOError:
@@ -231,7 +257,7 @@ class WtoDatabase(object):
                 puid = n[0]
                 try:
                     code = self.obsproject.query(
-                        'PRJ_ARCHIVE_UID == puid').ix[0, 'CODE']
+                        'PRJ_ARCHIVE_UID == @puid').ix[0, 'CODE']
                     if code in self.checked.CODE.tolist():
                         changes.append(code)
                     else:
@@ -265,7 +291,7 @@ class WtoDatabase(object):
                 self.get_obsproject(code)
                 self.row_sciencegoals(code)
                 pidlist = self.sciencegoals.query(
-                    'CODE == code').partId.tolist()
+                    'CODE == @code').partId.tolist()
                 for pid in pidlist:
                     sblist = self.sciencegoals.ix[pid].SBS
                     for sb in sblist:
@@ -300,7 +326,7 @@ class WtoDatabase(object):
                 sbuid = n[0]
                 try:
                     pid = self.schedblocks.query(
-                        'SB_UID == sbuid').ix[0, 'partId']
+                        'SB_UID == @sbuid').ix[0, 'partId']
                 except IndexError:
                     continue
                 print "Updating SB %s" % sbuid
@@ -382,7 +408,8 @@ class WtoDatabase(object):
         self.obsproject.loc[code, 'obsproj'] = xmlfilename
 
     def row_sciencegoals(self, code, new=False):
-        proj = self.obsproject.query('CODE == code').ix[0]
+        c = code
+        proj = self.obsproject[self.obsproject.CODE == c].ix[0]
         obsproj = ObsProject(proj.obsproj, self.obsxml)
         assoc_sbs = obsproj.assoc_sched_blocks()
         try:
@@ -530,7 +557,8 @@ class WtoDatabase(object):
         if name.endswith('TC'):
             name_e = name[:-2] + 'TE'
             try:
-                sbinfoE = self.schedblock_info.query('name == name_e').ix[0]
+                sbinfoE = self.schedblock_info[
+                    self.schedblock_info.name == name_e].ix[0]
                 sbnum = 2
                 sbuidE = sbinfoE.SB_UID
                 sbuidC = sbuid
@@ -540,7 +568,8 @@ class WtoDatabase(object):
         if name.endswith('TE'):
             name_e = name[:-2] + 'TC'
             try:
-                sbinfoC = self.schedblock_info.query('name == name_e').ix[0]
+                sbinfoC = self.schedblock_info[
+                    self.schedblock_info.name == name_e].ix[0]
                 sbnum = 2
                 sbuidC = sbinfoC.SB_UID
             except IndexError:
@@ -608,13 +637,9 @@ class WtoDatabase(object):
             m4, self.sbstates, left_index=True, right_index=True, how='left',
             copy=False)
         qa0group = self.qa0.groupby(['SCHEDBLOCKUID', 'QA0STATUS'])
-        qa0count = qa0group.count()
-        qa0count.columns = pd.Index(
-            [u'SCHEDBLOCKUIDcol', u'QA0STATUScol'], dtype='object')
-        qunset = qa0count.query(
-            'QA0STATUS == "Unset"')[['SCHEDBLOCKUIDcol']].unstack()
-        qpass = qa0count.query(
-            'QA0STATUS == "Pass"')[['SCHEDBLOCKUIDcol']].unstack()
+        qa0count = qa0group.QA0STATUS.count().unstack()
+        qpass = qa0count[["Pass"]]
+        qunset = qa0count[["Unset"]]
         m6 = pd.merge(
             m5, qunset, left_index=True, right_index=True, how='left',
             copy=False)
