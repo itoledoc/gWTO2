@@ -277,10 +277,10 @@ class WtoDatabase(object):
                 if n[1] <= newest:
                     print "\t Not Changes to apply (1)"
                     continue
-                self.__puid = n[0]
+                puid = n[0]
                 try:
-                    code = self.obsproject.query(
-                        'PRJ_ARCHIVE_UID == @self.__puid').ix[0, 'CODE']
+                    code = self.obsproject[
+                        self.obsproject.PRJ_ARCHIVE_UID == puid].ix[0, 'CODE']
                     if code in self.checked.CODE.tolist():
                         changes.append(code)
                     else:
@@ -290,11 +290,11 @@ class WtoDatabase(object):
                     try:
                         self.cursor.execute(
                             self.sql1 + " AND OBS1.PRJ_ARCHIVE_UID = '%s'" %
-                            self.__puid)
+                            puid)
                         row = list(self.cursor.fetchall()[0])
                     except IndexError:
                         print("\t %s must be a CSV project. Not ingesting" %
-                              self.__puid)
+                              puid)
                         continue
                     code = row[4]
                     if code not in self.checked.CODE.tolist():
@@ -302,7 +302,7 @@ class WtoDatabase(object):
                         continue
                     self.cursor.execute(
                         "SELECT ASSOCIATEDEXEC FROM ALMA.BMMV_OBSPROPOSAL "
-                        "WHERE PROJECTUID = '%s'" % self.__puid)
+                        "WHERE PROJECTUID = '%s'" % puid)
                     row.append(self.cursor.fetchall()[0][0])
                     row.append(n[1])
                     row.append(self.obsproject.ix[0, 'obsproj'])
@@ -313,8 +313,8 @@ class WtoDatabase(object):
                 print "Updating Project %s" % code
                 self.get_obsproject(code)
                 self.row_sciencegoals(code)
-                pidlist = self.sciencegoals.query(
-                    'CODE == @code').partId.tolist()
+                pidlist = self.sciencegoals[
+                    self.sciencegoals.CODE == code].partId.tolist()
                 for pid in pidlist:
                     sblist = self.sciencegoals.ix[pid].SBS
                     for sb in sblist:
