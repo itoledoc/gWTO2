@@ -482,7 +482,7 @@ class arrayRes:
                 
                 
                 if lasArr > 0.9 * self.lasObs and res < self.minAR[0] :
-                    print res
+                    # print res
                     self.minAR[0] = res
 
             
