@@ -348,8 +348,8 @@ class WtoDatabase(object):
                     continue
                 sbuid = n[0]
                 try:
-                    pid = self.schedblocks.query(
-                        'SB_UID == @sbuid').ix[0, 'partId']
+                    pid = self.schedblocks[
+                        self.schedblocks.SB_UID == sbuid].ix[0, 'partId']
                 except IndexError:
                     continue
                 print "Updating SB %s" % sbuid
@@ -506,22 +506,64 @@ class WtoDatabase(object):
         return 0
 
     def row_schedblock_info(self, sb_uid, new=False):
+        """
+        Populate dataframes self.schedblock_info
+        :param sb_uid:
+        :param new:
+        """
+        # Open SB with SB parser class
         sb = self.schedblocks.ix[sb_uid]
         pid = sb.partId
         xml = SchedBlocK(sb.sb_xml, self.sbxml)
+
+        # Extract root level data
         array = xml.data.findall(
             './/' + prj + 'ObsUnitControl')[0].attrib['arrayRequested']
-        repfreq = xml.data.SchedulingConstraints.representativeFrequency.pyval
-        ra = xml.data.SchedulingConstraints.representativeCoordinates.findall(
-            val + 'longitude')[0].pyval
-        dec = xml.data.SchedulingConstraints.representativeCoordinates.findall(
-            val + 'latitude')[0].pyval
         name = xml.data.findall('.//' + prj + 'name')[0].pyval
         status = xml.data.attrib['status']
+
         schedconstr = xml.data.SchedulingConstraints
+        schedcontrol = xml.data.SchedBlockControl
+        preconditions = xml.data.Preconditions
+        weather = preconditions.WeatherConstraints
+        ampliparam = xml.data.AmplitudeCalParameters
+        amplitude = ampliparam.attrib['entityPartId']
+        phaseparam = xml.data.PhaseCalParameters
+        phase = phaseparam.attrib['entityPartId']
+        basebandparam = xml.data.BandpassCalParameters
+        baseband = basebandparam.attrib['entityPartId']
+        try:
+            polarparam = xml.data.PolarizationCalParameters
+            polarization = polarparam.attrib['entityPartId']
+            isPolarization = True
+        except AttributeError:
+            isPolarization = False
+        try:
+            delayparam = xml.data.DelayCalParameters
+            delay = delayparam.attrib['entityPartId']
+        except AttributeError:
+            pass  # it doesn't do anything
+        scienceparam = xml.data.ScienceParameters
+        science = scienceparam.attrib['entityPardId']
+        integrationtime = science.integrationTime.pyval
+        subscandur = science.subScanDuration.pyval
+        sbuscandur_unit = science.subScanDuration.attrib['unit']
+
+        repfreq = schedconstr.representativeFrequency.pyval
+        ra = schedconstr.representativeCoordinates.findall(
+            val + 'longitude')[0].pyval
+        dec = schedconstr.representativeCoordinates.findall(
+            val + 'latitude')[0].pyval
         minar_old = schedconstr.minAcceptableAngResolution.pyval
         maxar_old = schedconstr.maxAcceptableAngResolution.pyval
-        execount = xml.data.SchedBlockControl.executionCount.pyval
+
+        execount = schedcontrol.executionCount.pyval
+        maxpwv = weather.maxPWVC.pyval
+
+        n_fs = len(xml.data.FieldSource)
+        n_tg = len(xml.data.Target)
+        n_ss = len(xml.data.SpectralSpec)
+
         if new:
             self.schedblock_info = pd.DataFrame(
                 [(sb_uid, pid, name, status, repfreq, array, ra, dec,
@@ -533,6 +575,15 @@ class WtoDatabase(object):
             self.schedblock_info.ix[sb_uid] = (
                 sb_uid, pid, name, status, repfreq, array, ra, dec, minar_old,
                 maxar_old, execount)
+
+    def row_fieldsource(self, fs):
+        pass
+
+    def row_target(self, tg):
+        pass
+
+    def row_spectralconf(self, ss):
+        pass
 
     def row_schedblocks(self, sb_uid, partid, new=False):
 
