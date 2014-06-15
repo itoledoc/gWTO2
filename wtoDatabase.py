@@ -396,6 +396,17 @@ class WtoDatabase(object):
                 las = perfparam.desiredLargestScale.pyval
                 # lasunit = perfparam.desiredLargestScale.attrib['unit']
                 bands = sciencegoal.requiredReceiverBands.pyval
+                istimeconst = perfparam.isTimeConstrained.pyval
+                if istimeconst:
+                    temppar = perfparam.TemporalParameters
+                    starttime = temppar.startTime.pyval
+                    endtime = temppar.endTime.pyval
+                    allowedmarg = temppar.allowedMargin.pyval
+                    allowedmarg_unit = temppar.allowedMargin.attrib['unit']
+                    repeats = temppar.repeats.pyval
+                    note = temppar.note.pyval
+                    isavoid = temppar.isAvoidConstraint.pyval
+
                 try:
                     ss = sciencegoal.SpectralSetupParameters.SpectralScan
                     isspectralscan = True
@@ -407,15 +418,37 @@ class WtoDatabase(object):
                 if new:
                     self.sciencegoals = pd.DataFrame(
                         [(code, partid, ar, las, bands, isspectralscan,
-                          useaca, usetp, assoc_sbs[partid])],
+                          istimeconst, useaca, usetp, assoc_sbs[partid])],
                         columns=['CODE', 'partId', 'AR', 'LAS', 'bands',
-                                 'isSpectralScan', 'useACA', 'useTP', 'SBS'],
+                                 'isSpectralScan', 'isTimeConstrained',
+                                 'useACA', 'useTP', 'SBS'],
                         index=[partid])
+                    if istimeconst:
+                        self.time_constrain = pd.DataFrame(
+                            [(starttime, endtime, allowedmarg,
+                             allowedmarg_unit, repeats, note, isavoid)],
+                            columns=['startRime', 'endTime', 'allowedMargin',
+                                     'allowedUnits', 'repeats', 'note',
+                                     'isavoid'],
+                            index=[partid])
                     new = False
                 else:
                     self.sciencegoals.ix[partid] = (
                         code, partid, ar, las, bands, isspectralscan,
-                        useaca, usetp, assoc_sbs[partid])
+                        istimeconst, useaca, usetp, assoc_sbs[partid])
+                    if istimeconst:
+                        try:
+                            self.time_constrain.ix[partid] = (
+                                starttime, endtime, allowedmarg,
+                                allowedmarg_unit, repeats, note, isavoid)
+                        except AttributeError or NameError:
+                            self.time_constrain = pd.DataFrame(
+                                [(starttime, endtime, allowedmarg,
+                                 allowedmarg_unit, repeats, note, isavoid)],
+                                columns=['startRime', 'endTime',
+                                         'allowedMargin', 'allowedUnits',
+                                         'repeats', 'note', 'isavoid'],
+                                index=[partid])
 
         except AttributeError:
             print "Project %s has not ObsUnitSets" % code
