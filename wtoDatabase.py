@@ -474,22 +474,35 @@ class WtoDatabase(object):
                 bands = sciencegoal.requiredReceiverBands.pyval
                 istimeconst = perfparam.isTimeConstrained.pyval
                 if istimeconst:
-                    temppar = perfparam.TemporalParameters
-                    starttime = temppar.startTime.pyval
-                    endtime = temppar.endTime.pyval
-                    allowedmarg = temppar.allowedMargin.pyval
-                    allowedmarg_unit = temppar.allowedMarg.bin.attrib['unit']
-                    repeats = temppar.repeats.pyval
-                    note = temppar.note.pyval
                     try:
-                        isavoid = temppar.isAvoidConstraint.pyval
-                    except AttributeError:
-                        isavoid = False
+                        temppar = perfparam.TemporalParameters
+                        starttime = temppar.startTime.pyval
+                        endtime = temppar.endTime.pyval
+                        try:
+                            allowedmarg = temppar.allowedMargin.pyval
+                            allowedmarg_unit = temppar.allowedMarg.bin.attrib[
+                                'unit']
+                        except AttributeError:
+                            allowedmarg = 0
+                            allowedmarg_unit = 'n'
+                        repeats = temppar.repeats.pyval
+                        note = temppar.note.pyval
+                        try:
+                            isavoid = temppar.isAvoidConstraint.pyval
+                        except AttributeError:
+                            isavoid = False
+                    except AttributeError, e:
+                        print("Project %s is timeconstrain but no parameters?"
+                              "(%s)" % (code, e))
+                        temppar, starttime, endtime, allowedmarg = (
+                            '', '', '', 0.)
+                        allowedmarg_unit, repeats, note, isavoid = (
+                            'd', '', '', False)
                 else:
                     temppar, starttime, endtime, allowedmarg = (
-                        pd.NaT, pd.NaT, pd.NaT, pd.NaT)
+                        '', '', '', 0.)
                     allowedmarg_unit, repeats, note, isavoid = (
-                        pd.NaT, pd.NaT, pd.NaT, pd.NaT)
+                        'd', '', '', False)
 
                 try:
                     ss = sciencegoal.SpectralSetupParameters.SpectralScan
@@ -520,7 +533,7 @@ class WtoDatabase(object):
                         allowedmarg_unit, repeats, note, isavoid)
 
         except AttributeError, e:
-            print "Project %s has not ObsUnitSets (%s)" % (code, e)
+            print "Project %s has no ObsUnitSets (%s)" % (code, e)
             return 0
         return 0
 
@@ -665,7 +678,7 @@ class WtoDatabase(object):
             qc_radius_unit = querysource.searchRadius.attrib['unit']
         else:
             qc_intendeduse, qc_ra, qc_dec, qc_use, qc_radius, qc_radius_unit = (
-                pd.NaT, pd.NaT, pd.NaT, pd.NaT, pd.NaT, pd.NaT
+                '', 0., 0., '', 0., 0.
             )
         ra = coord.findall(val + 'longitude')[0].pyval
         dec = coord.findall(val + 'latitude')[0].pyval
@@ -943,29 +956,3 @@ class SchedBlocK(object):
         tree = objectify.parse(io_file)
         io_file.close()
         self.data = tree.getroot()
-
-# Function to find outsync SBs...
-# import cx_Oracle
-# connection = cx_Oracle.connect(conx_string_sco)
-# cursor = connection.cursor()
-# cursor.execute(
-#     "SELECT ARCHIVE_UID, TIMESTAMP FROM ALMA.XML_SCHEDBLOCK_ENTITIES")
-# sco = pd.DataFrame(
-#     cursor.fetchall(), columns=[rec[0] for rec in cursor.description])
-# avoid = pd.merge(
-#     datas.schedblocks, sco, left_on='SB_UID',right_on='ARCHIVE_UID'
-# ).query('timestamp < TIMESTAMP').sort('TIMESTAMP', ascending=False
-# ).set_index('SB_UID', drop=False)
-
-# allsbinfo method
-# allsbinfo = pd.merge(
-#     datas.obsproject,
-#     pd.merge(datas.sciencegoals, datas.schedblock_info, on='partId'),
-#              on='CODE')[['CODE', 'PRJ_ARCHIVE_UID', 'name', 'SB_UID',
-#                          'bands', 'repfreq', 'array', 'EXEC', 'RA', 'DEC']]
-# allsbinfo['conf'] = pd.Series(pd.np.zeros(len(allsbinfo)), dtype='a25')
-# allsbinfo.loc[allsbinfo.array == "TWELVE-M", 'conf'] = 'C34'
-# allsbinfo.loc[allsbinfo.array != "TWELVE-M", 'conf'] = ''
-# allsbinfo.sort('CODE').to_csv('/home/aod/wto_conf/all.3.sbinfo',
-#                               sep='\t', header=0, index=0)
-
