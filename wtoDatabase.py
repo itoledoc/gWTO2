@@ -515,7 +515,7 @@ class WtoDatabase(object):
         sb = self.schedblocks.ix[sb_uid]
         pid = sb.partId
         xml = SchedBlocK(sb.sb_xml, self.sbxml)
-
+        new_orig = new
         # Extract root level data
         array = xml.data.findall(
             './/' + prj + 'ObsUnitControl')[0].attrib['arrayRequested']
@@ -581,12 +581,29 @@ class WtoDatabase(object):
         n_ss = len(xml.data.SpectralSpec)
 
         for n in range(n_fs):
-            self.row_fieldsource(xml.data.FieldSource[n])
-        for n in range(n_tg):
-            self.row_target(xml.data.Target[n])
-        for n in range(n_ss):
-            self.row_spectralconf(xml.data.SpectralSpec[n])
+            if new:
+                self.row_fieldsource(xml.data.FieldSource[n], new=new)
+                new = False
+            else:
+                self.row_fieldsource(xml.data.FieldSource[n])
 
+        new = new_orig
+        for n in range(n_tg):
+            if new:
+                self.row_target(xml.data.Target[n], new=new)
+                new = False
+            else:
+                self.row_target(xml.data.Target[n])
+
+        new = new_orig
+        for n in range(n_ss):
+            if new:
+                self.row_spectralconf(xml.data.SpectralSpec[n], new=new)
+                new = False
+            else:
+                self.row_spectralconf(xml.data.SpectralSpec[n])
+
+        new = new_orig
         if new:
             self.schedblock_info = pd.DataFrame(
                 [(sb_uid, pid, name, status, repfreq, array, ra, dec,
@@ -599,13 +616,51 @@ class WtoDatabase(object):
                 sb_uid, pid, name, status, repfreq, array, ra, dec, minar_old,
                 maxar_old, execount)
 
-    def row_fieldsource(self, fs):
+    def row_fieldsource(self, fs, new=False):
+        partid = fs.attrib['entityPartId']
+        coord = fs.sourceCoordinates
+        solarsystem = fs.attrib['solarSystemObject']
+        sourcename = fs.sourceName.pyval
+        name = fs.name.pyval
+        isquery = fs.isQuery.pyval
+        if isquery:
+            querysource = fs.QuerySource
+            qc_intendeduse = querysource.attrib['intendedUse']
+            qcenter = querysource.queryCenter
+            qc_ra = qcenter.findall('.//' + val + 'longitude')[0].pyval
+            qc_dec = qcenter.findall('.//' + val + 'latitude')[0].pyval
+            qc_use = querysource.use.pyval
+            qc_radius = querysource.searchRadius.pyval
+            qc_radius_unit = querysource.searchRadius.attrib['unit']
+        else:
+            qc_intendeduse, qc_ra, qc_dec, qc_use, qc_radius, qc_radius_unit = (
+                pd.NaT, pd.NaT, pd.NaT, pd.NaT, pd.NaT, pd.NaT
+            )
+        ra = coord.findall('.//' + val + 'longitude')[0].pyval
+        dec = coord.findall('.//' + val + 'latitude')[0].pyval
+        if solarsystem == 'Ephemeris':
+            ephemeris = fs.sourceEphemeris.text
+        else:
+            ephemeris = pd.NaT
+        if new:
+            self.fieldsource = pd.DataFrame(
+                [(partid, solarsystem, sourcename, name, ra, dec, isquery,
+                  qc_intendeduse, qc_ra, qc_dec, qc_use, qc_radius,
+                  qc_radius_unit, ephemeris)],
+                columns=['partId', 'solarSystem', 'sourcename', 'name', 'RA',
+                         'DEC', 'isQuery', 'intendedUse', 'qRA', 'qDEC', 'use',
+                         'search_radius', 'rad_unit', 'ephemeris'],
+                index=[partid]
+            )
+        self.fieldsource.ix[partid] = (
+            partid, solarsystem, sourcename, name, ra, dec, isquery,
+            qc_intendeduse, qc_ra, qc_dec, qc_use, qc_radius, qc_radius_unit,
+            ephemeris)
+
+    def row_target(self, tg, new=False):
         pass
 
-    def row_target(self, tg):
-        pass
-
-    def row_spectralconf(self, ss):
+    def row_spectralconf(self, ss, new=False):
         pass
 
     def row_schedblocks(self, sb_uid, partid, new=False):
@@ -638,7 +693,7 @@ class WtoDatabase(object):
         repfreq = sbinfo.repfreq
         dec = sbinfo.DEC
         c_bmax = 0.862 / pd.np.cos(pd.np.radians(-23.0262015) -
-                                   pd.np.radians(dec))
+                                   pd.np.radians(dec)) + 0.138
         c_freq = repfreq / 100.
         corr = c_freq / c_bmax
         useACA = sg.useACA
@@ -766,12 +821,12 @@ class WtoDatabase(object):
             allsb1 = allsb[allsb.CODE.str.startswith('2012')]
             allsb2 = allsb[allsb.CODE.str.startswith('2013')]
             allsb1.sort('CODE').to_csv(
-                self.path + 'allsbC1.info', sep='\t', header=False, index=False)
+                self.path + 'allC1.sbinfo', sep='\t', header=False, index=False)
             allsb2.sort('CODE').to_csv(
-                self.path + 'allsbC2.info', sep='\t', header=False, index=False)
+                self.path + 'allC2.sbinfo', sep='\t', header=False, index=False)
         else:
             allsb.sort('CODE').to_csv(
-                self.path + 'allsb.info', sep='\t', header=False, index=False)
+                self.path + 'all.sbinfo', sep='\t', header=False, index=False)
 
 
 class ObsProject(object):
