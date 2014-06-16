@@ -14,6 +14,7 @@ conx_string = 'almasu/alma4dba@ALMA_ONLINE.OSF.CL'
 conx_string_sco = 'almasu/alma4dba@ALMA_ONLINE.SCO.CL'
 prj = '{Alma/ObsPrep/ObsProject}'
 val = '{Alma/ValueTypes}'
+sbl = '{Alma/ObsPrep/SchedBlock}'
 
 
 class WtoDatabase(object):
@@ -39,11 +40,13 @@ class WtoDatabase(object):
             ['obsproject.pandas', source, 'sciencegoals.pandas',
              'scheduling.pandas', 'special.list', 'pwvdata.pandas',
              'executive.pandas', 'sbxml_table.pandas', 'sbinfo.pandas',
-             'newar.pandas', 'fieldsource.pandas'],
+             'newar.pandas', 'fieldsource.pandas', 'target.pandas',
+             'spectralconf.pandas'],
             index=['obsproject_table', 'source', 'sciencegoals_table',
                    'scheduling_table', 'special', 'pwv_data',
                    'executive_table', 'sbxml_table', 'sbinfo_table',
-                   'newar_table', 'fieldsource_table'])
+                   'newar_table', 'fieldsource_table', 'target_table',
+                   'spectralconf_table'])
         self.states = ["Approved", "Phase1Submitted", "Broken",
                        "Canceled", "Rejected"]
 
@@ -119,6 +122,10 @@ class WtoDatabase(object):
                     self.path + self.preferences.newar_table)
                 self.fieldsource = pd.read_pickle(
                     self.path + self.preferences.fieldsource_table)
+                self.target = pd.read_pickle(
+                    self.path + self.preferences.target_table)
+                #self.spectralconf = pd.read_pickle(
+                #    self.path + self.preferences.spectralconf_table)
                 self.filter_c1()
                 self.update()
             except IOError, e:
@@ -193,7 +200,7 @@ class WtoDatabase(object):
             print(len(df1.query('DOMAIN_ENTITY_STATE not in @states')))
             self.obsproject = pd.merge(
                 df1.query('DOMAIN_ENTITY_STATE not in @states'), self.executive,
-                on='PRJ_ARCHIVE_UID').set_index('CODE', drop=False).ix[0:40]
+                on='PRJ_ARCHIVE_UID').set_index('CODE', drop=False)
         else:
             if type(self.source) is not str and type(self.source) is not list:
                 print "The source should be a string or a list"
@@ -335,7 +342,12 @@ class WtoDatabase(object):
                 self.path + self.preferences.sbinfo_table)
             self.newar.to_pickle(
                 self.path + self.preferences.newar_table)
-
+            self.fieldsource.to_pickle(
+                self.path + self.preferences.fieldsource_table)
+            self.target.to_pickle(
+                self.path + self.preferences.target_table)
+            #self.spectralconf.to_pickle(
+            #    self.path + self.preferences.spectralconf_table)
         newest = self.schedblocks.timestamp.max()
         sql = str(
             "SELECT ARCHIVE_UID, TIMESTAMP FROM ALMA.XML_SCHEDBLOCK_ENTITIES "
@@ -366,6 +378,10 @@ class WtoDatabase(object):
                 self.path + self.preferences.newar_table)
             self.fieldsource.to_pickle(
                 self.path + self.preferences.fieldsource_table)
+            self.target.to_pickle(
+                self.path + self.preferences.target_table)
+            #self.spectralconf.to_pickle(
+            #    self.path + self.preferences.spectralconf_table)
         self.create_summary()
 
     def populate_sciencegoals_sbxml(self):
@@ -392,6 +408,10 @@ class WtoDatabase(object):
             self.path + self.preferences.sbinfo_table)
         self.fieldsource.to_pickle(
             self.path + self.preferences.fieldsource_table)
+        self.target.to_pickle(
+            self.path + self.preferences.target_table)
+        #self.spectralconf.to_pickle(
+        #    self.path + self.preferences.spectralconf_table)
 
     def populate_schedblocks(self):
         new = True
@@ -458,10 +478,18 @@ class WtoDatabase(object):
                     starttime = temppar.startTime.pyval
                     endtime = temppar.endTime.pyval
                     allowedmarg = temppar.allowedMargin.pyval
-                    allowedmarg_unit = temppar.allowedMargin.attrib['unit']
+                    allowedmarg_unit = temppar.allowedMarg.bin.attrib['unit']
                     repeats = temppar.repeats.pyval
                     note = temppar.note.pyval
-                    isavoid = temppar.isAvoidConstraint.pyval
+                    try:
+                        isavoid = temppar.isAvoidConstraint.pyval
+                    except AttributeError:
+                        isavoid = False
+                else:
+                    temppar, starttime, endtime, allowedmarg = (
+                        pd.NaT, pd.NaT, pd.NaT, pd.NaT)
+                    allowedmarg_unit, repeats, note, isavoid = (
+                        pd.NaT, pd.NaT, pd.NaT, pd.NaT)
 
                 try:
                     ss = sciencegoal.SpectralSetupParameters.SpectralScan
@@ -474,40 +502,25 @@ class WtoDatabase(object):
                 if new:
                     self.sciencegoals = pd.DataFrame(
                         [(code, partid, ar, las, bands, isspectralscan,
-                          istimeconst, useaca, usetp, assoc_sbs[partid])],
+                          istimeconst, useaca, usetp, assoc_sbs[partid],
+                          starttime, endtime, allowedmarg,
+                          allowedmarg_unit, repeats, note, isavoid)],
                         columns=['CODE', 'partId', 'AR', 'LAS', 'bands',
                                  'isSpectralScan', 'isTimeConstrained',
-                                 'useACA', 'useTP', 'SBS'],
+                                 'useACA', 'useTP', 'SBS', 'startRime',
+                                 'endTime', 'allowedMargin', 'allowedUnits',
+                                 'repeats', 'note', 'isavoid'],
                         index=[partid])
-                    if istimeconst:
-                        self.time_constrain = pd.DataFrame(
-                            [(starttime, endtime, allowedmarg,
-                             allowedmarg_unit, repeats, note, isavoid)],
-                            columns=['startRime', 'endTime', 'allowedMargin',
-                                     'allowedUnits', 'repeats', 'note',
-                                     'isavoid'],
-                            index=[partid])
                     new = False
                 else:
                     self.sciencegoals.ix[partid] = (
                         code, partid, ar, las, bands, isspectralscan,
-                        istimeconst, useaca, usetp, assoc_sbs[partid])
-                    if istimeconst:
-                        try:
-                            self.time_constrain.ix[partid] = (
-                                starttime, endtime, allowedmarg,
-                                allowedmarg_unit, repeats, note, isavoid)
-                        except AttributeError or NameError:
-                            self.time_constrain = pd.DataFrame(
-                                [(starttime, endtime, allowedmarg,
-                                 allowedmarg_unit, repeats, note, isavoid)],
-                                columns=['startRime', 'endTime',
-                                         'allowedMargin', 'allowedUnits',
-                                         'repeats', 'note', 'isavoid'],
-                                index=[partid])
+                        istimeconst, useaca, usetp, assoc_sbs[partid],
+                        starttime, endtime, allowedmarg,
+                        allowedmarg_unit, repeats, note, isavoid)
 
-        except AttributeError:
-            print "Project %s has not ObsUnitSets" % code
+        except AttributeError, e:
+            print "Project %s has not ObsUnitSets (%s)" % (code, e)
             return 0
         return 0
 
@@ -518,6 +531,7 @@ class WtoDatabase(object):
         :param new:
         """
         # Open SB with SB parser class
+        print " Processing SB %s" % sb_uid
         sb = self.schedblocks.ix[sb_uid]
         pid = sb.partId
         xml = SchedBlocK(sb.sb_xml, self.sbxml)
@@ -535,37 +549,35 @@ class WtoDatabase(object):
 
         try:
             ampliparam = xml.data.AmplitudeCalParameters
-            amplitude = ampliparam.attrib['entityPartId']
+            amplitude = str(ampliparam.attrib['entityPartId'])
         except AttributeError:
-            ampliparam = pd.NaT
-            amplitude = pd.NaT
+            amplitude = ''
 
         try:
             phaseparam = xml.data.PhaseCalParameters
-            phase = phaseparam.attrib['entityPartId']
+            phase = str(phaseparam.attrib['entityPartId'])
         except AttributeError:
-            phaseparam = pd.NaT
-            phase = pd.NaT
+            phase = ''
 
         try:
             basebandparam = xml.data.BandpassCalParameters
-            baseband = basebandparam.attrib['entityPartId']
+            baseband = str(basebandparam.attrib['entityPartId'])
         except AttributeError:
-            basebandparam = pd.NaT
-            baseband = pd.NaT
+            baseband = ''
         try:
             polarparam = xml.data.PolarizationCalParameters
-            polarization = polarparam.attrib['entityPartId']
-            isPolarization = True
+            polarization = str(polarparam.attrib['entityPartId'])
+            ispolarization = True
         except AttributeError:
-            isPolarization = False
+            ispolarization = False
+            polarization = ''
         try:
             delayparam = xml.data.DelayCalParameters
-            delay = delayparam.attrib['entityPartId']
+            delay = str(delayparam.attrib['entityPartId'])
         except AttributeError:
-            pass  # it doesn't do anything
+            delay = ''
         scienceparam = xml.data.ScienceParameters
-        science = scienceparam.attrib['entityPartId']
+        science = str(scienceparam.attrib['entityPartId'])
         integrationtime = scienceparam.integrationTime.pyval
         integrationtime_unit = scienceparam.integrationTime.attrib['unit']
         subscandur = scienceparam.subScanDuration.pyval
@@ -596,10 +608,10 @@ class WtoDatabase(object):
         new = new_orig
         for n in range(n_tg):
             if new:
-                self.row_target(xml.data.Target[n], new=new)
+                self.row_target(xml.data.Target[n], sb_uid, new=new)
                 new = False
             else:
-                self.row_target(xml.data.Target[n])
+                self.row_target(xml.data.Target[n], sb_uid)
 
         new = new_orig
         for n in range(n_ss):
@@ -613,29 +625,41 @@ class WtoDatabase(object):
         if new:
             self.schedblock_info = pd.DataFrame(
                 [(sb_uid, pid, name, status, repfreq, array, ra, dec,
-                 minar_old, maxar_old, execount)],
+                 minar_old, maxar_old, execount, ispolarization,
+                 amplitude, baseband, polarization, phase, delay, science,
+                 integrationtime, subscandur, maxpwv)],
                 columns=['SB_UID', 'partId', 'name', 'status_xml',
                          'repfreq', 'array', 'RA', 'DEC', 'minAR_old',
-                         'maxAR_old', 'execount'], index=[sb_uid])
+                         'maxAR_old', 'execount', 'isPolarization',
+                         'amplitude', 'baseband', 'polarization', 'phase',
+                         'delay', 'science', 'integrationTime', 'subScandur',
+                         'maxPWVC'], index=[sb_uid])
         else:
             self.schedblock_info.ix[sb_uid] = (
                 sb_uid, pid, name, status, repfreq, array, ra, dec, minar_old,
-                maxar_old, execount)
+                maxar_old, execount, ispolarization,
+                amplitude, baseband, polarization, phase, delay, science,
+                integrationtime, subscandur, maxpwv)
 
     def row_fieldsource(self, fs, new=False):
         partid = fs.attrib['entityPartId']
-        print partid
         coord = fs.sourceCoordinates
         solarsystem = fs.attrib['solarSystemObject']
         sourcename = fs.sourceName.pyval
         name = fs.name.pyval
         isquery = fs.isQuery.pyval
+        pointings = len(fs.findall(sbl + 'PointingPattern/' + sbl +
+                                   'phaseCenterCoordinates'))
+        try:
+            ismosaic = fs.PointingPattern.isMosaic.pyval
+        except AttributeError:
+            ismosaic = False
         if isquery:
             querysource = fs.QuerySource
             qc_intendeduse = querysource.attrib['intendedUse']
             qcenter = querysource.queryCenter
-            qc_ra = qcenter.findall('.//' + val + 'longitude')[0].pyval
-            qc_dec = qcenter.findall('.//' + val + 'latitude')[0].pyval
+            qc_ra = qcenter.findall(val + 'longitude')[0].pyval
+            qc_dec = qcenter.findall(val + 'latitude')[0].pyval
             qc_use = querysource.use.pyval
             qc_radius = querysource.searchRadius.pyval
             qc_radius_unit = querysource.searchRadius.attrib['unit']
@@ -643,29 +667,40 @@ class WtoDatabase(object):
             qc_intendeduse, qc_ra, qc_dec, qc_use, qc_radius, qc_radius_unit = (
                 pd.NaT, pd.NaT, pd.NaT, pd.NaT, pd.NaT, pd.NaT
             )
-        ra = coord.findall('.//' + val + 'longitude')[0].pyval
-        dec = coord.findall('.//' + val + 'latitude')[0].pyval
+        ra = coord.findall(val + 'longitude')[0].pyval
+        dec = coord.findall(val + 'latitude')[0].pyval
         if solarsystem == 'Ephemeris':
-            ephemeris = True
+            ephemeris = fs.sourceEphemeris.pyval
         else:
-            ephemeris = False
+            ephemeris = ''
         if new:
             self.fieldsource = pd.DataFrame(
                 [(partid, solarsystem, sourcename, name, ra, dec, isquery,
                   qc_intendeduse, qc_ra, qc_dec, qc_use, qc_radius,
-                  qc_radius_unit, ephemeris)],
+                  qc_radius_unit, ephemeris, pointings, ismosaic)],
                 columns=['partId', 'solarSystem', 'sourcename', 'name', 'RA',
                          'DEC', 'isQuery', 'intendedUse', 'qRA', 'qDEC', 'use',
-                         'search_radius', 'rad_unit', 'ephemeris'],
+                         'search_radius', 'rad_unit', 'ephemeris',
+                         'pointings', 'isMosaic'],
                 index=[partid]
             )
         self.fieldsource.ix[partid] = (
             partid, solarsystem, sourcename, name, ra, dec, isquery,
             qc_intendeduse, qc_ra, qc_dec, qc_use, qc_radius, qc_radius_unit,
-            ephemeris)
+            ephemeris, pointings, ismosaic)
 
-    def row_target(self, tg, new=False):
-        pass
+    def row_target(self, tg, sbuid, new=False):
+        partid = tg.attrib['entityPartId']
+        specref = tg.AbstractInstrumentSpecRef.attrib['partId']
+        fieldref = tg.FieldSourceRef.attrib['partId']
+        paramref = tg.ObservingParametersRef.attrib['partId']
+        if new:
+            self.target = pd.DataFrame(
+                [(sbuid, specref, fieldref, paramref)],
+                columns=['SB_UID', 'specRef', 'fieldRef', 'paramRef'],
+                index=[partid])
+        else:
+            self.target.ix[partid] = (sbuid, specref, fieldref, paramref)
 
     def row_spectralconf(self, ss, new=False):
         pass
