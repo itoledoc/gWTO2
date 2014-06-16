@@ -639,9 +639,9 @@ class WtoDatabase(object):
         ra = coord.findall('.//' + val + 'longitude')[0].pyval
         dec = coord.findall('.//' + val + 'latitude')[0].pyval
         if solarsystem == 'Ephemeris':
-            ephemeris = fs.sourceEphemeris.pyval
+            ephemeris = True
         else:
-            ephemeris = pd.NaT
+            ephemeris = False
         if new:
             self.fieldsource = pd.DataFrame(
                 [(partid, solarsystem, sourcename, name, ra, dec, isquery,
