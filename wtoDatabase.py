@@ -39,11 +39,11 @@ class WtoDatabase(object):
             ['obsproject.pandas', source, 'sciencegoals.pandas',
              'scheduling.pandas', 'special.list', 'pwvdata.pandas',
              'executive.pandas', 'sbxml_table.pandas', 'sbinfo.pandas',
-             'newar.pandas'],
+             'newar.pandas', 'fieldsource.pandas'],
             index=['obsproject_table', 'source', 'sciencegoals_table',
                    'scheduling_table', 'special', 'pwv_data',
                    'executive_table', 'sbxml_table', 'sbinfo_table',
-                   'newar_table'])
+                   'newar_table', 'fieldsource_table'])
         self.states = ["Approved", "Phase1Submitted", "Broken",
                        "Canceled", "Rejected"]
 
@@ -117,6 +117,8 @@ class WtoDatabase(object):
                     self.path + self.preferences.sbinfo_table)
                 self.newar = pd.read_pickle(
                     self.path + self.preferences.newar_table)
+                self.fieldsource = pd.read_pickle(
+                    self.path + self.preferences.fieldsource_table)
                 self.filter_c1()
                 self.update()
             except IOError, e:
@@ -191,7 +193,7 @@ class WtoDatabase(object):
             print(len(df1.query('DOMAIN_ENTITY_STATE not in @states')))
             self.obsproject = pd.merge(
                 df1.query('DOMAIN_ENTITY_STATE not in @states'), self.executive,
-                on='PRJ_ARCHIVE_UID').set_index('CODE', drop=False)
+                on='PRJ_ARCHIVE_UID').set_index('CODE', drop=False).ix[0:40]
         else:
             if type(self.source) is not str and type(self.source) is not list:
                 print "The source should be a string or a list"
@@ -362,6 +364,8 @@ class WtoDatabase(object):
                 self.path + self.preferences.sbinfo_table)
             self.newar.to_pickle(
                 self.path + self.preferences.newar_table)
+            self.fieldsource.to_pickle(
+                self.path + self.preferences.fieldsource_table)
         self.create_summary()
 
     def populate_sciencegoals_sbxml(self):
@@ -386,6 +390,8 @@ class WtoDatabase(object):
             new = False
         self.schedblock_info.to_pickle(
             self.path + self.preferences.sbinfo_table)
+        self.fieldsource.to_pickle(
+            self.path + self.preferences.fieldsource_table)
 
     def populate_schedblocks(self):
         new = True
@@ -618,6 +624,7 @@ class WtoDatabase(object):
 
     def row_fieldsource(self, fs, new=False):
         partid = fs.attrib['entityPartId']
+        print partid
         coord = fs.sourceCoordinates
         solarsystem = fs.attrib['solarSystemObject']
         sourcename = fs.sourceName.pyval
