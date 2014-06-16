@@ -652,17 +652,18 @@ class WtoDatabase(object):
             ephemeris = None
         if new:
             self.fieldsource = pd.DataFrame(
-                [(sbuid, solarsystem, sourcename, name, ra, dec, isquery,
+                [(partid, sbuid, solarsystem, sourcename, name, ra, dec, isquery,
                   qc_intendeduse, qc_ra, qc_dec, qc_use, qc_radius,
                   qc_radius_unit, ephemeris, pointings, ismosaic)],
-                columns=['SB_UID', 'solarSystem', 'sourcename', 'name', 'RA',
+                columns=['fieldRef', 'SB_UID', 'solarSystem', 'sourcename',
+                         'name', 'RA',
                          'DEC', 'isQuery', 'intendedUse', 'qRA', 'qDEC', 'use',
                          'search_radius', 'rad_unit', 'ephemeris',
                          'pointings', 'isMosaic'],
                 index=[partid]
             )
         self.fieldsource.ix[partid] = (
-            sbuid, solarsystem, sourcename, name, ra, dec, isquery,
+            partid, sbuid, solarsystem, sourcename, name, ra, dec, isquery,
             qc_intendeduse, qc_ra, qc_dec, qc_use, qc_radius, qc_radius_unit,
             ephemeris, pointings, ismosaic)
 
@@ -697,11 +698,11 @@ class WtoDatabase(object):
                 nspw += len(bbconf.ACASpectralWindow)
         if new:
             self.spectralconf = pd.DataFrame(
-                [(sbuid, nbb, nspw)],
-                columns=['SB_UID', 'BaseBands', 'SPWs'],
+                [(partid, sbuid, nbb, nspw)],
+                columns=['specRef', 'SB_UID', 'BaseBands', 'SPWs'],
                 index=[partid])
         else:
-            self.spectralconf.ix[partid] = (sbuid, nbb, nspw)
+            self.spectralconf.ix[partid] = (partid, sbuid, nbb, nspw)
 
     def row_schedblocks(self, sb_uid, partid, new=False):
 
@@ -941,3 +942,49 @@ class SchedBlocK(object):
         tree = objectify.parse(io_file)
         io_file.close()
         self.data = tree.getroot()
+
+
+def convert_deg(angle, unit):
+    value = angle
+    if unit == 'mas':
+        value /= 3600000.
+    elif unit == 'arcsec':
+        value /= 3600.
+    elif unit == 'arcmin':
+        value /= 60.
+    elif unit == 'rad':
+        value = value * pd.np.pi / 180.
+    elif unit == 'hours':
+        value *= 15.
+    return value
+
+
+def convert_jy(flux, unit):
+    value = flux
+    if unit == 'Jy':
+        value = value
+    elif unit == 'mJy':
+        value /= 1000.
+    return value
+
+
+def convert_mjy(flux, unit):
+    value = flux
+    if unit == 'Jy':
+        value *= 1e3
+    elif unit == 'mJy':
+        value = value
+    return value
+
+
+def convert_ghz(freq, unit):
+    value = freq
+    if unit == 'GHz':
+        value = value
+    elif unit == 'MHz':
+        value *= 1e-3
+    elif unit == 'kHz':
+        value *= 1e-6
+    elif unit == 'Hz':
+        value *= 1e-9
+    return value
