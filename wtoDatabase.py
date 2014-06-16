@@ -639,7 +639,7 @@ class WtoDatabase(object):
         ra = coord.findall('.//' + val + 'longitude')[0].pyval
         dec = coord.findall('.//' + val + 'latitude')[0].pyval
         if solarsystem == 'Ephemeris':
-            ephemeris = fs.sourceEphemeris.text
+            ephemeris = fs.sourceEphemeris.pyval
         else:
             ephemeris = pd.NaT
         if new:
