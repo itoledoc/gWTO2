@@ -124,8 +124,8 @@ class WtoDatabase(object):
                     self.path + self.preferences.fieldsource_table)
                 self.target = pd.read_pickle(
                     self.path + self.preferences.target_table)
-                #self.spectralconf = pd.read_pickle(
-                #    self.path + self.preferences.spectralconf_table)
+                self.spectralconf = pd.read_pickle(
+                    self.path + self.preferences.spectralconf_table)
                 self.filter_c1()
                 self.update()
             except IOError, e:
@@ -148,38 +148,6 @@ class WtoDatabase(object):
 
     def start_wto(self):
 
-        """
-        Procedures to initalize executive and obsproject dataframes.
-        The obsproject dataframe is filtered by Cycle 1 projects carried over
-        to Cycle 2. Dataframe structures:
-
-        ===============
-        self.obsproject
-        ===============
-        PRJ_ARCHIVE_UID                  String
-        DELETED                           int64
-        PI                               String
-        PRJ_NAME                         String
-        ** CODE                          String
-        PRJ_TIME_OF_CREATION             String
-        PRJ_SCIENTIFIC_RANK               int64
-        PRJ_VERSION                      String
-        PRJ_ASSIGNED_PRIORITY            String
-        PRJ_LETTER_GRADE                 String
-        DOMAIN_ENTITY_STATE              String
-        OBS_PROJECT_ID                   String
-        EXEC                             String
-        timestamp                datetime64[ns]
-        obsproj                          String
-
-        ==============
-        self.executive
-        ==============
-        ** PRJ_ARCHIVE_UID object
-        EXEC               object
-
-        :return: None only in case of failure. Else, nothing
-        """
         states = self.states
 
         sql2 = str(
@@ -346,8 +314,8 @@ class WtoDatabase(object):
                 self.path + self.preferences.fieldsource_table)
             self.target.to_pickle(
                 self.path + self.preferences.target_table)
-            #self.spectralconf.to_pickle(
-            #    self.path + self.preferences.spectralconf_table)
+            self.spectralconf.to_pickle(
+                self.path + self.preferences.spectralconf_table)
         newest = self.schedblocks.timestamp.max()
         sql = str(
             "SELECT ARCHIVE_UID, TIMESTAMP FROM ALMA.XML_SCHEDBLOCK_ENTITIES "
@@ -380,8 +348,8 @@ class WtoDatabase(object):
                 self.path + self.preferences.fieldsource_table)
             self.target.to_pickle(
                 self.path + self.preferences.target_table)
-            #self.spectralconf.to_pickle(
-            #    self.path + self.preferences.spectralconf_table)
+            self.spectralconf.to_pickle(
+                self.path + self.preferences.spectralconf_table)
         self.create_summary()
 
     def populate_sciencegoals_sbxml(self):
@@ -410,8 +378,8 @@ class WtoDatabase(object):
             self.path + self.preferences.fieldsource_table)
         self.target.to_pickle(
             self.path + self.preferences.target_table)
-        #self.spectralconf.to_pickle(
-        #    self.path + self.preferences.spectralconf_table)
+        self.spectralconf.to_pickle(
+            self.path + self.preferences.spectralconf_table)
 
     def populate_schedblocks(self):
         new = True
@@ -483,26 +451,26 @@ class WtoDatabase(object):
                             allowedmarg_unit = temppar.allowedMarg.bin.attrib[
                                 'unit']
                         except AttributeError:
-                            allowedmarg = 0
-                            allowedmarg_unit = 'n'
+                            allowedmarg = None
+                            allowedmarg_unit = None
                         repeats = temppar.repeats.pyval
                         note = temppar.note.pyval
                         try:
                             isavoid = temppar.isAvoidConstraint.pyval
                         except AttributeError:
-                            isavoid = False
+                            isavoid = None
                     except AttributeError, e:
                         print("Project %s is timeconstrain but no parameters?"
                               "(%s)" % (code, e))
                         temppar, starttime, endtime, allowedmarg = (
-                            '', '', '', 0.)
+                            None, None, None, None)
                         allowedmarg_unit, repeats, note, isavoid = (
-                            'd', '', '', False)
+                            None, None, None, None)
                 else:
                     temppar, starttime, endtime, allowedmarg = (
-                        '', '', '', 0.)
+                        None, None, None, None)
                     allowedmarg_unit, repeats, note, isavoid = (
-                        'd', '', '', False)
+                        None, None, None, None)
 
                 try:
                     ss = sciencegoal.SpectralSetupParameters.SpectralScan
@@ -538,11 +506,7 @@ class WtoDatabase(object):
         return 0
 
     def row_schedblock_info(self, sb_uid, new=False):
-        """
-        Populate dataframes self.schedblock_info
-        :param sb_uid:
-        :param new:
-        """
+
         # Open SB with SB parser class
         print " Processing SB %s" % sb_uid
         sb = self.schedblocks.ix[sb_uid]
@@ -564,31 +528,31 @@ class WtoDatabase(object):
             ampliparam = xml.data.AmplitudeCalParameters
             amplitude = str(ampliparam.attrib['entityPartId'])
         except AttributeError:
-            amplitude = ''
+            amplitude = None
 
         try:
             phaseparam = xml.data.PhaseCalParameters
             phase = str(phaseparam.attrib['entityPartId'])
         except AttributeError:
-            phase = ''
+            phase = None
 
         try:
             basebandparam = xml.data.BandpassCalParameters
             baseband = str(basebandparam.attrib['entityPartId'])
         except AttributeError:
-            baseband = ''
+            baseband = None
         try:
             polarparam = xml.data.PolarizationCalParameters
             polarization = str(polarparam.attrib['entityPartId'])
             ispolarization = True
         except AttributeError:
             ispolarization = False
-            polarization = ''
+            polarization = None
         try:
             delayparam = xml.data.DelayCalParameters
             delay = str(delayparam.attrib['entityPartId'])
         except AttributeError:
-            delay = ''
+            delay = None
         scienceparam = xml.data.ScienceParameters
         science = str(scienceparam.attrib['entityPartId'])
         integrationtime = scienceparam.integrationTime.pyval
@@ -613,10 +577,10 @@ class WtoDatabase(object):
 
         for n in range(n_fs):
             if new:
-                self.row_fieldsource(xml.data.FieldSource[n], new=new)
+                self.row_fieldsource(xml.data.FieldSource[n], sb_uid, new=new)
                 new = False
             else:
-                self.row_fieldsource(xml.data.FieldSource[n])
+                self.row_fieldsource(xml.data.FieldSource[n], sb_uid)
 
         new = new_orig
         for n in range(n_tg):
@@ -629,10 +593,10 @@ class WtoDatabase(object):
         new = new_orig
         for n in range(n_ss):
             if new:
-                self.row_spectralconf(xml.data.SpectralSpec[n], new=new)
+                self.row_spectralconf(xml.data.SpectralSpec[n], sb_uid, new=new)
                 new = False
             else:
-                self.row_spectralconf(xml.data.SpectralSpec[n])
+                self.row_spectralconf(xml.data.SpectralSpec[n], sb_uid)
 
         new = new_orig
         if new:
@@ -654,7 +618,7 @@ class WtoDatabase(object):
                 amplitude, baseband, polarization, phase, delay, science,
                 integrationtime, subscandur, maxpwv)
 
-    def row_fieldsource(self, fs, new=False):
+    def row_fieldsource(self, fs, sbuid, new=False):
         partid = fs.attrib['entityPartId']
         coord = fs.sourceCoordinates
         solarsystem = fs.attrib['solarSystemObject']
@@ -678,27 +642,27 @@ class WtoDatabase(object):
             qc_radius_unit = querysource.searchRadius.attrib['unit']
         else:
             qc_intendeduse, qc_ra, qc_dec, qc_use, qc_radius, qc_radius_unit = (
-                '', 0., 0., '', 0., 0.
+                None, None, None, None, None, None
             )
         ra = coord.findall(val + 'longitude')[0].pyval
         dec = coord.findall(val + 'latitude')[0].pyval
         if solarsystem == 'Ephemeris':
             ephemeris = fs.sourceEphemeris.pyval
         else:
-            ephemeris = ''
+            ephemeris = None
         if new:
             self.fieldsource = pd.DataFrame(
-                [(partid, solarsystem, sourcename, name, ra, dec, isquery,
+                [(sbuid, solarsystem, sourcename, name, ra, dec, isquery,
                   qc_intendeduse, qc_ra, qc_dec, qc_use, qc_radius,
                   qc_radius_unit, ephemeris, pointings, ismosaic)],
-                columns=['partId', 'solarSystem', 'sourcename', 'name', 'RA',
+                columns=['SB_UID', 'solarSystem', 'sourcename', 'name', 'RA',
                          'DEC', 'isQuery', 'intendedUse', 'qRA', 'qDEC', 'use',
                          'search_radius', 'rad_unit', 'ephemeris',
                          'pointings', 'isMosaic'],
                 index=[partid]
             )
         self.fieldsource.ix[partid] = (
-            partid, solarsystem, sourcename, name, ra, dec, isquery,
+            sbuid, solarsystem, sourcename, name, ra, dec, isquery,
             qc_intendeduse, qc_ra, qc_dec, qc_use, qc_radius, qc_radius_unit,
             ephemeris, pointings, ismosaic)
 
@@ -715,8 +679,29 @@ class WtoDatabase(object):
         else:
             self.target.ix[partid] = (sbuid, specref, fieldref, paramref)
 
-    def row_spectralconf(self, ss, new=False):
-        pass
+    def row_spectralconf(self, ss, sbuid, new=False):
+        partid = ss.attrib['entityPartId']
+        try:
+            corrconf = ss.BLCorrelatorConfiguration
+            nbb = len(corrconf.BLBaseBandConfig)
+            nspw = 0
+            for n in range(nbb):
+                bbconf = corrconf.BLBaseBandConfig[n]
+                nspw += len(bbconf.BLSpectralWindow)
+        except AttributeError:
+            corrconf = ss.ACACorrelatorConfiguration
+            nbb = len(corrconf.ACABaseBandConfig)
+            nspw = 0
+            for n in range(nbb):
+                bbconf = corrconf.ACABaseBandConfig[n]
+                nspw += len(bbconf.ACASpectralWindow)
+        if new:
+            self.spectralconf = pd.DataFrame(
+                [(sbuid, nbb, nspw)],
+                columns=['SB_UID', 'BaseBands', 'SPWs'],
+                index=[partid])
+        else:
+            self.spectralconf.ix[partid] = (sbuid, nbb, nspw)
 
     def row_schedblocks(self, sb_uid, partid, new=False):
 
