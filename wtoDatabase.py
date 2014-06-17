@@ -849,8 +849,8 @@ class WtoDatabase(object):
             copy=False)
         qa0group = self.qa0.groupby(['SCHEDBLOCKUID', 'QA0STATUS'])
         qa0count = qa0group.QA0STATUS.count().unstack()
-        qpass = qa0count[["Pass"]]
-        qunset = qa0count[["Unset"]]
+        qpass = qa0count[["Pass"]].fillna(0)
+        qunset = qa0count[["Unset"]].fillna(0)
         m6 = pd.merge(
             m5, qunset, left_index=True, right_index=True, how='left',
             copy=False)
@@ -868,6 +868,8 @@ class WtoDatabase(object):
              u'MAX_ANG_RESOLUTION', u'OBSUNIT_PROJECT_UID',
              u'DOMAIN_ENTITY_STATE', u'OBS_PROJECT_ID', u'QA0Unset',
              u'QA0Pass'], dtype='object')
+        self.sb_summary['Total_exe'] = self.sb_summary.QA0Unset + \
+            self.sb_summary.QA0Pass
 
     def create_allsb(self, split=False):
         allsb = self.sb_summary[
@@ -886,6 +888,19 @@ class WtoDatabase(object):
         else:
             allsb.sort('CODE').to_csv(
                 self.path + 'all.sbinfo', sep='\t', header=False, index=False)
+
+    def forcenew(self):
+        call(['rm', '-rf', self.path])
+        print self.path + ": creating preferences dir"
+        os.mkdir(self.path)
+        os.mkdir(self.sbxml)
+        os.mkdir(self.obsxml)
+        self.start_wto()
+        self.populate_sciencegoals_sbxml()
+        self.populate_schedblocks()
+        self.populate_schedblock_info()
+        self.populate_newar()
+        self.create_summary()
 
 
 class ObsProject(object):
