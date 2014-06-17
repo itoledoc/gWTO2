@@ -436,9 +436,11 @@ class WtoDatabase(object):
                 partid = sciencegoal.ObsUnitSetRef.attrib['partId']
                 perfparam = sciencegoal.PerformanceParameters
                 ar = perfparam.desiredAngularResolution.pyval
-                # arunit = perfparam.desiredAngularResolution.attrib['unit']
+                arunit = perfparam.desiredAngularResolution.attrib['unit']
+                ar = convert_sec(ar, arunit)
                 las = perfparam.desiredLargestScale.pyval
-                # lasunit = perfparam.desiredLargestScale.attrib['unit']
+                lasunit = perfparam.desiredLargestScale.attrib['unit']
+                las = convert_sec(las, lasunit)
                 bands = sciencegoal.requiredReceiverBands.pyval
                 istimeconst = perfparam.isTimeConstrained.pyval
                 if istimeconst:
@@ -557,8 +559,10 @@ class WtoDatabase(object):
         science = str(scienceparam.attrib['entityPartId'])
         integrationtime = scienceparam.integrationTime.pyval
         integrationtime_unit = scienceparam.integrationTime.attrib['unit']
+        integrationtime = convert_tsec(integrationtime, integrationtime_unit)
         subscandur = scienceparam.subScanDuration.pyval
-        sbuscandur_unit = scienceparam.subScanDuration.attrib['unit']
+        subscandur_unit = scienceparam.subScanDuration.attrib['unit']
+        subscandur = convert_tsec(subscandur, subscandur_unit)
 
         repfreq = schedconstr.representativeFrequency.pyval
         ra = schedconstr.representativeCoordinates.findall(
@@ -567,6 +571,7 @@ class WtoDatabase(object):
             val + 'latitude')[0].pyval
         minar_old = schedconstr.minAcceptableAngResolution.pyval
         maxar_old = schedconstr.maxAcceptableAngResolution.pyval
+        band = schedconstr.attrib['representativeReceiverBand']
 
         execount = schedcontrol.executionCount.pyval
         maxpwv = weather.maxPWVC.pyval
@@ -601,20 +606,21 @@ class WtoDatabase(object):
         new = new_orig
         if new:
             self.schedblock_info = pd.DataFrame(
-                [(sb_uid, pid, name, status, repfreq, array, ra, dec,
-                 minar_old, maxar_old, execount, ispolarization,
-                 amplitude, baseband, polarization, phase, delay, science,
-                 integrationtime, subscandur, maxpwv)],
+                [(sb_uid, pid, name, status,
+                  repfreq, band, array, ra, dec, minar_old,
+                  maxar_old, execount, ispolarization, amplitude,
+                  baseband, polarization, phase, delay,
+                  science, integrationtime, subscandur, maxpwv)],
                 columns=['SB_UID', 'partId', 'name', 'status_xml',
-                         'repfreq', 'array', 'RA', 'DEC', 'minAR_old',
-                         'maxAR_old', 'execount', 'isPolarization',
-                         'amplitude', 'baseband', 'polarization', 'phase',
-                         'delay', 'science', 'integrationTime', 'subScandur',
-                         'maxPWVC'], index=[sb_uid])
+                         'repfreq', 'band', 'array', 'RA', 'DEC', 'minAR_old',
+                         'maxAR_old', 'execount', 'isPolarization', 'amplitude',
+                         'baseband', 'polarization', 'phase', 'delay',
+                         'science', 'integrationTime', 'subScandur', 'maxPWVC'],
+                index=[sb_uid])
         else:
             self.schedblock_info.ix[sb_uid] = (
-                sb_uid, pid, name, status, repfreq, array, ra, dec, minar_old,
-                maxar_old, execount, ispolarization,
+                sb_uid, pid, name, status, repfreq, band, array, ra, dec,
+                minar_old, maxar_old, execount, ispolarization,
                 amplitude, baseband, polarization, phase, delay, science,
                 integrationtime, subscandur, maxpwv)
 
@@ -737,11 +743,11 @@ class WtoDatabase(object):
                                    pd.np.radians(dec)) + 0.138
         c_freq = repfreq / 100.
         corr = c_freq / c_bmax
-        useACA = sg.useACA
-        if useACA:
-            useACA = 'Y'
+        useaca= sg.useACA
+        if useaca:
+            useaca = 'Y'
         else:
-            useACA = 'N'
+            useaca = 'N'
         ar = sg.AR
         las = sg.LAS
         name = sbinfo['name']
@@ -768,7 +774,7 @@ class WtoDatabase(object):
             except IndexError:
                 sbnum = 1
 
-        newAR = ARes.arrayRes([self.wto_path, ar, las, repfreq, useACA, sbnum])
+        newAR = ARes.arrayRes([self.wto_path, ar, las, repfreq, useaca, sbnum])
         newAR.silentRun()
         minarE, maxarE, minarC, maxarC = newAR.run()
 
@@ -959,12 +965,33 @@ def convert_deg(angle, unit):
     return value
 
 
+def convert_sec(angle, unit):
+    value = angle
+    if unit == 'mas':
+        value /= 1000.
+    elif unit == 'arcsec':
+        value /= 1.
+    elif unit == 'arcmin':
+        value *= 60.
+    elif unit == 'rad':
+        value = (value * pd.np.pi / 180.) * 3600.
+    elif unit == 'hours':
+        value *= 15. * 3600.
+    elif unit == 'deg':
+        value *= 3600.
+    else:
+        return None
+    return value
+
+
 def convert_jy(flux, unit):
     value = flux
     if unit == 'Jy':
         value = value
     elif unit == 'mJy':
         value /= 1000.
+    else:
+        return None
     return value
 
 
@@ -974,6 +1001,8 @@ def convert_mjy(flux, unit):
         value *= 1e3
     elif unit == 'mJy':
         value = value
+    else:
+        return None
     return value
 
 
@@ -987,4 +1016,18 @@ def convert_ghz(freq, unit):
         value *= 1e-6
     elif unit == 'Hz':
         value *= 1e-9
+    else:
+        return None
     return value
+
+
+def convert_tsec(time, unit):
+    value = time
+    if unit == 's':
+        return value
+    elif unit == 'min':
+        return value * 60.
+    elif unit == 'h':
+        return value * 3600.
+    else:
+        return None
