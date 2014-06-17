@@ -1,0 +1,1134 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    
+    <title>wtoDatabase &mdash; gWTO 0.1 documentation</title>
+    
+    <link rel="stylesheet" href="../_static/default.css" type="text/css" />
+    <link rel="stylesheet" href="../_static/pygments.css" type="text/css" />
+    
+    <script type="text/javascript">
+      var DOCUMENTATION_OPTIONS = {
+        URL_ROOT:    '../',
+        VERSION:     '0.1',
+        COLLAPSE_INDEX: false,
+        FILE_SUFFIX: '.html',
+        HAS_SOURCE:  true
+      };
+    </script>
+    <script type="text/javascript" src="../_static/jquery.js"></script>
+    <script type="text/javascript" src="../_static/underscore.js"></script>
+    <script type="text/javascript" src="../_static/doctools.js"></script>
+    <link rel="top" title="gWTO 0.1 documentation" href="../index.html" />
+    <link rel="up" title="Module code" href="index.html" /> 
+  </head>
+  <body>
+    <div class="related">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="../genindex.html" title="General Index"
+             accesskey="I">index</a></li>
+        <li class="right" >
+          <a href="../py-modindex.html" title="Python Module Index"
+             >modules</a> |</li>
+        <li><a href="../index.html">gWTO 0.1 documentation</a> &raquo;</li>
+          <li><a href="index.html" accesskey="U">Module code</a> &raquo;</li> 
+      </ul>
+    </div>  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          <div class="body">
+            
+  <h1>Source code for wtoDatabase</h1><div class="highlight"><pre>
+<span class="n">__author__</span> <span class="o">=</span> <span class="s">&#39;itoledo&#39;</span>
+<span class="n">__metaclass__</span> <span class="o">=</span> <span class="nb">type</span>
+
+<span class="kn">import</span> <span class="nn">numpy</span> <span class="kn">as</span> <span class="nn">np</span>
+<span class="kn">import</span> <span class="nn">pandas</span> <span class="kn">as</span> <span class="nn">pd</span>
+<span class="kn">import</span> <span class="nn">csv</span>
+<span class="kn">import</span> <span class="nn">cx_Oracle</span>
+<span class="kn">import</span> <span class="nn">os</span>
+<span class="kn">from</span> <span class="nn">lxml</span> <span class="kn">import</span> <span class="n">objectify</span>
+<span class="kn">from</span> <span class="nn">subprocess</span> <span class="kn">import</span> <span class="n">call</span>
+<span class="kn">import</span> <span class="nn">arrayResolution2p</span> <span class="kn">as</span> <span class="nn">ARes</span>
+
+<span class="n">conx_string</span> <span class="o">=</span> <span class="s">&#39;almasu/alma4dba@ALMA_ONLINE.OSF.CL&#39;</span>
+<span class="n">conx_string_sco</span> <span class="o">=</span> <span class="s">&#39;almasu/alma4dba@ALMA_ONLINE.SCO.CL&#39;</span>
+<span class="n">prj</span> <span class="o">=</span> <span class="s">&#39;{Alma/ObsPrep/ObsProject}&#39;</span>
+<span class="n">val</span> <span class="o">=</span> <span class="s">&#39;{Alma/ValueTypes}&#39;</span>
+<span class="n">sbl</span> <span class="o">=</span> <span class="s">&#39;{Alma/ObsPrep/SchedBlock}&#39;</span>
+
+
+<div class="viewcode-block" id="WtoDatabase"><a class="viewcode-back" href="../index.html#wtoDatabase.WtoDatabase">[docs]</a><span class="k">class</span> <span class="nc">WtoDatabase</span><span class="p">(</span><span class="nb">object</span><span class="p">):</span>
+
+    <span class="sd">&quot;&quot;&quot;</span>
+
+
+<span class="sd">    :param default: Path for data cache</span>
+<span class="sd">    :type default: str.</span>
+<span class="sd">    :param source: File or list of strings with the codes of the projects</span>
+<span class="sd">        to be ingested by WtoDatabase</span>
+<span class="sd">    :type source: list or str</span>
+<span class="sd">    :param forcenew: Force cache cleaning and reload from archive</span>
+<span class="sd">    :type forcenew: boolean, default False</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">default</span><span class="o">=</span><span class="s">&#39;/.wto/&#39;</span><span class="p">,</span> <span class="n">source</span><span class="o">=</span><span class="bp">None</span><span class="p">,</span> <span class="n">forcenew</span><span class="o">=</span><span class="bp">False</span><span class="p">):</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">source</span> <span class="o">=</span> <span class="n">source</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">new</span> <span class="o">=</span> <span class="n">forcenew</span>
+        <span class="c"># Default Paths and Preferences</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">path</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">environ</span><span class="p">[</span><span class="s">&#39;HOME&#39;</span><span class="p">]</span> <span class="o">+</span> <span class="n">default</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">wto_path</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">environ</span><span class="p">[</span><span class="s">&#39;WTO&#39;</span><span class="p">]</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">sbxml</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">path</span> <span class="o">+</span> <span class="s">&#39;sbxml/&#39;</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">obsxml</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">path</span> <span class="o">+</span> <span class="s">&#39;obsxml/&#39;</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">preferences</span> <span class="o">=</span> <span class="n">pd</span><span class="o">.</span><span class="n">Series</span><span class="p">(</span>
+            <span class="p">[</span><span class="s">&#39;obsproject.pandas&#39;</span><span class="p">,</span> <span class="n">source</span><span class="p">,</span> <span class="s">&#39;sciencegoals.pandas&#39;</span><span class="p">,</span>
+             <span class="s">&#39;scheduling.pandas&#39;</span><span class="p">,</span> <span class="s">&#39;special.list&#39;</span><span class="p">,</span> <span class="s">&#39;pwvdata.pandas&#39;</span><span class="p">,</span>
+             <span class="s">&#39;executive.pandas&#39;</span><span class="p">,</span> <span class="s">&#39;sbxml_table.pandas&#39;</span><span class="p">,</span> <span class="s">&#39;sbinfo.pandas&#39;</span><span class="p">,</span>
+             <span class="s">&#39;newar.pandas&#39;</span><span class="p">,</span> <span class="s">&#39;fieldsource.pandas&#39;</span><span class="p">,</span> <span class="s">&#39;target.pandas&#39;</span><span class="p">,</span>
+             <span class="s">&#39;spectralconf.pandas&#39;</span><span class="p">],</span>
+            <span class="n">index</span><span class="o">=</span><span class="p">[</span><span class="s">&#39;obsproject_table&#39;</span><span class="p">,</span> <span class="s">&#39;source&#39;</span><span class="p">,</span> <span class="s">&#39;sciencegoals_table&#39;</span><span class="p">,</span>
+                   <span class="s">&#39;scheduling_table&#39;</span><span class="p">,</span> <span class="s">&#39;special&#39;</span><span class="p">,</span> <span class="s">&#39;pwv_data&#39;</span><span class="p">,</span>
+                   <span class="s">&#39;executive_table&#39;</span><span class="p">,</span> <span class="s">&#39;sbxml_table&#39;</span><span class="p">,</span> <span class="s">&#39;sbinfo_table&#39;</span><span class="p">,</span>
+                   <span class="s">&#39;newar_table&#39;</span><span class="p">,</span> <span class="s">&#39;fieldsource_table&#39;</span><span class="p">,</span> <span class="s">&#39;target_table&#39;</span><span class="p">,</span>
+                   <span class="s">&#39;spectralconf_table&#39;</span><span class="p">])</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">states</span> <span class="o">=</span> <span class="p">[</span><span class="s">&quot;Approved&quot;</span><span class="p">,</span> <span class="s">&quot;Phase1Submitted&quot;</span><span class="p">,</span> <span class="s">&quot;Broken&quot;</span><span class="p">,</span>
+                       <span class="s">&quot;Canceled&quot;</span><span class="p">,</span> <span class="s">&quot;Rejected&quot;</span><span class="p">]</span>
+
+        <span class="c"># Global SQL search expressions</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">sql1</span> <span class="o">=</span> <span class="nb">str</span><span class="p">(</span>
+            <span class="s">&quot;SELECT PRJ_ARCHIVE_UID,DELETED,PI,PRJ_NAME, &quot;</span>
+            <span class="s">&quot;CODE,PRJ_TIME_OF_CREATION,PRJ_SCIENTIFIC_RANK,PRJ_VERSION,&quot;</span>
+            <span class="s">&quot;PRJ_ASSIGNED_PRIORITY,PRJ_LETTER_GRADE,DOMAIN_ENTITY_STATE,&quot;</span>
+            <span class="s">&quot;OBS_PROJECT_ID &quot;</span>
+            <span class="s">&quot;FROM ALMA.BMMV_OBSPROJECT obs1, ALMA.OBS_PROJECT_STATUS obs2  &quot;</span>
+            <span class="s">&quot;WHERE regexp_like (CODE, &#39;^201[23].*\.[AST]&#39;) &quot;</span>
+            <span class="s">&quot;AND (PRJ_LETTER_GRADE=&#39;A&#39; OR PRJ_LETTER_GRADE=&#39;B&#39; &quot;</span>
+            <span class="s">&quot;OR PRJ_LETTER_GRADE=&#39;C&#39;) &quot;</span>
+            <span class="s">&quot;AND obs2.OBS_PROJECT_ID = obs1.PRJ_ARCHIVE_UID&quot;</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">sqlsched_proj</span> <span class="o">=</span> <span class="nb">str</span><span class="p">(</span>
+            <span class="s">&quot;SELECT * FROM SCHEDULING_AOS.OBSPROJECT &quot;</span>
+            <span class="s">&quot;WHERE regexp_like (CODE, &#39;^201[23].*\.[AST]&#39;)&quot;</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">sqlstates</span> <span class="o">=</span> <span class="nb">str</span><span class="p">(</span>
+            <span class="s">&quot;SELECT DOMAIN_ENTITY_STATE,DOMAIN_ENTITY_ID,OBS_PROJECT_ID &quot;</span>
+            <span class="s">&quot;FROM ALMA.SCHED_BLOCK_STATUS&quot;</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">sqlqa0</span> <span class="o">=</span> <span class="nb">str</span><span class="p">(</span>
+            <span class="s">&quot;SELECT SCHEDBLOCKUID,QA0STATUS FROM ALMA.AQUA_EXECBLOCK &quot;</span>
+            <span class="s">&quot;WHERE regexp_like (OBSPROJECTCODE, &#39;^201[23].*\.[AST]&#39;)&quot;</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">sqlsched_sb</span> <span class="o">=</span> <span class="nb">str</span><span class="p">(</span>
+            <span class="s">&quot;SELECT ou.OBSUNIT_UID,sb.NAME,sb.REPR_BAND,&quot;</span>
+            <span class="s">&quot;sb.SCHEDBLOCK_CTRL_EXEC_COUNT,sb.SCHEDBLOCK_CTRL_STATE,&quot;</span>
+            <span class="s">&quot;sb.MIN_ANG_RESOLUTION,sb.MAX_ANG_RESOLUTION,&quot;</span>
+            <span class="s">&quot;ou.OBSUNIT_PROJECT_UID &quot;</span>
+            <span class="s">&quot;FROM SCHEDULING_AOS.SCHEDBLOCK sb, SCHEDULING_AOS.OBSUNIT ou &quot;</span>
+            <span class="s">&quot;WHERE sb.SCHEDBLOCKID = ou.OBSUNITID AND sb.CSV = 0&quot;</span><span class="p">)</span>
+
+        <span class="c"># Global Oracle Connection</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">connection</span> <span class="o">=</span> <span class="n">cx_Oracle</span><span class="o">.</span><span class="n">connect</span><span class="p">(</span><span class="n">conx_string</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">cursor</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">connection</span><span class="o">.</span><span class="n">cursor</span><span class="p">()</span>
+
+        <span class="c"># Populate different dataframes related to projects and SBs statuses</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">cursor</span><span class="o">.</span><span class="n">execute</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">sqlsched_proj</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">scheduling_proj</span> <span class="o">=</span> <span class="n">pd</span><span class="o">.</span><span class="n">DataFrame</span><span class="p">(</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">cursor</span><span class="o">.</span><span class="n">fetchall</span><span class="p">(),</span>
+            <span class="n">columns</span><span class="o">=</span><span class="p">[</span><span class="n">rec</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="k">for</span> <span class="n">rec</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">cursor</span><span class="o">.</span><span class="n">description</span><span class="p">]</span>
+        <span class="p">)</span><span class="o">.</span><span class="n">set_index</span><span class="p">(</span><span class="s">&#39;CODE&#39;</span><span class="p">,</span> <span class="n">drop</span><span class="o">=</span><span class="bp">False</span><span class="p">)</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">cursor</span><span class="o">.</span><span class="n">execute</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">sqlstates</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">sbstates</span> <span class="o">=</span> <span class="n">pd</span><span class="o">.</span><span class="n">DataFrame</span><span class="p">(</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">cursor</span><span class="o">.</span><span class="n">fetchall</span><span class="p">(),</span>
+            <span class="n">columns</span><span class="o">=</span><span class="p">[</span><span class="n">rec</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="k">for</span> <span class="n">rec</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">cursor</span><span class="o">.</span><span class="n">description</span><span class="p">]</span>
+        <span class="p">)</span><span class="o">.</span><span class="n">set_index</span><span class="p">(</span><span class="s">&#39;DOMAIN_ENTITY_ID&#39;</span><span class="p">)</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">cursor</span><span class="o">.</span><span class="n">execute</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">sqlqa0</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">qa0</span> <span class="o">=</span> <span class="n">pd</span><span class="o">.</span><span class="n">DataFrame</span><span class="p">(</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">cursor</span><span class="o">.</span><span class="n">fetchall</span><span class="p">(),</span>
+            <span class="n">columns</span><span class="o">=</span><span class="p">[</span><span class="n">rec</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="k">for</span> <span class="n">rec</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">cursor</span><span class="o">.</span><span class="n">description</span><span class="p">]</span>
+        <span class="p">)</span><span class="o">.</span><span class="n">set_index</span><span class="p">(</span><span class="s">&#39;SCHEDBLOCKUID&#39;</span><span class="p">,</span> <span class="n">drop</span><span class="o">=</span><span class="bp">False</span><span class="p">)</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">cursor</span><span class="o">.</span><span class="n">execute</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">sqlsched_sb</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">scheduling_sb</span> <span class="o">=</span> <span class="n">pd</span><span class="o">.</span><span class="n">DataFrame</span><span class="p">(</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">cursor</span><span class="o">.</span><span class="n">fetchall</span><span class="p">(),</span>
+            <span class="n">columns</span><span class="o">=</span><span class="p">[</span><span class="n">rec</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="k">for</span> <span class="n">rec</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">cursor</span><span class="o">.</span><span class="n">description</span><span class="p">]</span>
+        <span class="p">)</span><span class="o">.</span><span class="n">set_index</span><span class="p">(</span><span class="s">&#39;OBSUNIT_UID&#39;</span><span class="p">,</span> <span class="n">drop</span><span class="o">=</span><span class="bp">False</span><span class="p">)</span>
+
+        <span class="c"># Initialize with saved data and update, Default behavior.</span>
+        <span class="k">if</span> <span class="ow">not</span> <span class="bp">self</span><span class="o">.</span><span class="n">new</span><span class="p">:</span>
+            <span class="k">try</span><span class="p">:</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">obsproject</span> <span class="o">=</span> <span class="n">pd</span><span class="o">.</span><span class="n">read_pickle</span><span class="p">(</span>
+                    <span class="bp">self</span><span class="o">.</span><span class="n">path</span> <span class="o">+</span> <span class="bp">self</span><span class="o">.</span><span class="n">preferences</span><span class="o">.</span><span class="n">obsproject_table</span><span class="p">)</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">sciencegoals</span> <span class="o">=</span> <span class="n">pd</span><span class="o">.</span><span class="n">read_pickle</span><span class="p">(</span>
+                    <span class="bp">self</span><span class="o">.</span><span class="n">path</span> <span class="o">+</span> <span class="bp">self</span><span class="o">.</span><span class="n">preferences</span><span class="o">.</span><span class="n">sciencegoals_table</span><span class="p">)</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">schedblocks</span> <span class="o">=</span> <span class="n">pd</span><span class="o">.</span><span class="n">read_pickle</span><span class="p">(</span>
+                    <span class="bp">self</span><span class="o">.</span><span class="n">path</span> <span class="o">+</span> <span class="bp">self</span><span class="o">.</span><span class="n">preferences</span><span class="o">.</span><span class="n">sbxml_table</span><span class="p">)</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">schedblock_info</span> <span class="o">=</span> <span class="n">pd</span><span class="o">.</span><span class="n">read_pickle</span><span class="p">(</span>
+                    <span class="bp">self</span><span class="o">.</span><span class="n">path</span> <span class="o">+</span> <span class="bp">self</span><span class="o">.</span><span class="n">preferences</span><span class="o">.</span><span class="n">sbinfo_table</span><span class="p">)</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">newar</span> <span class="o">=</span> <span class="n">pd</span><span class="o">.</span><span class="n">read_pickle</span><span class="p">(</span>
+                    <span class="bp">self</span><span class="o">.</span><span class="n">path</span> <span class="o">+</span> <span class="bp">self</span><span class="o">.</span><span class="n">preferences</span><span class="o">.</span><span class="n">newar_table</span><span class="p">)</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">fieldsource</span> <span class="o">=</span> <span class="n">pd</span><span class="o">.</span><span class="n">read_pickle</span><span class="p">(</span>
+                    <span class="bp">self</span><span class="o">.</span><span class="n">path</span> <span class="o">+</span> <span class="bp">self</span><span class="o">.</span><span class="n">preferences</span><span class="o">.</span><span class="n">fieldsource_table</span><span class="p">)</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">target</span> <span class="o">=</span> <span class="n">pd</span><span class="o">.</span><span class="n">read_pickle</span><span class="p">(</span>
+                    <span class="bp">self</span><span class="o">.</span><span class="n">path</span> <span class="o">+</span> <span class="bp">self</span><span class="o">.</span><span class="n">preferences</span><span class="o">.</span><span class="n">target_table</span><span class="p">)</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">spectralconf</span> <span class="o">=</span> <span class="n">pd</span><span class="o">.</span><span class="n">read_pickle</span><span class="p">(</span>
+                    <span class="bp">self</span><span class="o">.</span><span class="n">path</span> <span class="o">+</span> <span class="bp">self</span><span class="o">.</span><span class="n">preferences</span><span class="o">.</span><span class="n">spectralconf_table</span><span class="p">)</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">filter_c1</span><span class="p">()</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">update</span><span class="p">()</span>
+            <span class="k">except</span> <span class="ne">IOError</span><span class="p">,</span> <span class="n">e</span><span class="p">:</span>
+                <span class="k">print</span> <span class="n">e</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">new</span> <span class="o">=</span> <span class="bp">True</span>
+
+        <span class="c"># Create main dataframes</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">new</span><span class="p">:</span>
+            <span class="n">call</span><span class="p">([</span><span class="s">&#39;rm&#39;</span><span class="p">,</span> <span class="s">&#39;-rf&#39;</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">path</span><span class="p">])</span>
+            <span class="k">print</span> <span class="bp">self</span><span class="o">.</span><span class="n">path</span> <span class="o">+</span> <span class="s">&quot;: creating preferences dir&quot;</span>
+            <span class="n">os</span><span class="o">.</span><span class="n">mkdir</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">path</span><span class="p">)</span>
+            <span class="n">os</span><span class="o">.</span><span class="n">mkdir</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">sbxml</span><span class="p">)</span>
+            <span class="n">os</span><span class="o">.</span><span class="n">mkdir</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">obsxml</span><span class="p">)</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">start_wto</span><span class="p">()</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">populate_sciencegoals_sbxml</span><span class="p">()</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">populate_schedblocks</span><span class="p">()</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">populate_schedblock_info</span><span class="p">()</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">populate_newar</span><span class="p">()</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">create_summary</span><span class="p">()</span>
+
+<div class="viewcode-block" id="WtoDatabase.start_wto"><a class="viewcode-back" href="../index.html#wtoDatabase.WtoDatabase.start_wto">[docs]</a>    <span class="k">def</span> <span class="nf">start_wto</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        This populate the self.obsproject database</span>
+
+<span class="sd">        :return: None</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">states</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">states</span>
+
+        <span class="n">sql2</span> <span class="o">=</span> <span class="nb">str</span><span class="p">(</span>
+            <span class="s">&quot;SELECT PROJECTUID,ASSOCIATEDEXEC &quot;</span>
+            <span class="s">&quot;FROM ALMA.BMMV_OBSPROPOSAL &quot;</span>
+            <span class="s">&quot;WHERE (CYCLE=&#39;2012.1&#39; OR CYCLE=&#39;2013.1&#39; OR CYCLE=&#39;2013.A&#39; &quot;</span>
+            <span class="s">&quot;OR CYCLE=&#39;2012.A&#39;)&quot;</span><span class="p">)</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">cursor</span><span class="o">.</span><span class="n">execute</span><span class="p">(</span><span class="n">sql2</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">executive</span> <span class="o">=</span> <span class="n">pd</span><span class="o">.</span><span class="n">DataFrame</span><span class="p">(</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">cursor</span><span class="o">.</span><span class="n">fetchall</span><span class="p">(),</span> <span class="n">columns</span><span class="o">=</span><span class="p">[</span><span class="s">&#39;PRJ_ARCHIVE_UID&#39;</span><span class="p">,</span> <span class="s">&#39;EXEC&#39;</span><span class="p">])</span>
+
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">source</span> <span class="ow">is</span> <span class="bp">None</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">cursor</span><span class="o">.</span><span class="n">execute</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">sql1</span><span class="p">)</span>
+            <span class="n">df1</span> <span class="o">=</span> <span class="n">pd</span><span class="o">.</span><span class="n">DataFrame</span><span class="p">(</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">cursor</span><span class="o">.</span><span class="n">fetchall</span><span class="p">(),</span>
+                <span class="n">columns</span><span class="o">=</span><span class="p">[</span><span class="n">rec</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="k">for</span> <span class="n">rec</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">cursor</span><span class="o">.</span><span class="n">description</span><span class="p">])</span>
+            <span class="k">print</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">df1</span><span class="o">.</span><span class="n">query</span><span class="p">(</span><span class="s">&#39;DOMAIN_ENTITY_STATE not in @states&#39;</span><span class="p">)))</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">obsproject</span> <span class="o">=</span> <span class="n">pd</span><span class="o">.</span><span class="n">merge</span><span class="p">(</span>
+                <span class="n">df1</span><span class="o">.</span><span class="n">query</span><span class="p">(</span><span class="s">&#39;DOMAIN_ENTITY_STATE not in @states&#39;</span><span class="p">),</span> <span class="bp">self</span><span class="o">.</span><span class="n">executive</span><span class="p">,</span>
+                <span class="n">on</span><span class="o">=</span><span class="s">&#39;PRJ_ARCHIVE_UID&#39;</span><span class="p">)</span><span class="o">.</span><span class="n">set_index</span><span class="p">(</span><span class="s">&#39;CODE&#39;</span><span class="p">,</span> <span class="n">drop</span><span class="o">=</span><span class="bp">False</span><span class="p">)</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="k">if</span> <span class="nb">type</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">source</span><span class="p">)</span> <span class="ow">is</span> <span class="ow">not</span> <span class="nb">str</span> <span class="ow">and</span> <span class="nb">type</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">source</span><span class="p">)</span> <span class="ow">is</span> <span class="ow">not</span> <span class="nb">list</span><span class="p">:</span>
+                <span class="k">print</span> <span class="s">&quot;The source should be a string or a list&quot;</span>
+                <span class="k">return</span> <span class="bp">None</span>
+            <span class="k">try</span><span class="p">:</span>
+                <span class="k">if</span> <span class="nb">type</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">source</span><span class="p">)</span> <span class="ow">is</span> <span class="nb">str</span><span class="p">:</span>
+                    <span class="n">fp</span> <span class="o">=</span> <span class="nb">open</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">source</span><span class="p">,</span> <span class="s">&#39;r&#39;</span><span class="p">)</span>
+                    <span class="n">read_csv</span> <span class="o">=</span> <span class="n">csv</span><span class="o">.</span><span class="n">reader</span><span class="p">(</span><span class="n">fp</span><span class="p">)</span>
+                <span class="k">else</span><span class="p">:</span>
+                    <span class="n">read_csv</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">source</span>
+                <span class="n">c</span> <span class="o">=</span> <span class="mi">0</span>
+                <span class="k">for</span> <span class="n">l</span> <span class="ow">in</span> <span class="n">read_csv</span><span class="p">:</span>
+                    <span class="k">if</span> <span class="nb">type</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">source</span><span class="p">)</span> <span class="ow">is</span> <span class="nb">str</span><span class="p">:</span>
+                        <span class="n">l</span> <span class="o">=</span> <span class="n">l</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>
+                    <span class="n">sql3</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">sql1</span> <span class="o">+</span> <span class="s">&#39; AND OBS1.PRJ_CODE = &#39;</span> <span class="o">+</span> <span class="s">&#39;</span><span class="se">\&#39;</span><span class="si">%s</span><span class="se">\&#39;</span><span class="s">&#39;</span> <span class="o">%</span> <span class="n">l</span>
+                    <span class="bp">self</span><span class="o">.</span><span class="n">cursor</span><span class="o">.</span><span class="n">execute</span><span class="p">(</span><span class="n">sql3</span><span class="p">)</span>
+                    <span class="k">if</span> <span class="n">c</span> <span class="o">==</span> <span class="mi">0</span><span class="p">:</span>
+                        <span class="n">df2</span> <span class="o">=</span> <span class="n">pd</span><span class="o">.</span><span class="n">DataFrame</span><span class="p">(</span>
+                            <span class="bp">self</span><span class="o">.</span><span class="n">cursor</span><span class="o">.</span><span class="n">fetchall</span><span class="p">(),</span>
+                            <span class="n">columns</span><span class="o">=</span><span class="p">[</span><span class="n">rec</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="k">for</span> <span class="n">rec</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">cursor</span><span class="o">.</span><span class="n">description</span><span class="p">])</span>
+                    <span class="k">else</span><span class="p">:</span>
+                        <span class="n">df2</span><span class="o">.</span><span class="n">ix</span><span class="p">[</span><span class="n">c</span><span class="p">]</span> <span class="o">=</span> <span class="n">pd</span><span class="o">.</span><span class="n">Series</span><span class="p">(</span>
+                            <span class="bp">self</span><span class="o">.</span><span class="n">cursor</span><span class="o">.</span><span class="n">fetchall</span><span class="p">()[</span><span class="mi">0</span><span class="p">],</span> <span class="n">index</span><span class="o">=</span><span class="n">df2</span><span class="o">.</span><span class="n">columns</span><span class="p">)</span>
+                    <span class="n">c</span> <span class="o">+=</span> <span class="mi">1</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">obsproject</span> <span class="o">=</span> <span class="n">pd</span><span class="o">.</span><span class="n">merge</span><span class="p">(</span>
+                    <span class="n">df2</span><span class="o">.</span><span class="n">query</span><span class="p">(</span><span class="s">&#39;DOMAIN_ENTITY_STATE not in @states&#39;</span><span class="p">),</span>
+                    <span class="bp">self</span><span class="o">.</span><span class="n">executive</span><span class="p">,</span>
+                    <span class="n">on</span><span class="o">=</span><span class="s">&#39;PRJ_ARCHIVE_UID&#39;</span><span class="p">)</span><span class="o">.</span><span class="n">set_index</span><span class="p">(</span><span class="s">&#39;CODE&#39;</span><span class="p">,</span> <span class="n">drop</span><span class="o">=</span><span class="bp">False</span><span class="p">)</span>
+            <span class="k">except</span> <span class="ne">IOError</span><span class="p">:</span>
+                <span class="k">print</span> <span class="s">&quot;Source filename does not exist&quot;</span>
+                <span class="k">return</span> <span class="bp">None</span>
+
+        <span class="n">timestamp</span> <span class="o">=</span> <span class="n">pd</span><span class="o">.</span><span class="n">Series</span><span class="p">(</span>
+            <span class="n">np</span><span class="o">.</span><span class="n">zeros</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">obsproject</span><span class="p">),</span> <span class="n">dtype</span><span class="o">=</span><span class="nb">object</span><span class="p">),</span>
+            <span class="n">index</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">obsproject</span><span class="o">.</span><span class="n">index</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">obsproject</span><span class="p">[</span><span class="s">&#39;timestamp&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">timestamp</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">obsproject</span><span class="p">[</span><span class="s">&#39;obsproj&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">pd</span><span class="o">.</span><span class="n">Series</span><span class="p">(</span>
+            <span class="n">np</span><span class="o">.</span><span class="n">zeros</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">obsproject</span><span class="p">),</span> <span class="n">dtype</span><span class="o">=</span><span class="nb">object</span><span class="p">),</span>
+            <span class="n">index</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">obsproject</span><span class="o">.</span><span class="n">index</span><span class="p">)</span>
+        <span class="n">codes</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">obsproject</span><span class="o">.</span><span class="n">CODE</span><span class="o">.</span><span class="n">tolist</span><span class="p">()</span>
+        <span class="k">for</span> <span class="n">c</span> <span class="ow">in</span> <span class="n">codes</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">get_obsproject</span><span class="p">(</span><span class="n">c</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">filter_c1</span><span class="p">()</span>
+        <span class="k">print</span> <span class="nb">len</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">obsproject</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">obsproject</span><span class="o">.</span><span class="n">to_pickle</span><span class="p">(</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">path</span> <span class="o">+</span> <span class="bp">self</span><span class="o">.</span><span class="n">preferences</span><span class="o">.</span><span class="n">obsproject_table</span><span class="p">)</span>
+</div>
+    <span class="k">def</span> <span class="nf">update</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">cursor</span><span class="o">.</span><span class="n">execute</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">sqlsched_proj</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">scheduling_proj</span> <span class="o">=</span> <span class="n">pd</span><span class="o">.</span><span class="n">DataFrame</span><span class="p">(</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">cursor</span><span class="o">.</span><span class="n">fetchall</span><span class="p">(),</span>
+            <span class="n">columns</span><span class="o">=</span><span class="p">[</span><span class="n">rec</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="k">for</span> <span class="n">rec</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">cursor</span><span class="o">.</span><span class="n">description</span><span class="p">]</span>
+        <span class="p">)</span><span class="o">.</span><span class="n">set_index</span><span class="p">(</span><span class="s">&#39;CODE&#39;</span><span class="p">,</span> <span class="n">drop</span><span class="o">=</span><span class="bp">False</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">cursor</span><span class="o">.</span><span class="n">execute</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">sqlsched_sb</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">scheduling_sb</span> <span class="o">=</span> <span class="n">pd</span><span class="o">.</span><span class="n">DataFrame</span><span class="p">(</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">cursor</span><span class="o">.</span><span class="n">fetchall</span><span class="p">(),</span>
+            <span class="n">columns</span><span class="o">=</span><span class="p">[</span><span class="n">rec</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="k">for</span> <span class="n">rec</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">cursor</span><span class="o">.</span><span class="n">description</span><span class="p">]</span>
+        <span class="p">)</span><span class="o">.</span><span class="n">set_index</span><span class="p">(</span><span class="s">&#39;OBSUNIT_UID&#39;</span><span class="p">,</span> <span class="n">drop</span><span class="o">=</span><span class="bp">False</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">cursor</span><span class="o">.</span><span class="n">execute</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">sqlstates</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">sbstates</span> <span class="o">=</span> <span class="n">pd</span><span class="o">.</span><span class="n">DataFrame</span><span class="p">(</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">cursor</span><span class="o">.</span><span class="n">fetchall</span><span class="p">(),</span>
+            <span class="n">columns</span><span class="o">=</span><span class="p">[</span><span class="n">rec</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="k">for</span> <span class="n">rec</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">cursor</span><span class="o">.</span><span class="n">description</span><span class="p">]</span>
+        <span class="p">)</span><span class="o">.</span><span class="n">set_index</span><span class="p">(</span><span class="s">&#39;DOMAIN_ENTITY_ID&#39;</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">cursor</span><span class="o">.</span><span class="n">execute</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">sqlqa0</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">qa0</span> <span class="o">=</span> <span class="n">pd</span><span class="o">.</span><span class="n">DataFrame</span><span class="p">(</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">cursor</span><span class="o">.</span><span class="n">fetchall</span><span class="p">(),</span>
+            <span class="n">columns</span><span class="o">=</span><span class="p">[</span><span class="n">rec</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="k">for</span> <span class="n">rec</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">cursor</span><span class="o">.</span><span class="n">description</span><span class="p">]</span>
+        <span class="p">)</span><span class="o">.</span><span class="n">set_index</span><span class="p">(</span><span class="s">&#39;SCHEDBLOCKUID&#39;</span><span class="p">,</span> <span class="n">drop</span><span class="o">=</span><span class="bp">False</span><span class="p">)</span>
+
+        <span class="n">newest</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">obsproject</span><span class="o">.</span><span class="n">timestamp</span><span class="o">.</span><span class="n">max</span><span class="p">()</span>
+        <span class="n">changes</span> <span class="o">=</span> <span class="p">[]</span>
+        <span class="n">sql</span> <span class="o">=</span> <span class="nb">str</span><span class="p">(</span>
+            <span class="s">&quot;SELECT ARCHIVE_UID, TIMESTAMP FROM ALMA.XML_OBSPROJECT_ENTITIES &quot;</span>
+            <span class="s">&quot;WHERE TIMESTAMP &gt; to_date(&#39;</span><span class="si">%s</span><span class="s">&#39;, &#39;YYYY-MM-DD HH24:MI:SS&#39;)&quot;</span> <span class="o">%</span>
+            <span class="nb">str</span><span class="p">(</span><span class="n">newest</span><span class="p">)</span><span class="o">.</span><span class="n">split</span><span class="p">(</span><span class="s">&#39;.&#39;</span><span class="p">)[</span><span class="mi">0</span><span class="p">])</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">cursor</span><span class="o">.</span><span class="n">execute</span><span class="p">(</span><span class="n">sql</span><span class="p">)</span>
+        <span class="n">new_data</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">cursor</span><span class="o">.</span><span class="n">fetchall</span><span class="p">()</span>
+
+        <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">new_data</span><span class="p">)</span> <span class="o">&gt;</span> <span class="mi">0</span><span class="p">:</span>
+            <span class="k">for</span> <span class="n">n</span> <span class="ow">in</span> <span class="n">new_data</span><span class="p">:</span>
+                <span class="k">print</span> <span class="s">&quot;Changes? </span><span class="si">%s</span><span class="s">, </span><span class="si">%s</span><span class="s">, newest </span><span class="si">%s</span><span class="s">&quot;</span> <span class="o">%</span> <span class="p">(</span><span class="n">n</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span> <span class="n">n</span><span class="p">[</span><span class="mi">1</span><span class="p">],</span> <span class="n">newest</span><span class="p">)</span>
+                <span class="k">if</span> <span class="n">n</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span> <span class="o">&lt;=</span> <span class="n">newest</span><span class="p">:</span>
+                    <span class="k">print</span> <span class="s">&quot;</span><span class="se">\t</span><span class="s"> Not Changes to apply (1)&quot;</span>
+                    <span class="k">continue</span>
+                <span class="n">puid</span> <span class="o">=</span> <span class="n">n</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>
+                <span class="k">try</span><span class="p">:</span>
+                    <span class="n">code</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">obsproject</span><span class="p">[</span>
+                        <span class="bp">self</span><span class="o">.</span><span class="n">obsproject</span><span class="o">.</span><span class="n">PRJ_ARCHIVE_UID</span> <span class="o">==</span> <span class="n">puid</span><span class="p">]</span><span class="o">.</span><span class="n">ix</span><span class="p">[</span><span class="mi">0</span><span class="p">,</span> <span class="s">&#39;CODE&#39;</span><span class="p">]</span>
+                    <span class="k">if</span> <span class="n">code</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">checked</span><span class="o">.</span><span class="n">CODE</span><span class="o">.</span><span class="n">tolist</span><span class="p">():</span>
+                        <span class="n">changes</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">code</span><span class="p">)</span>
+                    <span class="k">else</span><span class="p">:</span>
+                        <span class="k">print</span> <span class="s">&quot;</span><span class="se">\t</span><span class="s"> Not Changes to apply (2)&quot;</span>
+                        <span class="k">continue</span>
+                <span class="k">except</span> <span class="ne">IndexError</span><span class="p">:</span>
+                    <span class="k">try</span><span class="p">:</span>
+                        <span class="bp">self</span><span class="o">.</span><span class="n">cursor</span><span class="o">.</span><span class="n">execute</span><span class="p">(</span>
+                            <span class="bp">self</span><span class="o">.</span><span class="n">sql1</span> <span class="o">+</span> <span class="s">&quot; AND OBS1.PRJ_ARCHIVE_UID = &#39;</span><span class="si">%s</span><span class="s">&#39;&quot;</span> <span class="o">%</span>
+                            <span class="n">puid</span><span class="p">)</span>
+                        <span class="n">row</span> <span class="o">=</span> <span class="nb">list</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">cursor</span><span class="o">.</span><span class="n">fetchall</span><span class="p">()[</span><span class="mi">0</span><span class="p">])</span>
+                    <span class="k">except</span> <span class="ne">IndexError</span><span class="p">:</span>
+                        <span class="k">print</span><span class="p">(</span><span class="s">&quot;</span><span class="se">\t</span><span class="s"> </span><span class="si">%s</span><span class="s"> must be a CSV project. Not ingesting&quot;</span> <span class="o">%</span>
+                              <span class="n">puid</span><span class="p">)</span>
+                        <span class="k">continue</span>
+                    <span class="n">code</span> <span class="o">=</span> <span class="n">row</span><span class="p">[</span><span class="mi">4</span><span class="p">]</span>
+                    <span class="k">if</span> <span class="n">code</span> <span class="ow">not</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">checked</span><span class="o">.</span><span class="n">CODE</span><span class="o">.</span><span class="n">tolist</span><span class="p">():</span>
+                        <span class="k">print</span><span class="p">(</span><span class="s">&quot;</span><span class="se">\t</span><span class="s"> </span><span class="si">%s</span><span class="s"> didn&#39;t pass filter C1&quot;</span> <span class="o">%</span> <span class="n">code</span><span class="p">)</span>
+                        <span class="k">continue</span>
+                    <span class="bp">self</span><span class="o">.</span><span class="n">cursor</span><span class="o">.</span><span class="n">execute</span><span class="p">(</span>
+                        <span class="s">&quot;SELECT ASSOCIATEDEXEC FROM ALMA.BMMV_OBSPROPOSAL &quot;</span>
+                        <span class="s">&quot;WHERE PROJECTUID = &#39;</span><span class="si">%s</span><span class="s">&#39;&quot;</span> <span class="o">%</span> <span class="n">puid</span><span class="p">)</span>
+                    <span class="n">row</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">cursor</span><span class="o">.</span><span class="n">fetchall</span><span class="p">()[</span><span class="mi">0</span><span class="p">][</span><span class="mi">0</span><span class="p">])</span>
+                    <span class="n">row</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">n</span><span class="p">[</span><span class="mi">1</span><span class="p">])</span>
+                    <span class="n">row</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">obsproject</span><span class="o">.</span><span class="n">ix</span><span class="p">[</span><span class="mi">0</span><span class="p">,</span> <span class="s">&#39;obsproj&#39;</span><span class="p">])</span>
+                    <span class="bp">self</span><span class="o">.</span><span class="n">obsproject</span><span class="o">.</span><span class="n">ix</span><span class="p">[</span><span class="n">code</span><span class="p">]</span> <span class="o">=</span> <span class="n">row</span>
+                    <span class="n">changes</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">code</span><span class="p">)</span>
+
+            <span class="k">for</span> <span class="n">code</span> <span class="ow">in</span> <span class="n">changes</span><span class="p">:</span>
+                <span class="k">print</span> <span class="s">&quot;Updating Project </span><span class="si">%s</span><span class="s">&quot;</span> <span class="o">%</span> <span class="n">code</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">get_obsproject</span><span class="p">(</span><span class="n">code</span><span class="p">)</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">row_sciencegoals</span><span class="p">(</span><span class="n">code</span><span class="p">)</span>
+                <span class="n">pidlist</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">sciencegoals</span><span class="p">[</span>
+                    <span class="bp">self</span><span class="o">.</span><span class="n">sciencegoals</span><span class="o">.</span><span class="n">CODE</span> <span class="o">==</span> <span class="n">code</span><span class="p">]</span><span class="o">.</span><span class="n">partId</span><span class="o">.</span><span class="n">tolist</span><span class="p">()</span>
+                <span class="k">for</span> <span class="n">pid</span> <span class="ow">in</span> <span class="n">pidlist</span><span class="p">:</span>
+                    <span class="n">sblist</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">sciencegoals</span><span class="o">.</span><span class="n">ix</span><span class="p">[</span><span class="n">pid</span><span class="p">]</span><span class="o">.</span><span class="n">SBS</span>
+                    <span class="k">for</span> <span class="n">sb</span> <span class="ow">in</span> <span class="n">sblist</span><span class="p">:</span>
+                        <span class="k">print</span> <span class="s">&quot;</span><span class="se">\t</span><span class="s">Updating sb </span><span class="si">%s</span><span class="s"> of project </span><span class="si">%s</span><span class="s">&quot;</span> <span class="o">%</span> <span class="p">(</span><span class="n">sb</span><span class="p">,</span> <span class="n">code</span><span class="p">)</span>
+                        <span class="bp">self</span><span class="o">.</span><span class="n">row_schedblocks</span><span class="p">(</span><span class="n">sb</span><span class="p">,</span> <span class="n">pid</span><span class="p">)</span>
+                        <span class="bp">self</span><span class="o">.</span><span class="n">row_schedblock_info</span><span class="p">(</span><span class="n">sb</span><span class="p">)</span>
+                        <span class="bp">self</span><span class="o">.</span><span class="n">row_newar</span><span class="p">(</span><span class="n">sb</span><span class="p">)</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">filter_c1</span><span class="p">()</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">schedblocks</span><span class="o">.</span><span class="n">to_pickle</span><span class="p">(</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">path</span> <span class="o">+</span> <span class="bp">self</span><span class="o">.</span><span class="n">preferences</span><span class="o">.</span><span class="n">sbxml_table</span><span class="p">)</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">sciencegoals</span><span class="o">.</span><span class="n">to_pickle</span><span class="p">(</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">path</span> <span class="o">+</span> <span class="bp">self</span><span class="o">.</span><span class="n">preferences</span><span class="o">.</span><span class="n">sciencegoals_table</span><span class="p">)</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">obsproject</span><span class="o">.</span><span class="n">to_pickle</span><span class="p">(</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">path</span> <span class="o">+</span> <span class="bp">self</span><span class="o">.</span><span class="n">preferences</span><span class="o">.</span><span class="n">obsproject_table</span><span class="p">)</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">schedblock_info</span><span class="o">.</span><span class="n">to_pickle</span><span class="p">(</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">path</span> <span class="o">+</span> <span class="bp">self</span><span class="o">.</span><span class="n">preferences</span><span class="o">.</span><span class="n">sbinfo_table</span><span class="p">)</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">newar</span><span class="o">.</span><span class="n">to_pickle</span><span class="p">(</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">path</span> <span class="o">+</span> <span class="bp">self</span><span class="o">.</span><span class="n">preferences</span><span class="o">.</span><span class="n">newar_table</span><span class="p">)</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">fieldsource</span><span class="o">.</span><span class="n">to_pickle</span><span class="p">(</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">path</span> <span class="o">+</span> <span class="bp">self</span><span class="o">.</span><span class="n">preferences</span><span class="o">.</span><span class="n">fieldsource_table</span><span class="p">)</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">target</span><span class="o">.</span><span class="n">to_pickle</span><span class="p">(</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">path</span> <span class="o">+</span> <span class="bp">self</span><span class="o">.</span><span class="n">preferences</span><span class="o">.</span><span class="n">target_table</span><span class="p">)</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">spectralconf</span><span class="o">.</span><span class="n">to_pickle</span><span class="p">(</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">path</span> <span class="o">+</span> <span class="bp">self</span><span class="o">.</span><span class="n">preferences</span><span class="o">.</span><span class="n">spectralconf_table</span><span class="p">)</span>
+        <span class="n">newest</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">schedblocks</span><span class="o">.</span><span class="n">timestamp</span><span class="o">.</span><span class="n">max</span><span class="p">()</span>
+        <span class="n">sql</span> <span class="o">=</span> <span class="nb">str</span><span class="p">(</span>
+            <span class="s">&quot;SELECT ARCHIVE_UID, TIMESTAMP FROM ALMA.XML_SCHEDBLOCK_ENTITIES &quot;</span>
+            <span class="s">&quot;WHERE TIMESTAMP &gt; to_date(&#39;</span><span class="si">%s</span><span class="s">&#39;, &#39;YYYY-MM-DD HH24:MI:SS&#39;)&quot;</span> <span class="o">%</span>
+            <span class="nb">str</span><span class="p">(</span><span class="n">newest</span><span class="p">)</span><span class="o">.</span><span class="n">split</span><span class="p">(</span><span class="s">&#39;.&#39;</span><span class="p">)[</span><span class="mi">0</span><span class="p">])</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">cursor</span><span class="o">.</span><span class="n">execute</span><span class="p">(</span><span class="n">sql</span><span class="p">)</span>
+        <span class="n">new_data</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">cursor</span><span class="o">.</span><span class="n">fetchall</span><span class="p">()</span>
+
+        <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">new_data</span><span class="p">)</span> <span class="o">&gt;</span> <span class="mi">0</span><span class="p">:</span>
+            <span class="k">for</span> <span class="n">n</span> <span class="ow">in</span> <span class="n">new_data</span><span class="p">:</span>
+                <span class="k">if</span> <span class="n">n</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span> <span class="o">&lt;=</span> <span class="n">newest</span><span class="p">:</span>
+                    <span class="k">continue</span>
+                <span class="n">sbuid</span> <span class="o">=</span> <span class="n">n</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>
+                <span class="k">try</span><span class="p">:</span>
+                    <span class="n">pid</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">schedblocks</span><span class="p">[</span>
+                        <span class="bp">self</span><span class="o">.</span><span class="n">schedblocks</span><span class="o">.</span><span class="n">SB_UID</span> <span class="o">==</span> <span class="n">sbuid</span><span class="p">]</span><span class="o">.</span><span class="n">ix</span><span class="p">[</span><span class="mi">0</span><span class="p">,</span> <span class="s">&#39;partId&#39;</span><span class="p">]</span>
+                <span class="k">except</span> <span class="ne">IndexError</span><span class="p">:</span>
+                    <span class="k">continue</span>
+                <span class="k">print</span> <span class="s">&quot;Updating SB </span><span class="si">%s</span><span class="s">&quot;</span> <span class="o">%</span> <span class="n">sbuid</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">row_schedblocks</span><span class="p">(</span><span class="n">sbuid</span><span class="p">,</span> <span class="n">pid</span><span class="p">)</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">row_schedblock_info</span><span class="p">(</span><span class="n">sbuid</span><span class="p">)</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">row_newar</span><span class="p">(</span><span class="n">sbuid</span><span class="p">)</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">schedblocks</span><span class="o">.</span><span class="n">to_pickle</span><span class="p">(</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">path</span> <span class="o">+</span> <span class="bp">self</span><span class="o">.</span><span class="n">preferences</span><span class="o">.</span><span class="n">sbxml_table</span><span class="p">)</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">schedblock_info</span><span class="o">.</span><span class="n">to_pickle</span><span class="p">(</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">path</span> <span class="o">+</span> <span class="bp">self</span><span class="o">.</span><span class="n">preferences</span><span class="o">.</span><span class="n">sbinfo_table</span><span class="p">)</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">newar</span><span class="o">.</span><span class="n">to_pickle</span><span class="p">(</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">path</span> <span class="o">+</span> <span class="bp">self</span><span class="o">.</span><span class="n">preferences</span><span class="o">.</span><span class="n">newar_table</span><span class="p">)</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">fieldsource</span><span class="o">.</span><span class="n">to_pickle</span><span class="p">(</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">path</span> <span class="o">+</span> <span class="bp">self</span><span class="o">.</span><span class="n">preferences</span><span class="o">.</span><span class="n">fieldsource_table</span><span class="p">)</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">target</span><span class="o">.</span><span class="n">to_pickle</span><span class="p">(</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">path</span> <span class="o">+</span> <span class="bp">self</span><span class="o">.</span><span class="n">preferences</span><span class="o">.</span><span class="n">target_table</span><span class="p">)</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">spectralconf</span><span class="o">.</span><span class="n">to_pickle</span><span class="p">(</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">path</span> <span class="o">+</span> <span class="bp">self</span><span class="o">.</span><span class="n">preferences</span><span class="o">.</span><span class="n">spectralconf_table</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">create_summary</span><span class="p">()</span>
+
+    <span class="k">def</span> <span class="nf">populate_sciencegoals_sbxml</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="k">try</span><span class="p">:</span>
+            <span class="nb">type</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">sciencegoals</span><span class="p">)</span>
+            <span class="n">new</span> <span class="o">=</span> <span class="bp">False</span>
+        <span class="k">except</span> <span class="ne">AttributeError</span><span class="p">:</span>
+            <span class="n">new</span> <span class="o">=</span> <span class="bp">True</span>
+        <span class="n">codes</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">obsproject</span><span class="o">.</span><span class="n">CODE</span><span class="o">.</span><span class="n">tolist</span><span class="p">()</span>
+        <span class="k">print</span> <span class="nb">len</span><span class="p">(</span><span class="n">codes</span><span class="p">)</span>
+        <span class="k">for</span> <span class="n">c</span> <span class="ow">in</span> <span class="n">codes</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">row_sciencegoals</span><span class="p">(</span><span class="n">c</span><span class="p">,</span> <span class="n">new</span><span class="o">=</span><span class="n">new</span><span class="p">)</span>
+            <span class="n">new</span> <span class="o">=</span> <span class="bp">False</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">sciencegoals</span><span class="o">.</span><span class="n">to_pickle</span><span class="p">(</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">path</span> <span class="o">+</span> <span class="bp">self</span><span class="o">.</span><span class="n">preferences</span><span class="o">.</span><span class="n">sciencegoals_table</span><span class="p">)</span>
+
+    <span class="k">def</span> <span class="nf">populate_schedblock_info</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="n">new</span> <span class="o">=</span> <span class="bp">True</span>
+        <span class="n">sb_uid_list</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">schedblocks</span><span class="o">.</span><span class="n">SB_UID</span><span class="o">.</span><span class="n">tolist</span><span class="p">()</span>
+        <span class="k">for</span> <span class="n">s</span> <span class="ow">in</span> <span class="n">sb_uid_list</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">row_schedblock_info</span><span class="p">(</span><span class="n">s</span><span class="p">,</span> <span class="n">new</span><span class="o">=</span><span class="n">new</span><span class="p">)</span>
+            <span class="n">new</span> <span class="o">=</span> <span class="bp">False</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">schedblock_info</span><span class="o">.</span><span class="n">to_pickle</span><span class="p">(</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">path</span> <span class="o">+</span> <span class="bp">self</span><span class="o">.</span><span class="n">preferences</span><span class="o">.</span><span class="n">sbinfo_table</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">fieldsource</span><span class="o">.</span><span class="n">to_pickle</span><span class="p">(</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">path</span> <span class="o">+</span> <span class="bp">self</span><span class="o">.</span><span class="n">preferences</span><span class="o">.</span><span class="n">fieldsource_table</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">target</span><span class="o">.</span><span class="n">to_pickle</span><span class="p">(</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">path</span> <span class="o">+</span> <span class="bp">self</span><span class="o">.</span><span class="n">preferences</span><span class="o">.</span><span class="n">target_table</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">spectralconf</span><span class="o">.</span><span class="n">to_pickle</span><span class="p">(</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">path</span> <span class="o">+</span> <span class="bp">self</span><span class="o">.</span><span class="n">preferences</span><span class="o">.</span><span class="n">spectralconf_table</span><span class="p">)</span>
+
+    <span class="k">def</span> <span class="nf">populate_schedblocks</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="n">new</span> <span class="o">=</span> <span class="bp">True</span>
+        <span class="n">sbpartid</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">sciencegoals</span><span class="o">.</span><span class="n">index</span><span class="o">.</span><span class="n">tolist</span><span class="p">()</span>
+        <span class="n">sizel</span> <span class="o">=</span> <span class="nb">len</span><span class="p">(</span><span class="n">sbpartid</span><span class="p">)</span>
+        <span class="n">c</span> <span class="o">=</span> <span class="mi">1</span>
+        <span class="k">for</span> <span class="n">pid</span> <span class="ow">in</span> <span class="n">sbpartid</span><span class="p">:</span>
+            <span class="n">sblist</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">sciencegoals</span><span class="o">.</span><span class="n">ix</span><span class="p">[</span><span class="n">pid</span><span class="p">]</span><span class="o">.</span><span class="n">SBS</span>
+            <span class="k">for</span> <span class="n">sb</span> <span class="ow">in</span> <span class="n">sblist</span><span class="p">:</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">row_schedblocks</span><span class="p">(</span><span class="n">sb</span><span class="p">,</span> <span class="n">pid</span><span class="p">,</span> <span class="n">new</span><span class="o">=</span><span class="n">new</span><span class="p">)</span>
+                <span class="n">new</span> <span class="o">=</span> <span class="bp">False</span>
+            <span class="k">print</span> <span class="s">&quot;</span><span class="si">%d</span><span class="s">/</span><span class="si">%d</span><span class="s"> ScienceGoals SBs ingested&quot;</span> <span class="o">%</span> <span class="p">(</span><span class="n">c</span><span class="p">,</span> <span class="n">sizel</span><span class="p">)</span>
+            <span class="n">c</span> <span class="o">+=</span> <span class="mi">1</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">schedblocks</span><span class="o">.</span><span class="n">to_pickle</span><span class="p">(</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">path</span> <span class="o">+</span> <span class="bp">self</span><span class="o">.</span><span class="n">preferences</span><span class="o">.</span><span class="n">sbxml_table</span><span class="p">)</span>
+
+    <span class="k">def</span> <span class="nf">populate_newar</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="n">new</span> <span class="o">=</span> <span class="bp">True</span>
+        <span class="n">sblist</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">schedblock_info</span><span class="o">.</span><span class="n">SB_UID</span><span class="o">.</span><span class="n">tolist</span><span class="p">()</span>
+        <span class="k">for</span> <span class="n">sbuid</span> <span class="ow">in</span> <span class="n">sblist</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">row_newar</span><span class="p">(</span><span class="n">sbuid</span><span class="p">,</span> <span class="n">new</span><span class="o">=</span><span class="n">new</span><span class="p">)</span>
+            <span class="n">new</span> <span class="o">=</span> <span class="bp">False</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">newar</span><span class="o">.</span><span class="n">to_pickle</span><span class="p">(</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">path</span> <span class="o">+</span> <span class="bp">self</span><span class="o">.</span><span class="n">preferences</span><span class="o">.</span><span class="n">newar_table</span><span class="p">)</span>
+
+    <span class="k">def</span> <span class="nf">get_obsproject</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">code</span><span class="p">):</span>
+        <span class="k">print</span> <span class="s">&quot;Downloading Project </span><span class="si">%s</span><span class="s"> obsproject.xml&quot;</span> <span class="o">%</span> <span class="n">code</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">cursor</span><span class="o">.</span><span class="n">execute</span><span class="p">(</span>
+            <span class="s">&quot;SELECT TIMESTAMP, XMLTYPE.getClobVal(xml) &quot;</span>
+            <span class="s">&quot;FROM ALMA.XML_OBSPROJECT_ENTITIES &quot;</span>
+            <span class="s">&quot;WHERE ARCHIVE_UID = &#39;</span><span class="si">%s</span><span class="s">&#39;&quot;</span> <span class="o">%</span> <span class="bp">self</span><span class="o">.</span><span class="n">obsproject</span><span class="o">.</span><span class="n">ix</span><span class="p">[</span>
+                <span class="n">code</span><span class="p">,</span> <span class="s">&#39;PRJ_ARCHIVE_UID&#39;</span><span class="p">])</span>
+        <span class="n">data</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">cursor</span><span class="o">.</span><span class="n">fetchall</span><span class="p">()[</span><span class="mi">0</span><span class="p">]</span>
+        <span class="n">xml_content</span> <span class="o">=</span> <span class="n">data</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span><span class="o">.</span><span class="n">read</span><span class="p">()</span>
+        <span class="n">xmlfilename</span> <span class="o">=</span> <span class="n">code</span> <span class="o">+</span> <span class="s">&#39;.xml&#39;</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">obsproject</span><span class="o">.</span><span class="n">loc</span><span class="p">[</span><span class="n">code</span><span class="p">,</span> <span class="s">&#39;timestamp&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">data</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>
+        <span class="n">filename</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">obsxml</span> <span class="o">+</span> <span class="n">xmlfilename</span>
+        <span class="n">io_file</span> <span class="o">=</span> <span class="nb">open</span><span class="p">(</span><span class="n">filename</span><span class="p">,</span> <span class="s">&#39;w&#39;</span><span class="p">)</span>
+        <span class="n">io_file</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="n">xml_content</span><span class="p">)</span>
+        <span class="n">io_file</span><span class="o">.</span><span class="n">close</span><span class="p">()</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">obsproject</span><span class="o">.</span><span class="n">loc</span><span class="p">[</span><span class="n">code</span><span class="p">,</span> <span class="s">&#39;obsproj&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">xmlfilename</span>
+
+    <span class="k">def</span> <span class="nf">row_sciencegoals</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">code</span><span class="p">,</span> <span class="n">new</span><span class="o">=</span><span class="bp">False</span><span class="p">):</span>
+        <span class="n">c</span> <span class="o">=</span> <span class="n">code</span>
+        <span class="n">proj</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">obsproject</span><span class="p">[</span><span class="bp">self</span><span class="o">.</span><span class="n">obsproject</span><span class="o">.</span><span class="n">CODE</span> <span class="o">==</span> <span class="n">c</span><span class="p">]</span><span class="o">.</span><span class="n">ix</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>
+        <span class="n">obsproj</span> <span class="o">=</span> <span class="n">ObsProject</span><span class="p">(</span><span class="n">proj</span><span class="o">.</span><span class="n">obsproj</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">obsxml</span><span class="p">)</span>
+        <span class="n">assoc_sbs</span> <span class="o">=</span> <span class="n">obsproj</span><span class="o">.</span><span class="n">assoc_sched_blocks</span><span class="p">()</span>
+        <span class="k">try</span><span class="p">:</span>
+            <span class="k">for</span> <span class="n">sg</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">obsproj</span><span class="o">.</span><span class="n">ObsProgram</span><span class="o">.</span><span class="n">ScienceGoal</span><span class="p">)):</span>
+                <span class="n">code</span> <span class="o">=</span> <span class="n">code</span>
+                <span class="n">sciencegoal</span> <span class="o">=</span> <span class="n">obsproj</span><span class="o">.</span><span class="n">ObsProgram</span><span class="o">.</span><span class="n">ScienceGoal</span><span class="p">[</span><span class="n">sg</span><span class="p">]</span>
+                <span class="n">partid</span> <span class="o">=</span> <span class="n">sciencegoal</span><span class="o">.</span><span class="n">ObsUnitSetRef</span><span class="o">.</span><span class="n">attrib</span><span class="p">[</span><span class="s">&#39;partId&#39;</span><span class="p">]</span>
+                <span class="n">perfparam</span> <span class="o">=</span> <span class="n">sciencegoal</span><span class="o">.</span><span class="n">PerformanceParameters</span>
+                <span class="n">ar</span> <span class="o">=</span> <span class="n">perfparam</span><span class="o">.</span><span class="n">desiredAngularResolution</span><span class="o">.</span><span class="n">pyval</span>
+                <span class="n">arunit</span> <span class="o">=</span> <span class="n">perfparam</span><span class="o">.</span><span class="n">desiredAngularResolution</span><span class="o">.</span><span class="n">attrib</span><span class="p">[</span><span class="s">&#39;unit&#39;</span><span class="p">]</span>
+                <span class="n">ar</span> <span class="o">=</span> <span class="n">convert_sec</span><span class="p">(</span><span class="n">ar</span><span class="p">,</span> <span class="n">arunit</span><span class="p">)</span>
+                <span class="n">las</span> <span class="o">=</span> <span class="n">perfparam</span><span class="o">.</span><span class="n">desiredLargestScale</span><span class="o">.</span><span class="n">pyval</span>
+                <span class="n">lasunit</span> <span class="o">=</span> <span class="n">perfparam</span><span class="o">.</span><span class="n">desiredLargestScale</span><span class="o">.</span><span class="n">attrib</span><span class="p">[</span><span class="s">&#39;unit&#39;</span><span class="p">]</span>
+                <span class="n">las</span> <span class="o">=</span> <span class="n">convert_sec</span><span class="p">(</span><span class="n">las</span><span class="p">,</span> <span class="n">lasunit</span><span class="p">)</span>
+                <span class="n">bands</span> <span class="o">=</span> <span class="n">sciencegoal</span><span class="o">.</span><span class="n">requiredReceiverBands</span><span class="o">.</span><span class="n">pyval</span>
+                <span class="n">istimeconst</span> <span class="o">=</span> <span class="n">perfparam</span><span class="o">.</span><span class="n">isTimeConstrained</span><span class="o">.</span><span class="n">pyval</span>
+                <span class="k">if</span> <span class="n">istimeconst</span><span class="p">:</span>
+                    <span class="k">try</span><span class="p">:</span>
+                        <span class="n">temppar</span> <span class="o">=</span> <span class="n">perfparam</span><span class="o">.</span><span class="n">TemporalParameters</span>
+                        <span class="n">starttime</span> <span class="o">=</span> <span class="n">temppar</span><span class="o">.</span><span class="n">startTime</span><span class="o">.</span><span class="n">pyval</span>
+                        <span class="n">endtime</span> <span class="o">=</span> <span class="n">temppar</span><span class="o">.</span><span class="n">endTime</span><span class="o">.</span><span class="n">pyval</span>
+                        <span class="k">try</span><span class="p">:</span>
+                            <span class="n">allowedmarg</span> <span class="o">=</span> <span class="n">temppar</span><span class="o">.</span><span class="n">allowedMargin</span><span class="o">.</span><span class="n">pyval</span>
+                            <span class="n">allowedmarg_unit</span> <span class="o">=</span> <span class="n">temppar</span><span class="o">.</span><span class="n">allowedMarg</span><span class="o">.</span><span class="n">bin</span><span class="o">.</span><span class="n">attrib</span><span class="p">[</span>
+                                <span class="s">&#39;unit&#39;</span><span class="p">]</span>
+                        <span class="k">except</span> <span class="ne">AttributeError</span><span class="p">:</span>
+                            <span class="n">allowedmarg</span> <span class="o">=</span> <span class="bp">None</span>
+                            <span class="n">allowedmarg_unit</span> <span class="o">=</span> <span class="bp">None</span>
+                        <span class="n">repeats</span> <span class="o">=</span> <span class="n">temppar</span><span class="o">.</span><span class="n">repeats</span><span class="o">.</span><span class="n">pyval</span>
+                        <span class="n">note</span> <span class="o">=</span> <span class="n">temppar</span><span class="o">.</span><span class="n">note</span><span class="o">.</span><span class="n">pyval</span>
+                        <span class="k">try</span><span class="p">:</span>
+                            <span class="n">isavoid</span> <span class="o">=</span> <span class="n">temppar</span><span class="o">.</span><span class="n">isAvoidConstraint</span><span class="o">.</span><span class="n">pyval</span>
+                        <span class="k">except</span> <span class="ne">AttributeError</span><span class="p">:</span>
+                            <span class="n">isavoid</span> <span class="o">=</span> <span class="bp">None</span>
+                    <span class="k">except</span> <span class="ne">AttributeError</span><span class="p">,</span> <span class="n">e</span><span class="p">:</span>
+                        <span class="k">print</span><span class="p">(</span><span class="s">&quot;Project </span><span class="si">%s</span><span class="s"> is timeconstrain but no parameters?&quot;</span>
+                              <span class="s">&quot;(</span><span class="si">%s</span><span class="s">)&quot;</span> <span class="o">%</span> <span class="p">(</span><span class="n">code</span><span class="p">,</span> <span class="n">e</span><span class="p">))</span>
+                        <span class="n">temppar</span><span class="p">,</span> <span class="n">starttime</span><span class="p">,</span> <span class="n">endtime</span><span class="p">,</span> <span class="n">allowedmarg</span> <span class="o">=</span> <span class="p">(</span>
+                            <span class="bp">None</span><span class="p">,</span> <span class="bp">None</span><span class="p">,</span> <span class="bp">None</span><span class="p">,</span> <span class="bp">None</span><span class="p">)</span>
+                        <span class="n">allowedmarg_unit</span><span class="p">,</span> <span class="n">repeats</span><span class="p">,</span> <span class="n">note</span><span class="p">,</span> <span class="n">isavoid</span> <span class="o">=</span> <span class="p">(</span>
+                            <span class="bp">None</span><span class="p">,</span> <span class="bp">None</span><span class="p">,</span> <span class="bp">None</span><span class="p">,</span> <span class="bp">None</span><span class="p">)</span>
+                <span class="k">else</span><span class="p">:</span>
+                    <span class="n">temppar</span><span class="p">,</span> <span class="n">starttime</span><span class="p">,</span> <span class="n">endtime</span><span class="p">,</span> <span class="n">allowedmarg</span> <span class="o">=</span> <span class="p">(</span>
+                        <span class="bp">None</span><span class="p">,</span> <span class="bp">None</span><span class="p">,</span> <span class="bp">None</span><span class="p">,</span> <span class="bp">None</span><span class="p">)</span>
+                    <span class="n">allowedmarg_unit</span><span class="p">,</span> <span class="n">repeats</span><span class="p">,</span> <span class="n">note</span><span class="p">,</span> <span class="n">isavoid</span> <span class="o">=</span> <span class="p">(</span>
+                        <span class="bp">None</span><span class="p">,</span> <span class="bp">None</span><span class="p">,</span> <span class="bp">None</span><span class="p">,</span> <span class="bp">None</span><span class="p">)</span>
+
+                <span class="k">try</span><span class="p">:</span>
+                    <span class="n">ss</span> <span class="o">=</span> <span class="n">sciencegoal</span><span class="o">.</span><span class="n">SpectralSetupParameters</span><span class="o">.</span><span class="n">SpectralScan</span>
+                    <span class="n">isspectralscan</span> <span class="o">=</span> <span class="bp">True</span>
+                <span class="k">except</span> <span class="ne">AttributeError</span><span class="p">:</span>
+                    <span class="n">isspectralscan</span> <span class="o">=</span> <span class="bp">False</span>
+                <span class="n">useaca</span> <span class="o">=</span> <span class="n">sciencegoal</span><span class="o">.</span><span class="n">PerformanceParameters</span><span class="o">.</span><span class="n">useACA</span><span class="o">.</span><span class="n">pyval</span>
+                <span class="n">usetp</span> <span class="o">=</span> <span class="n">sciencegoal</span><span class="o">.</span><span class="n">PerformanceParameters</span><span class="o">.</span><span class="n">useTP</span><span class="o">.</span><span class="n">pyval</span>
+
+                <span class="k">if</span> <span class="n">new</span><span class="p">:</span>
+                    <span class="bp">self</span><span class="o">.</span><span class="n">sciencegoals</span> <span class="o">=</span> <span class="n">pd</span><span class="o">.</span><span class="n">DataFrame</span><span class="p">(</span>
+                        <span class="p">[(</span><span class="n">code</span><span class="p">,</span> <span class="n">partid</span><span class="p">,</span> <span class="n">ar</span><span class="p">,</span> <span class="n">las</span><span class="p">,</span> <span class="n">bands</span><span class="p">,</span> <span class="n">isspectralscan</span><span class="p">,</span>
+                          <span class="n">istimeconst</span><span class="p">,</span> <span class="n">useaca</span><span class="p">,</span> <span class="n">usetp</span><span class="p">,</span> <span class="n">assoc_sbs</span><span class="p">[</span><span class="n">partid</span><span class="p">],</span>
+                          <span class="n">starttime</span><span class="p">,</span> <span class="n">endtime</span><span class="p">,</span> <span class="n">allowedmarg</span><span class="p">,</span>
+                          <span class="n">allowedmarg_unit</span><span class="p">,</span> <span class="n">repeats</span><span class="p">,</span> <span class="n">note</span><span class="p">,</span> <span class="n">isavoid</span><span class="p">)],</span>
+                        <span class="n">columns</span><span class="o">=</span><span class="p">[</span><span class="s">&#39;CODE&#39;</span><span class="p">,</span> <span class="s">&#39;partId&#39;</span><span class="p">,</span> <span class="s">&#39;AR&#39;</span><span class="p">,</span> <span class="s">&#39;LAS&#39;</span><span class="p">,</span> <span class="s">&#39;bands&#39;</span><span class="p">,</span>
+                                 <span class="s">&#39;isSpectralScan&#39;</span><span class="p">,</span> <span class="s">&#39;isTimeConstrained&#39;</span><span class="p">,</span>
+                                 <span class="s">&#39;useACA&#39;</span><span class="p">,</span> <span class="s">&#39;useTP&#39;</span><span class="p">,</span> <span class="s">&#39;SBS&#39;</span><span class="p">,</span> <span class="s">&#39;startRime&#39;</span><span class="p">,</span>
+                                 <span class="s">&#39;endTime&#39;</span><span class="p">,</span> <span class="s">&#39;allowedMargin&#39;</span><span class="p">,</span> <span class="s">&#39;allowedUnits&#39;</span><span class="p">,</span>
+                                 <span class="s">&#39;repeats&#39;</span><span class="p">,</span> <span class="s">&#39;note&#39;</span><span class="p">,</span> <span class="s">&#39;isavoid&#39;</span><span class="p">],</span>
+                        <span class="n">index</span><span class="o">=</span><span class="p">[</span><span class="n">partid</span><span class="p">])</span>
+                    <span class="n">new</span> <span class="o">=</span> <span class="bp">False</span>
+                <span class="k">else</span><span class="p">:</span>
+                    <span class="bp">self</span><span class="o">.</span><span class="n">sciencegoals</span><span class="o">.</span><span class="n">ix</span><span class="p">[</span><span class="n">partid</span><span class="p">]</span> <span class="o">=</span> <span class="p">(</span>
+                        <span class="n">code</span><span class="p">,</span> <span class="n">partid</span><span class="p">,</span> <span class="n">ar</span><span class="p">,</span> <span class="n">las</span><span class="p">,</span> <span class="n">bands</span><span class="p">,</span> <span class="n">isspectralscan</span><span class="p">,</span>
+                        <span class="n">istimeconst</span><span class="p">,</span> <span class="n">useaca</span><span class="p">,</span> <span class="n">usetp</span><span class="p">,</span> <span class="n">assoc_sbs</span><span class="p">[</span><span class="n">partid</span><span class="p">],</span>
+                        <span class="n">starttime</span><span class="p">,</span> <span class="n">endtime</span><span class="p">,</span> <span class="n">allowedmarg</span><span class="p">,</span>
+                        <span class="n">allowedmarg_unit</span><span class="p">,</span> <span class="n">repeats</span><span class="p">,</span> <span class="n">note</span><span class="p">,</span> <span class="n">isavoid</span><span class="p">)</span>
+
+        <span class="k">except</span> <span class="ne">AttributeError</span><span class="p">,</span> <span class="n">e</span><span class="p">:</span>
+            <span class="k">print</span> <span class="s">&quot;Project </span><span class="si">%s</span><span class="s"> has no ObsUnitSets (</span><span class="si">%s</span><span class="s">)&quot;</span> <span class="o">%</span> <span class="p">(</span><span class="n">code</span><span class="p">,</span> <span class="n">e</span><span class="p">)</span>
+            <span class="k">return</span> <span class="mi">0</span>
+        <span class="k">return</span> <span class="mi">0</span>
+
+    <span class="k">def</span> <span class="nf">row_schedblock_info</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">sb_uid</span><span class="p">,</span> <span class="n">new</span><span class="o">=</span><span class="bp">False</span><span class="p">):</span>
+
+        <span class="c"># Open SB with SB parser class</span>
+        <span class="k">print</span> <span class="s">&quot; Processing SB </span><span class="si">%s</span><span class="s">&quot;</span> <span class="o">%</span> <span class="n">sb_uid</span>
+        <span class="n">sb</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">schedblocks</span><span class="o">.</span><span class="n">ix</span><span class="p">[</span><span class="n">sb_uid</span><span class="p">]</span>
+        <span class="n">pid</span> <span class="o">=</span> <span class="n">sb</span><span class="o">.</span><span class="n">partId</span>
+        <span class="n">xml</span> <span class="o">=</span> <span class="n">SchedBlocK</span><span class="p">(</span><span class="n">sb</span><span class="o">.</span><span class="n">sb_xml</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">sbxml</span><span class="p">)</span>
+        <span class="n">new_orig</span> <span class="o">=</span> <span class="n">new</span>
+        <span class="c"># Extract root level data</span>
+        <span class="n">array</span> <span class="o">=</span> <span class="n">xml</span><span class="o">.</span><span class="n">data</span><span class="o">.</span><span class="n">findall</span><span class="p">(</span>
+            <span class="s">&#39;.//&#39;</span> <span class="o">+</span> <span class="n">prj</span> <span class="o">+</span> <span class="s">&#39;ObsUnitControl&#39;</span><span class="p">)[</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">attrib</span><span class="p">[</span><span class="s">&#39;arrayRequested&#39;</span><span class="p">]</span>
+        <span class="n">name</span> <span class="o">=</span> <span class="n">xml</span><span class="o">.</span><span class="n">data</span><span class="o">.</span><span class="n">findall</span><span class="p">(</span><span class="s">&#39;.//&#39;</span> <span class="o">+</span> <span class="n">prj</span> <span class="o">+</span> <span class="s">&#39;name&#39;</span><span class="p">)[</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">pyval</span>
+        <span class="n">status</span> <span class="o">=</span> <span class="n">xml</span><span class="o">.</span><span class="n">data</span><span class="o">.</span><span class="n">attrib</span><span class="p">[</span><span class="s">&#39;status&#39;</span><span class="p">]</span>
+
+        <span class="n">schedconstr</span> <span class="o">=</span> <span class="n">xml</span><span class="o">.</span><span class="n">data</span><span class="o">.</span><span class="n">SchedulingConstraints</span>
+        <span class="n">schedcontrol</span> <span class="o">=</span> <span class="n">xml</span><span class="o">.</span><span class="n">data</span><span class="o">.</span><span class="n">SchedBlockControl</span>
+        <span class="n">preconditions</span> <span class="o">=</span> <span class="n">xml</span><span class="o">.</span><span class="n">data</span><span class="o">.</span><span class="n">Preconditions</span>
+        <span class="n">weather</span> <span class="o">=</span> <span class="n">preconditions</span><span class="o">.</span><span class="n">findall</span><span class="p">(</span><span class="s">&#39;.//&#39;</span> <span class="o">+</span> <span class="n">prj</span> <span class="o">+</span> <span class="s">&#39;WeatherConstraints&#39;</span><span class="p">)[</span><span class="mi">0</span><span class="p">]</span>
+
+        <span class="k">try</span><span class="p">:</span>
+            <span class="n">ampliparam</span> <span class="o">=</span> <span class="n">xml</span><span class="o">.</span><span class="n">data</span><span class="o">.</span><span class="n">AmplitudeCalParameters</span>
+            <span class="n">amplitude</span> <span class="o">=</span> <span class="nb">str</span><span class="p">(</span><span class="n">ampliparam</span><span class="o">.</span><span class="n">attrib</span><span class="p">[</span><span class="s">&#39;entityPartId&#39;</span><span class="p">])</span>
+        <span class="k">except</span> <span class="ne">AttributeError</span><span class="p">:</span>
+            <span class="n">amplitude</span> <span class="o">=</span> <span class="bp">None</span>
+
+        <span class="k">try</span><span class="p">:</span>
+            <span class="n">phaseparam</span> <span class="o">=</span> <span class="n">xml</span><span class="o">.</span><span class="n">data</span><span class="o">.</span><span class="n">PhaseCalParameters</span>
+            <span class="n">phase</span> <span class="o">=</span> <span class="nb">str</span><span class="p">(</span><span class="n">phaseparam</span><span class="o">.</span><span class="n">attrib</span><span class="p">[</span><span class="s">&#39;entityPartId&#39;</span><span class="p">])</span>
+        <span class="k">except</span> <span class="ne">AttributeError</span><span class="p">:</span>
+            <span class="n">phase</span> <span class="o">=</span> <span class="bp">None</span>
+
+        <span class="k">try</span><span class="p">:</span>
+            <span class="n">basebandparam</span> <span class="o">=</span> <span class="n">xml</span><span class="o">.</span><span class="n">data</span><span class="o">.</span><span class="n">BandpassCalParameters</span>
+            <span class="n">baseband</span> <span class="o">=</span> <span class="nb">str</span><span class="p">(</span><span class="n">basebandparam</span><span class="o">.</span><span class="n">attrib</span><span class="p">[</span><span class="s">&#39;entityPartId&#39;</span><span class="p">])</span>
+        <span class="k">except</span> <span class="ne">AttributeError</span><span class="p">:</span>
+            <span class="n">baseband</span> <span class="o">=</span> <span class="bp">None</span>
+        <span class="k">try</span><span class="p">:</span>
+            <span class="n">polarparam</span> <span class="o">=</span> <span class="n">xml</span><span class="o">.</span><span class="n">data</span><span class="o">.</span><span class="n">PolarizationCalParameters</span>
+            <span class="n">polarization</span> <span class="o">=</span> <span class="nb">str</span><span class="p">(</span><span class="n">polarparam</span><span class="o">.</span><span class="n">attrib</span><span class="p">[</span><span class="s">&#39;entityPartId&#39;</span><span class="p">])</span>
+            <span class="n">ispolarization</span> <span class="o">=</span> <span class="bp">True</span>
+        <span class="k">except</span> <span class="ne">AttributeError</span><span class="p">:</span>
+            <span class="n">ispolarization</span> <span class="o">=</span> <span class="bp">False</span>
+            <span class="n">polarization</span> <span class="o">=</span> <span class="bp">None</span>
+        <span class="k">try</span><span class="p">:</span>
+            <span class="n">delayparam</span> <span class="o">=</span> <span class="n">xml</span><span class="o">.</span><span class="n">data</span><span class="o">.</span><span class="n">DelayCalParameters</span>
+            <span class="n">delay</span> <span class="o">=</span> <span class="nb">str</span><span class="p">(</span><span class="n">delayparam</span><span class="o">.</span><span class="n">attrib</span><span class="p">[</span><span class="s">&#39;entityPartId&#39;</span><span class="p">])</span>
+        <span class="k">except</span> <span class="ne">AttributeError</span><span class="p">:</span>
+            <span class="n">delay</span> <span class="o">=</span> <span class="bp">None</span>
+        <span class="n">scienceparam</span> <span class="o">=</span> <span class="n">xml</span><span class="o">.</span><span class="n">data</span><span class="o">.</span><span class="n">ScienceParameters</span>
+        <span class="n">science</span> <span class="o">=</span> <span class="nb">str</span><span class="p">(</span><span class="n">scienceparam</span><span class="o">.</span><span class="n">attrib</span><span class="p">[</span><span class="s">&#39;entityPartId&#39;</span><span class="p">])</span>
+        <span class="n">integrationtime</span> <span class="o">=</span> <span class="n">scienceparam</span><span class="o">.</span><span class="n">integrationTime</span><span class="o">.</span><span class="n">pyval</span>
+        <span class="n">integrationtime_unit</span> <span class="o">=</span> <span class="n">scienceparam</span><span class="o">.</span><span class="n">integrationTime</span><span class="o">.</span><span class="n">attrib</span><span class="p">[</span><span class="s">&#39;unit&#39;</span><span class="p">]</span>
+        <span class="n">integrationtime</span> <span class="o">=</span> <span class="n">convert_tsec</span><span class="p">(</span><span class="n">integrationtime</span><span class="p">,</span> <span class="n">integrationtime_unit</span><span class="p">)</span>
+        <span class="n">subscandur</span> <span class="o">=</span> <span class="n">scienceparam</span><span class="o">.</span><span class="n">subScanDuration</span><span class="o">.</span><span class="n">pyval</span>
+        <span class="n">subscandur_unit</span> <span class="o">=</span> <span class="n">scienceparam</span><span class="o">.</span><span class="n">subScanDuration</span><span class="o">.</span><span class="n">attrib</span><span class="p">[</span><span class="s">&#39;unit&#39;</span><span class="p">]</span>
+        <span class="n">subscandur</span> <span class="o">=</span> <span class="n">convert_tsec</span><span class="p">(</span><span class="n">subscandur</span><span class="p">,</span> <span class="n">subscandur_unit</span><span class="p">)</span>
+
+        <span class="n">repfreq</span> <span class="o">=</span> <span class="n">schedconstr</span><span class="o">.</span><span class="n">representativeFrequency</span><span class="o">.</span><span class="n">pyval</span>
+        <span class="n">ra</span> <span class="o">=</span> <span class="n">schedconstr</span><span class="o">.</span><span class="n">representativeCoordinates</span><span class="o">.</span><span class="n">findall</span><span class="p">(</span>
+            <span class="n">val</span> <span class="o">+</span> <span class="s">&#39;longitude&#39;</span><span class="p">)[</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">pyval</span>
+        <span class="n">dec</span> <span class="o">=</span> <span class="n">schedconstr</span><span class="o">.</span><span class="n">representativeCoordinates</span><span class="o">.</span><span class="n">findall</span><span class="p">(</span>
+            <span class="n">val</span> <span class="o">+</span> <span class="s">&#39;latitude&#39;</span><span class="p">)[</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">pyval</span>
+        <span class="n">minar_old</span> <span class="o">=</span> <span class="n">schedconstr</span><span class="o">.</span><span class="n">minAcceptableAngResolution</span><span class="o">.</span><span class="n">pyval</span>
+        <span class="n">maxar_old</span> <span class="o">=</span> <span class="n">schedconstr</span><span class="o">.</span><span class="n">maxAcceptableAngResolution</span><span class="o">.</span><span class="n">pyval</span>
+        <span class="n">band</span> <span class="o">=</span> <span class="n">schedconstr</span><span class="o">.</span><span class="n">attrib</span><span class="p">[</span><span class="s">&#39;representativeReceiverBand&#39;</span><span class="p">]</span>
+
+        <span class="n">execount</span> <span class="o">=</span> <span class="n">schedcontrol</span><span class="o">.</span><span class="n">executionCount</span><span class="o">.</span><span class="n">pyval</span>
+        <span class="n">maxpwv</span> <span class="o">=</span> <span class="n">weather</span><span class="o">.</span><span class="n">maxPWVC</span><span class="o">.</span><span class="n">pyval</span>
+
+        <span class="n">n_fs</span> <span class="o">=</span> <span class="nb">len</span><span class="p">(</span><span class="n">xml</span><span class="o">.</span><span class="n">data</span><span class="o">.</span><span class="n">FieldSource</span><span class="p">)</span>
+        <span class="n">n_tg</span> <span class="o">=</span> <span class="nb">len</span><span class="p">(</span><span class="n">xml</span><span class="o">.</span><span class="n">data</span><span class="o">.</span><span class="n">Target</span><span class="p">)</span>
+        <span class="n">n_ss</span> <span class="o">=</span> <span class="nb">len</span><span class="p">(</span><span class="n">xml</span><span class="o">.</span><span class="n">data</span><span class="o">.</span><span class="n">SpectralSpec</span><span class="p">)</span>
+
+        <span class="k">for</span> <span class="n">n</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">n_fs</span><span class="p">):</span>
+            <span class="k">if</span> <span class="n">new</span><span class="p">:</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">row_fieldsource</span><span class="p">(</span><span class="n">xml</span><span class="o">.</span><span class="n">data</span><span class="o">.</span><span class="n">FieldSource</span><span class="p">[</span><span class="n">n</span><span class="p">],</span> <span class="n">sb_uid</span><span class="p">,</span> <span class="n">new</span><span class="o">=</span><span class="n">new</span><span class="p">)</span>
+                <span class="n">new</span> <span class="o">=</span> <span class="bp">False</span>
+            <span class="k">else</span><span class="p">:</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">row_fieldsource</span><span class="p">(</span><span class="n">xml</span><span class="o">.</span><span class="n">data</span><span class="o">.</span><span class="n">FieldSource</span><span class="p">[</span><span class="n">n</span><span class="p">],</span> <span class="n">sb_uid</span><span class="p">)</span>
+
+        <span class="n">new</span> <span class="o">=</span> <span class="n">new_orig</span>
+        <span class="k">for</span> <span class="n">n</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">n_tg</span><span class="p">):</span>
+            <span class="k">if</span> <span class="n">new</span><span class="p">:</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">row_target</span><span class="p">(</span><span class="n">xml</span><span class="o">.</span><span class="n">data</span><span class="o">.</span><span class="n">Target</span><span class="p">[</span><span class="n">n</span><span class="p">],</span> <span class="n">sb_uid</span><span class="p">,</span> <span class="n">new</span><span class="o">=</span><span class="n">new</span><span class="p">)</span>
+                <span class="n">new</span> <span class="o">=</span> <span class="bp">False</span>
+            <span class="k">else</span><span class="p">:</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">row_target</span><span class="p">(</span><span class="n">xml</span><span class="o">.</span><span class="n">data</span><span class="o">.</span><span class="n">Target</span><span class="p">[</span><span class="n">n</span><span class="p">],</span> <span class="n">sb_uid</span><span class="p">)</span>
+
+        <span class="n">new</span> <span class="o">=</span> <span class="n">new_orig</span>
+        <span class="k">for</span> <span class="n">n</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">n_ss</span><span class="p">):</span>
+            <span class="k">if</span> <span class="n">new</span><span class="p">:</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">row_spectralconf</span><span class="p">(</span><span class="n">xml</span><span class="o">.</span><span class="n">data</span><span class="o">.</span><span class="n">SpectralSpec</span><span class="p">[</span><span class="n">n</span><span class="p">],</span> <span class="n">sb_uid</span><span class="p">,</span> <span class="n">new</span><span class="o">=</span><span class="n">new</span><span class="p">)</span>
+                <span class="n">new</span> <span class="o">=</span> <span class="bp">False</span>
+            <span class="k">else</span><span class="p">:</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">row_spectralconf</span><span class="p">(</span><span class="n">xml</span><span class="o">.</span><span class="n">data</span><span class="o">.</span><span class="n">SpectralSpec</span><span class="p">[</span><span class="n">n</span><span class="p">],</span> <span class="n">sb_uid</span><span class="p">)</span>
+
+        <span class="n">new</span> <span class="o">=</span> <span class="n">new_orig</span>
+        <span class="k">if</span> <span class="n">new</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">schedblock_info</span> <span class="o">=</span> <span class="n">pd</span><span class="o">.</span><span class="n">DataFrame</span><span class="p">(</span>
+                <span class="p">[(</span><span class="n">sb_uid</span><span class="p">,</span> <span class="n">pid</span><span class="p">,</span> <span class="n">name</span><span class="p">,</span> <span class="n">status</span><span class="p">,</span>
+                  <span class="n">repfreq</span><span class="p">,</span> <span class="n">band</span><span class="p">,</span> <span class="n">array</span><span class="p">,</span> <span class="n">ra</span><span class="p">,</span> <span class="n">dec</span><span class="p">,</span> <span class="n">minar_old</span><span class="p">,</span>
+                  <span class="n">maxar_old</span><span class="p">,</span> <span class="n">execount</span><span class="p">,</span> <span class="n">ispolarization</span><span class="p">,</span> <span class="n">amplitude</span><span class="p">,</span>
+                  <span class="n">baseband</span><span class="p">,</span> <span class="n">polarization</span><span class="p">,</span> <span class="n">phase</span><span class="p">,</span> <span class="n">delay</span><span class="p">,</span>
+                  <span class="n">science</span><span class="p">,</span> <span class="n">integrationtime</span><span class="p">,</span> <span class="n">subscandur</span><span class="p">,</span> <span class="n">maxpwv</span><span class="p">)],</span>
+                <span class="n">columns</span><span class="o">=</span><span class="p">[</span><span class="s">&#39;SB_UID&#39;</span><span class="p">,</span> <span class="s">&#39;partId&#39;</span><span class="p">,</span> <span class="s">&#39;name&#39;</span><span class="p">,</span> <span class="s">&#39;status_xml&#39;</span><span class="p">,</span>
+                         <span class="s">&#39;repfreq&#39;</span><span class="p">,</span> <span class="s">&#39;band&#39;</span><span class="p">,</span> <span class="s">&#39;array&#39;</span><span class="p">,</span> <span class="s">&#39;RA&#39;</span><span class="p">,</span> <span class="s">&#39;DEC&#39;</span><span class="p">,</span> <span class="s">&#39;minAR_old&#39;</span><span class="p">,</span>
+                         <span class="s">&#39;maxAR_old&#39;</span><span class="p">,</span> <span class="s">&#39;execount&#39;</span><span class="p">,</span> <span class="s">&#39;isPolarization&#39;</span><span class="p">,</span> <span class="s">&#39;amplitude&#39;</span><span class="p">,</span>
+                         <span class="s">&#39;baseband&#39;</span><span class="p">,</span> <span class="s">&#39;polarization&#39;</span><span class="p">,</span> <span class="s">&#39;phase&#39;</span><span class="p">,</span> <span class="s">&#39;delay&#39;</span><span class="p">,</span>
+                         <span class="s">&#39;science&#39;</span><span class="p">,</span> <span class="s">&#39;integrationTime&#39;</span><span class="p">,</span> <span class="s">&#39;subScandur&#39;</span><span class="p">,</span> <span class="s">&#39;maxPWVC&#39;</span><span class="p">],</span>
+                <span class="n">index</span><span class="o">=</span><span class="p">[</span><span class="n">sb_uid</span><span class="p">])</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">schedblock_info</span><span class="o">.</span><span class="n">ix</span><span class="p">[</span><span class="n">sb_uid</span><span class="p">]</span> <span class="o">=</span> <span class="p">(</span>
+                <span class="n">sb_uid</span><span class="p">,</span> <span class="n">pid</span><span class="p">,</span> <span class="n">name</span><span class="p">,</span> <span class="n">status</span><span class="p">,</span> <span class="n">repfreq</span><span class="p">,</span> <span class="n">band</span><span class="p">,</span> <span class="n">array</span><span class="p">,</span> <span class="n">ra</span><span class="p">,</span> <span class="n">dec</span><span class="p">,</span>
+                <span class="n">minar_old</span><span class="p">,</span> <span class="n">maxar_old</span><span class="p">,</span> <span class="n">execount</span><span class="p">,</span> <span class="n">ispolarization</span><span class="p">,</span>
+                <span class="n">amplitude</span><span class="p">,</span> <span class="n">baseband</span><span class="p">,</span> <span class="n">polarization</span><span class="p">,</span> <span class="n">phase</span><span class="p">,</span> <span class="n">delay</span><span class="p">,</span> <span class="n">science</span><span class="p">,</span>
+                <span class="n">integrationtime</span><span class="p">,</span> <span class="n">subscandur</span><span class="p">,</span> <span class="n">maxpwv</span><span class="p">)</span>
+
+    <span class="k">def</span> <span class="nf">row_fieldsource</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">fs</span><span class="p">,</span> <span class="n">sbuid</span><span class="p">,</span> <span class="n">new</span><span class="o">=</span><span class="bp">False</span><span class="p">):</span>
+        <span class="n">partid</span> <span class="o">=</span> <span class="n">fs</span><span class="o">.</span><span class="n">attrib</span><span class="p">[</span><span class="s">&#39;entityPartId&#39;</span><span class="p">]</span>
+        <span class="n">coord</span> <span class="o">=</span> <span class="n">fs</span><span class="o">.</span><span class="n">sourceCoordinates</span>
+        <span class="n">solarsystem</span> <span class="o">=</span> <span class="n">fs</span><span class="o">.</span><span class="n">attrib</span><span class="p">[</span><span class="s">&#39;solarSystemObject&#39;</span><span class="p">]</span>
+        <span class="n">sourcename</span> <span class="o">=</span> <span class="n">fs</span><span class="o">.</span><span class="n">sourceName</span><span class="o">.</span><span class="n">pyval</span>
+        <span class="n">name</span> <span class="o">=</span> <span class="n">fs</span><span class="o">.</span><span class="n">name</span><span class="o">.</span><span class="n">pyval</span>
+        <span class="n">isquery</span> <span class="o">=</span> <span class="n">fs</span><span class="o">.</span><span class="n">isQuery</span><span class="o">.</span><span class="n">pyval</span>
+        <span class="n">pointings</span> <span class="o">=</span> <span class="nb">len</span><span class="p">(</span><span class="n">fs</span><span class="o">.</span><span class="n">findall</span><span class="p">(</span><span class="n">sbl</span> <span class="o">+</span> <span class="s">&#39;PointingPattern/&#39;</span> <span class="o">+</span> <span class="n">sbl</span> <span class="o">+</span>
+                                   <span class="s">&#39;phaseCenterCoordinates&#39;</span><span class="p">))</span>
+        <span class="k">try</span><span class="p">:</span>
+            <span class="n">ismosaic</span> <span class="o">=</span> <span class="n">fs</span><span class="o">.</span><span class="n">PointingPattern</span><span class="o">.</span><span class="n">isMosaic</span><span class="o">.</span><span class="n">pyval</span>
+        <span class="k">except</span> <span class="ne">AttributeError</span><span class="p">:</span>
+            <span class="n">ismosaic</span> <span class="o">=</span> <span class="bp">False</span>
+        <span class="k">if</span> <span class="n">isquery</span><span class="p">:</span>
+            <span class="n">querysource</span> <span class="o">=</span> <span class="n">fs</span><span class="o">.</span><span class="n">QuerySource</span>
+            <span class="n">qc_intendeduse</span> <span class="o">=</span> <span class="n">querysource</span><span class="o">.</span><span class="n">attrib</span><span class="p">[</span><span class="s">&#39;intendedUse&#39;</span><span class="p">]</span>
+            <span class="n">qcenter</span> <span class="o">=</span> <span class="n">querysource</span><span class="o">.</span><span class="n">queryCenter</span>
+            <span class="n">qc_ra</span> <span class="o">=</span> <span class="n">qcenter</span><span class="o">.</span><span class="n">findall</span><span class="p">(</span><span class="n">val</span> <span class="o">+</span> <span class="s">&#39;longitude&#39;</span><span class="p">)[</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">pyval</span>
+            <span class="n">qc_dec</span> <span class="o">=</span> <span class="n">qcenter</span><span class="o">.</span><span class="n">findall</span><span class="p">(</span><span class="n">val</span> <span class="o">+</span> <span class="s">&#39;latitude&#39;</span><span class="p">)[</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">pyval</span>
+            <span class="n">qc_use</span> <span class="o">=</span> <span class="n">querysource</span><span class="o">.</span><span class="n">use</span><span class="o">.</span><span class="n">pyval</span>
+            <span class="n">qc_radius</span> <span class="o">=</span> <span class="n">querysource</span><span class="o">.</span><span class="n">searchRadius</span><span class="o">.</span><span class="n">pyval</span>
+            <span class="n">qc_radius_unit</span> <span class="o">=</span> <span class="n">querysource</span><span class="o">.</span><span class="n">searchRadius</span><span class="o">.</span><span class="n">attrib</span><span class="p">[</span><span class="s">&#39;unit&#39;</span><span class="p">]</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="n">qc_intendeduse</span><span class="p">,</span> <span class="n">qc_ra</span><span class="p">,</span> <span class="n">qc_dec</span><span class="p">,</span> <span class="n">qc_use</span><span class="p">,</span> <span class="n">qc_radius</span><span class="p">,</span> <span class="n">qc_radius_unit</span> <span class="o">=</span> <span class="p">(</span>
+                <span class="bp">None</span><span class="p">,</span> <span class="bp">None</span><span class="p">,</span> <span class="bp">None</span><span class="p">,</span> <span class="bp">None</span><span class="p">,</span> <span class="bp">None</span><span class="p">,</span> <span class="bp">None</span>
+            <span class="p">)</span>
+        <span class="n">ra</span> <span class="o">=</span> <span class="n">coord</span><span class="o">.</span><span class="n">findall</span><span class="p">(</span><span class="n">val</span> <span class="o">+</span> <span class="s">&#39;longitude&#39;</span><span class="p">)[</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">pyval</span>
+        <span class="n">dec</span> <span class="o">=</span> <span class="n">coord</span><span class="o">.</span><span class="n">findall</span><span class="p">(</span><span class="n">val</span> <span class="o">+</span> <span class="s">&#39;latitude&#39;</span><span class="p">)[</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">pyval</span>
+        <span class="k">if</span> <span class="n">solarsystem</span> <span class="o">==</span> <span class="s">&#39;Ephemeris&#39;</span><span class="p">:</span>
+            <span class="n">ephemeris</span> <span class="o">=</span> <span class="n">fs</span><span class="o">.</span><span class="n">sourceEphemeris</span><span class="o">.</span><span class="n">pyval</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="n">ephemeris</span> <span class="o">=</span> <span class="bp">None</span>
+        <span class="k">if</span> <span class="n">new</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">fieldsource</span> <span class="o">=</span> <span class="n">pd</span><span class="o">.</span><span class="n">DataFrame</span><span class="p">(</span>
+                <span class="p">[(</span><span class="n">partid</span><span class="p">,</span> <span class="n">sbuid</span><span class="p">,</span> <span class="n">solarsystem</span><span class="p">,</span> <span class="n">sourcename</span><span class="p">,</span> <span class="n">name</span><span class="p">,</span> <span class="n">ra</span><span class="p">,</span> <span class="n">dec</span><span class="p">,</span> <span class="n">isquery</span><span class="p">,</span>
+                  <span class="n">qc_intendeduse</span><span class="p">,</span> <span class="n">qc_ra</span><span class="p">,</span> <span class="n">qc_dec</span><span class="p">,</span> <span class="n">qc_use</span><span class="p">,</span> <span class="n">qc_radius</span><span class="p">,</span>
+                  <span class="n">qc_radius_unit</span><span class="p">,</span> <span class="n">ephemeris</span><span class="p">,</span> <span class="n">pointings</span><span class="p">,</span> <span class="n">ismosaic</span><span class="p">)],</span>
+                <span class="n">columns</span><span class="o">=</span><span class="p">[</span><span class="s">&#39;fieldRef&#39;</span><span class="p">,</span> <span class="s">&#39;SB_UID&#39;</span><span class="p">,</span> <span class="s">&#39;solarSystem&#39;</span><span class="p">,</span> <span class="s">&#39;sourcename&#39;</span><span class="p">,</span>
+                         <span class="s">&#39;name&#39;</span><span class="p">,</span> <span class="s">&#39;RA&#39;</span><span class="p">,</span>
+                         <span class="s">&#39;DEC&#39;</span><span class="p">,</span> <span class="s">&#39;isQuery&#39;</span><span class="p">,</span> <span class="s">&#39;intendedUse&#39;</span><span class="p">,</span> <span class="s">&#39;qRA&#39;</span><span class="p">,</span> <span class="s">&#39;qDEC&#39;</span><span class="p">,</span> <span class="s">&#39;use&#39;</span><span class="p">,</span>
+                         <span class="s">&#39;search_radius&#39;</span><span class="p">,</span> <span class="s">&#39;rad_unit&#39;</span><span class="p">,</span> <span class="s">&#39;ephemeris&#39;</span><span class="p">,</span>
+                         <span class="s">&#39;pointings&#39;</span><span class="p">,</span> <span class="s">&#39;isMosaic&#39;</span><span class="p">],</span>
+                <span class="n">index</span><span class="o">=</span><span class="p">[</span><span class="n">partid</span><span class="p">]</span>
+            <span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">fieldsource</span><span class="o">.</span><span class="n">ix</span><span class="p">[</span><span class="n">partid</span><span class="p">]</span> <span class="o">=</span> <span class="p">(</span>
+            <span class="n">partid</span><span class="p">,</span> <span class="n">sbuid</span><span class="p">,</span> <span class="n">solarsystem</span><span class="p">,</span> <span class="n">sourcename</span><span class="p">,</span> <span class="n">name</span><span class="p">,</span> <span class="n">ra</span><span class="p">,</span> <span class="n">dec</span><span class="p">,</span> <span class="n">isquery</span><span class="p">,</span>
+            <span class="n">qc_intendeduse</span><span class="p">,</span> <span class="n">qc_ra</span><span class="p">,</span> <span class="n">qc_dec</span><span class="p">,</span> <span class="n">qc_use</span><span class="p">,</span> <span class="n">qc_radius</span><span class="p">,</span> <span class="n">qc_radius_unit</span><span class="p">,</span>
+            <span class="n">ephemeris</span><span class="p">,</span> <span class="n">pointings</span><span class="p">,</span> <span class="n">ismosaic</span><span class="p">)</span>
+
+    <span class="k">def</span> <span class="nf">row_target</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">tg</span><span class="p">,</span> <span class="n">sbuid</span><span class="p">,</span> <span class="n">new</span><span class="o">=</span><span class="bp">False</span><span class="p">):</span>
+        <span class="n">partid</span> <span class="o">=</span> <span class="n">tg</span><span class="o">.</span><span class="n">attrib</span><span class="p">[</span><span class="s">&#39;entityPartId&#39;</span><span class="p">]</span>
+        <span class="n">specref</span> <span class="o">=</span> <span class="n">tg</span><span class="o">.</span><span class="n">AbstractInstrumentSpecRef</span><span class="o">.</span><span class="n">attrib</span><span class="p">[</span><span class="s">&#39;partId&#39;</span><span class="p">]</span>
+        <span class="n">fieldref</span> <span class="o">=</span> <span class="n">tg</span><span class="o">.</span><span class="n">FieldSourceRef</span><span class="o">.</span><span class="n">attrib</span><span class="p">[</span><span class="s">&#39;partId&#39;</span><span class="p">]</span>
+        <span class="n">paramref</span> <span class="o">=</span> <span class="n">tg</span><span class="o">.</span><span class="n">ObservingParametersRef</span><span class="o">.</span><span class="n">attrib</span><span class="p">[</span><span class="s">&#39;partId&#39;</span><span class="p">]</span>
+        <span class="k">if</span> <span class="n">new</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">target</span> <span class="o">=</span> <span class="n">pd</span><span class="o">.</span><span class="n">DataFrame</span><span class="p">(</span>
+                <span class="p">[(</span><span class="n">sbuid</span><span class="p">,</span> <span class="n">specref</span><span class="p">,</span> <span class="n">fieldref</span><span class="p">,</span> <span class="n">paramref</span><span class="p">)],</span>
+                <span class="n">columns</span><span class="o">=</span><span class="p">[</span><span class="s">&#39;SB_UID&#39;</span><span class="p">,</span> <span class="s">&#39;specRef&#39;</span><span class="p">,</span> <span class="s">&#39;fieldRef&#39;</span><span class="p">,</span> <span class="s">&#39;paramRef&#39;</span><span class="p">],</span>
+                <span class="n">index</span><span class="o">=</span><span class="p">[</span><span class="n">partid</span><span class="p">])</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">target</span><span class="o">.</span><span class="n">ix</span><span class="p">[</span><span class="n">partid</span><span class="p">]</span> <span class="o">=</span> <span class="p">(</span><span class="n">sbuid</span><span class="p">,</span> <span class="n">specref</span><span class="p">,</span> <span class="n">fieldref</span><span class="p">,</span> <span class="n">paramref</span><span class="p">)</span>
+
+    <span class="k">def</span> <span class="nf">row_spectralconf</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">ss</span><span class="p">,</span> <span class="n">sbuid</span><span class="p">,</span> <span class="n">new</span><span class="o">=</span><span class="bp">False</span><span class="p">):</span>
+        <span class="n">partid</span> <span class="o">=</span> <span class="n">ss</span><span class="o">.</span><span class="n">attrib</span><span class="p">[</span><span class="s">&#39;entityPartId&#39;</span><span class="p">]</span>
+        <span class="k">try</span><span class="p">:</span>
+            <span class="n">corrconf</span> <span class="o">=</span> <span class="n">ss</span><span class="o">.</span><span class="n">BLCorrelatorConfiguration</span>
+            <span class="n">nbb</span> <span class="o">=</span> <span class="nb">len</span><span class="p">(</span><span class="n">corrconf</span><span class="o">.</span><span class="n">BLBaseBandConfig</span><span class="p">)</span>
+            <span class="n">nspw</span> <span class="o">=</span> <span class="mi">0</span>
+            <span class="k">for</span> <span class="n">n</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">nbb</span><span class="p">):</span>
+                <span class="n">bbconf</span> <span class="o">=</span> <span class="n">corrconf</span><span class="o">.</span><span class="n">BLBaseBandConfig</span><span class="p">[</span><span class="n">n</span><span class="p">]</span>
+                <span class="n">nspw</span> <span class="o">+=</span> <span class="nb">len</span><span class="p">(</span><span class="n">bbconf</span><span class="o">.</span><span class="n">BLSpectralWindow</span><span class="p">)</span>
+        <span class="k">except</span> <span class="ne">AttributeError</span><span class="p">:</span>
+            <span class="n">corrconf</span> <span class="o">=</span> <span class="n">ss</span><span class="o">.</span><span class="n">ACACorrelatorConfiguration</span>
+            <span class="n">nbb</span> <span class="o">=</span> <span class="nb">len</span><span class="p">(</span><span class="n">corrconf</span><span class="o">.</span><span class="n">ACABaseBandConfig</span><span class="p">)</span>
+            <span class="n">nspw</span> <span class="o">=</span> <span class="mi">0</span>
+            <span class="k">for</span> <span class="n">n</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">nbb</span><span class="p">):</span>
+                <span class="n">bbconf</span> <span class="o">=</span> <span class="n">corrconf</span><span class="o">.</span><span class="n">ACABaseBandConfig</span><span class="p">[</span><span class="n">n</span><span class="p">]</span>
+                <span class="n">nspw</span> <span class="o">+=</span> <span class="nb">len</span><span class="p">(</span><span class="n">bbconf</span><span class="o">.</span><span class="n">ACASpectralWindow</span><span class="p">)</span>
+        <span class="k">if</span> <span class="n">new</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">spectralconf</span> <span class="o">=</span> <span class="n">pd</span><span class="o">.</span><span class="n">DataFrame</span><span class="p">(</span>
+                <span class="p">[(</span><span class="n">partid</span><span class="p">,</span> <span class="n">sbuid</span><span class="p">,</span> <span class="n">nbb</span><span class="p">,</span> <span class="n">nspw</span><span class="p">)],</span>
+                <span class="n">columns</span><span class="o">=</span><span class="p">[</span><span class="s">&#39;specRef&#39;</span><span class="p">,</span> <span class="s">&#39;SB_UID&#39;</span><span class="p">,</span> <span class="s">&#39;BaseBands&#39;</span><span class="p">,</span> <span class="s">&#39;SPWs&#39;</span><span class="p">],</span>
+                <span class="n">index</span><span class="o">=</span><span class="p">[</span><span class="n">partid</span><span class="p">])</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">spectralconf</span><span class="o">.</span><span class="n">ix</span><span class="p">[</span><span class="n">partid</span><span class="p">]</span> <span class="o">=</span> <span class="p">(</span><span class="n">partid</span><span class="p">,</span> <span class="n">sbuid</span><span class="p">,</span> <span class="n">nbb</span><span class="p">,</span> <span class="n">nspw</span><span class="p">)</span>
+
+    <span class="k">def</span> <span class="nf">row_schedblocks</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">sb_uid</span><span class="p">,</span> <span class="n">partid</span><span class="p">,</span> <span class="n">new</span><span class="o">=</span><span class="bp">False</span><span class="p">):</span>
+
+        <span class="n">sql</span> <span class="o">=</span> <span class="s">&quot;SELECT TIMESTAMP, XMLTYPE.getClobVal(xml) &quot;</span> \
+              <span class="s">&quot;FROM ALMA.xml_schedblock_entities &quot;</span> \
+              <span class="s">&quot;WHERE archive_uid = &#39;</span><span class="si">%s</span><span class="s">&#39;&quot;</span> <span class="o">%</span> <span class="n">sb_uid</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">cursor</span><span class="o">.</span><span class="n">execute</span><span class="p">(</span><span class="n">sql</span><span class="p">)</span>
+        <span class="n">data</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">cursor</span><span class="o">.</span><span class="n">fetchall</span><span class="p">()</span>
+        <span class="n">xml_content</span> <span class="o">=</span> <span class="n">data</span><span class="p">[</span><span class="mi">0</span><span class="p">][</span><span class="mi">1</span><span class="p">]</span><span class="o">.</span><span class="n">read</span><span class="p">()</span>
+        <span class="n">filename</span> <span class="o">=</span> <span class="n">sb_uid</span><span class="o">.</span><span class="n">replace</span><span class="p">(</span><span class="s">&#39;:&#39;</span><span class="p">,</span> <span class="s">&#39;_&#39;</span><span class="p">)</span><span class="o">.</span><span class="n">replace</span><span class="p">(</span><span class="s">&#39;/&#39;</span><span class="p">,</span> <span class="s">&#39;_&#39;</span><span class="p">)</span> <span class="o">+</span>\
+            <span class="s">&#39;.xml&#39;</span>
+        <span class="n">io_file</span> <span class="o">=</span> <span class="nb">open</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">sbxml</span> <span class="o">+</span> <span class="n">filename</span><span class="p">,</span> <span class="s">&#39;w&#39;</span><span class="p">)</span>
+        <span class="n">io_file</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="n">xml_content</span><span class="p">)</span>
+        <span class="n">io_file</span><span class="o">.</span><span class="n">close</span><span class="p">()</span>
+        <span class="n">xml</span> <span class="o">=</span> <span class="n">filename</span>
+        <span class="k">if</span> <span class="n">new</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">schedblocks</span> <span class="o">=</span> <span class="n">pd</span><span class="o">.</span><span class="n">DataFrame</span><span class="p">(</span>
+                <span class="p">[(</span><span class="n">sb_uid</span><span class="p">,</span> <span class="n">partid</span><span class="p">,</span> <span class="n">data</span><span class="p">[</span><span class="mi">0</span><span class="p">][</span><span class="mi">0</span><span class="p">],</span> <span class="n">xml</span><span class="p">)],</span>
+                <span class="n">columns</span><span class="o">=</span><span class="p">[</span><span class="s">&#39;SB_UID&#39;</span><span class="p">,</span> <span class="s">&#39;partId&#39;</span><span class="p">,</span> <span class="s">&#39;timestamp&#39;</span><span class="p">,</span> <span class="s">&#39;sb_xml&#39;</span><span class="p">],</span>
+                <span class="n">index</span><span class="o">=</span><span class="p">[</span><span class="n">sb_uid</span><span class="p">])</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">schedblocks</span><span class="o">.</span><span class="n">ix</span><span class="p">[</span><span class="n">sb_uid</span><span class="p">]</span> <span class="o">=</span> <span class="p">(</span><span class="n">sb_uid</span><span class="p">,</span> <span class="n">partid</span><span class="p">,</span> <span class="n">data</span><span class="p">[</span><span class="mi">0</span><span class="p">][</span><span class="mi">0</span><span class="p">],</span> <span class="n">xml</span><span class="p">)</span>
+
+    <span class="k">def</span> <span class="nf">row_newar</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">sbuid</span><span class="p">,</span> <span class="n">new</span><span class="o">=</span><span class="bp">False</span><span class="p">):</span>
+        <span class="n">sbinfo</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">schedblock_info</span><span class="o">.</span><span class="n">ix</span><span class="p">[</span><span class="n">sbuid</span><span class="p">]</span>
+        <span class="n">sb</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">schedblocks</span><span class="o">.</span><span class="n">ix</span><span class="p">[</span><span class="n">sbuid</span><span class="p">]</span>
+        <span class="n">pid</span> <span class="o">=</span> <span class="n">sb</span><span class="o">.</span><span class="n">partId</span>
+        <span class="n">sg</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">sciencegoals</span><span class="o">.</span><span class="n">ix</span><span class="p">[</span><span class="n">pid</span><span class="p">]</span>
+        <span class="n">repfreq</span> <span class="o">=</span> <span class="n">sbinfo</span><span class="o">.</span><span class="n">repfreq</span>
+        <span class="n">dec</span> <span class="o">=</span> <span class="n">sbinfo</span><span class="o">.</span><span class="n">DEC</span>
+        <span class="n">c_bmax</span> <span class="o">=</span> <span class="mf">0.862</span> <span class="o">/</span> <span class="n">pd</span><span class="o">.</span><span class="n">np</span><span class="o">.</span><span class="n">cos</span><span class="p">(</span><span class="n">pd</span><span class="o">.</span><span class="n">np</span><span class="o">.</span><span class="n">radians</span><span class="p">(</span><span class="o">-</span><span class="mf">23.0262015</span><span class="p">)</span> <span class="o">-</span>
+                                   <span class="n">pd</span><span class="o">.</span><span class="n">np</span><span class="o">.</span><span class="n">radians</span><span class="p">(</span><span class="n">dec</span><span class="p">))</span> <span class="o">+</span> <span class="mf">0.138</span>
+        <span class="n">c_freq</span> <span class="o">=</span> <span class="n">repfreq</span> <span class="o">/</span> <span class="mf">100.</span>
+        <span class="n">corr</span> <span class="o">=</span> <span class="n">c_freq</span> <span class="o">/</span> <span class="n">c_bmax</span>
+        <span class="n">useaca</span><span class="o">=</span> <span class="n">sg</span><span class="o">.</span><span class="n">useACA</span>
+        <span class="k">if</span> <span class="n">useaca</span><span class="p">:</span>
+            <span class="n">useaca</span> <span class="o">=</span> <span class="s">&#39;Y&#39;</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="n">useaca</span> <span class="o">=</span> <span class="s">&#39;N&#39;</span>
+        <span class="n">ar</span> <span class="o">=</span> <span class="n">sg</span><span class="o">.</span><span class="n">AR</span>
+        <span class="n">las</span> <span class="o">=</span> <span class="n">sg</span><span class="o">.</span><span class="n">LAS</span>
+        <span class="n">name</span> <span class="o">=</span> <span class="n">sbinfo</span><span class="p">[</span><span class="s">&#39;name&#39;</span><span class="p">]</span>
+        <span class="n">sbnum</span> <span class="o">=</span> <span class="mi">1</span>
+        <span class="n">sbuidE</span> <span class="o">=</span> <span class="n">sbuid</span>
+        <span class="k">if</span> <span class="n">name</span><span class="o">.</span><span class="n">endswith</span><span class="p">(</span><span class="s">&#39;TC&#39;</span><span class="p">):</span>
+            <span class="n">name_e</span> <span class="o">=</span> <span class="n">name</span><span class="p">[:</span><span class="o">-</span><span class="mi">2</span><span class="p">]</span> <span class="o">+</span> <span class="s">&#39;TE&#39;</span>
+            <span class="k">try</span><span class="p">:</span>
+                <span class="n">sbinfoE</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">schedblock_info</span><span class="p">[</span>
+                    <span class="bp">self</span><span class="o">.</span><span class="n">schedblock_info</span><span class="o">.</span><span class="n">name</span> <span class="o">==</span> <span class="n">name_e</span><span class="p">]</span><span class="o">.</span><span class="n">ix</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>
+                <span class="n">sbnum</span> <span class="o">=</span> <span class="mi">2</span>
+                <span class="n">sbuidE</span> <span class="o">=</span> <span class="n">sbinfoE</span><span class="o">.</span><span class="n">SB_UID</span>
+                <span class="n">sbuidC</span> <span class="o">=</span> <span class="n">sbuid</span>
+            <span class="k">except</span> <span class="ne">IndexError</span><span class="p">:</span>
+                <span class="k">print</span> <span class="s">&quot;Can&#39;t find TE for sb </span><span class="si">%s</span><span class="s">&quot;</span> <span class="o">%</span> <span class="n">name</span>
+                <span class="n">sbnum</span> <span class="o">=</span> <span class="mi">1</span>
+        <span class="k">if</span> <span class="n">name</span><span class="o">.</span><span class="n">endswith</span><span class="p">(</span><span class="s">&#39;TE&#39;</span><span class="p">):</span>
+            <span class="n">name_e</span> <span class="o">=</span> <span class="n">name</span><span class="p">[:</span><span class="o">-</span><span class="mi">2</span><span class="p">]</span> <span class="o">+</span> <span class="s">&#39;TC&#39;</span>
+            <span class="k">try</span><span class="p">:</span>
+                <span class="n">sbinfoC</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">schedblock_info</span><span class="p">[</span>
+                    <span class="bp">self</span><span class="o">.</span><span class="n">schedblock_info</span><span class="o">.</span><span class="n">name</span> <span class="o">==</span> <span class="n">name_e</span><span class="p">]</span><span class="o">.</span><span class="n">ix</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>
+                <span class="n">sbnum</span> <span class="o">=</span> <span class="mi">2</span>
+                <span class="n">sbuidC</span> <span class="o">=</span> <span class="n">sbinfoC</span><span class="o">.</span><span class="n">SB_UID</span>
+            <span class="k">except</span> <span class="ne">IndexError</span><span class="p">:</span>
+                <span class="n">sbnum</span> <span class="o">=</span> <span class="mi">1</span>
+
+        <span class="n">newAR</span> <span class="o">=</span> <span class="n">ARes</span><span class="o">.</span><span class="n">arrayRes</span><span class="p">([</span><span class="bp">self</span><span class="o">.</span><span class="n">wto_path</span><span class="p">,</span> <span class="n">ar</span><span class="p">,</span> <span class="n">las</span><span class="p">,</span> <span class="n">repfreq</span><span class="p">,</span> <span class="n">useaca</span><span class="p">,</span> <span class="n">sbnum</span><span class="p">])</span>
+        <span class="n">newAR</span><span class="o">.</span><span class="n">silentRun</span><span class="p">()</span>
+        <span class="n">minarE</span><span class="p">,</span> <span class="n">maxarE</span><span class="p">,</span> <span class="n">minarC</span><span class="p">,</span> <span class="n">maxarC</span> <span class="o">=</span> <span class="n">newAR</span><span class="o">.</span><span class="n">run</span><span class="p">()</span>
+
+        <span class="k">if</span> <span class="n">new</span> <span class="ow">and</span> <span class="n">sbnum</span> <span class="o">==</span> <span class="mi">1</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">newar</span> <span class="o">=</span> <span class="n">pd</span><span class="o">.</span><span class="n">DataFrame</span><span class="p">(</span>
+                <span class="p">[(</span><span class="n">minarE</span><span class="p">,</span> <span class="n">maxarE</span><span class="p">,</span> <span class="n">minarE</span> <span class="o">*</span> <span class="n">corr</span><span class="p">,</span> <span class="n">maxarE</span> <span class="o">*</span> <span class="n">corr</span><span class="p">)],</span>
+                <span class="n">columns</span><span class="o">=</span><span class="p">[</span><span class="s">&#39;minAR&#39;</span><span class="p">,</span> <span class="s">&#39;maxAR&#39;</span><span class="p">,</span> <span class="s">&#39;arrayMinAR&#39;</span><span class="p">,</span> <span class="s">&#39;arrayMaxAR&#39;</span><span class="p">],</span>
+                <span class="n">index</span><span class="o">=</span><span class="p">[</span><span class="n">sbuidE</span><span class="p">])</span>
+        <span class="k">elif</span> <span class="n">new</span> <span class="ow">and</span> <span class="n">sbnum</span> <span class="o">==</span> <span class="mi">2</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">newar</span> <span class="o">=</span> <span class="n">pd</span><span class="o">.</span><span class="n">DataFrame</span><span class="p">(</span>
+                <span class="p">[(</span><span class="n">minarE</span><span class="p">,</span> <span class="n">maxarE</span><span class="p">,</span> <span class="n">minarE</span> <span class="o">*</span> <span class="n">corr</span><span class="p">,</span> <span class="n">maxarE</span> <span class="o">*</span> <span class="n">corr</span><span class="p">)],</span>
+                <span class="n">columns</span><span class="o">=</span><span class="p">[</span><span class="s">&#39;minAR&#39;</span><span class="p">,</span> <span class="s">&#39;maxAR&#39;</span><span class="p">,</span> <span class="s">&#39;arrayMinAR&#39;</span><span class="p">,</span> <span class="s">&#39;arrayMaxAR&#39;</span><span class="p">],</span>
+                <span class="n">index</span><span class="o">=</span><span class="p">[</span><span class="n">sbuidE</span><span class="p">])</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">newar</span><span class="o">.</span><span class="n">ix</span><span class="p">[</span><span class="n">sbuidC</span><span class="p">]</span> <span class="o">=</span> <span class="p">(</span><span class="n">minarC</span><span class="p">,</span> <span class="n">maxarC</span><span class="p">,</span> <span class="n">minarC</span> <span class="o">*</span> <span class="n">corr</span><span class="p">,</span>
+                                     <span class="n">maxarC</span> <span class="o">*</span> <span class="n">corr</span><span class="p">)</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="k">if</span> <span class="n">sbnum</span> <span class="o">==</span> <span class="mi">1</span><span class="p">:</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">newar</span><span class="o">.</span><span class="n">ix</span><span class="p">[</span><span class="n">sbuidE</span><span class="p">]</span> <span class="o">=</span> <span class="p">(</span><span class="n">minarE</span><span class="p">,</span> <span class="n">maxarE</span><span class="p">,</span> <span class="n">minarE</span> <span class="o">*</span> <span class="n">corr</span><span class="p">,</span>
+                                        <span class="n">maxarE</span> <span class="o">*</span> <span class="n">corr</span><span class="p">)</span>
+            <span class="k">if</span> <span class="n">sbnum</span> <span class="o">==</span> <span class="mi">2</span><span class="p">:</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">newar</span><span class="o">.</span><span class="n">ix</span><span class="p">[</span><span class="n">sbuidE</span><span class="p">]</span> <span class="o">=</span> <span class="p">(</span><span class="n">minarE</span><span class="p">,</span> <span class="n">maxarE</span><span class="p">,</span> <span class="n">minarE</span> <span class="o">*</span> <span class="n">corr</span><span class="p">,</span>
+                                         <span class="n">maxarE</span> <span class="o">*</span> <span class="n">corr</span><span class="p">)</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">newar</span><span class="o">.</span><span class="n">ix</span><span class="p">[</span><span class="n">sbuidC</span><span class="p">]</span> <span class="o">=</span> <span class="p">(</span><span class="n">minarC</span><span class="p">,</span> <span class="n">maxarC</span><span class="p">,</span> <span class="n">minarC</span> <span class="o">*</span> <span class="n">corr</span><span class="p">,</span>
+                                         <span class="n">maxarC</span> <span class="o">*</span> <span class="n">corr</span><span class="p">)</span>
+
+    <span class="k">def</span> <span class="nf">filter_c1</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="n">c1c2</span> <span class="o">=</span> <span class="n">pd</span><span class="o">.</span><span class="n">read_csv</span><span class="p">(</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">wto_path</span> <span class="o">+</span> <span class="s">&#39;conf/c1c2.csv&#39;</span><span class="p">,</span> <span class="n">sep</span><span class="o">=</span><span class="s">&#39;,&#39;</span><span class="p">,</span> <span class="n">header</span><span class="o">=</span><span class="mi">0</span><span class="p">,</span>
+            <span class="n">usecols</span><span class="o">=</span><span class="nb">range</span><span class="p">(</span><span class="mi">5</span><span class="p">))</span>
+        <span class="n">c1c2</span><span class="o">.</span><span class="n">columns</span> <span class="o">=</span> <span class="n">pd</span><span class="o">.</span><span class="n">Index</span><span class="p">([</span><span class="s">u&#39;CODE&#39;</span><span class="p">,</span> <span class="s">u&#39;Region&#39;</span><span class="p">,</span> <span class="s">u&#39;ARC&#39;</span><span class="p">,</span> <span class="s">u&#39;C2&#39;</span><span class="p">,</span> <span class="s">u&#39;P2G&#39;</span><span class="p">],</span>
+                                <span class="n">dtype</span><span class="o">=</span><span class="s">&#39;object&#39;</span><span class="p">)</span>
+        <span class="n">toc2</span> <span class="o">=</span> <span class="n">c1c2</span><span class="p">[</span><span class="n">c1c2</span><span class="o">.</span><span class="n">fillna</span><span class="p">(</span><span class="s">&#39;no&#39;</span><span class="p">)</span><span class="o">.</span><span class="n">C2</span><span class="o">.</span><span class="n">str</span><span class="o">.</span><span class="n">contains</span><span class="p">(</span><span class="s">&#39;^Yes&#39;</span><span class="p">)]</span>
+        <span class="n">check_c1</span> <span class="o">=</span> <span class="n">pd</span><span class="o">.</span><span class="n">merge</span><span class="p">(</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">obsproject</span><span class="p">[</span><span class="bp">self</span><span class="o">.</span><span class="n">obsproject</span><span class="o">.</span><span class="n">CODE</span><span class="o">.</span><span class="n">str</span><span class="o">.</span><span class="n">contains</span><span class="p">(</span><span class="s">&#39;^2012&#39;</span><span class="p">)],</span>
+            <span class="n">toc2</span><span class="p">,</span> <span class="n">on</span><span class="o">=</span><span class="s">&#39;CODE&#39;</span><span class="p">)[[</span><span class="s">&#39;CODE&#39;</span><span class="p">]]</span>
+        <span class="n">check_c2</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">obsproject</span><span class="p">[</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">obsproject</span><span class="o">.</span><span class="n">CODE</span><span class="o">.</span><span class="n">str</span><span class="o">.</span><span class="n">contains</span><span class="p">(</span><span class="s">&#39;^2013&#39;</span><span class="p">)][[</span><span class="s">&#39;CODE&#39;</span><span class="p">]]</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">checked</span> <span class="o">=</span> <span class="n">pd</span><span class="o">.</span><span class="n">concat</span><span class="p">([</span><span class="n">check_c1</span><span class="p">,</span> <span class="n">check_c2</span><span class="p">])</span>
+        <span class="n">temp</span> <span class="o">=</span> <span class="n">pd</span><span class="o">.</span><span class="n">merge</span><span class="p">(</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">obsproject</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">checked</span><span class="p">,</span> <span class="n">on</span><span class="o">=</span><span class="s">&#39;CODE&#39;</span><span class="p">,</span>
+            <span class="n">copy</span><span class="o">=</span><span class="bp">False</span><span class="p">)</span><span class="o">.</span><span class="n">set_index</span><span class="p">(</span><span class="s">&#39;CODE&#39;</span><span class="p">,</span> <span class="n">drop</span><span class="o">=</span><span class="bp">False</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">obsproject</span> <span class="o">=</span> <span class="n">temp</span>
+
+    <span class="k">def</span> <span class="nf">create_summary</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="n">m1</span> <span class="o">=</span> <span class="n">pd</span><span class="o">.</span><span class="n">merge</span><span class="p">(</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">schedblock_info</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">newar</span><span class="p">,</span> <span class="n">left_index</span><span class="o">=</span><span class="bp">True</span><span class="p">,</span> <span class="n">right_index</span><span class="o">=</span><span class="bp">True</span><span class="p">)</span>
+        <span class="n">m2</span> <span class="o">=</span> <span class="n">pd</span><span class="o">.</span><span class="n">merge</span><span class="p">(</span><span class="n">m1</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">sciencegoals</span><span class="p">,</span> <span class="n">on</span><span class="o">=</span><span class="s">&#39;partId&#39;</span><span class="p">,</span> <span class="n">how</span><span class="o">=</span><span class="s">&#39;left&#39;</span><span class="p">)</span>
+        <span class="n">m3</span> <span class="o">=</span> <span class="n">pd</span><span class="o">.</span><span class="n">merge</span><span class="p">(</span>
+            <span class="n">m2</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">obsproject</span><span class="p">,</span> <span class="n">on</span><span class="o">=</span><span class="s">&#39;CODE&#39;</span><span class="p">,</span> <span class="n">how</span><span class="o">=</span><span class="s">&#39;left&#39;</span><span class="p">)</span><span class="o">.</span><span class="n">set_index</span><span class="p">(</span><span class="s">&#39;SB_UID&#39;</span><span class="p">,</span>
+                                                                  <span class="n">drop</span><span class="o">=</span><span class="bp">False</span><span class="p">)</span>
+        <span class="n">m3</span> <span class="o">=</span> <span class="n">m3</span><span class="p">[[</span><span class="s">&#39;CODE&#39;</span><span class="p">,</span> <span class="s">&#39;OBS_PROJECT_ID&#39;</span><span class="p">,</span> <span class="s">&#39;partId&#39;</span><span class="p">,</span> <span class="s">&#39;SB_UID&#39;</span><span class="p">,</span> <span class="s">&#39;name&#39;</span><span class="p">,</span>
+                 <span class="s">&#39;status_xml&#39;</span><span class="p">,</span> <span class="s">&#39;bands&#39;</span><span class="p">,</span>
+                 <span class="s">&#39;repfreq&#39;</span><span class="p">,</span> <span class="s">&#39;array&#39;</span><span class="p">,</span> <span class="s">&#39;RA&#39;</span><span class="p">,</span> <span class="s">&#39;DEC&#39;</span><span class="p">,</span> <span class="s">&#39;minAR&#39;</span><span class="p">,</span> <span class="s">&#39;maxAR&#39;</span><span class="p">,</span>
+                 <span class="s">&#39;arrayMinAR&#39;</span><span class="p">,</span> <span class="s">&#39;arrayMaxAR&#39;</span><span class="p">,</span> <span class="s">&#39;execount&#39;</span><span class="p">,</span>
+                 <span class="s">&#39;PRJ_SCIENTIFIC_RANK&#39;</span><span class="p">,</span> <span class="s">&#39;PRJ_LETTER_GRADE&#39;</span><span class="p">,</span> <span class="s">&#39;EXEC&#39;</span><span class="p">]]</span>
+        <span class="n">m4</span> <span class="o">=</span> <span class="n">pd</span><span class="o">.</span><span class="n">merge</span><span class="p">(</span><span class="n">m3</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">scheduling_sb</span><span class="p">,</span> <span class="n">left_index</span><span class="o">=</span><span class="bp">True</span><span class="p">,</span>
+                      <span class="n">right_index</span><span class="o">=</span><span class="bp">True</span><span class="p">,</span> <span class="n">how</span><span class="o">=</span><span class="s">&#39;left&#39;</span><span class="p">,</span> <span class="n">copy</span><span class="o">=</span><span class="bp">False</span><span class="p">)</span>
+        <span class="n">m5</span> <span class="o">=</span> <span class="n">pd</span><span class="o">.</span><span class="n">merge</span><span class="p">(</span>
+            <span class="n">m4</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">sbstates</span><span class="p">,</span> <span class="n">left_index</span><span class="o">=</span><span class="bp">True</span><span class="p">,</span> <span class="n">right_index</span><span class="o">=</span><span class="bp">True</span><span class="p">,</span> <span class="n">how</span><span class="o">=</span><span class="s">&#39;left&#39;</span><span class="p">,</span>
+            <span class="n">copy</span><span class="o">=</span><span class="bp">False</span><span class="p">)</span>
+        <span class="n">qa0group</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">qa0</span><span class="o">.</span><span class="n">groupby</span><span class="p">([</span><span class="s">&#39;SCHEDBLOCKUID&#39;</span><span class="p">,</span> <span class="s">&#39;QA0STATUS&#39;</span><span class="p">])</span>
+        <span class="n">qa0count</span> <span class="o">=</span> <span class="n">qa0group</span><span class="o">.</span><span class="n">QA0STATUS</span><span class="o">.</span><span class="n">count</span><span class="p">()</span><span class="o">.</span><span class="n">unstack</span><span class="p">()</span>
+        <span class="n">qpass</span> <span class="o">=</span> <span class="n">qa0count</span><span class="p">[[</span><span class="s">&quot;Pass&quot;</span><span class="p">]]</span>
+        <span class="n">qunset</span> <span class="o">=</span> <span class="n">qa0count</span><span class="p">[[</span><span class="s">&quot;Unset&quot;</span><span class="p">]]</span>
+        <span class="n">m6</span> <span class="o">=</span> <span class="n">pd</span><span class="o">.</span><span class="n">merge</span><span class="p">(</span>
+            <span class="n">m5</span><span class="p">,</span> <span class="n">qunset</span><span class="p">,</span> <span class="n">left_index</span><span class="o">=</span><span class="bp">True</span><span class="p">,</span> <span class="n">right_index</span><span class="o">=</span><span class="bp">True</span><span class="p">,</span> <span class="n">how</span><span class="o">=</span><span class="s">&#39;left&#39;</span><span class="p">,</span>
+            <span class="n">copy</span><span class="o">=</span><span class="bp">False</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">sb_summary</span> <span class="o">=</span> <span class="n">pd</span><span class="o">.</span><span class="n">merge</span><span class="p">(</span>
+            <span class="n">m6</span><span class="p">,</span> <span class="n">qpass</span><span class="p">,</span> <span class="n">left_index</span><span class="o">=</span><span class="bp">True</span><span class="p">,</span> <span class="n">right_index</span><span class="o">=</span><span class="bp">True</span><span class="p">,</span> <span class="n">how</span><span class="o">=</span><span class="s">&#39;left&#39;</span><span class="p">,</span>
+            <span class="n">copy</span><span class="o">=</span><span class="bp">False</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">sb_summary</span><span class="o">.</span><span class="n">columns</span> <span class="o">=</span> <span class="n">pd</span><span class="o">.</span><span class="n">Index</span><span class="p">(</span>
+            <span class="p">[</span><span class="s">u&#39;CODE&#39;</span><span class="p">,</span> <span class="s">u&#39;OBS_PROJECT_ID1&#39;</span><span class="p">,</span> <span class="s">u&#39;partId&#39;</span><span class="p">,</span> <span class="s">u&#39;SB_UID&#39;</span><span class="p">,</span> <span class="s">u&#39;name&#39;</span><span class="p">,</span>
+             <span class="s">u&#39;status_xml&#39;</span><span class="p">,</span> <span class="s">u&#39;bands&#39;</span><span class="p">,</span>
+             <span class="s">u&#39;repfreq&#39;</span><span class="p">,</span> <span class="s">u&#39;array&#39;</span><span class="p">,</span> <span class="s">u&#39;RA&#39;</span><span class="p">,</span> <span class="s">u&#39;DEC&#39;</span><span class="p">,</span> <span class="s">u&#39;minAR&#39;</span><span class="p">,</span> <span class="s">u&#39;maxAR&#39;</span><span class="p">,</span>
+             <span class="s">u&#39;arrayMinAR&#39;</span><span class="p">,</span> <span class="s">u&#39;arrayMaxAR&#39;</span><span class="p">,</span> <span class="s">u&#39;execount&#39;</span><span class="p">,</span> <span class="s">u&#39;PRJ_SCIENTIFIC_RANK&#39;</span><span class="p">,</span>
+             <span class="s">u&#39;PRJ_LETTER_GRADE&#39;</span><span class="p">,</span> <span class="s">u&#39;EXEC&#39;</span><span class="p">,</span> <span class="s">u&#39;OBSUNIT_UID&#39;</span><span class="p">,</span> <span class="s">u&#39;NAME&#39;</span><span class="p">,</span>
+             <span class="s">u&#39;REPR_BAND&#39;</span><span class="p">,</span> <span class="s">u&#39;SCHEDBLOCK_CTRL_EXEC_COUNT&#39;</span><span class="p">,</span>
+             <span class="s">u&#39;SCHEDBLOCK_CTRL_STATE&#39;</span><span class="p">,</span> <span class="s">u&#39;MIN_ANG_RESOLUTION&#39;</span><span class="p">,</span>
+             <span class="s">u&#39;MAX_ANG_RESOLUTION&#39;</span><span class="p">,</span> <span class="s">u&#39;OBSUNIT_PROJECT_UID&#39;</span><span class="p">,</span>
+             <span class="s">u&#39;DOMAIN_ENTITY_STATE&#39;</span><span class="p">,</span> <span class="s">u&#39;OBS_PROJECT_ID&#39;</span><span class="p">,</span> <span class="s">u&#39;QA0Unset&#39;</span><span class="p">,</span>
+             <span class="s">u&#39;QA0Pass&#39;</span><span class="p">],</span> <span class="n">dtype</span><span class="o">=</span><span class="s">&#39;object&#39;</span><span class="p">)</span>
+
+    <span class="k">def</span> <span class="nf">create_allsb</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">split</span><span class="o">=</span><span class="bp">False</span><span class="p">):</span>
+        <span class="n">allsb</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">sb_summary</span><span class="p">[</span>
+            <span class="p">[</span><span class="s">&#39;CODE&#39;</span><span class="p">,</span> <span class="s">&#39;OBS_PROJECT_ID&#39;</span><span class="p">,</span> <span class="s">&#39;name&#39;</span><span class="p">,</span> <span class="s">&#39;SB_UID&#39;</span><span class="p">,</span> <span class="s">&#39;bands&#39;</span><span class="p">,</span> <span class="s">&#39;repfreq&#39;</span><span class="p">,</span>
+             <span class="s">&#39;array&#39;</span><span class="p">,</span> <span class="s">&#39;EXEC&#39;</span><span class="p">,</span> <span class="s">&#39;RA&#39;</span><span class="p">,</span> <span class="s">&#39;DEC&#39;</span><span class="p">]]</span>
+        <span class="n">allsb</span><span class="p">[</span><span class="s">&#39;conf&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">pd</span><span class="o">.</span><span class="n">Series</span><span class="p">(</span><span class="n">pd</span><span class="o">.</span><span class="n">np</span><span class="o">.</span><span class="n">zeros</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">allsb</span><span class="p">)),</span> <span class="n">index</span><span class="o">=</span><span class="n">allsb</span><span class="o">.</span><span class="n">index</span><span class="p">)</span>
+        <span class="n">allsb</span><span class="o">.</span><span class="n">loc</span><span class="p">[</span><span class="n">allsb</span><span class="o">.</span><span class="n">array</span> <span class="o">==</span> <span class="s">&#39;TWELVE-M&#39;</span><span class="p">,</span> <span class="s">&#39;conf&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="s">&#39;C34&#39;</span>
+        <span class="n">allsb</span><span class="o">.</span><span class="n">loc</span><span class="p">[</span><span class="n">allsb</span><span class="o">.</span><span class="n">array</span> <span class="o">!=</span> <span class="s">&#39;TWELVE-M&#39;</span><span class="p">,</span> <span class="s">&#39;conf&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="s">&#39;&#39;</span>
+        <span class="k">if</span> <span class="n">split</span><span class="p">:</span>
+            <span class="n">allsb1</span> <span class="o">=</span> <span class="n">allsb</span><span class="p">[</span><span class="n">allsb</span><span class="o">.</span><span class="n">CODE</span><span class="o">.</span><span class="n">str</span><span class="o">.</span><span class="n">startswith</span><span class="p">(</span><span class="s">&#39;2012&#39;</span><span class="p">)]</span>
+            <span class="n">allsb2</span> <span class="o">=</span> <span class="n">allsb</span><span class="p">[</span><span class="n">allsb</span><span class="o">.</span><span class="n">CODE</span><span class="o">.</span><span class="n">str</span><span class="o">.</span><span class="n">startswith</span><span class="p">(</span><span class="s">&#39;2013&#39;</span><span class="p">)]</span>
+            <span class="n">allsb1</span><span class="o">.</span><span class="n">sort</span><span class="p">(</span><span class="s">&#39;CODE&#39;</span><span class="p">)</span><span class="o">.</span><span class="n">to_csv</span><span class="p">(</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">path</span> <span class="o">+</span> <span class="s">&#39;allC1.sbinfo&#39;</span><span class="p">,</span> <span class="n">sep</span><span class="o">=</span><span class="s">&#39;</span><span class="se">\t</span><span class="s">&#39;</span><span class="p">,</span> <span class="n">header</span><span class="o">=</span><span class="bp">False</span><span class="p">,</span> <span class="n">index</span><span class="o">=</span><span class="bp">False</span><span class="p">)</span>
+            <span class="n">allsb2</span><span class="o">.</span><span class="n">sort</span><span class="p">(</span><span class="s">&#39;CODE&#39;</span><span class="p">)</span><span class="o">.</span><span class="n">to_csv</span><span class="p">(</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">path</span> <span class="o">+</span> <span class="s">&#39;allC2.sbinfo&#39;</span><span class="p">,</span> <span class="n">sep</span><span class="o">=</span><span class="s">&#39;</span><span class="se">\t</span><span class="s">&#39;</span><span class="p">,</span> <span class="n">header</span><span class="o">=</span><span class="bp">False</span><span class="p">,</span> <span class="n">index</span><span class="o">=</span><span class="bp">False</span><span class="p">)</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="n">allsb</span><span class="o">.</span><span class="n">sort</span><span class="p">(</span><span class="s">&#39;CODE&#39;</span><span class="p">)</span><span class="o">.</span><span class="n">to_csv</span><span class="p">(</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">path</span> <span class="o">+</span> <span class="s">&#39;all.sbinfo&#39;</span><span class="p">,</span> <span class="n">sep</span><span class="o">=</span><span class="s">&#39;</span><span class="se">\t</span><span class="s">&#39;</span><span class="p">,</span> <span class="n">header</span><span class="o">=</span><span class="bp">False</span><span class="p">,</span> <span class="n">index</span><span class="o">=</span><span class="bp">False</span><span class="p">)</span>
+
+</div>
+<span class="k">class</span> <span class="nc">ObsProject</span><span class="p">(</span><span class="nb">object</span><span class="p">):</span>
+
+    <span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">xml_file</span><span class="p">,</span> <span class="n">path</span><span class="o">=</span><span class="s">&#39;./&#39;</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+
+<span class="sd">        :param xml_file:</span>
+<span class="sd">        :param path:</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">io_file</span> <span class="o">=</span> <span class="nb">open</span><span class="p">(</span><span class="n">path</span> <span class="o">+</span> <span class="n">xml_file</span><span class="p">)</span>
+        <span class="n">tree</span> <span class="o">=</span> <span class="n">objectify</span><span class="o">.</span><span class="n">parse</span><span class="p">(</span><span class="n">io_file</span><span class="p">)</span>
+        <span class="n">io_file</span><span class="o">.</span><span class="n">close</span><span class="p">()</span>
+        <span class="n">data</span> <span class="o">=</span> <span class="n">tree</span><span class="o">.</span><span class="n">getroot</span><span class="p">()</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">status</span> <span class="o">=</span> <span class="n">data</span><span class="o">.</span><span class="n">attrib</span><span class="p">[</span><span class="s">&#39;status&#39;</span><span class="p">]</span>
+        <span class="k">for</span> <span class="n">key</span> <span class="ow">in</span> <span class="n">data</span><span class="o">.</span><span class="n">__dict__</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">__setattr__</span><span class="p">(</span><span class="n">key</span><span class="p">,</span> <span class="n">data</span><span class="o">.</span><span class="n">__dict__</span><span class="p">[</span><span class="n">key</span><span class="p">])</span>
+
+    <span class="k">def</span> <span class="nf">assoc_sched_blocks</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+
+
+<span class="sd">        :return:</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">result</span> <span class="o">=</span> <span class="p">{}</span>
+
+        <span class="k">try</span><span class="p">:</span>
+            <span class="k">for</span> <span class="n">sg</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">ObsProgram</span><span class="o">.</span><span class="n">ObsPlan</span><span class="o">.</span><span class="n">ObsUnitSet</span><span class="p">:</span>
+                <span class="n">sched_uid</span> <span class="o">=</span> <span class="p">[]</span>
+                <span class="n">sgid</span> <span class="o">=</span> <span class="n">sg</span><span class="o">.</span><span class="n">attrib</span><span class="p">[</span><span class="s">&#39;entityPartId&#39;</span><span class="p">]</span>
+                <span class="k">for</span> <span class="n">ous</span> <span class="ow">in</span> <span class="n">sg</span><span class="o">.</span><span class="n">ObsUnitSet</span><span class="p">:</span>
+                    <span class="k">try</span><span class="p">:</span>
+                        <span class="k">for</span> <span class="n">mous</span> <span class="ow">in</span> <span class="n">ous</span><span class="o">.</span><span class="n">ObsUnitSet</span><span class="p">:</span>
+                            <span class="n">array_requested</span> <span class="o">=</span> <span class="n">mous</span><span class="o">.</span><span class="n">ObsUnitControl</span><span class="o">.</span><span class="n">attrib</span><span class="p">[</span>
+                                <span class="s">&#39;arrayRequested&#39;</span><span class="p">]</span>
+                            <span class="k">try</span><span class="p">:</span>
+                                <span class="k">for</span> <span class="n">sbs</span> <span class="ow">in</span> <span class="n">mous</span><span class="o">.</span><span class="n">SchedBlockRef</span><span class="p">:</span>
+                                    <span class="k">if</span> <span class="n">array_requested</span> <span class="ow">in</span> <span class="s">&#39;TWELVE-M&#39;</span><span class="p">:</span>
+                                        <span class="n">sched_uid</span><span class="o">.</span><span class="n">append</span><span class="p">(</span>
+                                            <span class="n">sbs</span><span class="o">.</span><span class="n">attrib</span><span class="p">[</span><span class="s">&#39;entityId&#39;</span><span class="p">])</span>
+                                    <span class="k">elif</span> <span class="n">array_requested</span> <span class="o">==</span> <span class="s">&#39;SEVEN-M&#39;</span><span class="p">:</span>
+                                        <span class="n">sched_uid</span><span class="o">.</span><span class="n">append</span><span class="p">(</span>
+                                            <span class="n">sbs</span><span class="o">.</span><span class="n">attrib</span><span class="p">[</span><span class="s">&#39;entityId&#39;</span><span class="p">])</span>
+                                    <span class="k">elif</span> <span class="n">array_requested</span> <span class="o">==</span> <span class="s">&#39;TP-Array&#39;</span><span class="p">:</span>
+                                        <span class="n">sched_uid</span><span class="o">.</span><span class="n">append</span><span class="p">(</span>
+                                            <span class="n">sbs</span><span class="o">.</span><span class="n">attrib</span><span class="p">[</span><span class="s">&#39;entityId&#39;</span><span class="p">])</span>
+                            <span class="k">except</span> <span class="ne">AttributeError</span><span class="p">:</span>
+                                <span class="c"># Member OUS does not have any SB created yet.</span>
+                                <span class="k">continue</span>
+                    <span class="k">except</span> <span class="ne">AttributeError</span><span class="p">:</span>
+                        <span class="k">print</span><span class="p">(</span><span class="s">&#39;Project </span><span class="si">%s</span><span class="s"> has no member OUS in at least one &#39;</span>
+                              <span class="s">&#39;SG_OUS&#39;</span> <span class="o">%</span> <span class="bp">self</span><span class="o">.</span><span class="n">code</span><span class="p">)</span>
+                        <span class="k">continue</span>
+                <span class="n">result</span><span class="p">[</span><span class="n">sgid</span><span class="p">]</span> <span class="o">=</span> <span class="n">sched_uid</span>
+        <span class="k">except</span> <span class="ne">AttributeError</span><span class="p">:</span>
+            <span class="k">print</span> <span class="s">&quot;Project </span><span class="si">%s</span><span class="s"> has no Science Goal OUS&quot;</span> <span class="o">%</span> <span class="bp">self</span><span class="o">.</span><span class="n">code</span>
+        <span class="k">return</span> <span class="n">result</span>
+
+    <span class="k">def</span> <span class="nf">import_sched_blocks</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="k">pass</span>
+
+
+<span class="k">class</span> <span class="nc">SchedBlocK</span><span class="p">(</span><span class="nb">object</span><span class="p">):</span>
+
+    <span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">xml_file</span><span class="p">,</span> <span class="n">path</span><span class="o">=</span><span class="s">&#39;./&#39;</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+
+<span class="sd">        :param xml_file:</span>
+<span class="sd">        :param path:</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">io_file</span> <span class="o">=</span> <span class="nb">open</span><span class="p">(</span><span class="n">path</span> <span class="o">+</span> <span class="n">xml_file</span><span class="p">)</span>
+        <span class="n">tree</span> <span class="o">=</span> <span class="n">objectify</span><span class="o">.</span><span class="n">parse</span><span class="p">(</span><span class="n">io_file</span><span class="p">)</span>
+        <span class="n">io_file</span><span class="o">.</span><span class="n">close</span><span class="p">()</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">data</span> <span class="o">=</span> <span class="n">tree</span><span class="o">.</span><span class="n">getroot</span><span class="p">()</span>
+
+
+<span class="k">def</span> <span class="nf">convert_deg</span><span class="p">(</span><span class="n">angle</span><span class="p">,</span> <span class="n">unit</span><span class="p">):</span>
+    <span class="n">value</span> <span class="o">=</span> <span class="n">angle</span>
+    <span class="k">if</span> <span class="n">unit</span> <span class="o">==</span> <span class="s">&#39;mas&#39;</span><span class="p">:</span>
+        <span class="n">value</span> <span class="o">/=</span> <span class="mf">3600000.</span>
+    <span class="k">elif</span> <span class="n">unit</span> <span class="o">==</span> <span class="s">&#39;arcsec&#39;</span><span class="p">:</span>
+        <span class="n">value</span> <span class="o">/=</span> <span class="mf">3600.</span>
+    <span class="k">elif</span> <span class="n">unit</span> <span class="o">==</span> <span class="s">&#39;arcmin&#39;</span><span class="p">:</span>
+        <span class="n">value</span> <span class="o">/=</span> <span class="mf">60.</span>
+    <span class="k">elif</span> <span class="n">unit</span> <span class="o">==</span> <span class="s">&#39;rad&#39;</span><span class="p">:</span>
+        <span class="n">value</span> <span class="o">=</span> <span class="n">value</span> <span class="o">*</span> <span class="n">pd</span><span class="o">.</span><span class="n">np</span><span class="o">.</span><span class="n">pi</span> <span class="o">/</span> <span class="mf">180.</span>
+    <span class="k">elif</span> <span class="n">unit</span> <span class="o">==</span> <span class="s">&#39;hours&#39;</span><span class="p">:</span>
+        <span class="n">value</span> <span class="o">*=</span> <span class="mf">15.</span>
+    <span class="k">return</span> <span class="n">value</span>
+
+
+<span class="k">def</span> <span class="nf">convert_sec</span><span class="p">(</span><span class="n">angle</span><span class="p">,</span> <span class="n">unit</span><span class="p">):</span>
+    <span class="n">value</span> <span class="o">=</span> <span class="n">angle</span>
+    <span class="k">if</span> <span class="n">unit</span> <span class="o">==</span> <span class="s">&#39;mas&#39;</span><span class="p">:</span>
+        <span class="n">value</span> <span class="o">/=</span> <span class="mf">1000.</span>
+    <span class="k">elif</span> <span class="n">unit</span> <span class="o">==</span> <span class="s">&#39;arcsec&#39;</span><span class="p">:</span>
+        <span class="n">value</span> <span class="o">/=</span> <span class="mf">1.</span>
+    <span class="k">elif</span> <span class="n">unit</span> <span class="o">==</span> <span class="s">&#39;arcmin&#39;</span><span class="p">:</span>
+        <span class="n">value</span> <span class="o">*=</span> <span class="mf">60.</span>
+    <span class="k">elif</span> <span class="n">unit</span> <span class="o">==</span> <span class="s">&#39;rad&#39;</span><span class="p">:</span>
+        <span class="n">value</span> <span class="o">=</span> <span class="p">(</span><span class="n">value</span> <span class="o">*</span> <span class="n">pd</span><span class="o">.</span><span class="n">np</span><span class="o">.</span><span class="n">pi</span> <span class="o">/</span> <span class="mf">180.</span><span class="p">)</span> <span class="o">*</span> <span class="mf">3600.</span>
+    <span class="k">elif</span> <span class="n">unit</span> <span class="o">==</span> <span class="s">&#39;hours&#39;</span><span class="p">:</span>
+        <span class="n">value</span> <span class="o">*=</span> <span class="mf">15.</span> <span class="o">*</span> <span class="mf">3600.</span>
+    <span class="k">elif</span> <span class="n">unit</span> <span class="o">==</span> <span class="s">&#39;deg&#39;</span><span class="p">:</span>
+        <span class="n">value</span> <span class="o">*=</span> <span class="mf">3600.</span>
+    <span class="k">else</span><span class="p">:</span>
+        <span class="k">return</span> <span class="bp">None</span>
+    <span class="k">return</span> <span class="n">value</span>
+
+
+<span class="k">def</span> <span class="nf">convert_jy</span><span class="p">(</span><span class="n">flux</span><span class="p">,</span> <span class="n">unit</span><span class="p">):</span>
+    <span class="n">value</span> <span class="o">=</span> <span class="n">flux</span>
+    <span class="k">if</span> <span class="n">unit</span> <span class="o">==</span> <span class="s">&#39;Jy&#39;</span><span class="p">:</span>
+        <span class="n">value</span> <span class="o">=</span> <span class="n">value</span>
+    <span class="k">elif</span> <span class="n">unit</span> <span class="o">==</span> <span class="s">&#39;mJy&#39;</span><span class="p">:</span>
+        <span class="n">value</span> <span class="o">/=</span> <span class="mf">1000.</span>
+    <span class="k">else</span><span class="p">:</span>
+        <span class="k">return</span> <span class="bp">None</span>
+    <span class="k">return</span> <span class="n">value</span>
+
+
+<span class="k">def</span> <span class="nf">convert_mjy</span><span class="p">(</span><span class="n">flux</span><span class="p">,</span> <span class="n">unit</span><span class="p">):</span>
+    <span class="n">value</span> <span class="o">=</span> <span class="n">flux</span>
+    <span class="k">if</span> <span class="n">unit</span> <span class="o">==</span> <span class="s">&#39;Jy&#39;</span><span class="p">:</span>
+        <span class="n">value</span> <span class="o">*=</span> <span class="mf">1e3</span>
+    <span class="k">elif</span> <span class="n">unit</span> <span class="o">==</span> <span class="s">&#39;mJy&#39;</span><span class="p">:</span>
+        <span class="n">value</span> <span class="o">=</span> <span class="n">value</span>
+    <span class="k">else</span><span class="p">:</span>
+        <span class="k">return</span> <span class="bp">None</span>
+    <span class="k">return</span> <span class="n">value</span>
+
+
+<span class="k">def</span> <span class="nf">convert_ghz</span><span class="p">(</span><span class="n">freq</span><span class="p">,</span> <span class="n">unit</span><span class="p">):</span>
+    <span class="n">value</span> <span class="o">=</span> <span class="n">freq</span>
+    <span class="k">if</span> <span class="n">unit</span> <span class="o">==</span> <span class="s">&#39;GHz&#39;</span><span class="p">:</span>
+        <span class="n">value</span> <span class="o">=</span> <span class="n">value</span>
+    <span class="k">elif</span> <span class="n">unit</span> <span class="o">==</span> <span class="s">&#39;MHz&#39;</span><span class="p">:</span>
+        <span class="n">value</span> <span class="o">*=</span> <span class="mf">1e-3</span>
+    <span class="k">elif</span> <span class="n">unit</span> <span class="o">==</span> <span class="s">&#39;kHz&#39;</span><span class="p">:</span>
+        <span class="n">value</span> <span class="o">*=</span> <span class="mf">1e-6</span>
+    <span class="k">elif</span> <span class="n">unit</span> <span class="o">==</span> <span class="s">&#39;Hz&#39;</span><span class="p">:</span>
+        <span class="n">value</span> <span class="o">*=</span> <span class="mf">1e-9</span>
+    <span class="k">else</span><span class="p">:</span>
+        <span class="k">return</span> <span class="bp">None</span>
+    <span class="k">return</span> <span class="n">value</span>
+
+
+<span class="k">def</span> <span class="nf">convert_tsec</span><span class="p">(</span><span class="n">time</span><span class="p">,</span> <span class="n">unit</span><span class="p">):</span>
+
+    <span class="n">value</span> <span class="o">=</span> <span class="n">time</span>
+    <span class="k">if</span> <span class="n">unit</span> <span class="o">==</span> <span class="s">&#39;s&#39;</span><span class="p">:</span>
+        <span class="k">return</span> <span class="n">value</span>
+    <span class="k">elif</span> <span class="n">unit</span> <span class="o">==</span> <span class="s">&#39;min&#39;</span><span class="p">:</span>
+        <span class="k">return</span> <span class="n">value</span> <span class="o">*</span> <span class="mf">60.</span>
+    <span class="k">elif</span> <span class="n">unit</span> <span class="o">==</span> <span class="s">&#39;h&#39;</span><span class="p">:</span>
+        <span class="k">return</span> <span class="n">value</span> <span class="o">*</span> <span class="mf">3600.</span>
+    <span class="k">else</span><span class="p">:</span>
+        <span class="k">return</span> <span class="bp">None</span>
+</pre></div>
+
+          </div>
+        </div>
+      </div>
+      <div class="sphinxsidebar">
+        <div class="sphinxsidebarwrapper">
+<div id="searchbox" style="display: none">
+  <h3>Quick search</h3>
+    <form class="search" action="../search.html" method="get">
+      <input type="text" name="q" />
+      <input type="submit" value="Go" />
+      <input type="hidden" name="check_keywords" value="yes" />
+      <input type="hidden" name="area" value="default" />
+    </form>
+    <p class="searchtip" style="font-size: 90%">
+    Enter search terms or a module, class or function name.
+    </p>
+</div>
+<script type="text/javascript">$('#searchbox').show(0);</script>
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="related">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="../genindex.html" title="General Index"
+             >index</a></li>
+        <li class="right" >
+          <a href="../py-modindex.html" title="Python Module Index"
+             >modules</a> |</li>
+        <li><a href="../index.html">gWTO 0.1 documentation</a> &raquo;</li>
+          <li><a href="index.html" >Module code</a> &raquo;</li> 
+      </ul>
+    </div>
+    <div class="footer">
+        &copy; Copyright 2014, IToledo.
+      Created using <a href="http://sphinx-doc.org/">Sphinx</a> 1.2.2.
+    </div>
+  </body>
+</html>
