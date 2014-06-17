@@ -870,8 +870,8 @@ class WtoDatabase(object):
              u'QA0Pass'], dtype='object')
 
         i = self.sb_summary.index
-        self.sb_summary[i, 'QA0Pass'] = self.sb_summary.QA0Pass.fillna(0)
-        self.sb_summary[i, 'QA0Unset'] = self.sb_summary.QA0Unset.fillna(0)
+        self.sb_summary.loc[i, 'QA0Pass'] = self.sb_summary.QA0Pass.fillna(0)
+        self.sb_summary.loc[i, 'QA0Unset'] = self.sb_summary.QA0Unset.fillna(0)
         total = self.sb_summary.QA0Unset + self.sb_summary.QA0Pass
         self.sb_summary['Total_exe'] = total
 

@@ -6,7 +6,7 @@
   <head>
     <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
     
-    <title>wtoDatabase &mdash; gWTO 0.1 documentation</title>
+    <title>wtoDatabase &mdash; gWTO 2.0RC documentation</title>
     
     <link rel="stylesheet" href="../_static/default.css" type="text/css" />
     <link rel="stylesheet" href="../_static/pygments.css" type="text/css" />
@@ -14,7 +14,7 @@
     <script type="text/javascript">
       var DOCUMENTATION_OPTIONS = {
         URL_ROOT:    '../',
-        VERSION:     '0.1',
+        VERSION:     '2.0RC',
         COLLAPSE_INDEX: false,
         FILE_SUFFIX: '.html',
         HAS_SOURCE:  true
@@ -23,7 +23,7 @@
     <script type="text/javascript" src="../_static/jquery.js"></script>
     <script type="text/javascript" src="../_static/underscore.js"></script>
     <script type="text/javascript" src="../_static/doctools.js"></script>
-    <link rel="top" title="gWTO 0.1 documentation" href="../index.html" />
+    <link rel="top" title="gWTO 2.0RC documentation" href="../index.html" />
     <link rel="up" title="Module code" href="index.html" /> 
   </head>
   <body>
@@ -36,7 +36,7 @@
         <li class="right" >
           <a href="../py-modindex.html" title="Python Module Index"
              >modules</a> |</li>
-        <li><a href="../index.html">gWTO 0.1 documentation</a> &raquo;</li>
+        <li><a href="../index.html">gWTO 2.0RC documentation</a> &raquo;</li>
           <li><a href="index.html" accesskey="U">Module code</a> &raquo;</li> 
       </ul>
     </div>  
@@ -898,8 +898,8 @@
             <span class="n">copy</span><span class="o">=</span><span class="bp">False</span><span class="p">)</span>
         <span class="n">qa0group</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">qa0</span><span class="o">.</span><span class="n">groupby</span><span class="p">([</span><span class="s">&#39;SCHEDBLOCKUID&#39;</span><span class="p">,</span> <span class="s">&#39;QA0STATUS&#39;</span><span class="p">])</span>
         <span class="n">qa0count</span> <span class="o">=</span> <span class="n">qa0group</span><span class="o">.</span><span class="n">QA0STATUS</span><span class="o">.</span><span class="n">count</span><span class="p">()</span><span class="o">.</span><span class="n">unstack</span><span class="p">()</span>
-        <span class="n">qpass</span> <span class="o">=</span> <span class="n">qa0count</span><span class="p">[[</span><span class="s">&quot;Pass&quot;</span><span class="p">]]</span>
-        <span class="n">qunset</span> <span class="o">=</span> <span class="n">qa0count</span><span class="p">[[</span><span class="s">&quot;Unset&quot;</span><span class="p">]]</span>
+        <span class="n">qpass</span> <span class="o">=</span> <span class="n">qa0count</span><span class="p">[[</span><span class="s">&quot;Pass&quot;</span><span class="p">]]</span><span class="o">.</span><span class="n">fillna</span><span class="p">(</span><span class="mi">0</span><span class="p">)</span>
+        <span class="n">qunset</span> <span class="o">=</span> <span class="n">qa0count</span><span class="p">[[</span><span class="s">&quot;Unset&quot;</span><span class="p">]]</span><span class="o">.</span><span class="n">fillna</span><span class="p">(</span><span class="mi">0</span><span class="p">)</span>
         <span class="n">m6</span> <span class="o">=</span> <span class="n">pd</span><span class="o">.</span><span class="n">merge</span><span class="p">(</span>
             <span class="n">m5</span><span class="p">,</span> <span class="n">qunset</span><span class="p">,</span> <span class="n">left_index</span><span class="o">=</span><span class="bp">True</span><span class="p">,</span> <span class="n">right_index</span><span class="o">=</span><span class="bp">True</span><span class="p">,</span> <span class="n">how</span><span class="o">=</span><span class="s">&#39;left&#39;</span><span class="p">,</span>
             <span class="n">copy</span><span class="o">=</span><span class="bp">False</span><span class="p">)</span>
@@ -918,6 +918,12 @@
              <span class="s">u&#39;DOMAIN_ENTITY_STATE&#39;</span><span class="p">,</span> <span class="s">u&#39;OBS_PROJECT_ID&#39;</span><span class="p">,</span> <span class="s">u&#39;QA0Unset&#39;</span><span class="p">,</span>
              <span class="s">u&#39;QA0Pass&#39;</span><span class="p">],</span> <span class="n">dtype</span><span class="o">=</span><span class="s">&#39;object&#39;</span><span class="p">)</span>
 
+        <span class="n">i</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">sb_summary</span><span class="o">.</span><span class="n">index</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">sb_summary</span><span class="p">[</span><span class="n">i</span><span class="p">,</span> <span class="s">&#39;QA0Pass&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">sb_summary</span><span class="o">.</span><span class="n">QA0Pass</span><span class="o">.</span><span class="n">fillna</span><span class="p">(</span><span class="mi">0</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">sb_summary</span><span class="p">[</span><span class="n">i</span><span class="p">,</span> <span class="s">&#39;QA0Unset&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">sb_summary</span><span class="o">.</span><span class="n">QA0Unset</span><span class="o">.</span><span class="n">fillna</span><span class="p">(</span><span class="mi">0</span><span class="p">)</span>
+        <span class="n">total</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">sb_summary</span><span class="o">.</span><span class="n">QA0Unset</span> <span class="o">+</span> <span class="bp">self</span><span class="o">.</span><span class="n">sb_summary</span><span class="o">.</span><span class="n">QA0Pass</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">sb_summary</span><span class="p">[</span><span class="s">&#39;Total_exe&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">total</span>
+
     <span class="k">def</span> <span class="nf">create_allsb</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">split</span><span class="o">=</span><span class="bp">False</span><span class="p">):</span>
         <span class="n">allsb</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">sb_summary</span><span class="p">[</span>
             <span class="p">[</span><span class="s">&#39;CODE&#39;</span><span class="p">,</span> <span class="s">&#39;OBS_PROJECT_ID&#39;</span><span class="p">,</span> <span class="s">&#39;name&#39;</span><span class="p">,</span> <span class="s">&#39;SB_UID&#39;</span><span class="p">,</span> <span class="s">&#39;bands&#39;</span><span class="p">,</span> <span class="s">&#39;repfreq&#39;</span><span class="p">,</span>
@@ -935,6 +941,19 @@
         <span class="k">else</span><span class="p">:</span>
             <span class="n">allsb</span><span class="o">.</span><span class="n">sort</span><span class="p">(</span><span class="s">&#39;CODE&#39;</span><span class="p">)</span><span class="o">.</span><span class="n">to_csv</span><span class="p">(</span>
                 <span class="bp">self</span><span class="o">.</span><span class="n">path</span> <span class="o">+</span> <span class="s">&#39;all.sbinfo&#39;</span><span class="p">,</span> <span class="n">sep</span><span class="o">=</span><span class="s">&#39;</span><span class="se">\t</span><span class="s">&#39;</span><span class="p">,</span> <span class="n">header</span><span class="o">=</span><span class="bp">False</span><span class="p">,</span> <span class="n">index</span><span class="o">=</span><span class="bp">False</span><span class="p">)</span>
+
+    <span class="k">def</span> <span class="nf">forcenew</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="n">call</span><span class="p">([</span><span class="s">&#39;rm&#39;</span><span class="p">,</span> <span class="s">&#39;-rf&#39;</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">path</span><span class="p">])</span>
+        <span class="k">print</span> <span class="bp">self</span><span class="o">.</span><span class="n">path</span> <span class="o">+</span> <span class="s">&quot;: creating preferences dir&quot;</span>
+        <span class="n">os</span><span class="o">.</span><span class="n">mkdir</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">path</span><span class="p">)</span>
+        <span class="n">os</span><span class="o">.</span><span class="n">mkdir</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">sbxml</span><span class="p">)</span>
+        <span class="n">os</span><span class="o">.</span><span class="n">mkdir</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">obsxml</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">start_wto</span><span class="p">()</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">populate_sciencegoals_sbxml</span><span class="p">()</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">populate_schedblocks</span><span class="p">()</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">populate_schedblock_info</span><span class="p">()</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">populate_newar</span><span class="p">()</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">create_summary</span><span class="p">()</span>
 
 </div>
 <span class="k">class</span> <span class="nc">ObsProject</span><span class="p">(</span><span class="nb">object</span><span class="p">):</span>
@@ -1126,7 +1145,7 @@
         <li class="right" >
           <a href="../py-modindex.html" title="Python Module Index"
              >modules</a> |</li>
-        <li><a href="../index.html">gWTO 0.1 documentation</a> &raquo;</li>
+        <li><a href="../index.html">gWTO 2.0RC documentation</a> &raquo;</li>
           <li><a href="index.html" >Module code</a> &raquo;</li> 
       </ul>
     </div>
