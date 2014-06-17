@@ -1,3 +1,7 @@
+"""
+Main gWTO database module
+"""
+
 __author__ = 'itoledo'
 __metaclass__ = type
 
