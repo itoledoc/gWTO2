@@ -19,16 +19,19 @@ sbl = '{Alma/ObsPrep/SchedBlock}'
 
 class WtoDatabase(object):
 
+    """
+
+
+    :param default: Path for data cache
+    :type default: str.
+    :param source: File or list of strings with the codes of the projects
+        to be ingested by WtoDatabase
+    :type source: list or str
+    :param forcenew: Force cache cleaning and reload from archive
+    :type forcenew: boolean, default False
+    """
     def __init__(self, default='/.wto/', source=None, forcenew=False):
 
-        """
-
-
-        :param default: Path for data cache
-        :param source: File or list of strings with the codes of the projects
-            to be ingested by WtoDatabase
-        :param forcenew: Force cache cleaning and reload from archive
-        """
         self.source = source
         self.new = forcenew
         # Default Paths and Preferences
@@ -148,6 +151,11 @@ class WtoDatabase(object):
 
     def start_wto(self):
 
+        """
+        This populate the self.obsproject database
+
+        :return: None
+        """
         states = self.states
 
         sql2 = str(
@@ -1022,6 +1030,7 @@ def convert_ghz(freq, unit):
 
 
 def convert_tsec(time, unit):
+
     value = time
     if unit == 's':
         return value
