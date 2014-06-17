@@ -286,7 +286,8 @@ class WtoDatabase(object):
                               puid)
                         continue
                     code = row[4]
-                    if code not in self.checked.CODE.tolist():
+                    if (code not in self.checked.CODE.tolist() and
+                            code.startswith('2012')):
                         print("\t %s didn't pass filter C1" % code)
                         continue
                     self.cursor.execute(
@@ -462,7 +463,7 @@ class WtoDatabase(object):
                         endtime = temppar.endTime.pyval
                         try:
                             allowedmarg = temppar.allowedMargin.pyval
-                            allowedmarg_unit = temppar.allowedMarg.bin.attrib[
+                            allowedmarg_unit = temppar.allowedMargin.attrib[
                                 'unit']
                         except AttributeError:
                             allowedmarg = None
@@ -502,7 +503,7 @@ class WtoDatabase(object):
                           allowedmarg_unit, repeats, note, isavoid)],
                         columns=['CODE', 'partId', 'AR', 'LAS', 'bands',
                                  'isSpectralScan', 'isTimeConstrained',
-                                 'useACA', 'useTP', 'SBS', 'startRime',
+                                 'useACA', 'useTP', 'SBS', 'startTime',
                                  'endTime', 'allowedMargin', 'allowedUnits',
                                  'repeats', 'note', 'isavoid'],
                         index=[partid])
@@ -818,12 +819,13 @@ class WtoDatabase(object):
             usecols=range(5))
         c1c2.columns = pd.Index([u'CODE', u'Region', u'ARC', u'C2', u'P2G'],
                                 dtype='object')
-        toc2 = c1c2[c1c2.fillna('no').C2.str.contains('^Yes')]
+        toc2 = c1c2[c1c2.fillna('no').C2.str.startswith('Yes')]
         check_c1 = pd.merge(
-            self.obsproject[self.obsproject.CODE.str.contains('^2012')],
-            toc2, on='CODE')[['CODE']]
+            self.obsproject[self.obsproject.CODE.str.startswith('2012')],
+            toc2, on='CODE', how='right').set_index(
+            'CODE', drop=False)[['CODE']]
         check_c2 = self.obsproject[
-            self.obsproject.CODE.str.contains('^2013')][['CODE']]
+            self.obsproject.CODE.str.startswith('2013')][['CODE']]
         self.checked = pd.concat([check_c1, check_c2])
         temp = pd.merge(
             self.obsproject, self.checked, on='CODE',

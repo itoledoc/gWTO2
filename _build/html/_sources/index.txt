@@ -29,24 +29,49 @@ datas.obsprojects
 ======================  ==========================================
 COLUMN                  VALUE
 ======================  ==========================================
-PRJ_ARCHIVE_UID         *(String)* Project UID
-DELETED                 *(Boolean int)* Is Deleted?
-PI                      *(String)* Principal Investigator
-PRJ_NAME                *(String)* Project Name
-** CODE                 *(String)* Project Code **Index**
-PRJ_TIME_OF_CREATION    *(Datetime)* Project creation timestamp
-PRJ_SCIENTIFIC_RANK     *(Int)* Project Rank
-PRJ_VERSION             *(Int)* Project Version
-PRJ_ASSIGNED_PRIORITY   *(Float)*
-PRJ_LETTER_GRADE        *(Int)* Project Grade
-DOMAIN_ENTITY_STATE     *(Int)* Project Status (ProTrack)
-OBS_PROJECT_ID          *(String)* Project UID
-EXEC                    *(String)* Executive
-timestamp               *(Datetime)* Project latest update date
-obsproj                 *(String)* Obsproject XML file
+PRJ_ARCHIVE_UID         *(string)* Project UID
+DELETED                 *(boolean int)* Is Deleted?
+PI                      *(string)* Principal Investigator
+PRJ_NAME                *(string)* Project Name
+** CODE                 *(string)* Project Code **Index**
+PRJ_TIME_OF_CREATION    *(string)* Project creation timestamp
+PRJ_SCIENTIFIC_RANK     *(int64)* Project Rank
+PRJ_VERSION             *(string)* Project Version
+PRJ_ASSIGNED_PRIORITY   *(object)* None
+PRJ_LETTER_GRADE        *(string)* Project Grade
+DOMAIN_ENTITY_STATE     *(string)* Project Status (ProTrack)
+OBS_PROJECT_ID          *(string)* Project UID
+EXEC                    *(string)* Executive
+timestamp               *(datetime64[ns])* Project latest update date
+obsproj                 *(string)* Obsproject XML file
 ======================  ==========================================
-Name: 2013.1.00114.S, dtype: object
 
+
+
+datas.sciencegoals
+------------------
+
+==================   ================================================
+COLUMN               VALUE
+==================   ================================================
+CODE                 *(string)* Project Code
+** partId            *(string)* Science Goal partId **Index**
+AR                   *(float64)* Desired angular resolution (arcsec)
+LAS                  *(float64)* Largest scale (arcser)
+bands                *(string)* ALMA Band
+isSpectralScan       *(boolean)*
+isTimeConstrained    *(boolean)*
+useACA               *(boolean)*
+useTP                *(boolean)*
+SBS                  *(list of str)* ScienceGoal SBs
+startRime            *(string)*
+endTime              *(string)*
+allowedMargin        *(float64)*
+allowedUnits         *(string)*
+repeats              *(int)*
+note                 *(string)* Time constrain notes
+isavoid              *(boolean)*
+==================   ================================================
 
 The WTO API
 ===========
