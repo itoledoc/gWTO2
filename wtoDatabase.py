@@ -868,8 +868,12 @@ class WtoDatabase(object):
              u'MAX_ANG_RESOLUTION', u'OBSUNIT_PROJECT_UID',
              u'DOMAIN_ENTITY_STATE', u'OBS_PROJECT_ID', u'QA0Unset',
              u'QA0Pass'], dtype='object')
-        self.sb_summary['Total_exe'] = self.sb_summary.QA0Unset + \
-            self.sb_summary.QA0Pass
+
+        i = self.sb_summary.index
+        self.sb_summary[i, 'QA0Pass'] = self.sb_summary.QA0Pass.fillna(0)
+        self.sb_summary[i, 'QA0Unset'] = self.sb_summary.QA0Unset.fillna(0)
+        total = self.sb_summary.QA0Unset + self.sb_summary.QA0Pass
+        self.sb_summary['Total_exe'] = total
 
     def create_allsb(self, split=False):
         allsb = self.sb_summary[
