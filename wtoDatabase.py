@@ -1,5 +1,9 @@
 """
-Main gWTO database module
+The Main gWTO database module.
+------------------------------
+It retrieves and process information of ALMA Cycle 2 and Cycle 1 projects,
+science goals, scheduling blocks, field sources, targets and spectral
+configurations.
 """
 
 __author__ = 'itoledo'
