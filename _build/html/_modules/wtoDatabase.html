@@ -209,7 +209,15 @@
 <div class="viewcode-block" id="WtoDatabase.start_wto"><a class="viewcode-back" href="../index.html#wtoDatabase.WtoDatabase.start_wto">[docs]</a>    <span class="k">def</span> <span class="nf">start_wto</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
 
         <span class="sd">&quot;&quot;&quot;</span>
-<span class="sd">        This populate the self.obsproject database</span>
+<span class="sd">        Initializes the wtoDatabase dataframes.</span>
+
+<span class="sd">        The function queries the archive (ALMA_ONLINE.OSF.CL) to look for</span>
+<span class="sd">        cycle 1 and cycle 2 projects, disregarding any projects with status</span>
+<span class="sd">        &quot;Approved&quot;, &quot;Phase1Submitted&quot;, &quot;Broken&quot;, &quot;Canceled&quot; or &quot;Rejected&quot;.</span>
+
+<span class="sd">        The archive tables used are ALMA.BMMV_OBSPROPOSAL,</span>
+<span class="sd">        ALMA.OBS_PROJECT_STATUS, ALMA.BMMV_OBSPROJECT and</span>
+<span class="sd">        ALMA.XML_OBSPROJECT_ENTITIES.</span>
 
 <span class="sd">        :return: None</span>
 <span class="sd">        &quot;&quot;&quot;</span>

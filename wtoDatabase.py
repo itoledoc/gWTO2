@@ -160,7 +160,15 @@ class WtoDatabase(object):
     def start_wto(self):
 
         """
-        This populate the self.obsproject database
+        Initializes the wtoDatabase dataframes.
+
+        The function queries the archive (ALMA_ONLINE.OSF.CL) to look for
+        cycle 1 and cycle 2 projects, disregarding any projects with status
+        "Approved", "Phase1Submitted", "Broken", "Canceled" or "Rejected".
+
+        The archive tables used are ALMA.BMMV_OBSPROPOSAL,
+        ALMA.OBS_PROJECT_STATUS, ALMA.BMMV_OBSPROJECT and
+        ALMA.XML_OBSPROJECT_ENTITIES.
 
         :return: None
         """

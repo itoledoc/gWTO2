@@ -11,14 +11,12 @@ The gWTO2 Documentation
 .. toctree::
    :maxdepth: 2
 
-Indices and tables
-==================
 
-* :ref:`genindex`
-* :ref:`modindex`
-* :ref:`search`
+The WTO API
+===========
 
-
+.. automodule:: wtoDatabase
+   :members:
 
 The WTO Data Frames
 ===================
@@ -152,13 +150,20 @@ isMosaic             object
 
 wtoDatabase.spectralconf
 ------------------------
-specRef       object
-SB_UID        object
-BaseBands    float64
-SPWs         float64
+==================   ================================================
+COLUMN               VALUE
+==================   ================================================
+specRef              object
+SB_UID               object
+BaseBands            float64
+SPWs                 float64
+==================   ================================================
 
 wtoDatabase.sb_summary (*"view"*)
 ---------------------------------
+===========================   ================================================
+COLUMN                        VALUE
+===========================   ================================================
 CODE                           object
 OBS_PROJECT_ID1                object
 partId                         object
@@ -191,15 +196,22 @@ OBS_PROJECT_ID                 object
 QA0Unset                      float64
 QA0Pass                       float64
 Total_exe                     float6
-
+===========================   ================================================
 
 wtoDatabase.qa0
 ---------------
-SCHEDBLOCKUID    object
-QA0STATUS        object
+==================   =========================
+COLUMN               VALUE
+==================   =========================
+SCHEDBLOCKUID        object
+QA0STATUS            object
+==================   =========================
 
 wtoDatabase.scheduling_proj
 ---------------------------
+===========================   ================================================
+COLUMN                        VALUE
+===========================   ================================================
 OBSPROJECTID                    int64
 OBSPROJECT_UID                 object
 CODE                           object
@@ -220,9 +232,13 @@ STATUS_ENTITY_TYPE_NAME        object
 STATUS_SCHEMA_VERSION          object
 STATUS_DOCUMENT_VERSION        object
 STATUS_TIMESTAMP               object
+===========================   ================================================
 
 wtoDatabase.scheduling_sb
 -------------------------
+===========================   ================================================
+COLUMN                        VALUE
+===========================   ================================================
 OBSUNIT_UID                    object
 NAME                           object
 REPR_BAND                       int64
@@ -231,11 +247,11 @@ SCHEDBLOCK_CTRL_STATE          object
 MIN_ANG_RESOLUTION            float64
 MAX_ANG_RESOLUTION            float64
 OBSUNIT_PROJECT_UID            object
+===========================   ================================================
 
+Indices and tables
+==================
 
-
-The WTO API
-===========
-
-.. automodule:: wtoDatabase
-   :members:
+* :ref:`genindex`
+* :ref:`modindex`
+* :ref:`search`

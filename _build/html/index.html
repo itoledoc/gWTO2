@@ -51,22 +51,22 @@
 <ul class="simple">
 <li><a class="reference internal" href="#the-gwto2-documentation" id="id1">The gWTO2 Documentation</a></li>
 <li><a class="reference internal" href="#indices-and-tables" id="id2">Indices and tables</a></li>
-<li><a class="reference internal" href="#the-wto-data-frames" id="id3">The WTO Data Frames</a><ul>
-<li><a class="reference internal" href="#wtodatabase-obsprojects" id="id4">wtoDatabase.obsprojects</a></li>
-<li><a class="reference internal" href="#wtodatabase-sciencegoals" id="id5">wtoDatabase.sciencegoals</a></li>
-<li><a class="reference internal" href="#wtodatabase-schedblocks" id="id6">wtoDatabase.schedblocks</a></li>
-<li><a class="reference internal" href="#wtodatabase-schedblock-info" id="id7">wtoDatabase.schedblock_info</a></li>
-<li><a class="reference internal" href="#wtodatabase-target" id="id8">wtoDatabase.target</a></li>
-<li><a class="reference internal" href="#wtodatabase-fieldsource" id="id9">wtoDatabase.fieldsource</a></li>
-<li><a class="reference internal" href="#wtodatabase-spectralconf" id="id10">wtoDatabase.spectralconf</a></li>
-<li><a class="reference internal" href="#wtodatabase-sb-summary-view" id="id11">wtoDatabase.sb_summary (<em>&#8220;view&#8221;</em>)</a></li>
-<li><a class="reference internal" href="#wtodatabase-qa0" id="id12">wtoDatabase.qa0</a></li>
-<li><a class="reference internal" href="#wtodatabase-scheduling-proj" id="id13">wtoDatabase.scheduling_proj</a></li>
-<li><a class="reference internal" href="#wtodatabase-scheduling-sb" id="id14">wtoDatabase.scheduling_sb</a></li>
+<li><a class="reference internal" href="#module-wtoDatabase" id="id3">The WTO API</a><ul>
+<li><a class="reference internal" href="#the-main-gwto-database-module" id="id4">The Main gWTO database module.</a></li>
 </ul>
 </li>
-<li><a class="reference internal" href="#module-wtoDatabase" id="id15">The WTO API</a><ul>
-<li><a class="reference internal" href="#the-main-gwto-database-module" id="id16">The Main gWTO database module.</a></li>
+<li><a class="reference internal" href="#the-wto-data-frames" id="id5">The WTO Data Frames</a><ul>
+<li><a class="reference internal" href="#wtodatabase-obsprojects" id="id6">wtoDatabase.obsprojects</a></li>
+<li><a class="reference internal" href="#wtodatabase-sciencegoals" id="id7">wtoDatabase.sciencegoals</a></li>
+<li><a class="reference internal" href="#wtodatabase-schedblocks" id="id8">wtoDatabase.schedblocks</a></li>
+<li><a class="reference internal" href="#wtodatabase-schedblock-info" id="id9">wtoDatabase.schedblock_info</a></li>
+<li><a class="reference internal" href="#wtodatabase-target" id="id10">wtoDatabase.target</a></li>
+<li><a class="reference internal" href="#wtodatabase-fieldsource" id="id11">wtoDatabase.fieldsource</a></li>
+<li><a class="reference internal" href="#wtodatabase-spectralconf" id="id12">wtoDatabase.spectralconf</a></li>
+<li><a class="reference internal" href="#wtodatabase-sb-summary-view" id="id13">wtoDatabase.sb_summary (<em>&#8220;view&#8221;</em>)</a></li>
+<li><a class="reference internal" href="#wtodatabase-qa0" id="id14">wtoDatabase.qa0</a></li>
+<li><a class="reference internal" href="#wtodatabase-scheduling-proj" id="id15">wtoDatabase.scheduling_proj</a></li>
+<li><a class="reference internal" href="#wtodatabase-scheduling-sb" id="id16">wtoDatabase.scheduling_sb</a></li>
 </ul>
 </li>
 </ul>
@@ -84,10 +84,58 @@
 <li><a class="reference internal" href="search.html"><em>Search Page</em></a></li>
 </ul>
 </div>
+<div class="section" id="module-wtoDatabase">
+<span id="the-wto-api"></span><h1><a class="toc-backref" href="#id3">The WTO API</a><a class="headerlink" href="#module-wtoDatabase" title="Permalink to this headline">¶</a></h1>
+<div class="section" id="the-main-gwto-database-module">
+<h2><a class="toc-backref" href="#id4">The Main gWTO database module.</a><a class="headerlink" href="#the-main-gwto-database-module" title="Permalink to this headline">¶</a></h2>
+<p>It retrieves and process information of ALMA Cycle 2 and Cycle 1 projects,
+science goals, scheduling blocks, field sources, targets and spectral
+configurations.</p>
+<dl class="class">
+<dt id="wtoDatabase.WtoDatabase">
+<em class="property">class </em><tt class="descclassname">wtoDatabase.</tt><tt class="descname">WtoDatabase</tt><big>(</big><em>default='/.wto/'</em>, <em>source=None</em>, <em>forcenew=False</em><big>)</big><a class="reference internal" href="_modules/wtoDatabase.html#WtoDatabase"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#wtoDatabase.WtoDatabase" title="Permalink to this definition">¶</a></dt>
+<dd><table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first last simple">
+<li><strong>default</strong> (<em>str.</em>) &#8211; Path for data cache</li>
+<li><strong>source</strong> (<em>list or str</em>) &#8211; File or list of strings with the codes of the projects
+to be ingested by WtoDatabase</li>
+<li><strong>forcenew</strong> (<em>boolean, default False</em>) &#8211; Force cache cleaning and reload from archive</li>
+</ul>
+</td>
+</tr>
+</tbody>
+</table>
+<dl class="method">
+<dt id="wtoDatabase.WtoDatabase.start_wto">
+<tt class="descname">start_wto</tt><big>(</big><big>)</big><a class="reference internal" href="_modules/wtoDatabase.html#WtoDatabase.start_wto"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#wtoDatabase.WtoDatabase.start_wto" title="Permalink to this definition">¶</a></dt>
+<dd><p>Initializes the wtoDatabase dataframes.</p>
+<p>The function queries the archive (ALMA_ONLINE.OSF.CL) to look for
+cycle 1 and cycle 2 projects, disregarding any projects with status
+&#8220;Approved&#8221;, &#8220;Phase1Submitted&#8221;, &#8220;Broken&#8221;, &#8220;Canceled&#8221; or &#8220;Rejected&#8221;.</p>
+<p>The archive tables used are ALMA.BMMV_OBSPROPOSAL,
+ALMA.OBS_PROJECT_STATUS, ALMA.BMMV_OBSPROJECT and
+ALMA.XML_OBSPROJECT_ENTITIES.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Returns:</th><td class="field-body">None</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+</dd></dl>
+
+</div>
+</div>
 <div class="section" id="the-wto-data-frames">
-<h1><a class="toc-backref" href="#id3">The WTO Data Frames</a><a class="headerlink" href="#the-wto-data-frames" title="Permalink to this headline">¶</a></h1>
+<h1><a class="toc-backref" href="#id5">The WTO Data Frames</a><a class="headerlink" href="#the-wto-data-frames" title="Permalink to this headline">¶</a></h1>
 <div class="section" id="wtodatabase-obsprojects">
-<h2><a class="toc-backref" href="#id4">wtoDatabase.obsprojects</a><a class="headerlink" href="#wtodatabase-obsprojects" title="Permalink to this headline">¶</a></h2>
+<h2><a class="toc-backref" href="#id6">wtoDatabase.obsprojects</a><a class="headerlink" href="#wtodatabase-obsprojects" title="Permalink to this headline">¶</a></h2>
 <table border="1" class="docutils">
 <colgroup>
 <col width="33%" />
@@ -148,7 +196,7 @@
 </table>
 </div>
 <div class="section" id="wtodatabase-sciencegoals">
-<h2><a class="toc-backref" href="#id5">wtoDatabase.sciencegoals</a><a class="headerlink" href="#wtodatabase-sciencegoals" title="Permalink to this headline">¶</a></h2>
+<h2><a class="toc-backref" href="#id7">wtoDatabase.sciencegoals</a><a class="headerlink" href="#wtodatabase-sciencegoals" title="Permalink to this headline">¶</a></h2>
 <table border="1" class="docutils">
 <colgroup>
 <col width="27%" />
@@ -215,7 +263,7 @@
 </table>
 </div>
 <div class="section" id="wtodatabase-schedblocks">
-<h2><a class="toc-backref" href="#id6">wtoDatabase.schedblocks</a><a class="headerlink" href="#wtodatabase-schedblocks" title="Permalink to this headline">¶</a></h2>
+<h2><a class="toc-backref" href="#id8">wtoDatabase.schedblocks</a><a class="headerlink" href="#wtodatabase-schedblocks" title="Permalink to this headline">¶</a></h2>
 <table border="1" class="docutils">
 <colgroup>
 <col width="27%" />
@@ -243,7 +291,7 @@
 </table>
 </div>
 <div class="section" id="wtodatabase-schedblock-info">
-<h2><a class="toc-backref" href="#id7">wtoDatabase.schedblock_info</a><a class="headerlink" href="#wtodatabase-schedblock-info" title="Permalink to this headline">¶</a></h2>
+<h2><a class="toc-backref" href="#id9">wtoDatabase.schedblock_info</a><a class="headerlink" href="#wtodatabase-schedblock-info" title="Permalink to this headline">¶</a></h2>
 <table border="1" class="docutils">
 <colgroup>
 <col width="27%" />
@@ -325,7 +373,7 @@
 </table>
 </div>
 <div class="section" id="wtodatabase-target">
-<h2><a class="toc-backref" href="#id8">wtoDatabase.target</a><a class="headerlink" href="#wtodatabase-target" title="Permalink to this headline">¶</a></h2>
+<h2><a class="toc-backref" href="#id10">wtoDatabase.target</a><a class="headerlink" href="#wtodatabase-target" title="Permalink to this headline">¶</a></h2>
 <table border="1" class="docutils">
 <colgroup>
 <col width="27%" />
@@ -353,7 +401,7 @@
 </table>
 </div>
 <div class="section" id="wtodatabase-fieldsource">
-<h2><a class="toc-backref" href="#id9">wtoDatabase.fieldsource</a><a class="headerlink" href="#wtodatabase-fieldsource" title="Permalink to this headline">¶</a></h2>
+<h2><a class="toc-backref" href="#id11">wtoDatabase.fieldsource</a><a class="headerlink" href="#wtodatabase-fieldsource" title="Permalink to this headline">¶</a></h2>
 <table border="1" class="docutils">
 <colgroup>
 <col width="27%" />
@@ -420,127 +468,282 @@
 </table>
 </div>
 <div class="section" id="wtodatabase-spectralconf">
-<h2><a class="toc-backref" href="#id10">wtoDatabase.spectralconf</a><a class="headerlink" href="#wtodatabase-spectralconf" title="Permalink to this headline">¶</a></h2>
-<p>specRef       object
-SB_UID        object
-BaseBands    float64
-SPWs         float64</p>
+<h2><a class="toc-backref" href="#id12">wtoDatabase.spectralconf</a><a class="headerlink" href="#wtodatabase-spectralconf" title="Permalink to this headline">¶</a></h2>
+<table border="1" class="docutils">
+<colgroup>
+<col width="27%" />
+<col width="73%" />
+</colgroup>
+<thead valign="bottom">
+<tr class="row-odd"><th class="head">COLUMN</th>
+<th class="head">VALUE</th>
+</tr>
+</thead>
+<tbody valign="top">
+<tr class="row-even"><td>specRef</td>
+<td>object</td>
+</tr>
+<tr class="row-odd"><td>SB_UID</td>
+<td>object</td>
+</tr>
+<tr class="row-even"><td>BaseBands</td>
+<td>float64</td>
+</tr>
+<tr class="row-odd"><td>SPWs</td>
+<td>float64</td>
+</tr>
+</tbody>
+</table>
 </div>
 <div class="section" id="wtodatabase-sb-summary-view">
-<h2><a class="toc-backref" href="#id11">wtoDatabase.sb_summary (<em>&#8220;view&#8221;</em>)</a><a class="headerlink" href="#wtodatabase-sb-summary-view" title="Permalink to this headline">¶</a></h2>
-<p>CODE                           object
-OBS_PROJECT_ID1                object
-partId                         object
-SB_UID                         object
-name                           object
-status_xml                     object
-bands                          object
-repfreq                       float64
-array                          object
-RA                            float64
-DEC                           float64
-minAR                         float64
-maxAR                         float64
-arrayMinAR                    float64
-arrayMaxAR                    float64
-execount                      float64
-PRJ_SCIENTIFIC_RANK           float64
-PRJ_LETTER_GRADE               object
-EXEC                           object
-OBSUNIT_UID                    object
-NAME                           object
-REPR_BAND                     float64
-SCHEDBLOCK_CTRL_EXEC_COUNT    float64
-SCHEDBLOCK_CTRL_STATE          object
-MIN_ANG_RESOLUTION            float64
-MAX_ANG_RESOLUTION            float64
-OBSUNIT_PROJECT_UID            object
-DOMAIN_ENTITY_STATE            object
-OBS_PROJECT_ID                 object
-QA0Unset                      float64
-QA0Pass                       float64
-Total_exe                     float6</p>
+<h2><a class="toc-backref" href="#id13">wtoDatabase.sb_summary (<em>&#8220;view&#8221;</em>)</a><a class="headerlink" href="#wtodatabase-sb-summary-view" title="Permalink to this headline">¶</a></h2>
+<table border="1" class="docutils">
+<colgroup>
+<col width="36%" />
+<col width="64%" />
+</colgroup>
+<thead valign="bottom">
+<tr class="row-odd"><th class="head">COLUMN</th>
+<th class="head">VALUE</th>
+</tr>
+</thead>
+<tbody valign="top">
+<tr class="row-even"><td>CODE</td>
+<td>object</td>
+</tr>
+<tr class="row-odd"><td>OBS_PROJECT_ID1</td>
+<td>object</td>
+</tr>
+<tr class="row-even"><td>partId</td>
+<td>object</td>
+</tr>
+<tr class="row-odd"><td>SB_UID</td>
+<td>object</td>
+</tr>
+<tr class="row-even"><td>name</td>
+<td>object</td>
+</tr>
+<tr class="row-odd"><td>status_xml</td>
+<td>object</td>
+</tr>
+<tr class="row-even"><td>bands</td>
+<td>object</td>
+</tr>
+<tr class="row-odd"><td>repfreq</td>
+<td>float64</td>
+</tr>
+<tr class="row-even"><td>array</td>
+<td>object</td>
+</tr>
+<tr class="row-odd"><td>RA</td>
+<td>float64</td>
+</tr>
+<tr class="row-even"><td>DEC</td>
+<td>float64</td>
+</tr>
+<tr class="row-odd"><td>minAR</td>
+<td>float64</td>
+</tr>
+<tr class="row-even"><td>maxAR</td>
+<td>float64</td>
+</tr>
+<tr class="row-odd"><td>arrayMinAR</td>
+<td>float64</td>
+</tr>
+<tr class="row-even"><td>arrayMaxAR</td>
+<td>float64</td>
+</tr>
+<tr class="row-odd"><td>execount</td>
+<td>float64</td>
+</tr>
+<tr class="row-even"><td>PRJ_SCIENTIFIC_RANK</td>
+<td>float64</td>
+</tr>
+<tr class="row-odd"><td>PRJ_LETTER_GRADE</td>
+<td>object</td>
+</tr>
+<tr class="row-even"><td>EXEC</td>
+<td>object</td>
+</tr>
+<tr class="row-odd"><td>OBSUNIT_UID</td>
+<td>object</td>
+</tr>
+<tr class="row-even"><td>NAME</td>
+<td>object</td>
+</tr>
+<tr class="row-odd"><td>REPR_BAND</td>
+<td>float64</td>
+</tr>
+<tr class="row-even"><td>SCHEDBLOCK_CTRL_EXEC_COUNT</td>
+<td>float64</td>
+</tr>
+<tr class="row-odd"><td>SCHEDBLOCK_CTRL_STATE</td>
+<td>object</td>
+</tr>
+<tr class="row-even"><td>MIN_ANG_RESOLUTION</td>
+<td>float64</td>
+</tr>
+<tr class="row-odd"><td>MAX_ANG_RESOLUTION</td>
+<td>float64</td>
+</tr>
+<tr class="row-even"><td>OBSUNIT_PROJECT_UID</td>
+<td>object</td>
+</tr>
+<tr class="row-odd"><td>DOMAIN_ENTITY_STATE</td>
+<td>object</td>
+</tr>
+<tr class="row-even"><td>OBS_PROJECT_ID</td>
+<td>object</td>
+</tr>
+<tr class="row-odd"><td>QA0Unset</td>
+<td>float64</td>
+</tr>
+<tr class="row-even"><td>QA0Pass</td>
+<td>float64</td>
+</tr>
+<tr class="row-odd"><td>Total_exe</td>
+<td>float6</td>
+</tr>
+</tbody>
+</table>
 </div>
 <div class="section" id="wtodatabase-qa0">
-<h2><a class="toc-backref" href="#id12">wtoDatabase.qa0</a><a class="headerlink" href="#wtodatabase-qa0" title="Permalink to this headline">¶</a></h2>
-<p>SCHEDBLOCKUID    object
-QA0STATUS        object</p>
+<h2><a class="toc-backref" href="#id14">wtoDatabase.qa0</a><a class="headerlink" href="#wtodatabase-qa0" title="Permalink to this headline">¶</a></h2>
+<table border="1" class="docutils">
+<colgroup>
+<col width="42%" />
+<col width="58%" />
+</colgroup>
+<thead valign="bottom">
+<tr class="row-odd"><th class="head">COLUMN</th>
+<th class="head">VALUE</th>
+</tr>
+</thead>
+<tbody valign="top">
+<tr class="row-even"><td>SCHEDBLOCKUID</td>
+<td>object</td>
+</tr>
+<tr class="row-odd"><td>QA0STATUS</td>
+<td>object</td>
+</tr>
+</tbody>
+</table>
 </div>
 <div class="section" id="wtodatabase-scheduling-proj">
-<h2><a class="toc-backref" href="#id13">wtoDatabase.scheduling_proj</a><a class="headerlink" href="#wtodatabase-scheduling-proj" title="Permalink to this headline">¶</a></h2>
-<p>OBSPROJECTID                    int64
-OBSPROJECT_UID                 object
-CODE                           object
-NAME                           object
-VERSION                        object
-PI                             object
-SCIENCE_SCORE                 float64
-SCIENCE_RANK                    int64
-SCIENCE_GRADE                  object
-STATUS                         object
-TOTAL_EXEC_TIME               float64
-CSV                             int64
-MANUAL                          int64
-OBSUNITID                       int64
-STATUS_ENTITY_ID               object
-STATUS_ENTITY_ID_ENCRYPTED     object
-STATUS_ENTITY_TYPE_NAME        object
-STATUS_SCHEMA_VERSION          object
-STATUS_DOCUMENT_VERSION        object
-STATUS_TIMESTAMP               object</p>
+<h2><a class="toc-backref" href="#id15">wtoDatabase.scheduling_proj</a><a class="headerlink" href="#wtodatabase-scheduling-proj" title="Permalink to this headline">¶</a></h2>
+<table border="1" class="docutils">
+<colgroup>
+<col width="36%" />
+<col width="64%" />
+</colgroup>
+<thead valign="bottom">
+<tr class="row-odd"><th class="head">COLUMN</th>
+<th class="head">VALUE</th>
+</tr>
+</thead>
+<tbody valign="top">
+<tr class="row-even"><td>OBSPROJECTID</td>
+<td>int64</td>
+</tr>
+<tr class="row-odd"><td>OBSPROJECT_UID</td>
+<td>object</td>
+</tr>
+<tr class="row-even"><td>CODE</td>
+<td>object</td>
+</tr>
+<tr class="row-odd"><td>NAME</td>
+<td>object</td>
+</tr>
+<tr class="row-even"><td>VERSION</td>
+<td>object</td>
+</tr>
+<tr class="row-odd"><td>PI</td>
+<td>object</td>
+</tr>
+<tr class="row-even"><td>SCIENCE_SCORE</td>
+<td>float64</td>
+</tr>
+<tr class="row-odd"><td>SCIENCE_RANK</td>
+<td>int64</td>
+</tr>
+<tr class="row-even"><td>SCIENCE_GRADE</td>
+<td>object</td>
+</tr>
+<tr class="row-odd"><td>STATUS</td>
+<td>object</td>
+</tr>
+<tr class="row-even"><td>TOTAL_EXEC_TIME</td>
+<td>float64</td>
+</tr>
+<tr class="row-odd"><td>CSV</td>
+<td>int64</td>
+</tr>
+<tr class="row-even"><td>MANUAL</td>
+<td>int64</td>
+</tr>
+<tr class="row-odd"><td>OBSUNITID</td>
+<td>int64</td>
+</tr>
+<tr class="row-even"><td>STATUS_ENTITY_ID</td>
+<td>object</td>
+</tr>
+<tr class="row-odd"><td>STATUS_ENTITY_ID_ENCRYPTED</td>
+<td>object</td>
+</tr>
+<tr class="row-even"><td>STATUS_ENTITY_TYPE_NAME</td>
+<td>object</td>
+</tr>
+<tr class="row-odd"><td>STATUS_SCHEMA_VERSION</td>
+<td>object</td>
+</tr>
+<tr class="row-even"><td>STATUS_DOCUMENT_VERSION</td>
+<td>object</td>
+</tr>
+<tr class="row-odd"><td>STATUS_TIMESTAMP</td>
+<td>object</td>
+</tr>
+</tbody>
+</table>
 </div>
 <div class="section" id="wtodatabase-scheduling-sb">
-<h2><a class="toc-backref" href="#id14">wtoDatabase.scheduling_sb</a><a class="headerlink" href="#wtodatabase-scheduling-sb" title="Permalink to this headline">¶</a></h2>
-<p>OBSUNIT_UID                    object
-NAME                           object
-REPR_BAND                       int64
-SCHEDBLOCK_CTRL_EXEC_COUNT      int64
-SCHEDBLOCK_CTRL_STATE          object
-MIN_ANG_RESOLUTION            float64
-MAX_ANG_RESOLUTION            float64
-OBSUNIT_PROJECT_UID            object</p>
-</div>
-</div>
-<div class="section" id="module-wtoDatabase">
-<span id="the-wto-api"></span><h1><a class="toc-backref" href="#id15">The WTO API</a><a class="headerlink" href="#module-wtoDatabase" title="Permalink to this headline">¶</a></h1>
-<div class="section" id="the-main-gwto-database-module">
-<h2><a class="toc-backref" href="#id16">The Main gWTO database module.</a><a class="headerlink" href="#the-main-gwto-database-module" title="Permalink to this headline">¶</a></h2>
-<p>It retrieves and process information of ALMA Cycle 2 and Cycle 1 projects,
-science goals, scheduling blocks, field sources, targets and spectral
-configurations.</p>
-<dl class="class">
-<dt id="wtoDatabase.WtoDatabase">
-<em class="property">class </em><tt class="descclassname">wtoDatabase.</tt><tt class="descname">WtoDatabase</tt><big>(</big><em>default='/.wto/'</em>, <em>source=None</em>, <em>forcenew=False</em><big>)</big><a class="reference internal" href="_modules/wtoDatabase.html#WtoDatabase"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#wtoDatabase.WtoDatabase" title="Permalink to this definition">¶</a></dt>
-<dd><table class="docutils field-list" frame="void" rules="none">
-<col class="field-name" />
-<col class="field-body" />
+<h2><a class="toc-backref" href="#id16">wtoDatabase.scheduling_sb</a><a class="headerlink" href="#wtodatabase-scheduling-sb" title="Permalink to this headline">¶</a></h2>
+<table border="1" class="docutils">
+<colgroup>
+<col width="36%" />
+<col width="64%" />
+</colgroup>
+<thead valign="bottom">
+<tr class="row-odd"><th class="head">COLUMN</th>
+<th class="head">VALUE</th>
+</tr>
+</thead>
 <tbody valign="top">
-<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first last simple">
-<li><strong>default</strong> (<em>str.</em>) &#8211; Path for data cache</li>
-<li><strong>source</strong> (<em>list or str</em>) &#8211; File or list of strings with the codes of the projects
-to be ingested by WtoDatabase</li>
-<li><strong>forcenew</strong> (<em>boolean, default False</em>) &#8211; Force cache cleaning and reload from archive</li>
-</ul>
-</td>
+<tr class="row-even"><td>OBSUNIT_UID</td>
+<td>object</td>
+</tr>
+<tr class="row-odd"><td>NAME</td>
+<td>object</td>
+</tr>
+<tr class="row-even"><td>REPR_BAND</td>
+<td>int64</td>
+</tr>
+<tr class="row-odd"><td>SCHEDBLOCK_CTRL_EXEC_COUNT</td>
+<td>int64</td>
+</tr>
+<tr class="row-even"><td>SCHEDBLOCK_CTRL_STATE</td>
+<td>object</td>
+</tr>
+<tr class="row-odd"><td>MIN_ANG_RESOLUTION</td>
+<td>float64</td>
+</tr>
+<tr class="row-even"><td>MAX_ANG_RESOLUTION</td>
+<td>float64</td>
+</tr>
+<tr class="row-odd"><td>OBSUNIT_PROJECT_UID</td>
+<td>object</td>
 </tr>
 </tbody>
 </table>
-<dl class="method">
-<dt id="wtoDatabase.WtoDatabase.start_wto">
-<tt class="descname">start_wto</tt><big>(</big><big>)</big><a class="reference internal" href="_modules/wtoDatabase.html#WtoDatabase.start_wto"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#wtoDatabase.WtoDatabase.start_wto" title="Permalink to this definition">¶</a></dt>
-<dd><p>This populate the self.obsproject database</p>
-<table class="docutils field-list" frame="void" rules="none">
-<col class="field-name" />
-<col class="field-body" />
-<tbody valign="top">
-<tr class="field-odd field"><th class="field-name">Returns:</th><td class="field-body">None</td>
-</tr>
-</tbody>
-</table>
-</dd></dl>
-
-</dd></dl>
-
 </div>
 </div>
 
@@ -554,6 +757,10 @@ to be ingested by WtoDatabase</li>
   <ul>
 <li><a class="reference internal" href="#">The gWTO2 Documentation</a></li>
 <li><a class="reference internal" href="#indices-and-tables">Indices and tables</a></li>
+<li><a class="reference internal" href="#module-wtoDatabase">The WTO API</a><ul>
+<li><a class="reference internal" href="#the-main-gwto-database-module">The Main gWTO database module.</a></li>
+</ul>
+</li>
 <li><a class="reference internal" href="#the-wto-data-frames">The WTO Data Frames</a><ul>
 <li><a class="reference internal" href="#wtodatabase-obsprojects">wtoDatabase.obsprojects</a></li>
 <li><a class="reference internal" href="#wtodatabase-sciencegoals">wtoDatabase.sciencegoals</a></li>
@@ -566,10 +773,6 @@ to be ingested by WtoDatabase</li>
 <li><a class="reference internal" href="#wtodatabase-qa0">wtoDatabase.qa0</a></li>
 <li><a class="reference internal" href="#wtodatabase-scheduling-proj">wtoDatabase.scheduling_proj</a></li>
 <li><a class="reference internal" href="#wtodatabase-scheduling-sb">wtoDatabase.scheduling_sb</a></li>
-</ul>
-</li>
-<li><a class="reference internal" href="#module-wtoDatabase">The WTO API</a><ul>
-<li><a class="reference internal" href="#the-main-gwto-database-module">The Main gWTO database module.</a></li>
 </ul>
 </li>
 </ul>
