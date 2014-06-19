@@ -564,10 +564,10 @@ class WtoDatabase(object):
             phase = None
 
         try:
-            basebandparam = xml.data.BandpassCalParameters
-            baseband = str(basebandparam.attrib['entityPartId'])
+            bandpassparam = xml.data.BandpassCalParameters
+            bandpass = str(bandpassparam.attrib['entityPartId'])
         except AttributeError:
-            baseband = None
+            bandpass = None
         try:
             polarparam = xml.data.PolarizationCalParameters
             polarization = str(polarparam.attrib['entityPartId'])
@@ -634,19 +634,19 @@ class WtoDatabase(object):
                 [(sb_uid, pid, name, status,
                   repfreq, band, array, ra, dec, minar_old,
                   maxar_old, execount, ispolarization, amplitude,
-                  baseband, polarization, phase, delay,
+                  bandpass, polarization, phase, delay,
                   science, integrationtime, subscandur, maxpwv)],
                 columns=['SB_UID', 'partId', 'name', 'status_xml',
                          'repfreq', 'band', 'array', 'RA', 'DEC', 'minAR_old',
                          'maxAR_old', 'execount', 'isPolarization', 'amplitude',
-                         'baseband', 'polarization', 'phase', 'delay',
+                         'bandpass', 'polarization', 'phase', 'delay',
                          'science', 'integrationTime', 'subScandur', 'maxPWVC'],
                 index=[sb_uid])
         else:
             self.schedblock_info.ix[sb_uid] = (
                 sb_uid, pid, name, status, repfreq, band, array, ra, dec,
                 minar_old, maxar_old, execount, ispolarization,
-                amplitude, baseband, polarization, phase, delay, science,
+                amplitude, bandpass, polarization, phase, delay, science,
                 integrationtime, subscandur, maxpwv)
 
     def row_fieldsource(self, fs, sbuid, new=False):
@@ -845,53 +845,56 @@ class WtoDatabase(object):
         self.obsproject = temp
 
     def create_summary(self):
-        m1 = pd.merge(
-            self.schedblock_info, self.newar, left_index=True, right_index=True)
-        m2 = pd.merge(m1, self.sciencegoals, on='partId', how='left')
-        m3 = pd.merge(
-            m2, self.obsproject, on='CODE', how='left').set_index('SB_UID',
-                                                                  drop=False)
-        m3 = m3[['CODE', 'OBS_PROJECT_ID', 'partId', 'SB_UID', 'name',
-                 'status_xml', 'bands',
-                 'repfreq', 'array', 'RA', 'DEC', 'minAR', 'maxAR',
-                 'arrayMinAR', 'arrayMaxAR', 'execount',
-                 'PRJ_SCIENTIFIC_RANK', 'PRJ_LETTER_GRADE', 'EXEC']]
-        m4 = pd.merge(m3, self.scheduling_sb, left_index=True,
-                      right_index=True, how='left', copy=False)
-        m5 = pd.merge(
-            m4, self.sbstates, left_index=True, right_index=True, how='left',
-            copy=False)
+        df1 = pd.merge(
+            self.schedblock_info, self.sbstates, left_on='SB_UID',
+            right_index=True)[
+                ['SB_UID', 'partId', 'name', 'repfreq', 'band', 'array', 'RA',
+                 'DEC', 'execount', 'isPolarization', 'amplitude', 'bandpass',
+                 'polarization', 'phase', 'delay', 'science', 'integrationTime',
+                 'subScandur', 'maxPWVC', 'DOMAIN_ENTITY_STATE']]
+
+        df2 = pd.merge(df1, self.newar, left_on='SB_UID', right_index=True)
+        df3 = pd.merge(
+            df2, self.sciencegoals[
+                ['CODE', 'isSpectralScan', 'isTimeConstrained', 'startTime',
+                 'endTime', 'allowedMargin', 'allowedUnits', 'repeats',
+                 'isavoid']], left_on='partId', right_index=True)
+
         qa0group = self.qa0.groupby(['SCHEDBLOCKUID', 'QA0STATUS'])
         qa0count = qa0group.QA0STATUS.count().unstack()
-        qpass = qa0count[["Pass"]].fillna(0)
-        qunset = qa0count[["Unset"]].fillna(0)
-        m6 = pd.merge(
-            m5, qunset, left_index=True, right_index=True, how='left',
-            copy=False)
-        self.sb_summary = pd.merge(
-            m6, qpass, left_index=True, right_index=True, how='left',
-            copy=False)
-        self.sb_summary.columns = pd.Index(
-            [u'CODE', u'OBS_PROJECT_ID1', u'partId', u'SB_UID', u'name',
-             u'status_xml', u'bands',
-             u'repfreq', u'array', u'RA', u'DEC', u'minAR', u'maxAR',
-             u'arrayMinAR', u'arrayMaxAR', u'execount', u'PRJ_SCIENTIFIC_RANK',
-             u'PRJ_LETTER_GRADE', u'EXEC', u'OBSUNIT_UID', u'NAME',
-             u'REPR_BAND', u'SCHEDBLOCK_CTRL_EXEC_COUNT',
-             u'SCHEDBLOCK_CTRL_STATE', u'MIN_ANG_RESOLUTION',
-             u'MAX_ANG_RESOLUTION', u'OBSUNIT_PROJECT_UID',
-             u'DOMAIN_ENTITY_STATE', u'OBS_PROJECT_ID', u'QA0Unset',
-             u'QA0Pass'], dtype='object')
+        qpass = qa0count[["Pass"]]
+        qunset = qa0count[["Unset"]]
 
-        i = self.sb_summary.index
-        self.sb_summary.loc[i, 'QA0Pass'] = self.sb_summary.QA0Pass.fillna(0)
-        self.sb_summary.loc[i, 'QA0Unset'] = self.sb_summary.QA0Unset.fillna(0)
-        total = self.sb_summary.QA0Unset + self.sb_summary.QA0Pass
-        self.sb_summary['Total_exe'] = total
+        df4 = pd.merge(
+            df3, qpass, left_index=True, right_index=True, how='left',
+            copy=False)
+        df5 = pd.merge(
+            df4, qunset, left_index=True, right_index=True, how='left',
+            copy=False)
+        i = df5.index
+        df5.loc[i, 'Pass'] = df5.Pass.fillna(0)
+        df5.loc[i, 'Unset'] = df5.Unset.fillna(0)
+        df5['Total'] = df5.Pass + df5.Unset
+        self.sb_summary = pd.merge(
+            df5, self.obsproject[['PRJ_ARCHIVE_UID', 'EXEC',
+                                  'DOMAIN_ENTITY_STATE']],
+            left_on='CODE', right_index=True, how='left')
+        self.sb_summary.columns = pd.Index(
+            [u'SB_UID', u'partId', u'name', u'repfreq', u'band', u'array',
+             u'RA', u'DEC', u'execount', u'isPolarization', u'amplitude',
+             u'bandpass', u'polarization', u'phase', u'delay', u'science',
+             u'integrationTime', u'subScandur', u'maxPWVC',
+             u'SB_state', u'minAR', u'maxAR', u'arrayMinAR', u'arrayMaxAR',
+             u'CODE', u'isSpectralScan', u'isTimeConstrained', u'startTime',
+             u'endTime', u'allowedMargin', u'allowedUnits', u'repeats',
+             u'isavoid', u'Pass', u'Unset', u'Total', u'PRJ_ARCHIVE_UID',
+             u'EXEC', u'PRJ_state'], dtype='object')
+        self.sb_summary.repfreq = pd.np.around(
+            self.sb_summary.repfreq, decimals=1)
 
     def create_allsb(self, split=False):
         allsb = self.sb_summary[
-            ['CODE', 'OBS_PROJECT_ID', 'name', 'SB_UID', 'bands', 'repfreq',
+            ['CODE', 'PRJ_ARCHIVE_UID', 'name', 'SB_UID', 'band', 'repfreq',
              'array', 'EXEC', 'RA', 'DEC']]
         allsb['conf'] = pd.Series(pd.np.zeros(len(allsb)), index=allsb.index)
         allsb.loc[allsb.array == 'TWELVE-M', 'conf'] = 'C34'

@@ -249,6 +249,10 @@ MAX_ANG_RESOLUTION            float64
 OBSUNIT_PROJECT_UID            object
 ===========================   ================================================
 
+wtoDatabase.sbstate
+-------------------
+
+
 Indices and tables
 ==================
 
