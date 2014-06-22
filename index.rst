@@ -12,10 +12,27 @@ The gWTO2 Documentation
    :maxdepth: 2
 
 
+Using gWTO2
+===========
+
+gWTO is tested and deployed at the osf-red machine, within the aod account.
+A virtual environment of python, based on the Anaconda distribution, must be
+loaded before using it. This is achieved by running:::
+
+    . activate
+
+The Anaconda distribution is based on python 2.7.6 and includes numpy, pandas,
+pyephem and other libraries need by gWTO.
+
+
+
 The WTO API
 ===========
 
 .. automodule:: wtoDatabase
+   :members:
+
+.. automodule:: wtoAlgorithm
    :members:
 
 The WTO Data Frames

@@ -41,12 +41,23 @@ class WtoAlgorithm(WtoDatabase):
         self.transmission = 0.7
         self.minha = -5.0
         self.maxha = 3.0
+        self.tau = pd.read_csv(
+            self.wto_path + 'conf/tau.csv', sep=',', header=0).set_index('freq')
+        self.tsky = pd.read_csv(
+            self.wto_path + 'conf/tsky.csv', sep=',', header=0).set_index(
+                'freq')
         self.pwvdata = pd.read_pickle(
             self.wto_path + 'conf/' + self.preferences.pwv_data).set_index(
                 'freq')
         self.pwvdata.index = pd.Float64Index(
             pd.np.round(self.pwvdata.index, decimals=1), dtype='float64')
         self.alma = alma
+        self.reciever = pd.DataFrame(
+            [55., 45., 75., 110., 51., 150.],
+            columns=['trx'],
+            index=['ALMA_RB_06', 'ALMA_RB_03', 'ALMA_RB_07', 'ALMA_RB_09',
+                   'ALMA_RB_04', 'ALMA_RB_08'])
+        self.reciever['g'] = [0., 0., 0., 1., 0., 0.]
 
     def selector(self, array):
 
@@ -78,12 +89,33 @@ class WtoAlgorithm(WtoDatabase):
         pwvcol = self.pwvdata[[str(self.pwv)]]
         s_pwv = pd.merge(
             self.sb_summary, pwvcol, left_on='repfreq', right_index=True)
-        s_pwv['airmass'] = 1/pd.np.cos(pd.np.radians(-23.0262015 - s_pwv.DEC))
-        print("SBs in sb_summary: %d. SBs with a calculated transmission: %d." %
-              (len(self.sb_summary), len(s_pwv)))
-
         s_pwv = s_pwv.rename(
             columns={str(self.pwv): 'transmission'})
+        ind1 = s_pwv.repfreq
+        ind2 = pd.np.around(s_pwv.maxPWVC, decimals=1).astype(str)
+        s_pwv['tau_org'] = self.tau.lookup(ind1, ind2)
+        s_pwv['tsky_org'] = self.tsky.lookup(ind1, ind2)
+        s_pwv['airmass'] = 1/pd.np.cos(pd.np.radians(-23.0262015 - s_pwv.DEC))
+        s_pwv = pd.merge(s_pwv, self.reciever, left_on='band', right_index=True,
+                         how='left')
+        tskycol = self.tsky[[str(self.pwv)]]
+        s_pwv = pd.merge(s_pwv, tskycol, left_on='repfreq', right_index=True)
+        taucol = self.tau[[str(self.pwv)]]
+        s_pwv = s_pwv.rename(
+            columns={str(self.pwv): 'tsky'})
+        s_pwv = pd.merge(s_pwv, taucol,  left_on='repfreq', right_index=True)
+        s_pwv = s_pwv.rename(
+            columns={str(self.pwv): 'tau'})
+        print("SBs in sb_summary: %d. SBs with a calculated transmission: %d." %
+              (len(self.sb_summary), len(s_pwv)))
+        s_pwv['tsys'] = (1 + s_pwv['g']) * \
+                        (s_pwv['trx'] + s_pwv['tsky'] * 0.95 + 0.05 * 270.) / \
+                        (0.95 * pd.np.exp(-1 * s_pwv['tau'] * s_pwv['airmass']))
+        s_pwv['tsys_org'] = (
+            1 + s_pwv['g']) * \
+            (s_pwv['trx'] + s_pwv['tsky_org'] * 0.95 + 0.05 * 270.) / \
+            (0.95 * pd.np.exp(-1 * s_pwv['tau_org'] * s_pwv['airmass']))
+
         sel1 = s_pwv[s_pwv.transmission > self.transmission]
         print("SBs with a transmission higher than %2.1f: %d" %
               (self.transmission, len(sel1)))
@@ -103,19 +135,22 @@ class WtoAlgorithm(WtoDatabase):
         ha.loc[ha < -12] = 24. + ha.loc[ha < -12]
         sel2['HA'] = ha
         sel2 = sel2
-        self.sel3 = sel2[((sel2.HA > self.minha) & (sel2.HA < self.maxha)) |
-                         (sel2.RA == 0.)]
-        print("SBs within current HA limits (or RA=0): %d" % len(self.sel3))
-
+        sel3 = sel2[((sel2.HA > self.minha) & (sel2.HA < self.maxha)) |
+                    (sel2.RA == 0.)]
+        sel3['frac'] = (sel3.tsys / sel3.tsys_org) ** 2.
+        print("SBs within current HA limits (or RA=0): %d" % len(sel3))
+        if array == '12m':
+            self.select12m = sel3
+        elif array == '7m':
+            self.select7m = sel3
+        else:
+            self.selecttp = sel3
         pass
 
     def observable(self, data, date):
         pass
 
     def scorer(self, data, trans, array, array_ar):
-        pass
-
-    def transmission(self, freq, pwv):
         pass
 
     def set_trans(self, transmission):

@@ -1,9 +1,9 @@
 """
-The Main gWTO database module.
-------------------------------
-It retrieves and process information of ALMA Cycle 2 and Cycle 1 projects,
-science goals, scheduling blocks, field sources, targets and spectral
-configurations.
+wtoDatabase.py: the gWTO database library.
+------------------------------------------
+This library contains the classes and functions required to query, parse and
+organize the Projects and SchedBlock information stored at the OSF archive in
+different tables.
 """
 
 __author__ = 'itoledo'
@@ -28,18 +28,26 @@ sbl = '{Alma/ObsPrep/SchedBlock}'
 class WtoDatabase(object):
 
     """
+    WtoDatabase is the class that stores the Projects and SB information in
+    dataframes, and it also has the methods to connect and query the OSF
+    archive for this info.
 
+    A default instance will use the directory $HOME/.wto as a cache, and it will
+    automatically find the approved Cycle 2 projects and carried-over cycle 1.
 
-    :param default: Path for data cache
-    :type default: str.
-    :param source: File or list of strings with the codes of the projects
-        to be ingested by WtoDatabase
-    :type source: list or str
-    :param forcenew: Force cache cleaning and reload from archive
-    :type forcenew: boolean, default False
     """
-    def __init__(self, default='/.wto/', source=None, forcenew=False):
 
+    def __init__(self, default='/.wto/', source=None, forcenew=False):
+        """
+
+        :param default: Path for data cache
+        :type default: str
+        :param source: File or list of strings with the codes of the projects
+            to be ingested by WtoDatabase
+        :type source: list or str
+        :param forcenew: Force cache cleaning and reload from archive
+        :type forcenew: boolean, default False
+        """
         self.source = source
         self.new = forcenew
         # Default Paths and Preferences
@@ -240,7 +248,7 @@ class WtoDatabase(object):
         self.obsproject.to_pickle(
             self.path + self.preferences.obsproject_table)
 
-    def update(self):
+    def update(self, connect=True):
 
         self.cursor.execute(self.sqlsched_proj)
         self.scheduling_proj = pd.DataFrame(
@@ -262,6 +270,10 @@ class WtoDatabase(object):
             self.cursor.fetchall(),
             columns=[rec[0] for rec in self.cursor.description]
         ).set_index('SCHEDBLOCKUID', drop=False)
+
+        if not connect:
+            self.create_summary()
+            return None
 
         newest = self.obsproject.timestamp.max()
         changes = []
@@ -858,7 +870,7 @@ class WtoDatabase(object):
             df2, self.sciencegoals[
                 ['CODE', 'isSpectralScan', 'isTimeConstrained', 'startTime',
                  'endTime', 'allowedMargin', 'allowedUnits', 'repeats',
-                 'isavoid']], left_on='partId', right_index=True)
+                 'isavoid', 'AR', 'LAS']], left_on='partId', right_index=True)
 
         qa0group = self.qa0.groupby(['SCHEDBLOCKUID', 'QA0STATUS'])
         qa0count = qa0group.QA0STATUS.count().unstack()
@@ -887,8 +899,8 @@ class WtoDatabase(object):
              u'SB_state', u'minAR', u'maxAR', u'arrayMinAR', u'arrayMaxAR',
              u'CODE', u'isSpectralScan', u'isTimeConstrained', u'startTime',
              u'endTime', u'allowedMargin', u'allowedUnits', u'repeats',
-             u'isavoid', u'Pass', u'Unset', u'Total', u'PRJ_ARCHIVE_UID',
-             u'EXEC', u'PRJ_state'], dtype='object')
+             u'isavoid', u'AR', u'LAS', u'Pass', u'Unset', u'Total',
+             u'PRJ_ARCHIVE_UID', u'EXEC', u'PRJ_state'], dtype='object')
         self.sb_summary.repfreq = pd.np.around(
             self.sb_summary.repfreq, decimals=1)
 
