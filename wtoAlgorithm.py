@@ -172,7 +172,7 @@ class WtoAlgorithm(WtoDatabase):
         pass
 
     def set_trans(self, transmission):
-        self.trans = transmission
+        self.transmission = transmission
 
     def set_pwv(self, pwv):
         self.pwv = pwv
