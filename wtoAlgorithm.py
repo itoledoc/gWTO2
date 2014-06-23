@@ -47,7 +47,7 @@ class WtoAlgorithm(WtoDatabase):
         self.tau = pd.read_csv(
             self.wto_path + 'conf/tau.csv', sep=',', header=0).set_index('freq')
         self.tsky = pd.read_csv(
-            self.wto_path + 'conf/tsky.csv', sep=',', header=0).set_index(
+            self.wto_path + 'conf/tskyR.csv', sep=',', header=0).set_index(
                 'freq')
         self.pwvdata = pd.read_pickle(
             self.wto_path + 'conf/' + self.preferences.pwv_data).set_index(
@@ -112,12 +112,17 @@ class WtoAlgorithm(WtoDatabase):
             columns={str(self.pwv): 'tau'})
         print("SBs in sb_summary: %d. SBs merged with tau/tsky info: %d." %
               (len(self.sb_summary), len(sum2)))
-        sum2['tsys'] = (1 + sum2['g']) * \
-                       (sum2['trx'] + sum2['tsky'] * 0.95 + 0.05 * 270.) / \
-                       (0.95 * pd.np.exp(-1 * sum2['tau'] * sum2['airmass']))
+        sum2['tsys'] = (
+            1 + sum2['g']) * \
+            (sum2['trx'] + sum2['tsky'] *
+             ((1 - pd.np.exp(-1*sum2['airmass']*sum2['tau'])) /
+              (1 - pd.np.exp(-1. * sum2['tau']))) * 0.95 + 0.05 * 270.) / \
+            (0.95 * pd.np.exp(-1 * sum2['tau'] * sum2['airmass']))
         sum2['tsys_org'] = (
             1 + sum2['g']) * \
-            (sum2['trx'] + sum2['tsky_org'] * 0.95 + 0.05 * 270.) / \
+            (sum2['trx'] + sum2['tsky_org'] *
+             ((1 - pd.np.exp(-1*sum2['airmass']*sum2['tau_org'])) /
+              (1 - pd.np.exp(-1. * sum2['tau_org']))) * 0.95 + 0.05 * 270.) / \
             (0.95 * pd.np.exp(-1 * sum2['tau_org'] * sum2['airmass']))
 
         sel1 = sum2[sum2.transmission > self.transmission]
