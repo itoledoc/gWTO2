@@ -50,9 +50,9 @@
 <span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">wtoDatabase.py: the gWTO database library.</span>
 <span class="sd">------------------------------------------</span>
-<span class="sd">It retrieves and process information of ALMA Cycle 2 and Cycle 1 projects,</span>
-<span class="sd">science goals, scheduling blocks, field sources, targets and spectral</span>
-<span class="sd">configurations.</span>
+<span class="sd">This library contains the classes and functions required to query, parse and</span>
+<span class="sd">organize the Projects and SchedBlock information stored at the OSF archive in</span>
+<span class="sd">different tables.</span>
 <span class="sd">&quot;&quot;&quot;</span>
 
 <span class="n">__author__</span> <span class="o">=</span> <span class="s">&#39;itoledo&#39;</span>
@@ -77,29 +77,36 @@
 <div class="viewcode-block" id="WtoDatabase"><a class="viewcode-back" href="../index.html#wtoDatabase.WtoDatabase">[docs]</a><span class="k">class</span> <span class="nc">WtoDatabase</span><span class="p">(</span><span class="nb">object</span><span class="p">):</span>
 
     <span class="sd">&quot;&quot;&quot;</span>
-<span class="sd">    WtoDatabase initialization. It looks for the cache files at the</span>
-<span class="sd">    default path.</span>
-<span class="sd">    If the cache directory and files are present, reads the pickle files</span>
-<span class="sd">    and updates the data by querying the archive. Else, it will create all</span>
-<span class="sd">    the dataframes with the information parsed from the OSF archive.</span>
+<span class="sd">    WtoDatabase is the class that stores the Projects and SB information in</span>
+<span class="sd">    dataframes, and it also has the methods to connect and query the OSF</span>
+<span class="sd">    archive for this info.</span>
 
+<span class="sd">    A default instance will use the directory $HOME/.wto as a cache, and by</span>
+<span class="sd">    default find the approved Cycle 2 projects and carried-over Cycle 1</span>
+<span class="sd">    projects. If a file name or list are given as &#39;source&#39; parameter, only the</span>
+<span class="sd">    information of the projects in that list or filename will be ingested.</span>
+
+<span class="sd">    Setting *forcenew* to True will force the cleaning of the cache dir, and</span>
+<span class="sd">    all information will be ingested again.</span>
+
+<span class="sd">    :param path: Path for data cache.</span>
+<span class="sd">    :type path: str, default &#39;$HOME/.wto&#39;</span>
+<span class="sd">    :param source: File or list of strings with the codes of the projects</span>
+<span class="sd">    to be ingested by WtoDatabase.</span>
+<span class="sd">    :type source: list or str</span>
+<span class="sd">    :param forcenew: Force cache cleaning and reload from archive.</span>
+<span class="sd">    :type forcenew: boolean, default False</span>
 <span class="sd">    &quot;&quot;&quot;</span>
 
-    <span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">default</span><span class="o">=</span><span class="s">&#39;/.wto/&#39;</span><span class="p">,</span> <span class="n">source</span><span class="o">=</span><span class="bp">None</span><span class="p">,</span> <span class="n">forcenew</span><span class="o">=</span><span class="bp">False</span><span class="p">):</span>
+    <span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">path</span><span class="o">=</span><span class="s">&#39;/.wto/&#39;</span><span class="p">,</span> <span class="n">source</span><span class="o">=</span><span class="bp">None</span><span class="p">,</span> <span class="n">forcenew</span><span class="o">=</span><span class="bp">False</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot;</span>
 
-<span class="sd">        :param default: Path for data cache</span>
-<span class="sd">        :type default: str</span>
-<span class="sd">        :param source: File or list of strings with the codes of the projects</span>
-<span class="sd">            to be ingested by WtoDatabase</span>
-<span class="sd">        :type source: list or str</span>
-<span class="sd">        :param forcenew: Force cache cleaning and reload from archive</span>
-<span class="sd">        :type forcenew: boolean, default False</span>
+
 <span class="sd">        &quot;&quot;&quot;</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">source</span> <span class="o">=</span> <span class="n">source</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">new</span> <span class="o">=</span> <span class="n">forcenew</span>
         <span class="c"># Default Paths and Preferences</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">path</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">environ</span><span class="p">[</span><span class="s">&#39;HOME&#39;</span><span class="p">]</span> <span class="o">+</span> <span class="n">default</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">path</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">environ</span><span class="p">[</span><span class="s">&#39;HOME&#39;</span><span class="p">]</span> <span class="o">+</span> <span class="n">path</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">wto_path</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">environ</span><span class="p">[</span><span class="s">&#39;WTO&#39;</span><span class="p">]</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">sbxml</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">path</span> <span class="o">+</span> <span class="s">&#39;sbxml/&#39;</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">obsxml</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">path</span> <span class="o">+</span> <span class="s">&#39;obsxml/&#39;</span>

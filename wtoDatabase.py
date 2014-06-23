@@ -32,26 +32,32 @@ class WtoDatabase(object):
     dataframes, and it also has the methods to connect and query the OSF
     archive for this info.
 
-    A default instance will use the directory $HOME/.wto as a cache, and it will
-    automatically find the approved Cycle 2 projects and carried-over cycle 1.
+    A default instance will use the directory $HOME/.wto as a cache, and by
+    default find the approved Cycle 2 projects and carried-over Cycle 1
+    projects. If a file name or list are given as 'source' parameter, only the
+    information of the projects in that list or filename will be ingested.
 
+    Setting *forcenew* to True will force the cleaning of the cache dir, and
+    all information will be processed again.
+
+    :param path: Path for data cache.
+    :type path: str, default '$HOME/.wto'
+    :param source: File or list of strings with the codes of the projects
+    to be ingested by WtoDatabase.
+    :type source: list or str
+    :param forcenew: Force cache cleaning and reload from archive.
+    :type forcenew: boolean, default False
     """
 
-    def __init__(self, default='/.wto/', source=None, forcenew=False):
+    def __init__(self, path='/.wto/', source=None, forcenew=False):
         """
 
-        :param default: Path for data cache
-        :type default: str
-        :param source: File or list of strings with the codes of the projects
-            to be ingested by WtoDatabase
-        :type source: list or str
-        :param forcenew: Force cache cleaning and reload from archive
-        :type forcenew: boolean, default False
+
         """
         self.source = source
         self.new = forcenew
         # Default Paths and Preferences
-        self.path = os.environ['HOME'] + default
+        self.path = os.environ['HOME'] + path
         self.wto_path = os.environ['WTO']
         self.sbxml = self.path + 'sbxml/'
         self.obsxml = self.path + 'obsxml/'
@@ -170,9 +176,9 @@ class WtoDatabase(object):
         """
         Initializes the wtoDatabase dataframes.
 
-        The function queries the archive (ALMA_ONLINE.OSF.CL) to look for
-        cycle 1 and cycle 2 projects, disregarding any projects with status
-        "Approved", "Phase1Submitted", "Broken", "Canceled" or "Rejected".
+        The function queries the archive to look for cycle 1 and cycle 2
+        projects, disregarding any projects with status "Approved",
+        "Phase1Submitted", "Broken", "Canceled" or "Rejected".
 
         The archive tables used are ALMA.BMMV_OBSPROPOSAL,
         ALMA.OBS_PROJECT_STATUS, ALMA.BMMV_OBSPROJECT and
@@ -904,7 +910,9 @@ class WtoDatabase(object):
         self.sb_summary.repfreq = pd.np.around(
             self.sb_summary.repfreq, decimals=1)
 
-    def create_allsb(self, split=False):
+    def create_allsb(self, split=False, path=None):
+        if path is None:
+            path = self.path
         allsb = self.sb_summary[
             ['CODE', 'PRJ_ARCHIVE_UID', 'name', 'SB_UID', 'band', 'repfreq',
              'array', 'EXEC', 'RA', 'DEC']]
@@ -915,12 +923,12 @@ class WtoDatabase(object):
             allsb1 = allsb[allsb.CODE.str.startswith('2012')]
             allsb2 = allsb[allsb.CODE.str.startswith('2013')]
             allsb1.sort('CODE').to_csv(
-                self.path + 'allC1.sbinfo', sep='\t', header=False, index=False)
+                path + 'allC1.sbinfo', sep='\t', header=False, index=False)
             allsb2.sort('CODE').to_csv(
-                self.path + 'allC2.sbinfo', sep='\t', header=False, index=False)
+                path + 'allC2.sbinfo', sep='\t', header=False, index=False)
         else:
             allsb.sort('CODE').to_csv(
-                self.path + 'all.sbinfo', sep='\t', header=False, index=False)
+                path + 'all.sbinfo', sep='\t', header=False, index=False)
 
     def forcenew(self):
         call(['rm', '-rf', self.path])

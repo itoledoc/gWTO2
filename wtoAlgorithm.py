@@ -29,12 +29,15 @@ class WtoAlgorithm(WtoDatabase):
 
 
     """
-    def __init__(self):
+    def __init__(self, path='/.wto/', source=None, forcenew=False):
         """
 
-
+        :param path:
+        :param source:
+        :param forcenew:
+        :return:
         """
-        super(WtoAlgorithm, self).__init__()
+        super(WtoAlgorithm, self).__init__(path, source, forcenew)
         self.pwv = 1.2
         self.date = ephem.now()
         self.array_ar = 1.0
@@ -59,6 +62,7 @@ class WtoAlgorithm(WtoDatabase):
                    'ALMA_RB_04', 'ALMA_RB_08'])
         self.reciever['g'] = [0., 0., 0., 1., 0., 0.]
 
+    # noinspection PyAugmentAssignment
     def selector(self, array):
 
         """
@@ -87,42 +91,42 @@ class WtoAlgorithm(WtoDatabase):
                 array1 = ['TP-Array']
 
         pwvcol = self.pwvdata[[str(self.pwv)]]
-        s_pwv = pd.merge(
+        sum2 = pd.merge(
             self.sb_summary, pwvcol, left_on='repfreq', right_index=True)
-        s_pwv = s_pwv.rename(
+        sum2 = sum2.rename(
             columns={str(self.pwv): 'transmission'})
-        ind1 = s_pwv.repfreq
-        ind2 = pd.np.around(s_pwv.maxPWVC, decimals=1).astype(str)
-        s_pwv['tau_org'] = self.tau.lookup(ind1, ind2)
-        s_pwv['tsky_org'] = self.tsky.lookup(ind1, ind2)
-        s_pwv['airmass'] = 1/pd.np.cos(pd.np.radians(-23.0262015 - s_pwv.DEC))
-        s_pwv = pd.merge(s_pwv, self.reciever, left_on='band', right_index=True,
-                         how='left')
+        ind1 = sum2.repfreq
+        ind2 = pd.np.around(sum2.maxPWVC, decimals=1).astype(str)
+        sum2['tau_org'] = self.tau.lookup(ind1, ind2)
+        sum2['tsky_org'] = self.tsky.lookup(ind1, ind2)
+        sum2['airmass'] = 1/pd.np.cos(pd.np.radians(-23.0262015 - sum2.DEC))
+        sum2 = pd.merge(sum2, self.reciever, left_on='band', right_index=True,
+                        how='left')
         tskycol = self.tsky[[str(self.pwv)]]
-        s_pwv = pd.merge(s_pwv, tskycol, left_on='repfreq', right_index=True)
+        sum2 = pd.merge(sum2, tskycol, left_on='repfreq', right_index=True)
         taucol = self.tau[[str(self.pwv)]]
-        s_pwv = s_pwv.rename(
+        sum2 = sum2.rename(
             columns={str(self.pwv): 'tsky'})
-        s_pwv = pd.merge(s_pwv, taucol,  left_on='repfreq', right_index=True)
-        s_pwv = s_pwv.rename(
+        sum2 = pd.merge(sum2, taucol,  left_on='repfreq', right_index=True)
+        sum2 = sum2.rename(
             columns={str(self.pwv): 'tau'})
-        print("SBs in sb_summary: %d. SBs with a calculated transmission: %d." %
-              (len(self.sb_summary), len(s_pwv)))
-        s_pwv['tsys'] = (1 + s_pwv['g']) * \
-                        (s_pwv['trx'] + s_pwv['tsky'] * 0.95 + 0.05 * 270.) / \
-                        (0.95 * pd.np.exp(-1 * s_pwv['tau'] * s_pwv['airmass']))
-        s_pwv['tsys_org'] = (
-            1 + s_pwv['g']) * \
-            (s_pwv['trx'] + s_pwv['tsky_org'] * 0.95 + 0.05 * 270.) / \
-            (0.95 * pd.np.exp(-1 * s_pwv['tau_org'] * s_pwv['airmass']))
+        print("SBs in sb_summary: %d. SBs merged with tau/tsky info: %d." %
+              (len(self.sb_summary), len(sum2)))
+        sum2['tsys'] = (1 + sum2['g']) * \
+                       (sum2['trx'] + sum2['tsky'] * 0.95 + 0.05 * 270.) / \
+                       (0.95 * pd.np.exp(-1 * sum2['tau'] * sum2['airmass']))
+        sum2['tsys_org'] = (
+            1 + sum2['g']) * \
+            (sum2['trx'] + sum2['tsky_org'] * 0.95 + 0.05 * 270.) / \
+            (0.95 * pd.np.exp(-1 * sum2['tau_org'] * sum2['airmass']))
 
-        sel1 = s_pwv[s_pwv.transmission > self.transmission]
+        sel1 = sum2[sum2.transmission > self.transmission]
         print("SBs with a transmission higher than %2.1f: %d" %
               (self.transmission, len(sel1)))
 
         if array == '7m':
             sel2 = sel1[
-                (sel1.array == array1[0]) or
+                (sel1.array == array1[0]) |
                 (sel1.array == array1[1])]
         else:
             sel2 = sel1[sel1.array == array1[0]]

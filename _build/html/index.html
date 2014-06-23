@@ -93,17 +93,37 @@ pyephem and other libraries need by gWTO.</p>
 <span id="the-wto-api"></span><h1><a class="toc-backref" href="#id3">The WTO API</a><a class="headerlink" href="#module-wtoDatabase" title="Permalink to this headline">¶</a></h1>
 <div class="section" id="wtodatabase-py-the-gwto-database-library">
 <h2><a class="toc-backref" href="#id4">wtoDatabase.py: the gWTO database library.</a><a class="headerlink" href="#wtodatabase-py-the-gwto-database-library" title="Permalink to this headline">¶</a></h2>
-<p>It retrieves and process information of ALMA Cycle 2 and Cycle 1 projects,
-science goals, scheduling blocks, field sources, targets and spectral
-configurations.</p>
+<p>This library contains the classes and functions required to query, parse and
+organize the Projects and SchedBlock information stored at the OSF archive in
+different tables.</p>
 <dl class="class">
 <dt id="wtoDatabase.WtoDatabase">
-<em class="property">class </em><tt class="descclassname">wtoDatabase.</tt><tt class="descname">WtoDatabase</tt><big>(</big><em>default='/.wto/'</em>, <em>source=None</em>, <em>forcenew=False</em><big>)</big><a class="reference internal" href="_modules/wtoDatabase.html#WtoDatabase"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#wtoDatabase.WtoDatabase" title="Permalink to this definition">¶</a></dt>
-<dd><p>WtoDatabase initialization. It looks for the cache files at the
-default path.
-If the cache directory and files are present, reads the pickle files
-and updates the data by querying the archive. Else, it will create all
-the dataframes with the information parsed from the OSF archive.</p>
+<em class="property">class </em><tt class="descclassname">wtoDatabase.</tt><tt class="descname">WtoDatabase</tt><big>(</big><em>path='/.wto/'</em>, <em>source=None</em>, <em>forcenew=False</em><big>)</big><a class="reference internal" href="_modules/wtoDatabase.html#WtoDatabase"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#wtoDatabase.WtoDatabase" title="Permalink to this definition">¶</a></dt>
+<dd><p>WtoDatabase is the class that stores the Projects and SB information in
+dataframes, and it also has the methods to connect and query the OSF
+archive for this info.</p>
+<p>A default instance will use the directory $HOME/.wto as a cache, and by
+default find the approved Cycle 2 projects and carried-over Cycle 1
+projects. If a file name or list are given as &#8216;source&#8217; parameter, only the
+information of the projects in that list or filename will be ingested.</p>
+<p>Setting <em>forcenew</em> to True will force the cleaning of the cache dir, and
+all information will be ingested again.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first last simple">
+<li><strong>path</strong> (<em>str, default &#8216;$HOME/.wto&#8217;</em>) &#8211; Path for data cache.</li>
+<li><strong>source</strong> &#8211; File or list of strings with the codes of the projects</li>
+</ul>
+</td>
+</tr>
+</tbody>
+</table>
+<p>to be ingested by WtoDatabase.
+:type source: list or str
+:param forcenew: Force cache cleaning and reload from archive.
+:type forcenew: boolean, default False</p>
 <dl class="method">
 <dt id="wtoDatabase.WtoDatabase.start_wto">
 <tt class="descname">start_wto</tt><big>(</big><big>)</big><a class="reference internal" href="_modules/wtoDatabase.html#WtoDatabase.start_wto"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#wtoDatabase.WtoDatabase.start_wto" title="Permalink to this definition">¶</a></dt>
