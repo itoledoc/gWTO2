@@ -141,7 +141,7 @@ class WtoAlgorithm(WtoDatabase):
         sel2 = sel2
         sel3 = sel2[((sel2.HA > self.minha) & (sel2.HA < self.maxha)) |
                     (sel2.RA == 0.)]
-        sel3['frac'] = (sel3.tsys / sel3.tsys_org) ** 2.
+        sel3['frac'] = (sel3.tsys_org / sel3.tsys) ** 2.
         print("SBs within current HA limits (or RA=0): %d" % len(sel3))
         if array == '12m':
             self.select12m = sel3
