@@ -895,7 +895,8 @@ class WtoDatabase(object):
         df5['Total'] = df5.Pass + df5.Unset
         self.sb_summary = pd.merge(
             df5, self.obsproject[['PRJ_ARCHIVE_UID', 'EXEC',
-                                  'DOMAIN_ENTITY_STATE']],
+                                  'DOMAIN_ENTITY_STATE', 'PRJ_LETTER_GRADE',
+                                  'PRJ_SCIENTIFIC_RANK']],
             left_on='CODE', right_index=True, how='left')
         self.sb_summary.columns = pd.Index(
             [u'SB_UID', u'partId', u'name', u'repfreq', u'band', u'array',
@@ -906,7 +907,8 @@ class WtoDatabase(object):
              u'CODE', u'isSpectralScan', u'isTimeConstrained', u'startTime',
              u'endTime', u'allowedMargin', u'allowedUnits', u'repeats',
              u'isavoid', u'AR', u'LAS', u'Pass', u'Unset', u'Total',
-             u'PRJ_ARCHIVE_UID', u'EXEC', u'PRJ_state'], dtype='object')
+             u'PRJ_ARCHIVE_UID', u'EXEC', u'PRJ_state', u'grade',
+             u'scienceRank'], dtype='object')
         self.sb_summary.repfreq = pd.np.around(
             self.sb_summary.repfreq, decimals=1)
 
