@@ -85,7 +85,7 @@ __author__ = "ALMA : SL, AL, FG"
 __version__ = "0.7.2@2014.06.14"
 
 
-import sys, pickle
+import sys, pickle, os
 import math
 
 
@@ -168,8 +168,8 @@ class arrayRes:
     
     def read_cycle2(self, directory=None):
         
-        
-        directory = self.args[0] + 'conf/'
+
+        directory = os.environ['WTO'] + 'conf/'
 
         self.data = []
         
