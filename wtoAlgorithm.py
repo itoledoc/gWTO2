@@ -40,7 +40,7 @@ class WtoAlgorithm(WtoDatabase):
         super(WtoAlgorithm, self).__init__(path, source, forcenew)
         self.pwv = 1.2
         self.date = ephem.now()
-        self.array_ar = 1.0
+        self.array_ar = 0.94
         self.transmission = 0.7
         self.minha = -5.0
         self.maxha = 3.0
@@ -144,7 +144,21 @@ class WtoAlgorithm(WtoDatabase):
         sel3['frac'] = (sel3.tsys_org / sel3.tsys) ** 2.
         print("SBs within current HA limits (or RA=0): %d" % len(sel3))
         if array == '12m':
+            sel3 = sel3.query(
+                '((arrayMinAR+arrayMaxAR/1.44)/2. < %f and %f < arrayMaxAR)'
+                ' and (band != "ALMA_RB_04" and band != "ALMA_RB_08") '
+                'and SB_state != "Phase2Submitted" and array=="TWELVE-M"' %
+                (self.array_ar, self.array_ar))
+            print("SBs for current 12m Array AR: %d." % len(sel3))
             self.select12m = sel3
+            special = self.select12m.query(
+                'PRJ_state != "Completed" and SB_state != "FullyObserved"')
+            special = special[
+                special.name.str.contains('not', case=False) == False]
+            special = special[special.isPolarization == False]
+            special[['SB_UID', 'name']].to_csv(
+                self.path + 'special.sbinfo', header=False, index=False,
+                sep=' ')
         elif array == '7m':
             self.select7m = sel3
         else:
@@ -167,4 +181,13 @@ class WtoAlgorithm(WtoDatabase):
         self.date = date
 
     def set_arrayar(self, ar):
+        self.array_ar = ar
+
+    def set_minha(self, ha):
+        self.minha = ha
+
+    def set_maxha(self, ha):
+        self.maxha = ha
+
+    def set_array_ar(self, ar):
         self.array_ar = ar
