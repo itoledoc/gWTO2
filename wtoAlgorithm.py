@@ -3,6 +3,11 @@ __author__ = 'itoledo'
 import pandas as pd
 import ephem
 from wtoDatabase import WtoDatabase
+import sys
+import os
+import ruvTest as ruv
+
+
 
 SSO = ['Moon', 'Sun', 'Mercury', 'Venus', 'Mars', 'Jupiter', 'Saturn',
        'Uranus', 'Neptune', 'Pluto']
@@ -196,3 +201,73 @@ class WtoAlgorithm(WtoDatabase):
 
     def set_array_ar(self, ar):
         self.array_ar = ar
+
+    def query_arrays(self):
+        a = str(
+            "with t1 as ( "
+            "select se.SE_TIMESTAMP ts1, sa.SLOG_ATTR_VALUE av1, se.SE_ID se1 "
+            "from ALMA.SHIFTLOG_ENTRIES se, ALMA.SLOG_ENTRY_ATTR sa "
+            "WHERE se.SE_TYPE=7 and se.SE_TIMESTAMP > SYSDATE - 1/4. "
+            "and sa.SLOG_SE_ID = se.SE_ID and sa.SLOG_ATTR_TYPE = 32 "
+            "and se.SE_LOCATION='OSF-AOS'), "
+            "t2 as ( "
+            "select sa.SLOG_ATTR_VALUE av2, se.SE_ID se2 "
+            "from ALMA.SHIFTLOG_ENTRIES se, ALMA.SLOG_ENTRY_ATTR sa "
+            "WHERE se.SE_TYPE=7 and se.SE_TIMESTAMP > SYSDATE - 1/4. "
+            "and sa.SLOG_SE_ID = se.SE_ID and sa.SLOG_ATTR_TYPE = 39 "
+            "and se.SE_LOCATION='OSF-AOS' "
+            ") "
+            "select t1.*, t2.av2 from t1,t2 where t1.se1 = t2.se2 "
+            "and av2 = 'BL'"
+        )
+        try:
+            self.cursor.execute(a)
+            self.bl_arrays = pd.DataFrame(
+                self.cursor.fetchall(),
+                columns=[rec[0] for rec in self.cursor.description]
+            ).sort('TS1', ascending=False)
+        except ValueError:
+            self.bl_arrays = pd.DataFrame(
+                columns=pd.Index(
+                    [u'TS1', u'AV1', u'SE1', u'AV2'], dtype='object'))
+            print "No BL arrays have been created in the last 6 hours."
+        b = str(
+            "WITH t1 AS ( "
+            "select se.SE_TIMESTAMP ts1, sa.SLOG_ATTR_VALUE av1, se.SE_ID se1 "
+            "from ALMA.SHIFTLOG_ENTRIES se, ALMA.SLOG_ENTRY_ATTR sa "
+            "WHERE se.SE_TYPE=7 and se.SE_TIMESTAMP > SYSDATE - 1/4. "
+            "and sa.SLOG_SE_ID = se.SE_ID and sa.SLOG_ATTR_TYPE = 32 "
+            "and se.SE_LOCATION='OSF-AOS'), "
+            "t2 as ( "
+            "select sa.SLOG_ATTR_VALUE av2, se.SE_ID se2 "
+            "from ALMA.SHIFTLOG_ENTRIES se, ALMA.SLOG_ENTRY_ATTR sa "
+            "WHERE se.SE_TYPE=7 and se.SE_TIMESTAMP > SYSDATE - 1/4. "
+            "and sa.SLOG_SE_ID = se.SE_ID and sa.SLOG_ATTR_TYPE = 39 "
+            "and se.SE_LOCATION='OSF-AOS' "
+            ") "
+            "select t1.*, t2.av2 from t1,t2 where t1.se1 = t2.se2 "
+            "and av2 = 'ACA'"
+        )
+        try:
+            self.cursor.execute(b)
+            self.aca_arrays = pd.DataFrame(
+                self.cursor.fetchall(),
+                columns=[rec[0] for rec in self.cursor.description]
+            ).sort('TS1', ascending=False)
+        except ValueError:
+            self.aca_arrays = pd.DataFrame(
+                columns=pd.Index(
+                    [u'TS1', u'AV1', u'SE1', u'AV2'], dtype='object'))
+            print "No ACA arrays have been created in the last 6 hours."
+
+    def set_bl_prop(self, array_type, array_name):
+        if array_type == 'BL':
+            id1 = self.bl_arrays.query('AV1 == "%s"' % array_name).iloc[0].SE1
+        else:
+            id1 = self.aca_arrays.query('AV1 == "%s"' % array_name).iloc[0].SE1
+
+        a = str("SELECT SLOG_ATTR_VALUE FROM ALMA.SLOG_ENTRY_ATTR"
+                "WHERE SLOG_ATTR_TYPE = 31 "
+                "AND SLOG_SE_ID=%d" % id1)
+        self.cursor.execute(a)
+        return pd.DataFrame(self.cursor.fetchall()).iloc[:, 0].tolist()
