@@ -3,9 +3,10 @@ __author__ = 'itoledo'
 import pandas as pd
 import ephem
 from wtoDatabase import WtoDatabase
+from lxml import objectify
 import sys
 import os
-import ruvTest as ruv
+import ruvTest as rUV
 
 
 
@@ -66,9 +67,18 @@ class WtoAlgorithm(WtoDatabase):
             index=['ALMA_RB_06', 'ALMA_RB_03', 'ALMA_RB_07', 'ALMA_RB_09',
                    'ALMA_RB_04', 'ALMA_RB_08'])
         self.reciever['g'] = [0., 0., 0., 1., 0., 0.]
+        io_file = open(self.wto_path + 'conf/ArrayConfiguration.xml')
+        tree = objectify.parse(io_file)
+        antfile = tree.getroot()
+        io_file.close()
+        self.antennas = pd.DataFrame(columns=['pad', 'antenna'])
+        for n in range(len(antfile.AntennaOnPad)):
+            p = antfile.AntennaOnPad[n].attrib['pad']
+            a = antfile.AntennaOnPad[n].attrib['antenna']
+            self.antennas.loc[n] = (p, a)
 
     # noinspection PyAugmentAssignment
-    def selector(self, array):
+    def selector(self, array, array_name=None):
 
         """
         Selects SBs that can be observed given the current weather conditions,
@@ -94,6 +104,9 @@ class WtoAlgorithm(WtoDatabase):
                 array1 = ['SEVEN-M', 'ACA']
             else:
                 array1 = ['TP-Array']
+        if array_name is not None:
+            self.set_bl_prop(array_name=array_name)
+            self.array_ar = 61800 / (100.0 * self.ruv.max())
 
         pwvcol = self.pwvdata[[str(self.pwv)]]
         sum2 = pd.merge(
@@ -151,7 +164,7 @@ class WtoAlgorithm(WtoDatabase):
         sel2 = sel2
         sel3 = sel2[((sel2.HA > self.minha) & (sel2.HA < self.maxha)) |
                     (sel2.RA == 0.)]
-        sel3['frac'] = (sel3.tsys_org / sel3.tsys) ** 2.
+        sel3['tsysfrac'] = (sel3.tsys_org / sel3.tsys) ** 2.
         print("SBs within current HA limits (or RA=0): %d" % len(sel3))
         if array == '12m':
             sel3 = sel3.query(
@@ -160,9 +173,17 @@ class WtoAlgorithm(WtoDatabase):
                 'and SB_state != "Phase2Submitted" and array=="TWELVE-M"' %
                 (self.array_ar, self.array_ar))
             print("SBs for current 12m Array AR: %d." % len(sel3))
+            sel3['blmax'] = sel3.apply(
+                lambda row: rUV.computeBL(row['AR'], row['repfreq']), axis=1)
+            sel3['blfrac'] = sel3.apply(
+                lambda row: 1.*len(
+                    self.ruv[self.ruv < row['blmax']]) / (17. * 34.)
+                if (row['LAS'] != 0) else 1., axis=1)
+            sel3['frac'] = sel3.tsysfrac * sel3.blfrac
             self.select12m = sel3
             special = self.select12m.query(
-                'PRJ_state != "Completed" and SB_state != "FullyObserved"')
+                'PRJ_state != "Completed" and SB_state != "FullyObserved"'
+                ' and SB_state != "Deleted"')
             special = special[
                 special.name.str.contains('not', case=False) == False]
             special = special[special.isPolarization == False]
@@ -207,13 +228,13 @@ class WtoAlgorithm(WtoDatabase):
             "with t1 as ( "
             "select se.SE_TIMESTAMP ts1, sa.SLOG_ATTR_VALUE av1, se.SE_ID se1 "
             "from ALMA.SHIFTLOG_ENTRIES se, ALMA.SLOG_ENTRY_ATTR sa "
-            "WHERE se.SE_TYPE=7 and se.SE_TIMESTAMP > SYSDATE - 1/4. "
+            "WHERE se.SE_TYPE=7 and se.SE_TIMESTAMP > SYSDATE - 1/1. "
             "and sa.SLOG_SE_ID = se.SE_ID and sa.SLOG_ATTR_TYPE = 32 "
             "and se.SE_LOCATION='OSF-AOS'), "
             "t2 as ( "
             "select sa.SLOG_ATTR_VALUE av2, se.SE_ID se2 "
             "from ALMA.SHIFTLOG_ENTRIES se, ALMA.SLOG_ENTRY_ATTR sa "
-            "WHERE se.SE_TYPE=7 and se.SE_TIMESTAMP > SYSDATE - 1/4. "
+            "WHERE se.SE_TYPE=7 and se.SE_TIMESTAMP > SYSDATE - 1/1. "
             "and sa.SLOG_SE_ID = se.SE_ID and sa.SLOG_ATTR_TYPE = 39 "
             "and se.SE_LOCATION='OSF-AOS' "
             ") "
@@ -235,13 +256,13 @@ class WtoAlgorithm(WtoDatabase):
             "WITH t1 AS ( "
             "select se.SE_TIMESTAMP ts1, sa.SLOG_ATTR_VALUE av1, se.SE_ID se1 "
             "from ALMA.SHIFTLOG_ENTRIES se, ALMA.SLOG_ENTRY_ATTR sa "
-            "WHERE se.SE_TYPE=7 and se.SE_TIMESTAMP > SYSDATE - 1/4. "
+            "WHERE se.SE_TYPE=7 and se.SE_TIMESTAMP > SYSDATE - 1/1. "
             "and sa.SLOG_SE_ID = se.SE_ID and sa.SLOG_ATTR_TYPE = 32 "
             "and se.SE_LOCATION='OSF-AOS'), "
             "t2 as ( "
             "select sa.SLOG_ATTR_VALUE av2, se.SE_ID se2 "
             "from ALMA.SHIFTLOG_ENTRIES se, ALMA.SLOG_ENTRY_ATTR sa "
-            "WHERE se.SE_TYPE=7 and se.SE_TIMESTAMP > SYSDATE - 1/4. "
+            "WHERE se.SE_TYPE=7 and se.SE_TIMESTAMP > SYSDATE - 1/1. "
             "and sa.SLOG_SE_ID = se.SE_ID and sa.SLOG_ATTR_TYPE = 39 "
             "and se.SE_LOCATION='OSF-AOS' "
             ") "
@@ -260,14 +281,22 @@ class WtoAlgorithm(WtoDatabase):
                     [u'TS1', u'AV1', u'SE1', u'AV2'], dtype='object'))
             print "No ACA arrays have been created in the last 6 hours."
 
-    def set_bl_prop(self, array_type, array_name):
-        if array_type == 'BL':
-            id1 = self.bl_arrays.query('AV1 == "%s"' % array_name).iloc[0].SE1
-        else:
-            id1 = self.aca_arrays.query('AV1 == "%s"' % array_name).iloc[0].SE1
+    def set_bl_prop(self, array_name):
+        id1 = self.bl_arrays.query('AV1 == "%s"' % array_name).iloc[0].SE1
 
-        a = str("SELECT SLOG_ATTR_VALUE FROM ALMA.SLOG_ENTRY_ATTR"
+        a = str("SELECT SLOG_ATTR_VALUE FROM ALMA.SLOG_ENTRY_ATTR "
                 "WHERE SLOG_ATTR_TYPE = 31 "
                 "AND SLOG_SE_ID=%d" % id1)
         self.cursor.execute(a)
-        return pd.DataFrame(self.cursor.fetchall()).iloc[:, 0].tolist()
+        ap = pd.DataFrame(self.cursor.fetchall(), columns=['antenna'])
+        ap = ap[ap.antenna.str.contains('CM') == False]
+        conf = pd.merge(self.antennas, ap,
+                        left_on='antenna', right_on='antenna')
+        conf_file = self.path + '%s.txt' % array_name
+        conf.to_csv(conf_file, header=False,
+                    index=False, sep=' ')
+        ac = rUV.ac.ArrayConfigurationCasaFile()
+        ac.createCasaConfig(conf_file)
+        self.ruv = rUV.computeRuv(conf_file + ".cfg")
+        self.num_bl = len(self.ruv)
+        self.num_ant = len(ap)
