@@ -178,7 +178,8 @@ class WtoAlgorithm(WtoDatabase):
                 ' and (band != "ALMA_RB_04" and band != "ALMA_RB_08") '
                 'and SB_state != "Phase2Submitted" and array=="TWELVE-M"' %
                 (self.array_ar, self.array_ar))
-            print("SBs for current 12m Array AR: %d." % len(sel3))
+            print("SBs for current 12m Array AR: %d. (AR=%d, #bl=%d, #ant=%d)" %
+                  (len(sel3), self.array_ar, self.num_bl, self.num_ant))
             sel3['blmax'] = sel3.apply(
                 lambda row: rUV.computeBL(row['AR'], row['repfreq']), axis=1)
             sel3['blfrac'] = sel3.apply(
