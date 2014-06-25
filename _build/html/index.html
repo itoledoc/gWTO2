@@ -83,7 +83,7 @@
 <p>gWTO is tested and deployed at the osf-red machine, within the aod account.
 A virtual environment of python, based on the Anaconda distribution, must be
 loaded before using it. This is achieved by running::</p>
-<div class="highlight-python"><div class="highlight"><pre>. activate
+<div class="highlight-python"><div class="highlight"><pre>. activateC2Test
 </pre></div>
 </div>
 <p>The Anaconda distribution is based on python 2.7.6 and includes numpy, pandas,
@@ -107,7 +107,7 @@ default find the approved Cycle 2 projects and carried-over Cycle 1
 projects. If a file name or list are given as &#8216;source&#8217; parameter, only the
 information of the projects in that list or filename will be ingested.</p>
 <p>Setting <em>forcenew</em> to True will force the cleaning of the cache dir, and
-all information will be ingested again.</p>
+all information will be processed again.</p>
 <table class="docutils field-list" frame="void" rules="none">
 <col class="field-name" />
 <col class="field-body" />
@@ -128,9 +128,9 @@ all information will be ingested again.</p>
 <dt id="wtoDatabase.WtoDatabase.start_wto">
 <tt class="descname">start_wto</tt><big>(</big><big>)</big><a class="reference internal" href="_modules/wtoDatabase.html#WtoDatabase.start_wto"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#wtoDatabase.WtoDatabase.start_wto" title="Permalink to this definition">¶</a></dt>
 <dd><p>Initializes the wtoDatabase dataframes.</p>
-<p>The function queries the archive (ALMA_ONLINE.OSF.CL) to look for
-cycle 1 and cycle 2 projects, disregarding any projects with status
-&#8220;Approved&#8221;, &#8220;Phase1Submitted&#8221;, &#8220;Broken&#8221;, &#8220;Canceled&#8221; or &#8220;Rejected&#8221;.</p>
+<p>The function queries the archive to look for cycle 1 and cycle 2
+projects, disregarding any projects with status &#8220;Approved&#8221;,
+&#8220;Phase1Submitted&#8221;, &#8220;Broken&#8221;, &#8220;Canceled&#8221; or &#8220;Rejected&#8221;.</p>
 <p>The archive tables used are ALMA.BMMV_OBSPROPOSAL,
 ALMA.OBS_PROJECT_STATUS, ALMA.BMMV_OBSPROJECT and
 ALMA.XML_OBSPROJECT_ENTITIES.</p>
@@ -149,10 +149,10 @@ ALMA.XML_OBSPROJECT_ENTITIES.</p>
 </div>
 <span class="target" id="module-wtoAlgorithm"></span><dl class="class">
 <dt id="wtoAlgorithm.WtoAlgorithm">
-<em class="property">class </em><tt class="descclassname">wtoAlgorithm.</tt><tt class="descname">WtoAlgorithm</tt><a class="reference internal" href="_modules/wtoAlgorithm.html#WtoAlgorithm"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#wtoAlgorithm.WtoAlgorithm" title="Permalink to this definition">¶</a></dt>
+<em class="property">class </em><tt class="descclassname">wtoAlgorithm.</tt><tt class="descname">WtoAlgorithm</tt><big>(</big><em>path='/.wto/'</em>, <em>source=None</em>, <em>forcenew=False</em><big>)</big><a class="reference internal" href="_modules/wtoAlgorithm.html#WtoAlgorithm"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#wtoAlgorithm.WtoAlgorithm" title="Permalink to this definition">¶</a></dt>
 <dd><dl class="method">
 <dt id="wtoAlgorithm.WtoAlgorithm.selector">
-<tt class="descname">selector</tt><big>(</big><em>array</em><big>)</big><a class="reference internal" href="_modules/wtoAlgorithm.html#WtoAlgorithm.selector"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#wtoAlgorithm.WtoAlgorithm.selector" title="Permalink to this definition">¶</a></dt>
+<tt class="descname">selector</tt><big>(</big><em>array</em>, <em>array_name=None</em><big>)</big><a class="reference internal" href="_modules/wtoAlgorithm.html#WtoAlgorithm.selector"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#wtoAlgorithm.WtoAlgorithm.selector" title="Permalink to this definition">¶</a></dt>
 <dd><p>Selects SBs that can be observed given the current weather conditions,
 HA range, array type and array configuration (in the case of 12m array
 type) and SB/Project Status. To limit the calculation of pyephem, the

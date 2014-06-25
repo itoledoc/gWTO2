@@ -1,0 +1,27 @@
+=== Array Configuration Summary ==== 
+
+Input file : /home/itoledo/Downloads/2014-06-23.cfg 
+Nant : 37 
+Declination (Degree): -23.00 
+Duration : 2h 
+Frequency (GHz) : 100.0 
+Minimum Proj. BL (meters) : 19.651715 
+Maximum Proj. BL (meters) : 650.305898 
+RMS (meters) : 284.38 
+Shadowing fraction (%): 0.0 
+minor beam (arcsec) : 0.9147 
+major beam (arcsec) : 0.9716 
+Spatial resolution (arcsec) : 0.9427 
+Weighting : briggs 
+Sidelobe level (%) : 8.4 
+PA beam (degree): 100.4 
+LAS (arcsec) : 18.8788 
+
+Matching with  ACA-std.cfg:   1.5 %   (uv-overlap: 19.7 m -- 32.1 m)
+Matching with    C34-1.cfg:  22.6 %   (uv-overlap: 19.7 m -- 165.6 m)
+Matching with    C34-2.cfg:  43.1 %   (uv-overlap: 19.7 m -- 303.6 m)
+Matching with    C34-3.cfg:  59.9 %   (uv-overlap: 21.0 m -- 442.7 m)
+Matching with    C34-4.cfg:  67.1 %   (uv-overlap: 21.0 m -- 558.2 m)
+Matching with    C34-5.cfg:  71.6 %   (uv-overlap: 25.9 m -- 650.3 m)
+Matching with    C34-6.cfg:  60.5 %   (uv-overlap: 42.1 m -- 650.3 m)
+Matching with    C34-7.cfg:  58.1 %   (uv-overlap: 42.1 m -- 650.3 m)

@@ -71,11 +71,12 @@ class WtoAlgorithm(WtoDatabase):
         tree = objectify.parse(io_file)
         antfile = tree.getroot()
         io_file.close()
-        self.antennas = pd.DataFrame(columns=['pad', 'antenna'])
+        self.antpad = pd.DataFrame(columns=['pad', 'antenna'])
         for n in range(len(antfile.AntennaOnPad)):
             p = antfile.AntennaOnPad[n].attrib['pad']
             a = antfile.AntennaOnPad[n].attrib['antenna']
-            self.antennas.loc[n] = (p, a)
+            self.antpad.loc[n] = (p, a)
+        self.query_arrays()
 
     # noinspection PyAugmentAssignment
     def selector(self, array, array_name=None):
@@ -93,6 +94,8 @@ class WtoAlgorithm(WtoDatabase):
         :param array: '12m', '7m', 'tp'
         :type array: str
         """
+        # TODO: add a 5% padding to fraction selection.
+        # TODO: check with Jorge Garcia the rms fraction against reality.
 
         if array not in ['12m', '7m', 'tp']:
             print("Use 12m, 7m or tp for array selection.")
@@ -104,8 +107,11 @@ class WtoAlgorithm(WtoDatabase):
                 array1 = ['SEVEN-M', 'ACA']
             else:
                 array1 = ['TP-Array']
+
         if array_name is not None:
             self.set_bl_prop(array_name=array_name)
+        else:
+            self.set_bl_prop(array_name=None)
             self.array_ar = 61800 / (100.0 * self.ruv.max())
 
         pwvcol = self.pwvdata[[str(self.pwv)]]
@@ -164,7 +170,7 @@ class WtoAlgorithm(WtoDatabase):
         sel2 = sel2
         sel3 = sel2[((sel2.HA > self.minha) & (sel2.HA < self.maxha)) |
                     (sel2.RA == 0.)]
-        sel3['tsysfrac'] = (sel3.tsys_org / sel3.tsys) ** 2.
+        sel3['tsysfrac'] = (sel3.tsys / sel3.tsys_org) ** 2.
         print("SBs within current HA limits (or RA=0): %d" % len(sel3))
         if array == '12m':
             sel3 = sel3.query(
@@ -176,9 +182,9 @@ class WtoAlgorithm(WtoDatabase):
             sel3['blmax'] = sel3.apply(
                 lambda row: rUV.computeBL(row['AR'], row['repfreq']), axis=1)
             sel3['blfrac'] = sel3.apply(
-                lambda row: 1.*len(
-                    self.ruv[self.ruv < row['blmax']]) / (17. * 34.)
-                if (row['LAS'] != 0) else 1., axis=1)
+                lambda row: (33. * 17) / (1.*len(
+                    self.ruv[self.ruv < row['blmax']]))
+                if (row['LAS'] != 0) else (33. * 17) / self.num_ant, axis=1)
             sel3['frac'] = sel3.tsysfrac * sel3.blfrac
             self.select12m = sel3
             special = self.select12m.query(
@@ -282,21 +288,38 @@ class WtoAlgorithm(WtoDatabase):
             print "No ACA arrays have been created in the last 6 hours."
 
     def set_bl_prop(self, array_name):
-        id1 = self.bl_arrays.query('AV1 == "%s"' % array_name).iloc[0].SE1
 
-        a = str("SELECT SLOG_ATTR_VALUE FROM ALMA.SLOG_ENTRY_ATTR "
-                "WHERE SLOG_ATTR_TYPE = 31 "
-                "AND SLOG_SE_ID=%d" % id1)
-        self.cursor.execute(a)
-        ap = pd.DataFrame(self.cursor.fetchall(), columns=['antenna'])
-        ap = ap[ap.antenna.str.contains('CM') == False]
-        conf = pd.merge(self.antennas, ap,
-                        left_on='antenna', right_on='antenna')
-        conf_file = self.path + '%s.txt' % array_name
-        conf.to_csv(conf_file, header=False,
-                    index=False, sep=' ')
-        ac = rUV.ac.ArrayConfigurationCasaFile()
-        ac.createCasaConfig(conf_file)
-        self.ruv = rUV.computeRuv(conf_file + ".cfg")
-        self.num_bl = len(self.ruv)
-        self.num_ant = len(ap)
+        if array_name is not None and len(self.bl_arrays) != 0:
+            id1 = self.bl_arrays.query('AV1 == "%s"' % array_name).iloc[0].SE1
+
+            a = str("SELECT SLOG_ATTR_VALUE FROM ALMA.SLOG_ENTRY_ATTR "
+                    "WHERE SLOG_ATTR_TYPE = 31 "
+                    "AND SLOG_SE_ID=%d" % id1)
+            self.cursor.execute(a)
+            ap = pd.DataFrame(self.cursor.fetchall(), columns=['antenna'])
+            ap = ap[ap.antenna.str.contains('CM') == False]
+            conf = pd.merge(self.antpad, ap,
+                            left_on='antenna', right_on='antenna')
+            conf_file = self.path + '%s.txt' % array_name
+            conf.to_csv(conf_file, header=False,
+                        index=False, sep=' ')
+            ac = rUV.ac.ArrayConfigurationCasaFile()
+            ac.createCasaConfig(conf_file)
+            self.ruv = rUV.computeRuv(conf_file + ".cfg")
+            self.num_bl = len(self.ruv)
+            self.num_ant = len(ap)
+        else:
+            conf_file = self.wto_path + 'conf/default.txt'
+            io_file = open(self.wto_path + 'conf/arrayConfigurationResults.txt')
+            self.array_ar = float(io_file.readlines()[13].split(':')[1])
+            ac = rUV.ac.ArrayConfigurationCasaFile()
+            ac.createCasaConfig(conf_file)
+            self.ruv = rUV.computeRuv(conf_file + ".cfg")
+            if len(self.ruv) > 33. * 17.:
+                self.ruv = self.ruv[-561:]
+                self.numb_bl = len(self.ruv)
+                self.num_ant = 34.
+            else:
+                self.num_bl = len(self.ruv)
+                self.num_ant = int((1 + pd.np.sqrt(1 + 8 * self.num_bl)) / 2.)
+
