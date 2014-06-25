@@ -103,16 +103,17 @@ class WtoAlgorithm(WtoDatabase):
         else:
             if array == '12m':
                 array1 = ['TWELVE-M']
+                if array_name is not None:
+                    self.set_bl_prop(array_name=array_name)
+                    self.array_ar = 61800 / (100.0 * self.ruv.max())
+                else:
+                    self.set_bl_prop(array_name=None)
             elif array == '7m':
                 array1 = ['SEVEN-M', 'ACA']
             else:
                 array1 = ['TP-Array']
 
-        if array_name is not None:
-            self.set_bl_prop(array_name=array_name)
-        else:
-            self.set_bl_prop(array_name=None)
-            self.array_ar = 61800 / (100.0 * self.ruv.max())
+
 
         pwvcol = self.pwvdata[[str(self.pwv)]]
         sum2 = pd.merge(
@@ -159,6 +160,7 @@ class WtoAlgorithm(WtoDatabase):
                 (sel1.array == array1[1])]
         else:
             sel2 = sel1[sel1.array == array1[0]]
+
         print("SBs for %s array: %d" % (array, len(sel2)))
 
         self.alma.date = self.date
@@ -178,7 +180,8 @@ class WtoAlgorithm(WtoDatabase):
                 ' and (band != "ALMA_RB_04" and band != "ALMA_RB_08") '
                 'and SB_state != "Phase2Submitted" and array=="TWELVE-M"' %
                 (self.array_ar, self.array_ar))
-            print("SBs for current 12m Array AR: %d. (AR=%d, #bl=%d, #ant=%d)" %
+            print("SBs for current 12m Array AR: %d. "
+                  "(AR=%.2f, #bl=%d, #ant=%d)" %
                   (len(sel3), self.array_ar, self.num_bl, self.num_ant))
             sel3['blmax'] = sel3.apply(
                 lambda row: rUV.computeBL(row['AR'], row['repfreq']), axis=1)
@@ -289,7 +292,7 @@ class WtoAlgorithm(WtoDatabase):
             print "No ACA arrays have been created in the last 6 hours."
 
     def set_bl_prop(self, array_name):
-
+        # TODO: check uv coverage to remove baselines that are outliers
         if array_name is not None and len(self.bl_arrays) != 0:
             id1 = self.bl_arrays.query('AV1 == "%s"' % array_name).iloc[0].SE1
 
@@ -318,9 +321,8 @@ class WtoAlgorithm(WtoDatabase):
             self.ruv = rUV.computeRuv(conf_file + ".cfg")
             if len(self.ruv) > 33. * 17.:
                 self.ruv = self.ruv[-561:]
-                self.numb_bl = len(self.ruv)
+                self.num_bl = len(self.ruv)
                 self.num_ant = 34.
             else:
                 self.num_bl = len(self.ruv)
                 self.num_ant = int((1 + pd.np.sqrt(1 + 8 * self.num_bl)) / 2.)
-
