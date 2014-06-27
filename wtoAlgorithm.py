@@ -50,10 +50,15 @@ class WtoAlgorithm(WtoDatabase):
         super(WtoAlgorithm, self).__init__(path, source, forcenew)
         self.pwv = 1.2
         self.date = ephem.now()
+        self.old_date = 0
         self.array_ar = 0.94
         self.transmission = 0.7
         self.minha = -5.0
         self.maxha = 3.0
+        self.minfrac = 0.75
+        self.maxfrac = 1.3
+        self.horizon = 30.
+
         self.tau = pd.read_csv(
             self.wto_path + 'conf/tau.csv', sep=',', header=0).set_index('freq')
         self.tsky = pd.read_csv(
@@ -64,7 +69,7 @@ class WtoAlgorithm(WtoDatabase):
                 'freq')
         self.pwvdata.index = pd.Float64Index(
             pd.np.round(self.pwvdata.index, decimals=1), dtype='float64')
-        self.alma = alma
+        self.alma = alma1
         self.reciever = pd.DataFrame(
             [55., 45., 75., 110., 51., 150.],
             columns=['trx'],
@@ -82,6 +87,63 @@ class WtoAlgorithm(WtoDatabase):
             self.antpad.loc[n] = (p, a)
         self.query_arrays()
 
+    def check_observability(self):
+        if self.date == self.old_date:
+            pass
+        alma1.date = self.date
+        fs = self.fieldsource.apply(
+            lambda r: observable(
+                r['solarSystem'], r['sourcename'], r['RA'], r['DEC'],
+                self.horizon, r['isQuery'], r['ephemeris'], alma=alma1),
+            axis=1)
+        df_fs = pd.DataFrame(
+            fs.values.tolist(),
+            index=fs.index,
+            columns=['RA', 'DEC', 'elev', 'remaining', 'rise', 'sets', 'lstr',
+                     'lsts', 'observable'])
+        print len(df_fs)
+        fs_1 = pd.merge(
+            self.fieldsource[['fieldRef', 'SB_UID', 'isQuery']],
+            df_fs, left_index=True, right_index=True,
+            how='left')
+        print len(fs_1)
+        fs_1g = fs_1.query('isQuery == False').groupby('SB_UID')
+        allup = pd.DataFrame(
+            fs_1g.observable.mean())
+        allup.columns = pd.Index([u'up'])
+        print len(allup)
+        fs_2 = pd.merge(fs_1, allup, left_on='SB_UID', right_index=True,
+                        how='left')
+        print len(fs_2)
+        fs_2g = fs_2.query('isQuery == False').groupby('SB_UID')
+        etime = pd.DataFrame(
+            fs_2g.remaining.min()[fs_2g.remaining.min() > 1.5])
+        etime.columns = pd.Index([u'etime'])
+
+        elevation = pd.DataFrame(
+            fs_2g.elev.mean())
+        elevation.columns = pd.Index([u'elev'])
+
+        lstr = pd.DataFrame(
+            fs_2g.lstr.max())
+        lstr.columns = pd.Index([u'lstr'])
+
+        lsts = pd.DataFrame(
+            fs_2g.lsts.max())
+        lsts.columns = pd.Index([u'lsts'])
+
+        fs_3 = pd.merge(allup, etime, right_index=True, left_index=True,
+                        how='left')
+        print len(fs_3)
+        fs_4 = pd.merge(fs_3, elevation, right_index=True,
+                        left_index=True, how='left')
+        print len(fs_4)
+        fs_5 = pd.merge(fs_4, lstr, right_index=True,
+                        left_index=True, how='left')
+        print len(fs_5)
+        self.obser_prop = pd.merge(fs_5, lsts, right_index=True,
+                                   left_index=True, how='left')
+        self.old_date = self.date
     # noinspection PyAugmentAssignment
     def selector(self, array, array_name=None):
 
@@ -100,6 +162,10 @@ class WtoAlgorithm(WtoDatabase):
         """
         # TODO: add a 5% padding to fraction selection.
         # TODO: check with Jorge Garcia the rms fraction against reality.
+
+        print("Calculating observability for %d sources..." %
+              len(self.fieldsource))
+        self.check_observability()
 
         if array not in ['12m', '7m', 'tp']:
             print("Use 12m, 7m or tp for array selection.")
@@ -139,6 +205,7 @@ class WtoAlgorithm(WtoDatabase):
             columns={str(self.pwv): 'tau'})
         print("SBs in sb_summary: %d. SBs merged with tau/tsky info: %d." %
               (len(self.sb_summary), len(sum2)))
+
         sum2['tsys'] = (
             1 + sum2['g']) * \
             (sum2['trx'] + sum2['tsky'] *
@@ -153,6 +220,7 @@ class WtoAlgorithm(WtoDatabase):
             (0.95 * pd.np.exp(-1 * sum2['tau_org'] * sum2['airmass']))
 
         sel1 = sum2[sum2.transmission > self.transmission]
+
         print("SBs with a transmission higher than %2.1f: %d" %
               (self.transmission, len(sel1)))
 
@@ -176,27 +244,32 @@ class WtoAlgorithm(WtoDatabase):
                     (sel2.RA == 0.)]
         sel3['tsysfrac'] = (sel3.tsys / sel3.tsys_org) ** 2.
         print("SBs within current HA limits (or RA=0): %d" % len(sel3))
+
+        sel4 = pd.merge(sel3, self.obser_prop, left_on='SB_UID',
+                        right_index=True)
+        sel4 = sel4.query('up == 1 and etime > 1.5')
+        print("SBs over %d degrees, 1.5 hours: %d" % (self.horizon, len(sel4)))
         if array == '12m':
-            sel3 = sel3.query(
+            sel4 = sel4.query(
                 '((arrayMinAR+arrayMaxAR/1.44)/2. < %f and %f < arrayMaxAR)'
                 ' and (band != "ALMA_RB_04" and band != "ALMA_RB_08") '
                 'and SB_state != "Phase2Submitted" and array=="TWELVE-M"' %
                 (self.array_ar, self.array_ar))
             print("SBs for current 12m Array AR: %d. "
                   "(AR=%.2f, #bl=%d, #ant=%d)" %
-                  (len(sel3), self.array_ar, self.num_bl, self.num_ant))
-            sel3['blmax'] = sel3.apply(
+                  (len(sel4), self.array_ar, self.num_bl, self.num_ant))
+            sel4['blmax'] = sel4.apply(
                 lambda row: rUV.computeBL(row['AR'], row['repfreq']), axis=1)
-            sel3['blfrac'] = sel3.apply(
+            sel4['blfrac'] = sel4.apply(
                 lambda row: (33. * 17) / (1.*len(
                     self.ruv[self.ruv < row['blmax']]))
                 if (row['LAS'] != 0) else (33. * 17) / self.num_ant, axis=1)
-            sel3['frac'] = sel3.tsysfrac * sel3.blfrac
-            self.select12m = sel3
+            sel4['frac'] = sel4.tsysfrac * sel4.blfrac
+            self.select12m = sel4
             special = self.select12m.query(
                 'PRJ_state != "Completed" and SB_state != "FullyObserved"'
                 ' and SB_state != "Deleted" and isTimeConstrained == False'
-                ' and blfrac < 1.4')
+                ' and frac < 1.3')
             special = special[
                 special.name.str.contains('not', case=False) == False]
             special = special[special.isPolarization == False]
@@ -204,17 +277,15 @@ class WtoAlgorithm(WtoDatabase):
                 self.path + 'special.sbinfo', header=False, index=False,
                 sep=' ')
         elif array == '7m':
-            self.select7m = sel3
+            self.select7m = sel4
         else:
-            self.selecttp = sel3
+            self.selecttp = sel4
         pass
 
         # TODO: merge sb_summary with target left on SB_UID, science, right on
         #       SB_UID, paramRef (t1)
         # TODO: merge t1 with fieldsource on fieldRef (and SB_UID) (t2)
         # TODO: group t2 by SB_UID and calculate mean RA_y and DEC_y
-    def observable(self, data, date):
-        pass
 
     def scorer(self, data, trans, array, array_ar):
         pass
