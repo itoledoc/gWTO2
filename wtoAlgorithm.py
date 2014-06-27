@@ -1,23 +1,27 @@
 __author__ = 'itoledo'
 
+from datetime import datetime
+from datetime import timedelta
+
 import pandas as pd
 import ephem
-from wtoDatabase import WtoDatabase
 from lxml import objectify
-import sys
-import os
+
+from wtoDatabase import WtoDatabase
 import ruvTest as rUV
 
 
+pd.options.display.width = 200
+pd.options.display.max_columns = 55
 
 SSO = ['Moon', 'Sun', 'Mercury', 'Venus', 'Mars', 'Jupiter', 'Saturn',
        'Uranus', 'Neptune', 'Pluto']
 MOON = ['Ganymede', 'Europa', 'Callisto', 'Io', 'Titan']
 
-alma = ephem.Observer()
-alma.lat = '-23.0262015'
-alma.long = '-67.7551257'
-alma.elev = 5060
+alma1 = ephem.Observer()
+alma1.lat = '-23.0262015'
+alma1.long = '-67.7551257'
+alma1.elev = 5060
 
 h = 6.6260755e-27
 k = 1.380658e-16
@@ -113,8 +117,6 @@ class WtoAlgorithm(WtoDatabase):
             else:
                 array1 = ['TP-Array']
 
-
-
         pwvcol = self.pwvdata[[str(self.pwv)]]
         sum2 = pd.merge(
             self.sb_summary, pwvcol, left_on='repfreq', right_index=True)
@@ -193,7 +195,7 @@ class WtoAlgorithm(WtoDatabase):
             self.select12m = sel3
             special = self.select12m.query(
                 'PRJ_state != "Completed" and SB_state != "FullyObserved"'
-                ' and SB_state != "Deleted"')
+                ' and SB_state != "Deleted" and isTimeConstrained == False')
             special = special[
                 special.name.str.contains('not', case=False) == False]
             special = special[special.isPolarization == False]
@@ -206,6 +208,10 @@ class WtoAlgorithm(WtoDatabase):
             self.selecttp = sel3
         pass
 
+        # TODO: merge sb_summary with target left on SB_UID, science, right on
+        #       SB_UID, paramRef (t1)
+        # TODO: merge t1 with fieldsource on fieldRef (and SB_UID) (t2)
+        # TODO: group t2 by SB_UID and calculate mean RA_y and DEC_y
     def observable(self, data, date):
         pass
 
@@ -326,3 +332,162 @@ class WtoAlgorithm(WtoDatabase):
             else:
                 self.num_bl = len(self.ruv)
                 self.num_ant = int((1 + pd.np.sqrt(1 + 8 * self.num_bl)) / 2.)
+
+
+def observable(solarSystem, sourcename, RA, DEC, horizon, isQuery, ephemeris,
+               alma=alma1):
+    dtemp = alma.date
+    alma.horizon = ephem.degrees(str(horizon))
+    if isQuery:
+        alma.date = dtemp
+        return 0, 0, 0, 0, 0, 0, 0, 0, False
+
+    if solarSystem != 'Unspecified':
+        if solarSystem in SSO and solarSystem == sourcename:
+            obj = eval('ephem.' + solarSystem + '()')
+            obj.compute(alma)
+            ra = obj.ra
+            dec = obj.dec
+            elev = obj.alt
+            neverup = False
+        elif solarSystem in MOON:
+            obj = eval('ephem.' + solarSystem + '()')
+            obj.compute(alma)
+            ra = obj.ra
+            dec = obj.dec
+            elev = obj.alt
+            obj.radius = 0.
+            neverup = False
+        elif solarSystem == 'Ephemeris':
+            ra, dec, ephe = read_ephemeris(ephemeris, alma.date)
+            if not ephe:
+                alma.date = dtemp
+                return 0, 0, 0, 0, 0, 0, 0, 0, False
+            obj = ephem.FixedBody()
+            obj._ra = pd.np.deg2rad(ra)
+            obj._dec = pd.np.deg2rad(dec)
+            obj.compute(alma)
+            ra = obj.ra
+            dec = obj.dec
+            elev = obj.alt
+            neverup = obj.neverup
+        else:
+            alma.date = dtemp
+            return 0, 0, 0, 0, 0, 0, 0, 0, False
+
+    else:
+        obj = ephem.FixedBody()
+        obj._ra = pd.np.deg2rad(RA)
+        obj._dec = pd.np.deg2rad(DEC)
+        obj.compute(alma)
+        ra = obj.ra
+        dec = obj.dec
+        elev = obj.alt
+        neverup = obj.neverup
+
+    if obj.alt > ephem.degrees(str(horizon)):
+        try:
+            c2 = obj.circumpolar
+        except AttributeError:
+            c2 = False
+        if not c2:
+            sets = alma.next_setting(obj)
+            rise = alma.previous_rising(obj)
+            remaining = sets.datetime() - dtemp.datetime()
+            alma.date = rise
+            lstr = alma.sidereal_time()
+            alma.date = sets
+            lsts = alma.sidereal_time()
+            obs = True
+        else:
+            remaining = timedelta(1)
+            lstr = ephem.hours('0')
+            lsts = ephem.hours('0')
+            rise = ephem.hours('0')
+            sets = ephem.hours('0')
+            obs = True
+    else:
+        if neverup:
+            print("Source %s is never over %d deg. of elev. (%s, %s, %s)" %
+                  (sourcename, horizon, obj.dec, obj.ra, alma.date))
+            remaining = timedelta(0)
+            alma.horizon = ephem.degrees('0')
+            obj.compute(alma)
+            lstr = ephem.hours('0')
+            lsts = ephem.hours('0')
+            rise = ephem.hours('0')
+            sets = ephem.hours('0')
+            obs = False
+        else:
+            rise = alma.next_rising(obj)
+            sets = alma.next_setting(obj)
+            remaining = dtemp.datetime() - rise.datetime()
+            alma.date = rise
+            lstr = alma.sidereal_time()
+            alma.date = sets
+            lsts = alma.sidereal_time()
+            obs = False
+
+    alma.date = dtemp
+    alma.horizon = ephem.degrees(str(horizon))
+    return str(ra), str(dec), pd.np.degrees(elev), remaining.total_seconds() / 3600., rise, sets, lstr,\
+        lsts, obs
+
+
+def read_ephemeris(ephemeris, date):
+
+    in_data = False
+    now = date
+    month_ints = {
+        'Jan': 1, 'Feb': 2, 'Mar': 3, 'Apr': 4, 'May': 5, 'Jun': 6,
+        'Jul': 7, 'Aug': 8, 'Sep': 9, 'Oct': 10, 'Nov': 11, 'Dec': 12}
+    for line in ephemeris.split('\n'):
+        if line.startswith('$$SOE'):
+            in_data = True
+            c1 = 0
+        elif line.startswith('$$EOE'):
+            if not found:
+                # print "NO EPHEMERIS FOR CURRENT DATE. Setting RA=0, DEC=0"
+                ra = ephem.hours('00:00:00')
+                dec = ephem.degrees('00:00:00')
+                ephe = False
+                return ra, dec, ephe
+        elif in_data:
+            datestr = line[1:6] + str(month_ints[line[6:9]]) + line[9:18]
+            date = datetime.strptime(datestr, '%Y-%m-%d %H:%M')
+            if now.datetime() > date:
+                data = line
+                found = False
+                c1 += 1
+            else:
+                if c1 == 0:
+                    #print("NO EPHEMERIS FOR CURRENT DATE. Setting RA=0,"
+                    #      " DEC=0")
+                    ra = ephem.hours('00:00:00')
+                    dec = ephem.degrees('00:00:00')
+                    ephe = False
+                    return ra, dec, ephe
+                ra = ephem.hours(data[23:34].strip().replace(' ', ':'))
+                dec = ephem.degrees(data[35:46].strip().replace(' ', ':'))
+                ephe = True
+                return ra, dec, ephe
+
+"""
+To fit the ruv distribution
+from scipy.stats import norm,rayleigh
+
+samp = rayleigh.rvs(loc=5,scale=2,size=150) # samples generation
+
+param = rayleigh.fit(samp) # distribution fitting
+
+x = linspace(5,13,100)
+# fitted distribution
+pdf_fitted = rayleigh.pdf(x,loc=param[0],scale=param[1])
+# original distribution
+pdf = rayleigh.pdf(x,loc=5,scale=2)
+
+title('Rayleigh distribution')
+plot(x,pdf_fitted,'r-',x,pdf,'b-')
+hist(samp,normed=1,alpha=.3)
+show()
+"""
