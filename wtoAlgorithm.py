@@ -195,7 +195,8 @@ class WtoAlgorithm(WtoDatabase):
             self.select12m = sel3
             special = self.select12m.query(
                 'PRJ_state != "Completed" and SB_state != "FullyObserved"'
-                ' and SB_state != "Deleted" and isTimeConstrained == False')
+                ' and SB_state != "Deleted" and isTimeConstrained == False'
+                ' and blfrac < 1.4')
             special = special[
                 special.name.str.contains('not', case=False) == False]
             special = special[special.isPolarization == False]
