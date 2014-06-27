@@ -58,6 +58,14 @@ class WtoAlgorithm(WtoDatabase):
         self.minfrac = 0.75
         self.maxfrac = 1.3
         self.horizon = 30.
+        self.num_ant_user = None
+        self.defarrays = ['C34-1', 'C34-2', 'C34-3', 'C34-4', 'C34-5', 'C34-6',
+                          'C34-7']
+        self.arr_ar_def = {'C34-1': 3.73, 'C34-2': 2.04, 'C34-3': 1.4,
+                           'C34-4': 1.11, 'C34-5': 0.75, 'C34-6': 0.57,
+                           'C34-7': 0.41}
+        self.array_name = None
+        self.not_horizon = False
 
         self.tau = pd.read_csv(
             self.wto_path + 'conf/tau.csv', sep=',', header=0).set_index('freq')
@@ -88,6 +96,7 @@ class WtoAlgorithm(WtoDatabase):
         self.query_arrays()
 
     def check_observability(self):
+
         if self.date == self.old_date:
             pass
         alma1.date = self.date
@@ -144,6 +153,7 @@ class WtoAlgorithm(WtoDatabase):
         self.obser_prop = pd.merge(fs_5, lsts, right_index=True,
                                    left_index=True, how='left')
         self.old_date = self.date
+
     # noinspection PyAugmentAssignment
     def selector(self, array, array_name=None):
 
@@ -170,14 +180,16 @@ class WtoAlgorithm(WtoDatabase):
         if array not in ['12m', '7m', 'tp']:
             print("Use 12m, 7m or tp for array selection.")
             return None
+
         else:
             if array == '12m':
                 array1 = ['TWELVE-M']
-                if array_name is not None:
+                if (array_name is not None or
+                        array_name in self.defarrays):
                     self.set_bl_prop(array_name=array_name)
                     self.array_ar = 61800 / (100.0 * self.ruv.max())
                 else:
-                    self.set_bl_prop(array_name=None)
+                    self.set_bl_prop(array_name=array_name)
             elif array == '7m':
                 array1 = ['SEVEN-M', 'ACA']
             else:
@@ -244,11 +256,12 @@ class WtoAlgorithm(WtoDatabase):
                     (sel2.RA == 0.)]
         sel3['tsysfrac'] = (sel3.tsys / sel3.tsys_org) ** 2.
         print("SBs within current HA limits (or RA=0): %d" % len(sel3))
-
         sel4 = pd.merge(sel3, self.obser_prop, left_on='SB_UID',
                         right_index=True)
-        sel4 = sel4.query('up == 1 and etime > 1.5')
-        print("SBs over %d degrees, 1.5 hours: %d" % (self.horizon, len(sel4)))
+        if self.not_horizon is False:
+            sel4 = sel4.query('up == 1 and etime > 1.5')
+            print("SBs over %d degrees, 1.5 hours: %d" %
+                  (self.horizon, len(sel4)))
         if array == '12m':
             sel4 = sel4.query(
                 '((arrayMinAR+arrayMaxAR/1.44)/2. < %f and %f < arrayMaxAR)'
@@ -260,16 +273,24 @@ class WtoAlgorithm(WtoDatabase):
                   (len(sel4), self.array_ar, self.num_bl, self.num_ant))
             sel4['blmax'] = sel4.apply(
                 lambda row: rUV.computeBL(row['AR'], row['repfreq']), axis=1)
-            sel4['blfrac'] = sel4.apply(
-                lambda row: (33. * 17) / (1.*len(
-                    self.ruv[self.ruv < row['blmax']]))
-                if (row['LAS'] != 0) else (33. * 17) / self.num_ant, axis=1)
+            if self.num_ant_user is None:
+                sel4['blfrac'] = sel4.apply(
+                    lambda row: (33. * 17) / (1.*len(
+                        self.ruv[self.ruv < row['blmax']]))
+                    if (row['LAS'] != 0)
+                    else (33. * 17) /
+                         (self.num_ant*(self.num_ant - 1) / 2.),
+                    axis=1)
+            else:
+                sel4['blfrac'] = sel4.RA * 0. + (
+                    33 * 17 / (self.num_ant_user*(self.num_ant_user - 1) / 2.))
             sel4['frac'] = sel4.tsysfrac * sel4.blfrac
             self.select12m = sel4
+
             special = self.select12m.query(
                 'PRJ_state != "Completed" and SB_state != "FullyObserved"'
                 ' and SB_state != "Deleted" and isTimeConstrained == False'
-                ' and frac < 1.3')
+                ' and frac < 1.3 and PRJ_state != "Phase2Submitted"')
             special = special[
                 special.name.str.contains('not', case=False) == False]
             special = special[special.isPolarization == False]
@@ -371,7 +392,8 @@ class WtoAlgorithm(WtoDatabase):
 
     def set_bl_prop(self, array_name):
         # TODO: check uv coverage to remove baselines that are outliers
-        if array_name is not None and len(self.bl_arrays) != 0:
+        if (array_name is not None and len(self.bl_arrays) != 0
+                and array_name not in self.defarrays):
             id1 = self.bl_arrays.query('AV1 == "%s"' % array_name).iloc[0].SE1
 
             a = str("SELECT SLOG_ATTR_VALUE FROM ALMA.SLOG_ENTRY_ATTR "
@@ -390,13 +412,23 @@ class WtoAlgorithm(WtoDatabase):
             self.ruv = rUV.computeRuv(conf_file + ".cfg")
             self.num_bl = len(self.ruv)
             self.num_ant = len(ap)
+
         else:
-            conf_file = self.wto_path + 'conf/default.txt'
-            io_file = open(self.wto_path + 'conf/arrayConfigurationResults.txt')
-            self.array_ar = float(io_file.readlines()[13].split(':')[1])
-            ac = rUV.ac.ArrayConfigurationCasaFile()
-            ac.createCasaConfig(conf_file)
-            self.ruv = rUV.computeRuv(conf_file + ".cfg")
+            if array_name is None:
+                conf_file = self.wto_path + 'conf/default.txt'
+                io_file = open(
+                    self.wto_path + 'conf/arrayConfigurationResults.txt')
+                self.array_ar = float(io_file.readlines()[13].split(':')[1])
+                io_file.close()
+                ac = rUV.ac.ArrayConfigurationCasaFile()
+                ac.createCasaConfig(conf_file)
+                self.ruv = rUV.computeRuv(conf_file + ".cfg")
+            else:
+                conf_file = self.wto_path + 'conf/%s.txt.cfg' % array_name
+                self.ruv = rUV.computeRuv(conf_file)
+                self.array_ar = self.arr_ar_def[array_name]
+                self.num_ant = 34
+
             if len(self.ruv) > 33. * 17.:
                 self.ruv = self.ruv[-561:]
                 self.num_bl = len(self.ruv)
