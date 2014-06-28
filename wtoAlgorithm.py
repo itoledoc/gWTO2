@@ -400,7 +400,7 @@ class WtoAlgorithm(WtoDatabase):
         else:
             sb_cond_score = (1/frac**6) * 10.
 
-        score = (0.3 * sb_cond_uscore +
+        score = (0.3 * sb_cond_score +
                  0.25 * sb_array_score +
                  0.15 * sb_completion_score +
                  0.1 * sb_exec_score +
