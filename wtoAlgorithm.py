@@ -152,7 +152,7 @@ class WtoAlgorithm(WtoDatabase):
         fs_5 = pd.merge(fs_4, lstr, right_index=True,
                         left_index=True, how='left')
 
-        self.sb_summary.loc[dec.index, 'DEC'] = dec.loc[dec.index, 'DEC']
+        self.sb_summary.loc[dec.index, 'DEC'] = pd.np.degrees(dec.loc[dec.index, 'DEC'])
         self.obser_prop = pd.merge(fs_5, lsts, right_index=True,
                                    left_index=True, how='left')
         self.old_date = self.date
@@ -675,9 +675,10 @@ def read_ephemeris(ephemeris, date):
                     dec = ephem.degrees('00:00:00')
                     ephe = False
                     return ra, dec, ephe
-                ra = ephem.hours(data[23:34].strip().replace(' ', ':'))
-                dec = ephem.degrees(data[35:46].strip().replace(' ', ':'))
+                ra = ephem.hours(data[23:35].strip().replace(' ', ':'))
+                dec = ephem.degrees(data[36:47].strip().replace(' ', ':'))
                 ephe = True
+                print ra, dec, ephe
                 return ra, dec, ephe
 
 """
