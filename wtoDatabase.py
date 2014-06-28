@@ -786,7 +786,7 @@ class WtoDatabase(object):
                                    pd.np.radians(dec)) + 0.138
         c_freq = repfreq / 100.
         corr = c_freq / c_bmax
-        useaca= sg.useACA
+        useaca = sg.useACA
         if useaca:
             useaca = 'Y'
         else:

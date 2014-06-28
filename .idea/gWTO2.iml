@@ -7,5 +7,9 @@
     <orderEntry type="jdk" jdkName="Python 2.7.6 (~/anaconda/bin/python)" jdkType="Python SDK" />
     <orderEntry type="sourceFolder" forTests="false" />
   </component>
+  <component name="ReSTService">
+    <option name="workdir" value="$USER_HOME$/Templates" />
+    <option name="DOC_DIR" value="$USER_HOME$/Templates" />
+  </component>
 </module>
 

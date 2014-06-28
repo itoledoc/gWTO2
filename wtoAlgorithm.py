@@ -52,12 +52,16 @@ class WtoAlgorithm(WtoDatabase):
         self.date = ephem.now()
         self.old_date = 0
         self.array_ar = 0.94
-        self.transmission = 0.7
+        self.transmission = 0.5
         self.minha = -5.0
         self.maxha = 3.0
         self.minfrac = 0.75
-        self.maxfrac = 1.3
+        self.maxfrac = 1.2
         self.horizon = 30.
+        self.maxblfrac = 1.5
+        self.exec_prio = {'EA': 10., 'NA': 10., 'EU': 10., 'CL': 10.,
+                          'OTHER': 10.}
+
         self.num_ant_user = None
         self.defarrays = ['C34-1', 'C34-2', 'C34-3', 'C34-4', 'C34-5', 'C34-6',
                           'C34-7']
@@ -98,7 +102,7 @@ class WtoAlgorithm(WtoDatabase):
     def check_observability(self):
 
         if self.date == self.old_date:
-            pass
+            return None
         alma1.date = self.date
         fs = self.fieldsource.apply(
             lambda r: observable(
@@ -110,20 +114,16 @@ class WtoAlgorithm(WtoDatabase):
             index=fs.index,
             columns=['RA', 'DEC', 'elev', 'remaining', 'rise', 'sets', 'lstr',
                      'lsts', 'observable'])
-        print len(df_fs)
         fs_1 = pd.merge(
             self.fieldsource[['fieldRef', 'SB_UID', 'isQuery']],
             df_fs, left_index=True, right_index=True,
             how='left')
-        print len(fs_1)
         fs_1g = fs_1.query('isQuery == False').groupby('SB_UID')
         allup = pd.DataFrame(
             fs_1g.observable.mean())
         allup.columns = pd.Index([u'up'])
-        print len(allup)
         fs_2 = pd.merge(fs_1, allup, left_on='SB_UID', right_index=True,
                         how='left')
-        print len(fs_2)
         fs_2g = fs_2.query('isQuery == False').groupby('SB_UID')
         etime = pd.DataFrame(
             fs_2g.remaining.min()[fs_2g.remaining.min() > 1.5])
@@ -141,18 +141,22 @@ class WtoAlgorithm(WtoDatabase):
             fs_2g.lsts.max())
         lsts.columns = pd.Index([u'lsts'])
 
+        dec = pd.DataFrame(
+            fs_2g.DEC.mean())
+        dec.columns = pd.Index([u'DEC'])
+
         fs_3 = pd.merge(allup, etime, right_index=True, left_index=True,
                         how='left')
-        print len(fs_3)
         fs_4 = pd.merge(fs_3, elevation, right_index=True,
                         left_index=True, how='left')
-        print len(fs_4)
         fs_5 = pd.merge(fs_4, lstr, right_index=True,
                         left_index=True, how='left')
-        print len(fs_5)
+
+        self.sb_summary.loc[dec.index, 'DEC'] = dec.loc[dec.index, 'DEC']
         self.obser_prop = pd.merge(fs_5, lsts, right_index=True,
                                    left_index=True, how='left')
         self.old_date = self.date
+        print self.old_date, self.date
 
     # noinspection PyAugmentAssignment
     def selector(self, array, array_name=None):
@@ -262,11 +266,18 @@ class WtoAlgorithm(WtoDatabase):
             sel4 = sel4.query('up == 1 and etime > 1.5')
             print("SBs over %d degrees, 1.5 hours: %d" %
                   (self.horizon, len(sel4)))
+        sel4 = sel4.query(
+            'SB_state != "Phase2Submitted"'
+            ' and SB_state != "FullyObserved"'
+            ' and SB_state != "FullyObserved"'
+            ' and PRJ_state != "Phase2Submitted"'
+            ' and PRJ_state != "Completed"')
+        print("SBs with Ok state: %d" % len(sel4))
+        sel4 = sel4.query('execount > Total')
+        print("SBs with missing exec: %d" % len(sel4))
         if array == '12m':
             sel4 = sel4.query(
-                '((arrayMinAR+arrayMaxAR/1.44)/2. < %f and %f < arrayMaxAR)'
-                ' and (band != "ALMA_RB_04" and band != "ALMA_RB_08") '
-                'and SB_state != "Phase2Submitted" and array=="TWELVE-M"' %
+                '(arrayMinAR < %f and %f < arrayMaxAR) ' %
                 (self.array_ar, self.array_ar))
             print("SBs for current 12m Array AR: %d. "
                   "(AR=%.2f, #bl=%d, #ant=%d)" %
@@ -287,7 +298,7 @@ class WtoAlgorithm(WtoDatabase):
             sel4['frac'] = sel4.tsysfrac * sel4.blfrac
             self.select12m = sel4
 
-            special = self.select12m.query(
+            special = sel4.query(
                 'PRJ_state != "Completed" and SB_state != "FullyObserved"'
                 ' and SB_state != "Deleted" and isTimeConstrained == False'
                 ' and frac < 1.3 and PRJ_state != "Phase2Submitted"')
@@ -308,8 +319,96 @@ class WtoAlgorithm(WtoDatabase):
         # TODO: merge t1 with fieldsource on fieldRef (and SB_UID) (t2)
         # TODO: group t2 by SB_UID and calculate mean RA_y and DEC_y
 
-    def scorer(self, data, trans, array, array_ar):
-        pass
+    def scorer(self, array):
+        if array == '12m':
+            df = self.select12m
+        elif array == '7m':
+            df = self.select7m
+        else:
+            df = self.selecttp
+        self.max_scirank = df.scienceRank.max()
+        scores = df.apply(
+            lambda r: self.calculate_score(
+                r['execount'], r['Total'], r['scienceRank'], r['AR'],
+                r['arrayMinAR'], r['arrayMaxAR'], r['tsysfrac'], r['blfrac'],
+                r['grade'], r['repfreq'], r['DEC'], r['EXEC'], array,
+                r['frac']),
+            axis=1)
+        scores = pd.DataFrame(scores.values.tolist(), index=scores.index)
+        scores.columns = pd.Index(
+            [u'sb_cond_score', u'sb_array_score', u'sb_completion_score',
+             u'sb_exec_score', u'sb_science_score', u'sb_grade_score', u'arcorr',
+             u'score'])
+        if array == '12m':
+            self.select12m = pd.merge(
+                self.select12m, scores, left_on='SB_UID', right_index=True)
+        elif array == '7m':
+            self.select7m = pd.merge(
+                self.select7m, scores, left_on='SB_UID', right_index=True)
+        else:
+            self.selecttp = pd.merge(
+                self.selecttp, scores, left_on='SB_UID', right_index=True)
+
+    def calculate_score(self, ecount, tcount, srank, ar, aminar, amaxar,
+                        tsysfrac, blfrac, grade, repfreq, dec, execu, array,
+                        frac):
+
+
+        # set sb completion score
+        sb_completion = tcount / ecount
+        sb_completion_score = 10. * sb_completion
+
+        # set sb priority score
+        if grade == 'A':
+            sb_grade_score = 10.
+        elif grade == 'B':
+            sb_grade_score = 5.
+        else:
+            sb_grade_score = -100.
+
+        # set science score
+        sb_science_score = 10. * srank / self.max_scirank
+
+        # set array score
+        if array == '7m' or array == 'tp':
+            sb_array_score = 10.
+            arcorr = 0.
+        else:
+            c_bmax = 0.862 / pd.np.cos(pd.np.radians(-23.0262015) -
+                                       pd.np.radians(dec)) + 0.138
+            c_freq = repfreq / 100.
+            corr = c_freq / c_bmax
+            arcorr = ar * corr
+            if self.array_ar < arcorr:
+                l = arcorr - aminar
+                s = 10. / l
+                sb_array_score = (self.array_ar - aminar) * s
+            elif self.array_ar == arcorr:
+                sb_array_score = 10.
+            else:
+                l = arcorr - amaxar
+                s = 10. / l
+                sb_array_score = (self.array_ar - amaxar) * s
+        # set exec score:
+        sb_exec_score = self.exec_prio[execu]
+
+        # set condition score:
+        if frac < 1:
+            sb_cond_score = 10. - 2. * frac**1/2.
+        elif frac == 1:
+            sb_cond_score = 10.
+        else:
+            sb_cond_score = (1/frac**6) * 10.
+
+        score = (0.3 * sb_cond_uscore +
+                 0.25 * sb_array_score +
+                 0.15 * sb_completion_score +
+                 0.1 * sb_exec_score +
+                 0.05 * sb_science_score +
+                 0.15 * sb_grade_score)
+        return (sb_cond_score, sb_array_score, sb_completion_score,
+                sb_exec_score, sb_science_score, sb_grade_score, arcorr, score)
+
 
     def set_trans(self, transmission):
         self.transmission = transmission
@@ -432,10 +531,14 @@ class WtoAlgorithm(WtoDatabase):
             if len(self.ruv) > 33. * 17.:
                 self.ruv = self.ruv[-561:]
                 self.num_bl = len(self.ruv)
-                self.num_ant = 34.
+                self.num_ant = 34
+                if self.num_ant_user is not None:
+                    self.num_ant = self.num_ant_user
             else:
                 self.num_bl = len(self.ruv)
                 self.num_ant = int((1 + pd.np.sqrt(1 + 8 * self.num_bl)) / 2.)
+                if self.num_ant_user is not None:
+                    self.num_ant = self.num_ant_user
 
 
 def observable(solarSystem, sourcename, RA, DEC, horizon, isQuery, ephemeris,
@@ -475,6 +578,7 @@ def observable(solarSystem, sourcename, RA, DEC, horizon, isQuery, ephemeris,
             dec = obj.dec
             elev = obj.alt
             neverup = obj.neverup
+
         else:
             alma.date = dtemp
             return 0, 0, 0, 0, 0, 0, 0, 0, False
@@ -534,8 +638,8 @@ def observable(solarSystem, sourcename, RA, DEC, horizon, isQuery, ephemeris,
 
     alma.date = dtemp
     alma.horizon = ephem.degrees(str(horizon))
-    return str(ra), str(dec), pd.np.degrees(elev), remaining.total_seconds() / 3600., rise, sets, lstr,\
-        lsts, obs
+    return str(ra), pd.np.degrees(dec), pd.np.degrees(elev),\
+        remaining.total_seconds() / 3600., rise, sets, lstr, lsts, obs
 
 
 def read_ephemeris(ephemeris, date):
