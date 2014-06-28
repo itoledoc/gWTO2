@@ -37,7 +37,10 @@ c_mks = 2.99792458e8
 class WtoAlgorithm(WtoDatabase):
     """
 
-
+    :param path:
+    :param source:
+    :param forcenew:
+    :return:
     """
     def __init__(self, path='/.wto/', source=None, forcenew=False):
         """
@@ -101,6 +104,11 @@ class WtoAlgorithm(WtoDatabase):
 
     def check_observability(self):
 
+        """
+
+
+        :return:
+        """
         if self.date == self.old_date:
             return None
         alma1.date = self.date
@@ -320,6 +328,10 @@ class WtoAlgorithm(WtoDatabase):
         # TODO: group t2 by SB_UID and calculate mean RA_y and DEC_y
 
     def scorer(self, array):
+        """
+
+        :param array:
+        """
         if array == '12m':
             df = self.select12m
         elif array == '7m':
@@ -353,8 +365,25 @@ class WtoAlgorithm(WtoDatabase):
                         tsysfrac, blfrac, grade, repfreq, dec, execu, array,
                         frac):
 
-
         # set sb completion score
+        """
+
+        :param ecount:
+        :param tcount:
+        :param srank:
+        :param ar:
+        :param aminar:
+        :param amaxar:
+        :param tsysfrac:
+        :param blfrac:
+        :param grade:
+        :param repfreq:
+        :param dec:
+        :param execu:
+        :param array:
+        :param frac:
+        :return:
+        """
         sb_completion = tcount / ecount
         sb_completion_score = 10. * sb_completion
 
@@ -409,29 +438,60 @@ class WtoAlgorithm(WtoDatabase):
         return (sb_cond_score, sb_array_score, sb_completion_score,
                 sb_exec_score, sb_science_score, sb_grade_score, arcorr, score)
 
-
     def set_trans(self, transmission):
+        """
+
+        :param transmission:
+        """
         self.transmission = transmission
 
     def set_pwv(self, pwv):
+        """
+
+        :param pwv:
+        """
         self.pwv = pwv
 
     def set_date(self, date):
+        """
+
+        :param date:
+        """
         self.date = date
 
     def set_arrayar(self, ar):
+        """
+
+        :param ar:
+        """
         self.array_ar = ar
 
     def set_minha(self, ha):
+        """
+
+        :param ha:
+        """
         self.minha = ha
 
     def set_maxha(self, ha):
+        """
+
+        :param ha:
+        """
         self.maxha = ha
 
     def set_array_ar(self, ar):
+        """
+
+        :param ar:
+        """
         self.array_ar = ar
 
     def query_arrays(self):
+        """
+
+
+        """
         a = str(
             "with t1 as ( "
             "select se.SE_TIMESTAMP ts1, sa.SLOG_ATTR_VALUE av1, se.SE_ID se1 "
@@ -491,6 +551,10 @@ class WtoAlgorithm(WtoDatabase):
 
     def set_bl_prop(self, array_name):
         # TODO: check uv coverage to remove baselines that are outliers
+        """
+
+        :param array_name:
+        """
         if (array_name is not None and len(self.bl_arrays) != 0
                 and array_name not in self.defarrays):
             id1 = self.bl_arrays.query('AV1 == "%s"' % array_name).iloc[0].SE1
@@ -542,7 +606,19 @@ class WtoAlgorithm(WtoDatabase):
 
 
 def observable(solarSystem, sourcename, RA, DEC, horizon, isQuery, ephemeris,
-               alma=alma1):
+               alma):
+    """
+
+    :param solarSystem:
+    :param sourcename:
+    :param RA:
+    :param DEC:
+    :param horizon:
+    :param isQuery:
+    :param ephemeris:
+    :param alma:
+    :return:
+    """
     dtemp = alma.date
     alma.horizon = ephem.degrees(str(horizon))
     if isQuery:
@@ -643,7 +719,14 @@ def observable(solarSystem, sourcename, RA, DEC, horizon, isQuery, ephemeris,
 
 
 def read_ephemeris(ephemeris, date):
+    # TODO: is the ephemeris file fixed in col positions?
 
+    """
+
+    :param ephemeris:
+    :param date:
+    :return:
+    """
     in_data = False
     now = date
     month_ints = {
