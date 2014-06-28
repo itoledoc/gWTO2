@@ -675,8 +675,8 @@ def read_ephemeris(ephemeris, date):
                     dec = ephem.degrees('00:00:00')
                     ephe = False
                     return ra, dec, ephe
-                ra = ephem.hours(data[23:35].strip().replace(' ', ':'))
-                dec = ephem.degrees(data[36:47].strip().replace(' ', ':'))
+                ra = ephem.hours(data[23:36].strip().replace(' ', ':'))
+                dec = ephem.degrees(data[37:51].strip().replace(' ', ':'))
                 ephe = True
                 print ra, dec, ephe
                 return pd.np.degrees(ra), pd.np.degrees(dec), ephe
