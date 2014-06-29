@@ -431,6 +431,8 @@ class WtoAlgorithm(WtoDatabase):
             m = -1/0.4
             if frac <= 1.4:
                 sb_cond_score = (((3.5 + m*frac)**(1/2.)) * 10.)
+                if self.pwv < maxpwvc:
+                    sb_cond_score *= (self.pwv / maxpwvc)**(1/3.)
             else:
                 sb_cond_score = 0.
 
