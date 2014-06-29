@@ -344,7 +344,7 @@ class WtoAlgorithm(WtoDatabase):
                 r['execount'], r['Total'], r['scienceRank'], r['AR'],
                 r['arrayMinAR'], r['arrayMaxAR'], r['tsysfrac'], r['blfrac'],
                 r['grade'], r['repfreq'], r['DEC'], r['EXEC'], array,
-                r['frac']),
+                r['frac'], r['maxPWVC']),
             axis=1)
         scores = pd.DataFrame(scores.values.tolist(), index=scores.index)
         scores.columns = pd.Index(
@@ -363,7 +363,7 @@ class WtoAlgorithm(WtoDatabase):
 
     def calculate_score(self, ecount, tcount, srank, ar, aminar, amaxar,
                         tsysfrac, blfrac, grade, repfreq, dec, execu, array,
-                        frac):
+                        frac, maxpwvc):
 
         # set sb completion score
         """
@@ -385,7 +385,7 @@ class WtoAlgorithm(WtoDatabase):
         :return:
         """
         sb_completion = tcount / ecount
-        sb_completion_score = 10. * sb_completion
+        sb_completion_score = 6. * sb_completion + 4.
 
         # set sb priority score
         if grade == 'A':
@@ -410,8 +410,8 @@ class WtoAlgorithm(WtoDatabase):
             arcorr = ar * corr
             if self.array_ar < arcorr:
                 l = arcorr - aminar
-                s = 10. / l
-                sb_array_score = pd.np.sqrt(self.array_ar - aminar) * s
+                s = 10.
+                sb_array_score = (((self.array_ar - aminar) / l)**(1/3.)) * s
             elif self.array_ar == arcorr:
                 sb_array_score = 10.
             else:
@@ -423,11 +423,17 @@ class WtoAlgorithm(WtoDatabase):
 
         # set condition score:
         if frac < 1:
-            sb_cond_score = 10. - 2. * frac**1/2.
+            sb_cond_score = (8. + 2. * (frac**(1/4.))) * (
+                (self.pwv / maxpwvc)**(1/2.))
         elif frac == 1:
             sb_cond_score = 10.
         else:
-            sb_cond_score = (1/frac**6) * 10.
+            m = -1/0.4
+            if frac <= 1.4:
+                sb_cond_score = (((3.5 + m*frac)**(1/2.)) * 10.) * (
+                    (maxpwvc / self.pwv)**(1/6.))
+            else:
+                sb_cond_score = 0.
 
         score = (0.3 * sb_cond_score +
                  0.25 * sb_array_score +

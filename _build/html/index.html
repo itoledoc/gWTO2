@@ -106,9 +106,9 @@ ipython
 <p>And the run the following script. You can copy the code, and then paste into
 python with %paste, or copy it into a file, and then execute it inside the
 ipython session:</p>
-<div class="highlight-python"><div class="highlight"><pre><span class="k">def</span> <span class="nf">runwto</span><span class="p">(</span><span class="n">pwv</span><span class="p">,</span> <span class="n">array_name</span><span class="o">=</span><span class="n">datas</span><span class="o">.</span><span class="n">bl_arrays</span><span class="o">.</span><span class="n">AV1</span><span class="o">.</span><span class="n">values</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span> <span class="n">date</span><span class="o">=</span><span class="n">ephem</span><span class="o">.</span><span class="n">now</span><span class="p">()):</span>
+<div class="highlight-python"><div class="highlight"><pre><span class="k">def</span> <span class="nf">runwto</span><span class="p">(</span><span class="n">pwv</span><span class="p">,</span> <span class="n">array_name</span><span class="o">=</span><span class="n">datas</span><span class="o">.</span><span class="n">bl_arrays</span><span class="o">.</span><span class="n">AV1</span><span class="o">.</span><span class="n">values</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span> <span class="n">d</span><span class="o">=</span><span class="n">ephem</span><span class="o">.</span><span class="n">now</span><span class="p">()):</span>
     <span class="n">datas</span><span class="o">.</span><span class="n">update</span><span class="p">()</span>
-    <span class="n">datas</span><span class="o">.</span><span class="n">date</span> <span class="o">=</span> <span class="n">date</span>
+    <span class="n">datas</span><span class="o">.</span><span class="n">date</span> <span class="o">=</span> <span class="n">d</span>
     <span class="n">datas</span><span class="o">.</span><span class="n">pwv</span> <span class="o">=</span> <span class="n">pwv</span>
     <span class="n">datas</span><span class="o">.</span><span class="n">query_arrays</span><span class="p">()</span>
     <span class="n">datas</span><span class="o">.</span><span class="n">selector</span><span class="p">(</span><span class="s">&#39;12m&#39;</span><span class="p">,</span> <span class="n">array_name</span><span class="p">)</span>
@@ -117,17 +117,19 @@ ipython session:</p>
         <span class="s">&#39;score&#39;</span><span class="p">,</span> <span class="n">ascending</span><span class="o">=</span><span class="bp">False</span><span class="p">)</span><span class="o">.</span><span class="n">query</span><span class="p">(</span>
         <span class="s">&#39;band != &quot;ALMA_RB_04&quot; and band &#39;</span>
         <span class="s">&#39;!= &quot;ALMA_RB_08&quot; and isPolarization == False&#39;</span><span class="p">)[</span>
-        <span class="p">[</span><span class="s">&#39;score&#39;</span><span class="p">,</span><span class="s">&#39;CODE&#39;</span><span class="p">,</span><span class="s">&#39;SB_UID&#39;</span><span class="p">,</span><span class="s">&#39;name&#39;</span><span class="p">,</span><span class="s">&#39;SB_state&#39;</span><span class="p">,</span><span class="s">&#39;band&#39;</span><span class="p">,</span><span class="s">&#39;HA&#39;</span><span class="p">,</span><span class="s">&#39;elev&#39;</span><span class="p">,</span><span class="s">&#39;etime&#39;</span><span class="p">,</span>
-         <span class="s">&#39;execount&#39;</span><span class="p">,</span><span class="s">&#39;Total&#39;</span><span class="p">,</span><span class="s">&#39;arrayMinAR&#39;</span><span class="p">,</span><span class="s">&#39;arcorr&#39;</span><span class="p">,</span><span class="s">&#39;arrayMaxAR&#39;</span><span class="p">,</span><span class="s">&#39;tsysfrac&#39;</span><span class="p">,</span>
-         <span class="s">&#39;blfrac&#39;</span><span class="p">,</span><span class="s">&#39;frac&#39;</span><span class="p">,</span><span class="s">&#39;sb_array_score&#39;</span><span class="p">,</span><span class="s">&#39;sb_cond_score&#39;</span><span class="p">,</span> <span class="s">&#39;DEC&#39;</span><span class="p">,</span><span class="s">&#39;RA&#39;</span><span class="p">,</span>
-         <span class="s">&#39;isTimeConstrained&#39;</span><span class="p">,</span> <span class="s">&#39;integrationTime&#39;</span><span class="p">,</span> <span class="s">&#39;PRJ_ARCHIVE_UID&#39;</span><span class="p">]]</span><span class="o">.</span><span class="n">head</span><span class="p">(</span><span class="mi">25</span><span class="p">)</span>
+        <span class="p">[</span><span class="s">&#39;score&#39;</span><span class="p">,</span><span class="s">&#39;CODE&#39;</span><span class="p">,</span><span class="s">&#39;SB_UID&#39;</span><span class="p">,</span><span class="s">&#39;name&#39;</span><span class="p">,</span><span class="s">&#39;SB_state&#39;</span><span class="p">,</span><span class="s">&#39;band&#39;</span><span class="p">,</span><span class="s">&#39;maxPWVC&#39;</span><span class="p">,</span> <span class="s">&#39;HA&#39;</span><span class="p">,</span>
+         <span class="s">&#39;elev&#39;</span><span class="p">,</span><span class="s">&#39;etime&#39;</span><span class="p">,</span> <span class="s">&#39;execount&#39;</span><span class="p">,</span><span class="s">&#39;Total&#39;</span><span class="p">,</span><span class="s">&#39;arrayMinAR&#39;</span><span class="p">,</span><span class="s">&#39;arcorr&#39;</span><span class="p">,</span>
+         <span class="s">&#39;arrayMaxAR&#39;</span><span class="p">,</span><span class="s">&#39;tsysfrac&#39;</span><span class="p">,</span> <span class="s">&#39;blfrac&#39;</span><span class="p">,</span><span class="s">&#39;frac&#39;</span><span class="p">,</span><span class="s">&#39;sb_array_score&#39;</span><span class="p">,</span>
+         <span class="s">&#39;sb_cond_score&#39;</span><span class="p">,</span> <span class="s">&#39;DEC&#39;</span><span class="p">,</span><span class="s">&#39;RA&#39;</span><span class="p">,</span> <span class="s">&#39;isTimeConstrained&#39;</span><span class="p">,</span>
+         <span class="s">&#39;integrationTime&#39;</span><span class="p">,</span> <span class="s">&#39;PRJ_ARCHIVE_UID&#39;</span><span class="p">]]</span><span class="o">.</span><span class="n">head</span><span class="p">(</span><span class="mi">25</span><span class="p">)</span>
 </pre></div>
 </div>
 <p>The to run the wto algorith use a pwv value between 0 and 20, with steps of
 0.05 (e.g., 0.4, 0.45, but no 0.42), and assuming the latest BL Array. Set
-array_name=None when running runwto (e.g. runwto(0.45, array_name=None)) to
+array_name=None when running runwto (e.g. runwto(X.XX, array_name=None)) to
 use the Current configuration parameters calculated with arrayConfigurationTools
-and 34 antennas.</p>
+and 34 antennas. Also, to change the date to current date use
+runwto(X.XX, d=ephem.now())</p>
 <p>This will display the top 25 values of datas.scorer12m dataFrame. To check full
 output in an excel table run::</p>
 <div class="highlight-python"><div class="highlight"><pre><span class="n">datas</span><span class="o">.</span><span class="n">score12m</span><span class="o">.</span><span class="n">to_excel</span><span class="p">(</span><span class="s">&#39;output_path/score.xls&#39;</span><span class="p">)</span>
@@ -571,7 +573,7 @@ ALMA.XML_OBSPROJECT_ENTITIES.</p>
 </table>
 <dl class="method">
 <dt id="wtoAlgorithm.WtoAlgorithm.calculate_score">
-<tt class="descname">calculate_score</tt><big>(</big><em>ecount</em>, <em>tcount</em>, <em>srank</em>, <em>ar</em>, <em>aminar</em>, <em>amaxar</em>, <em>tsysfrac</em>, <em>blfrac</em>, <em>grade</em>, <em>repfreq</em>, <em>dec</em>, <em>execu</em>, <em>array</em>, <em>frac</em><big>)</big><a class="reference internal" href="_modules/wtoAlgorithm.html#WtoAlgorithm.calculate_score"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#wtoAlgorithm.WtoAlgorithm.calculate_score" title="Permalink to this definition">¶</a></dt>
+<tt class="descname">calculate_score</tt><big>(</big><em>ecount</em>, <em>tcount</em>, <em>srank</em>, <em>ar</em>, <em>aminar</em>, <em>amaxar</em>, <em>tsysfrac</em>, <em>blfrac</em>, <em>grade</em>, <em>repfreq</em>, <em>dec</em>, <em>execu</em>, <em>array</em>, <em>frac</em>, <em>maxpwvc</em><big>)</big><a class="reference internal" href="_modules/wtoAlgorithm.html#WtoAlgorithm.calculate_score"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#wtoAlgorithm.WtoAlgorithm.calculate_score" title="Permalink to this definition">¶</a></dt>
 <dd><table class="docutils field-list" frame="void" rules="none">
 <col class="field-name" />
 <col class="field-body" />
