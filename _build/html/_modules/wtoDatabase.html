@@ -303,8 +303,13 @@
         <span class="bp">self</span><span class="o">.</span><span class="n">obsproject</span><span class="o">.</span><span class="n">to_pickle</span><span class="p">(</span>
             <span class="bp">self</span><span class="o">.</span><span class="n">path</span> <span class="o">+</span> <span class="bp">self</span><span class="o">.</span><span class="n">preferences</span><span class="o">.</span><span class="n">obsproject_table</span><span class="p">)</span>
 </div>
-    <span class="k">def</span> <span class="nf">update</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">connect</span><span class="o">=</span><span class="bp">True</span><span class="p">):</span>
+<div class="viewcode-block" id="WtoDatabase.update"><a class="viewcode-back" href="../index.html#wtoDatabase.WtoDatabase.update">[docs]</a>    <span class="k">def</span> <span class="nf">update</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">connect</span><span class="o">=</span><span class="bp">True</span><span class="p">):</span>
 
+        <span class="sd">&quot;&quot;&quot;</span>
+
+<span class="sd">        :param connect:</span>
+<span class="sd">        :return:</span>
+<span class="sd">        &quot;&quot;&quot;</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">cursor</span><span class="o">.</span><span class="n">execute</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">sqlsched_proj</span><span class="p">)</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">scheduling_proj</span> <span class="o">=</span> <span class="n">pd</span><span class="o">.</span><span class="n">DataFrame</span><span class="p">(</span>
             <span class="bp">self</span><span class="o">.</span><span class="n">cursor</span><span class="o">.</span><span class="n">fetchall</span><span class="p">(),</span>
@@ -443,8 +448,12 @@
             <span class="bp">self</span><span class="o">.</span><span class="n">spectralconf</span><span class="o">.</span><span class="n">to_pickle</span><span class="p">(</span>
                 <span class="bp">self</span><span class="o">.</span><span class="n">path</span> <span class="o">+</span> <span class="bp">self</span><span class="o">.</span><span class="n">preferences</span><span class="o">.</span><span class="n">spectralconf_table</span><span class="p">)</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">create_summary</span><span class="p">()</span>
+</div>
+<div class="viewcode-block" id="WtoDatabase.populate_sciencegoals_sbxml"><a class="viewcode-back" href="../index.html#wtoDatabase.WtoDatabase.populate_sciencegoals_sbxml">[docs]</a>    <span class="k">def</span> <span class="nf">populate_sciencegoals_sbxml</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
 
-    <span class="k">def</span> <span class="nf">populate_sciencegoals_sbxml</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+
+<span class="sd">        &quot;&quot;&quot;</span>
         <span class="k">try</span><span class="p">:</span>
             <span class="nb">type</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">sciencegoals</span><span class="p">)</span>
             <span class="n">new</span> <span class="o">=</span> <span class="bp">False</span>
@@ -457,8 +466,12 @@
             <span class="n">new</span> <span class="o">=</span> <span class="bp">False</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">sciencegoals</span><span class="o">.</span><span class="n">to_pickle</span><span class="p">(</span>
             <span class="bp">self</span><span class="o">.</span><span class="n">path</span> <span class="o">+</span> <span class="bp">self</span><span class="o">.</span><span class="n">preferences</span><span class="o">.</span><span class="n">sciencegoals_table</span><span class="p">)</span>
+</div>
+<div class="viewcode-block" id="WtoDatabase.populate_schedblock_info"><a class="viewcode-back" href="../index.html#wtoDatabase.WtoDatabase.populate_schedblock_info">[docs]</a>    <span class="k">def</span> <span class="nf">populate_schedblock_info</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
 
-    <span class="k">def</span> <span class="nf">populate_schedblock_info</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+
+<span class="sd">        &quot;&quot;&quot;</span>
         <span class="n">new</span> <span class="o">=</span> <span class="bp">True</span>
         <span class="n">sb_uid_list</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">schedblocks</span><span class="o">.</span><span class="n">SB_UID</span><span class="o">.</span><span class="n">tolist</span><span class="p">()</span>
         <span class="k">for</span> <span class="n">s</span> <span class="ow">in</span> <span class="n">sb_uid_list</span><span class="p">:</span>
@@ -472,8 +485,12 @@
             <span class="bp">self</span><span class="o">.</span><span class="n">path</span> <span class="o">+</span> <span class="bp">self</span><span class="o">.</span><span class="n">preferences</span><span class="o">.</span><span class="n">target_table</span><span class="p">)</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">spectralconf</span><span class="o">.</span><span class="n">to_pickle</span><span class="p">(</span>
             <span class="bp">self</span><span class="o">.</span><span class="n">path</span> <span class="o">+</span> <span class="bp">self</span><span class="o">.</span><span class="n">preferences</span><span class="o">.</span><span class="n">spectralconf_table</span><span class="p">)</span>
+</div>
+<div class="viewcode-block" id="WtoDatabase.populate_schedblocks"><a class="viewcode-back" href="../index.html#wtoDatabase.WtoDatabase.populate_schedblocks">[docs]</a>    <span class="k">def</span> <span class="nf">populate_schedblocks</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
 
-    <span class="k">def</span> <span class="nf">populate_schedblocks</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+
+<span class="sd">        &quot;&quot;&quot;</span>
         <span class="n">new</span> <span class="o">=</span> <span class="bp">True</span>
         <span class="n">sbpartid</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">sciencegoals</span><span class="o">.</span><span class="n">index</span><span class="o">.</span><span class="n">tolist</span><span class="p">()</span>
         <span class="n">sizel</span> <span class="o">=</span> <span class="nb">len</span><span class="p">(</span><span class="n">sbpartid</span><span class="p">)</span>
@@ -488,8 +505,12 @@
 
         <span class="bp">self</span><span class="o">.</span><span class="n">schedblocks</span><span class="o">.</span><span class="n">to_pickle</span><span class="p">(</span>
             <span class="bp">self</span><span class="o">.</span><span class="n">path</span> <span class="o">+</span> <span class="bp">self</span><span class="o">.</span><span class="n">preferences</span><span class="o">.</span><span class="n">sbxml_table</span><span class="p">)</span>
+</div>
+<div class="viewcode-block" id="WtoDatabase.populate_newar"><a class="viewcode-back" href="../index.html#wtoDatabase.WtoDatabase.populate_newar">[docs]</a>    <span class="k">def</span> <span class="nf">populate_newar</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
 
-    <span class="k">def</span> <span class="nf">populate_newar</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+
+<span class="sd">        &quot;&quot;&quot;</span>
         <span class="n">new</span> <span class="o">=</span> <span class="bp">True</span>
         <span class="n">sblist</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">schedblock_info</span><span class="o">.</span><span class="n">SB_UID</span><span class="o">.</span><span class="n">tolist</span><span class="p">()</span>
         <span class="k">for</span> <span class="n">sbuid</span> <span class="ow">in</span> <span class="n">sblist</span><span class="p">:</span>
@@ -498,8 +519,12 @@
 
         <span class="bp">self</span><span class="o">.</span><span class="n">newar</span><span class="o">.</span><span class="n">to_pickle</span><span class="p">(</span>
             <span class="bp">self</span><span class="o">.</span><span class="n">path</span> <span class="o">+</span> <span class="bp">self</span><span class="o">.</span><span class="n">preferences</span><span class="o">.</span><span class="n">newar_table</span><span class="p">)</span>
+</div>
+<div class="viewcode-block" id="WtoDatabase.get_obsproject"><a class="viewcode-back" href="../index.html#wtoDatabase.WtoDatabase.get_obsproject">[docs]</a>    <span class="k">def</span> <span class="nf">get_obsproject</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">code</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
 
-    <span class="k">def</span> <span class="nf">get_obsproject</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">code</span><span class="p">):</span>
+<span class="sd">        :param code:</span>
+<span class="sd">        &quot;&quot;&quot;</span>
         <span class="k">print</span> <span class="s">&quot;Downloading Project </span><span class="si">%s</span><span class="s"> obsproject.xml&quot;</span> <span class="o">%</span> <span class="n">code</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">cursor</span><span class="o">.</span><span class="n">execute</span><span class="p">(</span>
             <span class="s">&quot;SELECT TIMESTAMP, XMLTYPE.getClobVal(xml) &quot;</span>
@@ -515,8 +540,14 @@
         <span class="n">io_file</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="n">xml_content</span><span class="p">)</span>
         <span class="n">io_file</span><span class="o">.</span><span class="n">close</span><span class="p">()</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">obsproject</span><span class="o">.</span><span class="n">loc</span><span class="p">[</span><span class="n">code</span><span class="p">,</span> <span class="s">&#39;obsproj&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">xmlfilename</span>
+</div>
+<div class="viewcode-block" id="WtoDatabase.row_sciencegoals"><a class="viewcode-back" href="../index.html#wtoDatabase.WtoDatabase.row_sciencegoals">[docs]</a>    <span class="k">def</span> <span class="nf">row_sciencegoals</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">code</span><span class="p">,</span> <span class="n">new</span><span class="o">=</span><span class="bp">False</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
 
-    <span class="k">def</span> <span class="nf">row_sciencegoals</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">code</span><span class="p">,</span> <span class="n">new</span><span class="o">=</span><span class="bp">False</span><span class="p">):</span>
+<span class="sd">        :param code:</span>
+<span class="sd">        :param new:</span>
+<span class="sd">        :return:</span>
+<span class="sd">        &quot;&quot;&quot;</span>
         <span class="n">c</span> <span class="o">=</span> <span class="n">code</span>
         <span class="n">proj</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">obsproject</span><span class="p">[</span><span class="bp">self</span><span class="o">.</span><span class="n">obsproject</span><span class="o">.</span><span class="n">CODE</span> <span class="o">==</span> <span class="n">c</span><span class="p">]</span><span class="o">.</span><span class="n">ix</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>
         <span class="n">obsproj</span> <span class="o">=</span> <span class="n">ObsProject</span><span class="p">(</span><span class="n">proj</span><span class="o">.</span><span class="n">obsproj</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">obsxml</span><span class="p">)</span>
@@ -598,10 +629,15 @@
             <span class="k">print</span> <span class="s">&quot;Project </span><span class="si">%s</span><span class="s"> has no ObsUnitSets (</span><span class="si">%s</span><span class="s">)&quot;</span> <span class="o">%</span> <span class="p">(</span><span class="n">code</span><span class="p">,</span> <span class="n">e</span><span class="p">)</span>
             <span class="k">return</span> <span class="mi">0</span>
         <span class="k">return</span> <span class="mi">0</span>
-
-    <span class="k">def</span> <span class="nf">row_schedblock_info</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">sb_uid</span><span class="p">,</span> <span class="n">new</span><span class="o">=</span><span class="bp">False</span><span class="p">):</span>
+</div>
+<div class="viewcode-block" id="WtoDatabase.row_schedblock_info"><a class="viewcode-back" href="../index.html#wtoDatabase.WtoDatabase.row_schedblock_info">[docs]</a>    <span class="k">def</span> <span class="nf">row_schedblock_info</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">sb_uid</span><span class="p">,</span> <span class="n">new</span><span class="o">=</span><span class="bp">False</span><span class="p">):</span>
 
         <span class="c"># Open SB with SB parser class</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+
+<span class="sd">        :param sb_uid:</span>
+<span class="sd">        :param new:</span>
+<span class="sd">        &quot;&quot;&quot;</span>
         <span class="k">print</span> <span class="s">&quot; Processing SB </span><span class="si">%s</span><span class="s">&quot;</span> <span class="o">%</span> <span class="n">sb_uid</span>
         <span class="n">sb</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">schedblocks</span><span class="o">.</span><span class="n">ix</span><span class="p">[</span><span class="n">sb_uid</span><span class="p">]</span>
         <span class="n">pid</span> <span class="o">=</span> <span class="n">sb</span><span class="o">.</span><span class="n">partId</span>
@@ -715,8 +751,14 @@
                 <span class="n">minar_old</span><span class="p">,</span> <span class="n">maxar_old</span><span class="p">,</span> <span class="n">execount</span><span class="p">,</span> <span class="n">ispolarization</span><span class="p">,</span>
                 <span class="n">amplitude</span><span class="p">,</span> <span class="n">bandpass</span><span class="p">,</span> <span class="n">polarization</span><span class="p">,</span> <span class="n">phase</span><span class="p">,</span> <span class="n">delay</span><span class="p">,</span> <span class="n">science</span><span class="p">,</span>
                 <span class="n">integrationtime</span><span class="p">,</span> <span class="n">subscandur</span><span class="p">,</span> <span class="n">maxpwv</span><span class="p">)</span>
+</div>
+<div class="viewcode-block" id="WtoDatabase.row_fieldsource"><a class="viewcode-back" href="../index.html#wtoDatabase.WtoDatabase.row_fieldsource">[docs]</a>    <span class="k">def</span> <span class="nf">row_fieldsource</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">fs</span><span class="p">,</span> <span class="n">sbuid</span><span class="p">,</span> <span class="n">new</span><span class="o">=</span><span class="bp">False</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
 
-    <span class="k">def</span> <span class="nf">row_fieldsource</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">fs</span><span class="p">,</span> <span class="n">sbuid</span><span class="p">,</span> <span class="n">new</span><span class="o">=</span><span class="bp">False</span><span class="p">):</span>
+<span class="sd">        :param fs:</span>
+<span class="sd">        :param sbuid:</span>
+<span class="sd">        :param new:</span>
+<span class="sd">        &quot;&quot;&quot;</span>
         <span class="n">partid</span> <span class="o">=</span> <span class="n">fs</span><span class="o">.</span><span class="n">attrib</span><span class="p">[</span><span class="s">&#39;entityPartId&#39;</span><span class="p">]</span>
         <span class="n">coord</span> <span class="o">=</span> <span class="n">fs</span><span class="o">.</span><span class="n">sourceCoordinates</span>
         <span class="n">solarsystem</span> <span class="o">=</span> <span class="n">fs</span><span class="o">.</span><span class="n">attrib</span><span class="p">[</span><span class="s">&#39;solarSystemObject&#39;</span><span class="p">]</span>
@@ -764,8 +806,14 @@
             <span class="n">partid</span><span class="p">,</span> <span class="n">sbuid</span><span class="p">,</span> <span class="n">solarsystem</span><span class="p">,</span> <span class="n">sourcename</span><span class="p">,</span> <span class="n">name</span><span class="p">,</span> <span class="n">ra</span><span class="p">,</span> <span class="n">dec</span><span class="p">,</span> <span class="n">isquery</span><span class="p">,</span>
             <span class="n">qc_intendeduse</span><span class="p">,</span> <span class="n">qc_ra</span><span class="p">,</span> <span class="n">qc_dec</span><span class="p">,</span> <span class="n">qc_use</span><span class="p">,</span> <span class="n">qc_radius</span><span class="p">,</span> <span class="n">qc_radius_unit</span><span class="p">,</span>
             <span class="n">ephemeris</span><span class="p">,</span> <span class="n">pointings</span><span class="p">,</span> <span class="n">ismosaic</span><span class="p">)</span>
+</div>
+<div class="viewcode-block" id="WtoDatabase.row_target"><a class="viewcode-back" href="../index.html#wtoDatabase.WtoDatabase.row_target">[docs]</a>    <span class="k">def</span> <span class="nf">row_target</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">tg</span><span class="p">,</span> <span class="n">sbuid</span><span class="p">,</span> <span class="n">new</span><span class="o">=</span><span class="bp">False</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
 
-    <span class="k">def</span> <span class="nf">row_target</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">tg</span><span class="p">,</span> <span class="n">sbuid</span><span class="p">,</span> <span class="n">new</span><span class="o">=</span><span class="bp">False</span><span class="p">):</span>
+<span class="sd">        :param tg:</span>
+<span class="sd">        :param sbuid:</span>
+<span class="sd">        :param new:</span>
+<span class="sd">        &quot;&quot;&quot;</span>
         <span class="n">partid</span> <span class="o">=</span> <span class="n">tg</span><span class="o">.</span><span class="n">attrib</span><span class="p">[</span><span class="s">&#39;entityPartId&#39;</span><span class="p">]</span>
         <span class="n">specref</span> <span class="o">=</span> <span class="n">tg</span><span class="o">.</span><span class="n">AbstractInstrumentSpecRef</span><span class="o">.</span><span class="n">attrib</span><span class="p">[</span><span class="s">&#39;partId&#39;</span><span class="p">]</span>
         <span class="n">fieldref</span> <span class="o">=</span> <span class="n">tg</span><span class="o">.</span><span class="n">FieldSourceRef</span><span class="o">.</span><span class="n">attrib</span><span class="p">[</span><span class="s">&#39;partId&#39;</span><span class="p">]</span>
@@ -777,8 +825,14 @@
                 <span class="n">index</span><span class="o">=</span><span class="p">[</span><span class="n">partid</span><span class="p">])</span>
         <span class="k">else</span><span class="p">:</span>
             <span class="bp">self</span><span class="o">.</span><span class="n">target</span><span class="o">.</span><span class="n">ix</span><span class="p">[</span><span class="n">partid</span><span class="p">]</span> <span class="o">=</span> <span class="p">(</span><span class="n">sbuid</span><span class="p">,</span> <span class="n">specref</span><span class="p">,</span> <span class="n">fieldref</span><span class="p">,</span> <span class="n">paramref</span><span class="p">)</span>
+</div>
+<div class="viewcode-block" id="WtoDatabase.row_spectralconf"><a class="viewcode-back" href="../index.html#wtoDatabase.WtoDatabase.row_spectralconf">[docs]</a>    <span class="k">def</span> <span class="nf">row_spectralconf</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">ss</span><span class="p">,</span> <span class="n">sbuid</span><span class="p">,</span> <span class="n">new</span><span class="o">=</span><span class="bp">False</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
 
-    <span class="k">def</span> <span class="nf">row_spectralconf</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">ss</span><span class="p">,</span> <span class="n">sbuid</span><span class="p">,</span> <span class="n">new</span><span class="o">=</span><span class="bp">False</span><span class="p">):</span>
+<span class="sd">        :param ss:</span>
+<span class="sd">        :param sbuid:</span>
+<span class="sd">        :param new:</span>
+<span class="sd">        &quot;&quot;&quot;</span>
         <span class="n">partid</span> <span class="o">=</span> <span class="n">ss</span><span class="o">.</span><span class="n">attrib</span><span class="p">[</span><span class="s">&#39;entityPartId&#39;</span><span class="p">]</span>
         <span class="k">try</span><span class="p">:</span>
             <span class="n">corrconf</span> <span class="o">=</span> <span class="n">ss</span><span class="o">.</span><span class="n">BLCorrelatorConfiguration</span>
@@ -801,9 +855,15 @@
                 <span class="n">index</span><span class="o">=</span><span class="p">[</span><span class="n">partid</span><span class="p">])</span>
         <span class="k">else</span><span class="p">:</span>
             <span class="bp">self</span><span class="o">.</span><span class="n">spectralconf</span><span class="o">.</span><span class="n">ix</span><span class="p">[</span><span class="n">partid</span><span class="p">]</span> <span class="o">=</span> <span class="p">(</span><span class="n">partid</span><span class="p">,</span> <span class="n">sbuid</span><span class="p">,</span> <span class="n">nbb</span><span class="p">,</span> <span class="n">nspw</span><span class="p">)</span>
+</div>
+<div class="viewcode-block" id="WtoDatabase.row_schedblocks"><a class="viewcode-back" href="../index.html#wtoDatabase.WtoDatabase.row_schedblocks">[docs]</a>    <span class="k">def</span> <span class="nf">row_schedblocks</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">sb_uid</span><span class="p">,</span> <span class="n">partid</span><span class="p">,</span> <span class="n">new</span><span class="o">=</span><span class="bp">False</span><span class="p">):</span>
 
-    <span class="k">def</span> <span class="nf">row_schedblocks</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">sb_uid</span><span class="p">,</span> <span class="n">partid</span><span class="p">,</span> <span class="n">new</span><span class="o">=</span><span class="bp">False</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
 
+<span class="sd">        :param sb_uid:</span>
+<span class="sd">        :param partid:</span>
+<span class="sd">        :param new:</span>
+<span class="sd">        &quot;&quot;&quot;</span>
         <span class="n">sql</span> <span class="o">=</span> <span class="s">&quot;SELECT TIMESTAMP, XMLTYPE.getClobVal(xml) &quot;</span> \
               <span class="s">&quot;FROM ALMA.xml_schedblock_entities &quot;</span> \
               <span class="s">&quot;WHERE archive_uid = &#39;</span><span class="si">%s</span><span class="s">&#39;&quot;</span> <span class="o">%</span> <span class="n">sb_uid</span>
@@ -823,8 +883,13 @@
                 <span class="n">index</span><span class="o">=</span><span class="p">[</span><span class="n">sb_uid</span><span class="p">])</span>
         <span class="k">else</span><span class="p">:</span>
             <span class="bp">self</span><span class="o">.</span><span class="n">schedblocks</span><span class="o">.</span><span class="n">ix</span><span class="p">[</span><span class="n">sb_uid</span><span class="p">]</span> <span class="o">=</span> <span class="p">(</span><span class="n">sb_uid</span><span class="p">,</span> <span class="n">partid</span><span class="p">,</span> <span class="n">data</span><span class="p">[</span><span class="mi">0</span><span class="p">][</span><span class="mi">0</span><span class="p">],</span> <span class="n">xml</span><span class="p">)</span>
+</div>
+<div class="viewcode-block" id="WtoDatabase.row_newar"><a class="viewcode-back" href="../index.html#wtoDatabase.WtoDatabase.row_newar">[docs]</a>    <span class="k">def</span> <span class="nf">row_newar</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">sbuid</span><span class="p">,</span> <span class="n">new</span><span class="o">=</span><span class="bp">False</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
 
-    <span class="k">def</span> <span class="nf">row_newar</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">sbuid</span><span class="p">,</span> <span class="n">new</span><span class="o">=</span><span class="bp">False</span><span class="p">):</span>
+<span class="sd">        :param sbuid:</span>
+<span class="sd">        :param new:</span>
+<span class="sd">        &quot;&quot;&quot;</span>
         <span class="n">sbinfo</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">schedblock_info</span><span class="o">.</span><span class="n">ix</span><span class="p">[</span><span class="n">sbuid</span><span class="p">]</span>
         <span class="n">sb</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">schedblocks</span><span class="o">.</span><span class="n">ix</span><span class="p">[</span><span class="n">sbuid</span><span class="p">]</span>
         <span class="n">pid</span> <span class="o">=</span> <span class="n">sb</span><span class="o">.</span><span class="n">partId</span>
@@ -891,8 +956,12 @@
                                          <span class="n">maxarE</span> <span class="o">*</span> <span class="n">corr</span><span class="p">)</span>
                 <span class="bp">self</span><span class="o">.</span><span class="n">newar</span><span class="o">.</span><span class="n">ix</span><span class="p">[</span><span class="n">sbuidC</span><span class="p">]</span> <span class="o">=</span> <span class="p">(</span><span class="n">minarC</span><span class="p">,</span> <span class="n">maxarC</span><span class="p">,</span> <span class="n">minarC</span> <span class="o">*</span> <span class="n">corr</span><span class="p">,</span>
                                          <span class="n">maxarC</span> <span class="o">*</span> <span class="n">corr</span><span class="p">)</span>
+</div>
+<div class="viewcode-block" id="WtoDatabase.filter_c1"><a class="viewcode-back" href="../index.html#wtoDatabase.WtoDatabase.filter_c1">[docs]</a>    <span class="k">def</span> <span class="nf">filter_c1</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
 
-    <span class="k">def</span> <span class="nf">filter_c1</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+
+<span class="sd">        &quot;&quot;&quot;</span>
         <span class="n">c1c2</span> <span class="o">=</span> <span class="n">pd</span><span class="o">.</span><span class="n">read_csv</span><span class="p">(</span>
             <span class="bp">self</span><span class="o">.</span><span class="n">wto_path</span> <span class="o">+</span> <span class="s">&#39;conf/c1c2.csv&#39;</span><span class="p">,</span> <span class="n">sep</span><span class="o">=</span><span class="s">&#39;,&#39;</span><span class="p">,</span> <span class="n">header</span><span class="o">=</span><span class="mi">0</span><span class="p">,</span>
             <span class="n">usecols</span><span class="o">=</span><span class="nb">range</span><span class="p">(</span><span class="mi">5</span><span class="p">))</span>
@@ -910,8 +979,12 @@
             <span class="bp">self</span><span class="o">.</span><span class="n">obsproject</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">checked</span><span class="p">,</span> <span class="n">on</span><span class="o">=</span><span class="s">&#39;CODE&#39;</span><span class="p">,</span>
             <span class="n">copy</span><span class="o">=</span><span class="bp">False</span><span class="p">)</span><span class="o">.</span><span class="n">set_index</span><span class="p">(</span><span class="s">&#39;CODE&#39;</span><span class="p">,</span> <span class="n">drop</span><span class="o">=</span><span class="bp">False</span><span class="p">)</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">obsproject</span> <span class="o">=</span> <span class="n">temp</span>
+</div>
+<div class="viewcode-block" id="WtoDatabase.create_summary"><a class="viewcode-back" href="../index.html#wtoDatabase.WtoDatabase.create_summary">[docs]</a>    <span class="k">def</span> <span class="nf">create_summary</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
 
-    <span class="k">def</span> <span class="nf">create_summary</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+
+<span class="sd">        &quot;&quot;&quot;</span>
         <span class="n">df1</span> <span class="o">=</span> <span class="n">pd</span><span class="o">.</span><span class="n">merge</span><span class="p">(</span>
             <span class="bp">self</span><span class="o">.</span><span class="n">schedblock_info</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">sbstates</span><span class="p">,</span> <span class="n">left_on</span><span class="o">=</span><span class="s">&#39;SB_UID&#39;</span><span class="p">,</span>
             <span class="n">right_index</span><span class="o">=</span><span class="bp">True</span><span class="p">)[</span>
@@ -960,8 +1033,13 @@
              <span class="s">u&#39;scienceRank&#39;</span><span class="p">],</span> <span class="n">dtype</span><span class="o">=</span><span class="s">&#39;object&#39;</span><span class="p">)</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">sb_summary</span><span class="o">.</span><span class="n">repfreq</span> <span class="o">=</span> <span class="n">pd</span><span class="o">.</span><span class="n">np</span><span class="o">.</span><span class="n">around</span><span class="p">(</span>
             <span class="bp">self</span><span class="o">.</span><span class="n">sb_summary</span><span class="o">.</span><span class="n">repfreq</span><span class="p">,</span> <span class="n">decimals</span><span class="o">=</span><span class="mi">1</span><span class="p">)</span>
+</div>
+<div class="viewcode-block" id="WtoDatabase.create_allsb"><a class="viewcode-back" href="../index.html#wtoDatabase.WtoDatabase.create_allsb">[docs]</a>    <span class="k">def</span> <span class="nf">create_allsb</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">split</span><span class="o">=</span><span class="bp">False</span><span class="p">,</span> <span class="n">path</span><span class="o">=</span><span class="bp">None</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
 
-    <span class="k">def</span> <span class="nf">create_allsb</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">split</span><span class="o">=</span><span class="bp">False</span><span class="p">,</span> <span class="n">path</span><span class="o">=</span><span class="bp">None</span><span class="p">):</span>
+<span class="sd">        :param split:</span>
+<span class="sd">        :param path:</span>
+<span class="sd">        &quot;&quot;&quot;</span>
         <span class="k">if</span> <span class="n">path</span> <span class="ow">is</span> <span class="bp">None</span><span class="p">:</span>
             <span class="n">path</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">path</span>
         <span class="n">allsb</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">sb_summary</span><span class="p">[</span>
@@ -980,8 +1058,12 @@
         <span class="k">else</span><span class="p">:</span>
             <span class="n">allsb</span><span class="o">.</span><span class="n">sort</span><span class="p">(</span><span class="s">&#39;CODE&#39;</span><span class="p">)</span><span class="o">.</span><span class="n">to_csv</span><span class="p">(</span>
                 <span class="n">path</span> <span class="o">+</span> <span class="s">&#39;all.sbinfo&#39;</span><span class="p">,</span> <span class="n">sep</span><span class="o">=</span><span class="s">&#39;</span><span class="se">\t</span><span class="s">&#39;</span><span class="p">,</span> <span class="n">header</span><span class="o">=</span><span class="bp">False</span><span class="p">,</span> <span class="n">index</span><span class="o">=</span><span class="bp">False</span><span class="p">)</span>
+</div>
+<div class="viewcode-block" id="WtoDatabase.forcenew"><a class="viewcode-back" href="../index.html#wtoDatabase.WtoDatabase.forcenew">[docs]</a>    <span class="k">def</span> <span class="nf">forcenew</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
 
-    <span class="k">def</span> <span class="nf">forcenew</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+
+<span class="sd">        &quot;&quot;&quot;</span>
         <span class="n">call</span><span class="p">([</span><span class="s">&#39;rm&#39;</span><span class="p">,</span> <span class="s">&#39;-rf&#39;</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">path</span><span class="p">])</span>
         <span class="k">print</span> <span class="bp">self</span><span class="o">.</span><span class="n">path</span> <span class="o">+</span> <span class="s">&quot;: creating preferences dir&quot;</span>
         <span class="n">os</span><span class="o">.</span><span class="n">mkdir</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">path</span><span class="p">)</span>
@@ -994,8 +1076,13 @@
         <span class="bp">self</span><span class="o">.</span><span class="n">populate_newar</span><span class="p">()</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">create_summary</span><span class="p">()</span>
 
-</div>
-<span class="k">class</span> <span class="nc">ObsProject</span><span class="p">(</span><span class="nb">object</span><span class="p">):</span>
+</div></div>
+<div class="viewcode-block" id="ObsProject"><a class="viewcode-back" href="../index.html#wtoDatabase.ObsProject">[docs]</a><span class="k">class</span> <span class="nc">ObsProject</span><span class="p">(</span><span class="nb">object</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;</span>
+
+<span class="sd">    :param xml_file:</span>
+<span class="sd">    :param path:</span>
+<span class="sd">    &quot;&quot;&quot;</span>
 
     <span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">xml_file</span><span class="p">,</span> <span class="n">path</span><span class="o">=</span><span class="s">&#39;./&#39;</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot;</span>
@@ -1011,7 +1098,7 @@
         <span class="k">for</span> <span class="n">key</span> <span class="ow">in</span> <span class="n">data</span><span class="o">.</span><span class="n">__dict__</span><span class="p">:</span>
             <span class="bp">self</span><span class="o">.</span><span class="n">__setattr__</span><span class="p">(</span><span class="n">key</span><span class="p">,</span> <span class="n">data</span><span class="o">.</span><span class="n">__dict__</span><span class="p">[</span><span class="n">key</span><span class="p">])</span>
 
-    <span class="k">def</span> <span class="nf">assoc_sched_blocks</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+<div class="viewcode-block" id="ObsProject.assoc_sched_blocks"><a class="viewcode-back" href="../index.html#wtoDatabase.ObsProject.assoc_sched_blocks">[docs]</a>    <span class="k">def</span> <span class="nf">assoc_sched_blocks</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot;</span>
 
 
@@ -1050,11 +1137,11 @@
         <span class="k">except</span> <span class="ne">AttributeError</span><span class="p">:</span>
             <span class="k">print</span> <span class="s">&quot;Project </span><span class="si">%s</span><span class="s"> has no Science Goal OUS&quot;</span> <span class="o">%</span> <span class="bp">self</span><span class="o">.</span><span class="n">code</span>
         <span class="k">return</span> <span class="n">result</span>
-
+</div>
     <span class="k">def</span> <span class="nf">import_sched_blocks</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
         <span class="k">pass</span>
 
-
+</div>
 <span class="k">class</span> <span class="nc">SchedBlocK</span><span class="p">(</span><span class="nb">object</span><span class="p">):</span>
 
     <span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">xml_file</span><span class="p">,</span> <span class="n">path</span><span class="o">=</span><span class="s">&#39;./&#39;</span><span class="p">):</span>
@@ -1069,7 +1156,13 @@
         <span class="bp">self</span><span class="o">.</span><span class="n">data</span> <span class="o">=</span> <span class="n">tree</span><span class="o">.</span><span class="n">getroot</span><span class="p">()</span>
 
 
-<span class="k">def</span> <span class="nf">convert_deg</span><span class="p">(</span><span class="n">angle</span><span class="p">,</span> <span class="n">unit</span><span class="p">):</span>
+<div class="viewcode-block" id="convert_deg"><a class="viewcode-back" href="../index.html#wtoDatabase.convert_deg">[docs]</a><span class="k">def</span> <span class="nf">convert_deg</span><span class="p">(</span><span class="n">angle</span><span class="p">,</span> <span class="n">unit</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;</span>
+
+<span class="sd">    :param angle:</span>
+<span class="sd">    :param unit:</span>
+<span class="sd">    :return:</span>
+<span class="sd">    &quot;&quot;&quot;</span>
     <span class="n">value</span> <span class="o">=</span> <span class="n">angle</span>
     <span class="k">if</span> <span class="n">unit</span> <span class="o">==</span> <span class="s">&#39;mas&#39;</span><span class="p">:</span>
         <span class="n">value</span> <span class="o">/=</span> <span class="mf">3600000.</span>
@@ -1083,8 +1176,14 @@
         <span class="n">value</span> <span class="o">*=</span> <span class="mf">15.</span>
     <span class="k">return</span> <span class="n">value</span>
 
+</div>
+<div class="viewcode-block" id="convert_sec"><a class="viewcode-back" href="../index.html#wtoDatabase.convert_sec">[docs]</a><span class="k">def</span> <span class="nf">convert_sec</span><span class="p">(</span><span class="n">angle</span><span class="p">,</span> <span class="n">unit</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;</span>
 
-<span class="k">def</span> <span class="nf">convert_sec</span><span class="p">(</span><span class="n">angle</span><span class="p">,</span> <span class="n">unit</span><span class="p">):</span>
+<span class="sd">    :param angle:</span>
+<span class="sd">    :param unit:</span>
+<span class="sd">    :return:</span>
+<span class="sd">    &quot;&quot;&quot;</span>
     <span class="n">value</span> <span class="o">=</span> <span class="n">angle</span>
     <span class="k">if</span> <span class="n">unit</span> <span class="o">==</span> <span class="s">&#39;mas&#39;</span><span class="p">:</span>
         <span class="n">value</span> <span class="o">/=</span> <span class="mf">1000.</span>
@@ -1102,8 +1201,14 @@
         <span class="k">return</span> <span class="bp">None</span>
     <span class="k">return</span> <span class="n">value</span>
 
+</div>
+<div class="viewcode-block" id="convert_jy"><a class="viewcode-back" href="../index.html#wtoDatabase.convert_jy">[docs]</a><span class="k">def</span> <span class="nf">convert_jy</span><span class="p">(</span><span class="n">flux</span><span class="p">,</span> <span class="n">unit</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;</span>
 
-<span class="k">def</span> <span class="nf">convert_jy</span><span class="p">(</span><span class="n">flux</span><span class="p">,</span> <span class="n">unit</span><span class="p">):</span>
+<span class="sd">    :param flux:</span>
+<span class="sd">    :param unit:</span>
+<span class="sd">    :return:</span>
+<span class="sd">    &quot;&quot;&quot;</span>
     <span class="n">value</span> <span class="o">=</span> <span class="n">flux</span>
     <span class="k">if</span> <span class="n">unit</span> <span class="o">==</span> <span class="s">&#39;Jy&#39;</span><span class="p">:</span>
         <span class="n">value</span> <span class="o">=</span> <span class="n">value</span>
@@ -1113,8 +1218,14 @@
         <span class="k">return</span> <span class="bp">None</span>
     <span class="k">return</span> <span class="n">value</span>
 
+</div>
+<div class="viewcode-block" id="convert_mjy"><a class="viewcode-back" href="../index.html#wtoDatabase.convert_mjy">[docs]</a><span class="k">def</span> <span class="nf">convert_mjy</span><span class="p">(</span><span class="n">flux</span><span class="p">,</span> <span class="n">unit</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;</span>
 
-<span class="k">def</span> <span class="nf">convert_mjy</span><span class="p">(</span><span class="n">flux</span><span class="p">,</span> <span class="n">unit</span><span class="p">):</span>
+<span class="sd">    :param flux:</span>
+<span class="sd">    :param unit:</span>
+<span class="sd">    :return:</span>
+<span class="sd">    &quot;&quot;&quot;</span>
     <span class="n">value</span> <span class="o">=</span> <span class="n">flux</span>
     <span class="k">if</span> <span class="n">unit</span> <span class="o">==</span> <span class="s">&#39;Jy&#39;</span><span class="p">:</span>
         <span class="n">value</span> <span class="o">*=</span> <span class="mf">1e3</span>
@@ -1124,8 +1235,14 @@
         <span class="k">return</span> <span class="bp">None</span>
     <span class="k">return</span> <span class="n">value</span>
 
+</div>
+<div class="viewcode-block" id="convert_ghz"><a class="viewcode-back" href="../index.html#wtoDatabase.convert_ghz">[docs]</a><span class="k">def</span> <span class="nf">convert_ghz</span><span class="p">(</span><span class="n">freq</span><span class="p">,</span> <span class="n">unit</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;</span>
 
-<span class="k">def</span> <span class="nf">convert_ghz</span><span class="p">(</span><span class="n">freq</span><span class="p">,</span> <span class="n">unit</span><span class="p">):</span>
+<span class="sd">    :param freq:</span>
+<span class="sd">    :param unit:</span>
+<span class="sd">    :return:</span>
+<span class="sd">    &quot;&quot;&quot;</span>
     <span class="n">value</span> <span class="o">=</span> <span class="n">freq</span>
     <span class="k">if</span> <span class="n">unit</span> <span class="o">==</span> <span class="s">&#39;GHz&#39;</span><span class="p">:</span>
         <span class="n">value</span> <span class="o">=</span> <span class="n">value</span>
@@ -1139,9 +1256,15 @@
         <span class="k">return</span> <span class="bp">None</span>
     <span class="k">return</span> <span class="n">value</span>
 
+</div>
+<div class="viewcode-block" id="convert_tsec"><a class="viewcode-back" href="../index.html#wtoDatabase.convert_tsec">[docs]</a><span class="k">def</span> <span class="nf">convert_tsec</span><span class="p">(</span><span class="n">time</span><span class="p">,</span> <span class="n">unit</span><span class="p">):</span>
 
-<span class="k">def</span> <span class="nf">convert_tsec</span><span class="p">(</span><span class="n">time</span><span class="p">,</span> <span class="n">unit</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;</span>
 
+<span class="sd">    :param time:</span>
+<span class="sd">    :param unit:</span>
+<span class="sd">    :return:</span>
+<span class="sd">    &quot;&quot;&quot;</span>
     <span class="n">value</span> <span class="o">=</span> <span class="n">time</span>
     <span class="k">if</span> <span class="n">unit</span> <span class="o">==</span> <span class="s">&#39;s&#39;</span><span class="p">:</span>
         <span class="k">return</span> <span class="n">value</span>
@@ -1150,7 +1273,7 @@
     <span class="k">elif</span> <span class="n">unit</span> <span class="o">==</span> <span class="s">&#39;h&#39;</span><span class="p">:</span>
         <span class="k">return</span> <span class="n">value</span> <span class="o">*</span> <span class="mf">3600.</span>
     <span class="k">else</span><span class="p">:</span>
-        <span class="k">return</span> <span class="bp">None</span>
+        <span class="k">return</span> <span class="bp">None</span></div>
 </pre></div>
 
           </div>

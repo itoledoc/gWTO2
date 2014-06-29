@@ -256,6 +256,11 @@ class WtoDatabase(object):
 
     def update(self, connect=True):
 
+        """
+
+        :param connect:
+        :return:
+        """
         self.cursor.execute(self.sqlsched_proj)
         self.scheduling_proj = pd.DataFrame(
             self.cursor.fetchall(),
@@ -396,6 +401,10 @@ class WtoDatabase(object):
         self.create_summary()
 
     def populate_sciencegoals_sbxml(self):
+        """
+
+
+        """
         try:
             type(self.sciencegoals)
             new = False
@@ -410,6 +419,10 @@ class WtoDatabase(object):
             self.path + self.preferences.sciencegoals_table)
 
     def populate_schedblock_info(self):
+        """
+
+
+        """
         new = True
         sb_uid_list = self.schedblocks.SB_UID.tolist()
         for s in sb_uid_list:
@@ -425,6 +438,10 @@ class WtoDatabase(object):
             self.path + self.preferences.spectralconf_table)
 
     def populate_schedblocks(self):
+        """
+
+
+        """
         new = True
         sbpartid = self.sciencegoals.index.tolist()
         sizel = len(sbpartid)
@@ -441,6 +458,10 @@ class WtoDatabase(object):
             self.path + self.preferences.sbxml_table)
 
     def populate_newar(self):
+        """
+
+
+        """
         new = True
         sblist = self.schedblock_info.SB_UID.tolist()
         for sbuid in sblist:
@@ -451,6 +472,10 @@ class WtoDatabase(object):
             self.path + self.preferences.newar_table)
 
     def get_obsproject(self, code):
+        """
+
+        :param code:
+        """
         print "Downloading Project %s obsproject.xml" % code
         self.cursor.execute(
             "SELECT TIMESTAMP, XMLTYPE.getClobVal(xml) "
@@ -468,6 +493,12 @@ class WtoDatabase(object):
         self.obsproject.loc[code, 'obsproj'] = xmlfilename
 
     def row_sciencegoals(self, code, new=False):
+        """
+
+        :param code:
+        :param new:
+        :return:
+        """
         c = code
         proj = self.obsproject[self.obsproject.CODE == c].ix[0]
         obsproj = ObsProject(proj.obsproj, self.obsxml)
@@ -553,6 +584,11 @@ class WtoDatabase(object):
     def row_schedblock_info(self, sb_uid, new=False):
 
         # Open SB with SB parser class
+        """
+
+        :param sb_uid:
+        :param new:
+        """
         print " Processing SB %s" % sb_uid
         sb = self.schedblocks.ix[sb_uid]
         pid = sb.partId
@@ -668,6 +704,12 @@ class WtoDatabase(object):
                 integrationtime, subscandur, maxpwv)
 
     def row_fieldsource(self, fs, sbuid, new=False):
+        """
+
+        :param fs:
+        :param sbuid:
+        :param new:
+        """
         partid = fs.attrib['entityPartId']
         coord = fs.sourceCoordinates
         solarsystem = fs.attrib['solarSystemObject']
@@ -717,6 +759,12 @@ class WtoDatabase(object):
             ephemeris, pointings, ismosaic)
 
     def row_target(self, tg, sbuid, new=False):
+        """
+
+        :param tg:
+        :param sbuid:
+        :param new:
+        """
         partid = tg.attrib['entityPartId']
         specref = tg.AbstractInstrumentSpecRef.attrib['partId']
         fieldref = tg.FieldSourceRef.attrib['partId']
@@ -730,6 +778,12 @@ class WtoDatabase(object):
             self.target.ix[partid] = (sbuid, specref, fieldref, paramref)
 
     def row_spectralconf(self, ss, sbuid, new=False):
+        """
+
+        :param ss:
+        :param sbuid:
+        :param new:
+        """
         partid = ss.attrib['entityPartId']
         try:
             corrconf = ss.BLCorrelatorConfiguration
@@ -755,6 +809,12 @@ class WtoDatabase(object):
 
     def row_schedblocks(self, sb_uid, partid, new=False):
 
+        """
+
+        :param sb_uid:
+        :param partid:
+        :param new:
+        """
         sql = "SELECT TIMESTAMP, XMLTYPE.getClobVal(xml) " \
               "FROM ALMA.xml_schedblock_entities " \
               "WHERE archive_uid = '%s'" % sb_uid
@@ -776,6 +836,11 @@ class WtoDatabase(object):
             self.schedblocks.ix[sb_uid] = (sb_uid, partid, data[0][0], xml)
 
     def row_newar(self, sbuid, new=False):
+        """
+
+        :param sbuid:
+        :param new:
+        """
         sbinfo = self.schedblock_info.ix[sbuid]
         sb = self.schedblocks.ix[sbuid]
         pid = sb.partId
@@ -844,6 +909,10 @@ class WtoDatabase(object):
                                          maxarC * corr)
 
     def filter_c1(self):
+        """
+
+
+        """
         c1c2 = pd.read_csv(
             self.wto_path + 'conf/c1c2.csv', sep=',', header=0,
             usecols=range(5))
@@ -863,6 +932,10 @@ class WtoDatabase(object):
         self.obsproject = temp
 
     def create_summary(self):
+        """
+
+
+        """
         df1 = pd.merge(
             self.schedblock_info, self.sbstates, left_on='SB_UID',
             right_index=True)[
@@ -913,6 +986,11 @@ class WtoDatabase(object):
             self.sb_summary.repfreq, decimals=1)
 
     def create_allsb(self, split=False, path=None):
+        """
+
+        :param split:
+        :param path:
+        """
         if path is None:
             path = self.path
         allsb = self.sb_summary[
@@ -933,6 +1011,10 @@ class WtoDatabase(object):
                 path + 'all.sbinfo', sep='\t', header=False, index=False)
 
     def forcenew(self):
+        """
+
+
+        """
         call(['rm', '-rf', self.path])
         print self.path + ": creating preferences dir"
         os.mkdir(self.path)
@@ -947,6 +1029,11 @@ class WtoDatabase(object):
 
 
 class ObsProject(object):
+    """
+
+    :param xml_file:
+    :param path:
+    """
 
     def __init__(self, xml_file, path='./'):
         """
@@ -1021,6 +1108,12 @@ class SchedBlocK(object):
 
 
 def convert_deg(angle, unit):
+    """
+
+    :param angle:
+    :param unit:
+    :return:
+    """
     value = angle
     if unit == 'mas':
         value /= 3600000.
@@ -1036,6 +1129,12 @@ def convert_deg(angle, unit):
 
 
 def convert_sec(angle, unit):
+    """
+
+    :param angle:
+    :param unit:
+    :return:
+    """
     value = angle
     if unit == 'mas':
         value /= 1000.
@@ -1055,6 +1154,12 @@ def convert_sec(angle, unit):
 
 
 def convert_jy(flux, unit):
+    """
+
+    :param flux:
+    :param unit:
+    :return:
+    """
     value = flux
     if unit == 'Jy':
         value = value
@@ -1066,6 +1171,12 @@ def convert_jy(flux, unit):
 
 
 def convert_mjy(flux, unit):
+    """
+
+    :param flux:
+    :param unit:
+    :return:
+    """
     value = flux
     if unit == 'Jy':
         value *= 1e3
@@ -1077,6 +1188,12 @@ def convert_mjy(flux, unit):
 
 
 def convert_ghz(freq, unit):
+    """
+
+    :param freq:
+    :param unit:
+    :return:
+    """
     value = freq
     if unit == 'GHz':
         value = value
@@ -1093,6 +1210,12 @@ def convert_ghz(freq, unit):
 
 def convert_tsec(time, unit):
 
+    """
+
+    :param time:
+    :param unit:
+    :return:
+    """
     value = time
     if unit == 's':
         return value

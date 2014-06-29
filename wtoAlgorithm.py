@@ -65,7 +65,7 @@ class WtoAlgorithm(WtoDatabase):
         self.exec_prio = {'EA': 10., 'NA': 10., 'EU': 10., 'CL': 10.,
                           'OTHER': 10.}
 
-        self.num_ant_user = None
+        self.num_ant_user = 34
         self.defarrays = ['C34-1', 'C34-2', 'C34-3', 'C34-4', 'C34-5', 'C34-6',
                           'C34-7']
         self.arr_ar_def = {'C34-1': 3.73, 'C34-2': 2.04, 'C34-3': 1.4,
@@ -292,7 +292,7 @@ class WtoAlgorithm(WtoDatabase):
                   (len(sel4), self.array_ar, self.num_bl, self.num_ant))
             sel4['blmax'] = sel4.apply(
                 lambda row: rUV.computeBL(row['AR'], row['repfreq']), axis=1)
-            if self.num_ant_user is None:
+            if self.num_ant_user == 34:
                 sel4['blfrac'] = sel4.apply(
                     lambda row: (33. * 17) / (1.*len(
                         self.ruv[self.ruv < row['blmax']]))
@@ -349,16 +349,16 @@ class WtoAlgorithm(WtoDatabase):
         scores = pd.DataFrame(scores.values.tolist(), index=scores.index)
         scores.columns = pd.Index(
             [u'sb_cond_score', u'sb_array_score', u'sb_completion_score',
-             u'sb_exec_score', u'sb_science_score', u'sb_grade_score', u'arcorr',
-             u'score'])
+             u'sb_exec_score', u'sb_science_score', u'sb_grade_score',
+             u'arcorr', u'score'])
         if array == '12m':
-            self.select12m = pd.merge(
+            self.score12m = pd.merge(
                 self.select12m, scores, left_on='SB_UID', right_index=True)
         elif array == '7m':
-            self.select7m = pd.merge(
+            self.score7m = pd.merge(
                 self.select7m, scores, left_on='SB_UID', right_index=True)
         else:
-            self.selecttp = pd.merge(
+            self.scoretp = pd.merge(
                 self.selecttp, scores, left_on='SB_UID', right_index=True)
 
     def calculate_score(self, ecount, tcount, srank, ar, aminar, amaxar,
@@ -411,7 +411,7 @@ class WtoAlgorithm(WtoDatabase):
             if self.array_ar < arcorr:
                 l = arcorr - aminar
                 s = 10. / l
-                sb_array_score = (self.array_ar - aminar) * s
+                sb_array_score = pd.np.sqrt(self.array_ar - aminar) * s
             elif self.array_ar == arcorr:
                 sb_array_score = 10.
             else:
@@ -596,12 +596,12 @@ class WtoAlgorithm(WtoDatabase):
                 self.ruv = self.ruv[-561:]
                 self.num_bl = len(self.ruv)
                 self.num_ant = 34
-                if self.num_ant_user is not None:
+                if self.num_ant_user != 34:
                     self.num_ant = self.num_ant_user
             else:
                 self.num_bl = len(self.ruv)
                 self.num_ant = int((1 + pd.np.sqrt(1 + 8 * self.num_bl)) / 2.)
-                if self.num_ant_user is not None:
+                if self.num_ant_user != 34:
                     self.num_ant = self.num_ant_user
 
 

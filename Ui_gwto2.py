@@ -2,7 +2,7 @@
 
 # Form implementation generated from reading ui file '/home/itoledo/Work/gWTO2/gwto2.ui'
 #
-# Created: Sat Jun 28 23:00:35 2014
+# Created: Sat Jun 28 23:42:38 2014
 #      by: PyQt4 UI code generator 4.10.4
 #
 # WARNING! All changes made in this file will be lost!
@@ -26,7 +26,7 @@ except AttributeError:
 class Ui_MainWindow(object):
     def setupUi(self, MainWindow):
         MainWindow.setObjectName(_fromUtf8("MainWindow"))
-        MainWindow.resize(1057, 822)
+        MainWindow.resize(1090, 822)
         self.centralwidget = QtGui.QWidget(MainWindow)
         self.centralwidget.setObjectName(_fromUtf8("centralwidget"))
         self.gridLayout = QtGui.QGridLayout(self.centralwidget)
@@ -102,9 +102,9 @@ class Ui_MainWindow(object):
         self.lst_label.setObjectName(_fromUtf8("lst_label"))
         self.gridLayout_6.addWidget(self.lst_label, 0, 4, 1, 1)
         spacerItem = QtGui.QSpacerItem(40, 20, QtGui.QSizePolicy.Expanding, QtGui.QSizePolicy.Minimum)
-        self.gridLayout_6.addItem(spacerItem, 0, 6, 1, 1)
+        self.gridLayout_6.addItem(spacerItem, 0, 7, 1, 1)
         spacerItem1 = QtGui.QSpacerItem(40, 20, QtGui.QSizePolicy.Expanding, QtGui.QSizePolicy.Minimum)
-        self.gridLayout_6.addItem(spacerItem1, 1, 6, 1, 1)
+        self.gridLayout_6.addItem(spacerItem1, 1, 7, 1, 1)
         self.lst_spin = QtGui.QTimeEdit(self.OptionsFrame)
         self.lst_spin.setEnabled(True)
         self.lst_spin.setReadOnly(True)
@@ -156,7 +156,10 @@ class Ui_MainWindow(object):
         self.array_ar_spin.setProperty("value", 1.0)
         self.array_ar_spin.setObjectName(_fromUtf8("array_ar_spin"))
         self.gridLayout_7.addWidget(self.array_ar_spin, 0, 4, 1, 1)
-        self.gridLayout_6.addWidget(self.ArraysFrame, 0, 11, 2, 1)
+        self.gridLayout_6.addWidget(self.ArraysFrame, 0, 12, 2, 1)
+        self.now_button = QtGui.QPushButton(self.OptionsFrame)
+        self.now_button.setObjectName(_fromUtf8("now_button"))
+        self.gridLayout_6.addWidget(self.now_button, 0, 6, 1, 1)
         self.gridLayout_2.addWidget(self.OptionsFrame, 0, 0, 1, 1)
         self.TabFrame = QtGui.QFrame(self.MainFrame)
         self.TabFrame.setFrameShape(QtGui.QFrame.Box)
@@ -198,7 +201,7 @@ class Ui_MainWindow(object):
         self.gridLayout.addWidget(self.MainFrame, 0, 0, 1, 1)
         MainWindow.setCentralWidget(self.centralwidget)
         self.menubar = QtGui.QMenuBar(MainWindow)
-        self.menubar.setGeometry(QtCore.QRect(0, 0, 1057, 27))
+        self.menubar.setGeometry(QtCore.QRect(0, 0, 1090, 27))
         self.menubar.setObjectName(_fromUtf8("menubar"))
         self.menuMenu = QtGui.QMenu(self.menubar)
         self.menuMenu.setObjectName(_fromUtf8("menuMenu"))
@@ -246,6 +249,7 @@ class Ui_MainWindow(object):
         self.std_conf_label.setText(_translate("MainWindow", "Std. Conf.:", None))
         self.arrayAR_label.setText(_translate("MainWindow", "Array AR", None))
         self.antennas_label.setText(_translate("MainWindow", "Antennas", None))
+        self.now_button.setText(_translate("MainWindow", "Now", None))
         self.tabWidget.setTabText(self.tabWidget.indexOf(self.bl_tab), _translate("MainWindow", "Tab 1", None))
         self.tabWidget.setTabText(self.tabWidget.indexOf(self.tc_tab), _translate("MainWindow", "Tab 2", None))
         self.tabWidget.setTabText(self.tabWidget.indexOf(self.pol_tab), _translate("MainWindow", "Page", None))

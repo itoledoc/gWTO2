@@ -51,26 +51,27 @@
 <ul class="simple">
 <li><a class="reference internal" href="#the-gwto2-documentation" id="id1">The gWTO2 Documentation</a></li>
 <li><a class="reference internal" href="#using-gwto2" id="id2">Using gWTO2</a></li>
-<li><a class="reference internal" href="#module-wtoDatabase" id="id3">The WTO API</a><ul>
-<li><a class="reference internal" href="#wtodatabase-py-the-gwto-database-library" id="id4">wtoDatabase.py: the gWTO database library.</a></li>
+<li><a class="reference internal" href="#playing-with-the-libraries" id="id3">Playing with the libraries:</a></li>
+<li><a class="reference internal" href="#module-wtoDatabase" id="id4">The WTO API</a><ul>
+<li><a class="reference internal" href="#wtodatabase-py-the-gwto-database-library" id="id5">wtoDatabase.py: the gWTO database library.</a></li>
 </ul>
 </li>
-<li><a class="reference internal" href="#the-wto-data-frames" id="id5">The WTO Data Frames</a><ul>
-<li><a class="reference internal" href="#wtodatabase-obsprojects" id="id6">wtoDatabase.obsprojects</a></li>
-<li><a class="reference internal" href="#wtodatabase-sciencegoals" id="id7">wtoDatabase.sciencegoals</a></li>
-<li><a class="reference internal" href="#wtodatabase-schedblocks" id="id8">wtoDatabase.schedblocks</a></li>
-<li><a class="reference internal" href="#wtodatabase-schedblock-info" id="id9">wtoDatabase.schedblock_info</a></li>
-<li><a class="reference internal" href="#wtodatabase-target" id="id10">wtoDatabase.target</a></li>
-<li><a class="reference internal" href="#wtodatabase-fieldsource" id="id11">wtoDatabase.fieldsource</a></li>
-<li><a class="reference internal" href="#wtodatabase-spectralconf" id="id12">wtoDatabase.spectralconf</a></li>
-<li><a class="reference internal" href="#wtodatabase-sb-summary-view" id="id13">wtoDatabase.sb_summary (<em>&#8220;view&#8221;</em>)</a></li>
-<li><a class="reference internal" href="#wtodatabase-qa0" id="id14">wtoDatabase.qa0</a></li>
-<li><a class="reference internal" href="#wtodatabase-scheduling-proj" id="id15">wtoDatabase.scheduling_proj</a></li>
-<li><a class="reference internal" href="#wtodatabase-scheduling-sb" id="id16">wtoDatabase.scheduling_sb</a></li>
-<li><a class="reference internal" href="#wtodatabase-sbstate" id="id17">wtoDatabase.sbstate</a></li>
+<li><a class="reference internal" href="#the-wto-data-frames" id="id6">The WTO Data Frames</a><ul>
+<li><a class="reference internal" href="#wtodatabase-obsprojects" id="id7">wtoDatabase.obsprojects</a></li>
+<li><a class="reference internal" href="#wtodatabase-sciencegoals" id="id8">wtoDatabase.sciencegoals</a></li>
+<li><a class="reference internal" href="#wtodatabase-schedblocks" id="id9">wtoDatabase.schedblocks</a></li>
+<li><a class="reference internal" href="#wtodatabase-schedblock-info" id="id10">wtoDatabase.schedblock_info</a></li>
+<li><a class="reference internal" href="#wtodatabase-target" id="id11">wtoDatabase.target</a></li>
+<li><a class="reference internal" href="#wtodatabase-fieldsource" id="id12">wtoDatabase.fieldsource</a></li>
+<li><a class="reference internal" href="#wtodatabase-spectralconf" id="id13">wtoDatabase.spectralconf</a></li>
+<li><a class="reference internal" href="#wtodatabase-sb-summary-view" id="id14">wtoDatabase.sb_summary (<em>&#8220;view&#8221;</em>)</a></li>
+<li><a class="reference internal" href="#wtodatabase-qa0" id="id15">wtoDatabase.qa0</a></li>
+<li><a class="reference internal" href="#wtodatabase-scheduling-proj" id="id16">wtoDatabase.scheduling_proj</a></li>
+<li><a class="reference internal" href="#wtodatabase-scheduling-sb" id="id17">wtoDatabase.scheduling_sb</a></li>
+<li><a class="reference internal" href="#wtodatabase-sbstate" id="id18">wtoDatabase.sbstate</a></li>
 </ul>
 </li>
-<li><a class="reference internal" href="#indices-and-tables" id="id18">Indices and tables</a></li>
+<li><a class="reference internal" href="#indices-and-tables" id="id19">Indices and tables</a></li>
 </ul>
 </div>
 <div class="toctree-wrapper compound">
@@ -89,13 +90,89 @@ loaded before using it. This is achieved by running::</p>
 <p>The Anaconda distribution is based on python 2.7.6 and includes numpy, pandas,
 pyephem and other libraries need by gWTO.</p>
 </div>
+<div class="section" id="playing-with-the-libraries">
+<h1><a class="toc-backref" href="#id3">Playing with the libraries:</a><a class="headerlink" href="#playing-with-the-libraries" title="Permalink to this headline">¶</a></h1>
+<div class="highlight-python"><div class="highlight"><pre>. activateC2Test
+ipython
+</pre></div>
+</div>
+<p>Once in ipython::</p>
+<div class="highlight-python"><div class="highlight"><pre><span class="kn">import</span> <span class="nn">wtoAlgorithm</span> <span class="kn">as</span> <span class="nn">wto</span>
+<span class="kn">import</span> <span class="nn">ephem</span>
+<span class="kn">import</span> <span class="nn">pandas</span> <span class="kn">as</span> <span class="nn">pd</span>
+<span class="n">datas</span> <span class="o">=</span> <span class="n">wto</span><span class="o">.</span><span class="n">Algorithm</span><span class="p">(</span><span class="n">path</span><span class="o">=</span><span class="s">&#39;./wto_testing/&#39;</span><span class="p">)</span>
+</pre></div>
+</div>
+<p>And the run the following script. You can copy the code, and then paste into
+python with %paste, or copy it into a file, and then execute it inside the
+ipython session:</p>
+<div class="highlight-python"><div class="highlight"><pre><span class="k">def</span> <span class="nf">runwto</span><span class="p">(</span><span class="n">pwv</span><span class="p">,</span> <span class="n">array_name</span><span class="o">=</span><span class="n">datas</span><span class="o">.</span><span class="n">bl_arrays</span><span class="o">.</span><span class="n">AV1</span><span class="o">.</span><span class="n">values</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span> <span class="n">date</span><span class="o">=</span><span class="n">ephem</span><span class="o">.</span><span class="n">now</span><span class="p">()):</span>
+    <span class="n">datas</span><span class="o">.</span><span class="n">update</span><span class="p">()</span>
+    <span class="n">datas</span><span class="o">.</span><span class="n">date</span> <span class="o">=</span> <span class="n">date</span>
+    <span class="n">datas</span><span class="o">.</span><span class="n">pwv</span> <span class="o">=</span> <span class="n">pwv</span>
+    <span class="n">datas</span><span class="o">.</span><span class="n">query_arrays</span><span class="p">()</span>
+    <span class="n">datas</span><span class="o">.</span><span class="n">selector</span><span class="p">(</span><span class="s">&#39;12m&#39;</span><span class="p">,</span> <span class="n">array_name</span><span class="p">)</span>
+    <span class="n">datas</span><span class="o">.</span><span class="n">scorer</span><span class="p">(</span><span class="s">&#39;12m&#39;</span><span class="p">)</span>
+    <span class="k">print</span> <span class="n">datas</span><span class="o">.</span><span class="n">score12m</span><span class="o">.</span><span class="n">sort</span><span class="p">(</span>
+        <span class="s">&#39;score&#39;</span><span class="p">,</span> <span class="n">ascending</span><span class="o">=</span><span class="bp">False</span><span class="p">)</span><span class="o">.</span><span class="n">query</span><span class="p">(</span>
+        <span class="s">&#39;band != &quot;ALMA_RB_04&quot; and band &#39;</span>
+        <span class="s">&#39;!= &quot;ALMA_RB_08&quot; and isPolarization == False&#39;</span><span class="p">)[</span>
+        <span class="p">[</span><span class="s">&#39;score&#39;</span><span class="p">,</span><span class="s">&#39;CODE&#39;</span><span class="p">,</span><span class="s">&#39;SB_UID&#39;</span><span class="p">,</span><span class="s">&#39;name&#39;</span><span class="p">,</span><span class="s">&#39;SB_state&#39;</span><span class="p">,</span><span class="s">&#39;band&#39;</span><span class="p">,</span><span class="s">&#39;HA&#39;</span><span class="p">,</span><span class="s">&#39;elev&#39;</span><span class="p">,</span><span class="s">&#39;etime&#39;</span><span class="p">,</span>
+         <span class="s">&#39;execount&#39;</span><span class="p">,</span><span class="s">&#39;Total&#39;</span><span class="p">,</span><span class="s">&#39;arrayMinAR&#39;</span><span class="p">,</span><span class="s">&#39;arcorr&#39;</span><span class="p">,</span><span class="s">&#39;arrayMaxAR&#39;</span><span class="p">,</span><span class="s">&#39;tsysfrac&#39;</span><span class="p">,</span>
+         <span class="s">&#39;blfrac&#39;</span><span class="p">,</span><span class="s">&#39;frac&#39;</span><span class="p">,</span><span class="s">&#39;sb_array_score&#39;</span><span class="p">,</span><span class="s">&#39;sb_cond_score&#39;</span><span class="p">,</span> <span class="s">&#39;DEC&#39;</span><span class="p">,</span><span class="s">&#39;RA&#39;</span><span class="p">,</span>
+         <span class="s">&#39;isTimeConstrained&#39;</span><span class="p">,</span> <span class="s">&#39;integrationTime&#39;</span><span class="p">,</span> <span class="s">&#39;PRJ_ARCHIVE_UID&#39;</span><span class="p">]]</span><span class="o">.</span><span class="n">head</span><span class="p">(</span><span class="mi">25</span><span class="p">)</span>
+</pre></div>
+</div>
+<p>The to run the wto algorith use a pwv value between 0 and 20, with steps of
+0.05 (e.g., 0.4, 0.45, but no 0.42), and assuming the latest BL Array. Set
+array_name=None when running runwto (e.g. runwto(0.45, array_name=None)) to
+use the Current configuration parameters calculated with arrayConfigurationTools
+and 34 antennas.</p>
+<p>This will display the top 25 values of datas.scorer12m dataFrame. To check full
+output in an excel table run::</p>
+<div class="highlight-python"><div class="highlight"><pre><span class="n">datas</span><span class="o">.</span><span class="n">score12m</span><span class="o">.</span><span class="n">to_excel</span><span class="p">(</span><span class="s">&#39;output_path/score.xls&#39;</span><span class="p">)</span>
+</pre></div>
+</div>
+<p>Where output_path is the full path to the directory where you want to save the
+score.xls excel spreadsheet.</p>
+</div>
 <div class="section" id="module-wtoDatabase">
-<span id="the-wto-api"></span><h1><a class="toc-backref" href="#id3">The WTO API</a><a class="headerlink" href="#module-wtoDatabase" title="Permalink to this headline">¶</a></h1>
+<span id="the-wto-api"></span><h1><a class="toc-backref" href="#id4">The WTO API</a><a class="headerlink" href="#module-wtoDatabase" title="Permalink to this headline">¶</a></h1>
 <div class="section" id="wtodatabase-py-the-gwto-database-library">
-<h2><a class="toc-backref" href="#id4">wtoDatabase.py: the gWTO database library.</a><a class="headerlink" href="#wtodatabase-py-the-gwto-database-library" title="Permalink to this headline">¶</a></h2>
+<h2><a class="toc-backref" href="#id5">wtoDatabase.py: the gWTO database library.</a><a class="headerlink" href="#wtodatabase-py-the-gwto-database-library" title="Permalink to this headline">¶</a></h2>
 <p>This library contains the classes and functions required to query, parse and
 organize the Projects and SchedBlock information stored at the OSF archive in
 different tables.</p>
+<dl class="class">
+<dt id="wtoDatabase.ObsProject">
+<em class="property">class </em><tt class="descclassname">wtoDatabase.</tt><tt class="descname">ObsProject</tt><big>(</big><em>xml_file</em>, <em>path='./'</em><big>)</big><a class="reference internal" href="_modules/wtoDatabase.html#ObsProject"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#wtoDatabase.ObsProject" title="Permalink to this definition">¶</a></dt>
+<dd><table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first last simple">
+<li><strong>xml_file</strong> &#8211; </li>
+<li><strong>path</strong> &#8211; </li>
+</ul>
+</td>
+</tr>
+</tbody>
+</table>
+<dl class="method">
+<dt id="wtoDatabase.ObsProject.assoc_sched_blocks">
+<tt class="descname">assoc_sched_blocks</tt><big>(</big><big>)</big><a class="reference internal" href="_modules/wtoDatabase.html#ObsProject.assoc_sched_blocks"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#wtoDatabase.ObsProject.assoc_sched_blocks" title="Permalink to this definition">¶</a></dt>
+<dd><table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Returns:</th><td class="field-body"></td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+</dd></dl>
+
 <dl class="class">
 <dt id="wtoDatabase.WtoDatabase">
 <em class="property">class </em><tt class="descclassname">wtoDatabase.</tt><tt class="descname">WtoDatabase</tt><big>(</big><em>path='/.wto/'</em>, <em>source=None</em>, <em>forcenew=False</em><big>)</big><a class="reference internal" href="_modules/wtoDatabase.html#WtoDatabase"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#wtoDatabase.WtoDatabase" title="Permalink to this definition">¶</a></dt>
@@ -125,6 +202,197 @@ all information will be processed again.</p>
 :param forcenew: Force cache cleaning and reload from archive.
 :type forcenew: boolean, default False</p>
 <dl class="method">
+<dt id="wtoDatabase.WtoDatabase.create_allsb">
+<tt class="descname">create_allsb</tt><big>(</big><em>split=False</em>, <em>path=None</em><big>)</big><a class="reference internal" href="_modules/wtoDatabase.html#WtoDatabase.create_allsb"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#wtoDatabase.WtoDatabase.create_allsb" title="Permalink to this definition">¶</a></dt>
+<dd><table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first last simple">
+<li><strong>split</strong> &#8211; </li>
+<li><strong>path</strong> &#8211; </li>
+</ul>
+</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="method">
+<dt id="wtoDatabase.WtoDatabase.create_summary">
+<tt class="descname">create_summary</tt><big>(</big><big>)</big><a class="reference internal" href="_modules/wtoDatabase.html#WtoDatabase.create_summary"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#wtoDatabase.WtoDatabase.create_summary" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="wtoDatabase.WtoDatabase.filter_c1">
+<tt class="descname">filter_c1</tt><big>(</big><big>)</big><a class="reference internal" href="_modules/wtoDatabase.html#WtoDatabase.filter_c1"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#wtoDatabase.WtoDatabase.filter_c1" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="wtoDatabase.WtoDatabase.forcenew">
+<tt class="descname">forcenew</tt><big>(</big><big>)</big><a class="reference internal" href="_modules/wtoDatabase.html#WtoDatabase.forcenew"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#wtoDatabase.WtoDatabase.forcenew" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="wtoDatabase.WtoDatabase.get_obsproject">
+<tt class="descname">get_obsproject</tt><big>(</big><em>code</em><big>)</big><a class="reference internal" href="_modules/wtoDatabase.html#WtoDatabase.get_obsproject"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#wtoDatabase.WtoDatabase.get_obsproject" title="Permalink to this definition">¶</a></dt>
+<dd><table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><strong>code</strong> &#8211; </td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="method">
+<dt id="wtoDatabase.WtoDatabase.populate_newar">
+<tt class="descname">populate_newar</tt><big>(</big><big>)</big><a class="reference internal" href="_modules/wtoDatabase.html#WtoDatabase.populate_newar"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#wtoDatabase.WtoDatabase.populate_newar" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="wtoDatabase.WtoDatabase.populate_schedblock_info">
+<tt class="descname">populate_schedblock_info</tt><big>(</big><big>)</big><a class="reference internal" href="_modules/wtoDatabase.html#WtoDatabase.populate_schedblock_info"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#wtoDatabase.WtoDatabase.populate_schedblock_info" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="wtoDatabase.WtoDatabase.populate_schedblocks">
+<tt class="descname">populate_schedblocks</tt><big>(</big><big>)</big><a class="reference internal" href="_modules/wtoDatabase.html#WtoDatabase.populate_schedblocks"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#wtoDatabase.WtoDatabase.populate_schedblocks" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="wtoDatabase.WtoDatabase.populate_sciencegoals_sbxml">
+<tt class="descname">populate_sciencegoals_sbxml</tt><big>(</big><big>)</big><a class="reference internal" href="_modules/wtoDatabase.html#WtoDatabase.populate_sciencegoals_sbxml"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#wtoDatabase.WtoDatabase.populate_sciencegoals_sbxml" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="wtoDatabase.WtoDatabase.row_fieldsource">
+<tt class="descname">row_fieldsource</tt><big>(</big><em>fs</em>, <em>sbuid</em>, <em>new=False</em><big>)</big><a class="reference internal" href="_modules/wtoDatabase.html#WtoDatabase.row_fieldsource"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#wtoDatabase.WtoDatabase.row_fieldsource" title="Permalink to this definition">¶</a></dt>
+<dd><table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first last simple">
+<li><strong>fs</strong> &#8211; </li>
+<li><strong>sbuid</strong> &#8211; </li>
+<li><strong>new</strong> &#8211; </li>
+</ul>
+</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="method">
+<dt id="wtoDatabase.WtoDatabase.row_newar">
+<tt class="descname">row_newar</tt><big>(</big><em>sbuid</em>, <em>new=False</em><big>)</big><a class="reference internal" href="_modules/wtoDatabase.html#WtoDatabase.row_newar"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#wtoDatabase.WtoDatabase.row_newar" title="Permalink to this definition">¶</a></dt>
+<dd><table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first last simple">
+<li><strong>sbuid</strong> &#8211; </li>
+<li><strong>new</strong> &#8211; </li>
+</ul>
+</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="method">
+<dt id="wtoDatabase.WtoDatabase.row_schedblock_info">
+<tt class="descname">row_schedblock_info</tt><big>(</big><em>sb_uid</em>, <em>new=False</em><big>)</big><a class="reference internal" href="_modules/wtoDatabase.html#WtoDatabase.row_schedblock_info"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#wtoDatabase.WtoDatabase.row_schedblock_info" title="Permalink to this definition">¶</a></dt>
+<dd><table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first last simple">
+<li><strong>sb_uid</strong> &#8211; </li>
+<li><strong>new</strong> &#8211; </li>
+</ul>
+</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="method">
+<dt id="wtoDatabase.WtoDatabase.row_schedblocks">
+<tt class="descname">row_schedblocks</tt><big>(</big><em>sb_uid</em>, <em>partid</em>, <em>new=False</em><big>)</big><a class="reference internal" href="_modules/wtoDatabase.html#WtoDatabase.row_schedblocks"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#wtoDatabase.WtoDatabase.row_schedblocks" title="Permalink to this definition">¶</a></dt>
+<dd><table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first last simple">
+<li><strong>sb_uid</strong> &#8211; </li>
+<li><strong>partid</strong> &#8211; </li>
+<li><strong>new</strong> &#8211; </li>
+</ul>
+</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="method">
+<dt id="wtoDatabase.WtoDatabase.row_sciencegoals">
+<tt class="descname">row_sciencegoals</tt><big>(</big><em>code</em>, <em>new=False</em><big>)</big><a class="reference internal" href="_modules/wtoDatabase.html#WtoDatabase.row_sciencegoals"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#wtoDatabase.WtoDatabase.row_sciencegoals" title="Permalink to this definition">¶</a></dt>
+<dd><table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first simple">
+<li><strong>code</strong> &#8211; </li>
+<li><strong>new</strong> &#8211; </li>
+</ul>
+</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><p class="first last"></p>
+</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="method">
+<dt id="wtoDatabase.WtoDatabase.row_spectralconf">
+<tt class="descname">row_spectralconf</tt><big>(</big><em>ss</em>, <em>sbuid</em>, <em>new=False</em><big>)</big><a class="reference internal" href="_modules/wtoDatabase.html#WtoDatabase.row_spectralconf"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#wtoDatabase.WtoDatabase.row_spectralconf" title="Permalink to this definition">¶</a></dt>
+<dd><table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first last simple">
+<li><strong>ss</strong> &#8211; </li>
+<li><strong>sbuid</strong> &#8211; </li>
+<li><strong>new</strong> &#8211; </li>
+</ul>
+</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="method">
+<dt id="wtoDatabase.WtoDatabase.row_target">
+<tt class="descname">row_target</tt><big>(</big><em>tg</em>, <em>sbuid</em>, <em>new=False</em><big>)</big><a class="reference internal" href="_modules/wtoDatabase.html#WtoDatabase.row_target"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#wtoDatabase.WtoDatabase.row_target" title="Permalink to this definition">¶</a></dt>
+<dd><table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first last simple">
+<li><strong>tg</strong> &#8211; </li>
+<li><strong>sbuid</strong> &#8211; </li>
+<li><strong>new</strong> &#8211; </li>
+</ul>
+</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="method">
 <dt id="wtoDatabase.WtoDatabase.start_wto">
 <tt class="descname">start_wto</tt><big>(</big><big>)</big><a class="reference internal" href="_modules/wtoDatabase.html#WtoDatabase.start_wto"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#wtoDatabase.WtoDatabase.start_wto" title="Permalink to this definition">¶</a></dt>
 <dd><p>Initializes the wtoDatabase dataframes.</p>
@@ -144,6 +412,141 @@ ALMA.XML_OBSPROJECT_ENTITIES.</p>
 </table>
 </dd></dl>
 
+<dl class="method">
+<dt id="wtoDatabase.WtoDatabase.update">
+<tt class="descname">update</tt><big>(</big><em>connect=True</em><big>)</big><a class="reference internal" href="_modules/wtoDatabase.html#WtoDatabase.update"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#wtoDatabase.WtoDatabase.update" title="Permalink to this definition">¶</a></dt>
+<dd><table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><strong>connect</strong> &#8211; </td>
+</tr>
+<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"></td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+</dd></dl>
+
+<dl class="function">
+<dt id="wtoDatabase.convert_deg">
+<tt class="descclassname">wtoDatabase.</tt><tt class="descname">convert_deg</tt><big>(</big><em>angle</em>, <em>unit</em><big>)</big><a class="reference internal" href="_modules/wtoDatabase.html#convert_deg"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#wtoDatabase.convert_deg" title="Permalink to this definition">¶</a></dt>
+<dd><table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first simple">
+<li><strong>angle</strong> &#8211; </li>
+<li><strong>unit</strong> &#8211; </li>
+</ul>
+</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><p class="first last"></p>
+</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="function">
+<dt id="wtoDatabase.convert_ghz">
+<tt class="descclassname">wtoDatabase.</tt><tt class="descname">convert_ghz</tt><big>(</big><em>freq</em>, <em>unit</em><big>)</big><a class="reference internal" href="_modules/wtoDatabase.html#convert_ghz"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#wtoDatabase.convert_ghz" title="Permalink to this definition">¶</a></dt>
+<dd><table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first simple">
+<li><strong>freq</strong> &#8211; </li>
+<li><strong>unit</strong> &#8211; </li>
+</ul>
+</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><p class="first last"></p>
+</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="function">
+<dt id="wtoDatabase.convert_jy">
+<tt class="descclassname">wtoDatabase.</tt><tt class="descname">convert_jy</tt><big>(</big><em>flux</em>, <em>unit</em><big>)</big><a class="reference internal" href="_modules/wtoDatabase.html#convert_jy"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#wtoDatabase.convert_jy" title="Permalink to this definition">¶</a></dt>
+<dd><table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first simple">
+<li><strong>flux</strong> &#8211; </li>
+<li><strong>unit</strong> &#8211; </li>
+</ul>
+</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><p class="first last"></p>
+</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="function">
+<dt id="wtoDatabase.convert_mjy">
+<tt class="descclassname">wtoDatabase.</tt><tt class="descname">convert_mjy</tt><big>(</big><em>flux</em>, <em>unit</em><big>)</big><a class="reference internal" href="_modules/wtoDatabase.html#convert_mjy"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#wtoDatabase.convert_mjy" title="Permalink to this definition">¶</a></dt>
+<dd><table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first simple">
+<li><strong>flux</strong> &#8211; </li>
+<li><strong>unit</strong> &#8211; </li>
+</ul>
+</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><p class="first last"></p>
+</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="function">
+<dt id="wtoDatabase.convert_sec">
+<tt class="descclassname">wtoDatabase.</tt><tt class="descname">convert_sec</tt><big>(</big><em>angle</em>, <em>unit</em><big>)</big><a class="reference internal" href="_modules/wtoDatabase.html#convert_sec"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#wtoDatabase.convert_sec" title="Permalink to this definition">¶</a></dt>
+<dd><table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first simple">
+<li><strong>angle</strong> &#8211; </li>
+<li><strong>unit</strong> &#8211; </li>
+</ul>
+</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><p class="first last"></p>
+</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="function">
+<dt id="wtoDatabase.convert_tsec">
+<tt class="descclassname">wtoDatabase.</tt><tt class="descname">convert_tsec</tt><big>(</big><em>time</em>, <em>unit</em><big>)</big><a class="reference internal" href="_modules/wtoDatabase.html#convert_tsec"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#wtoDatabase.convert_tsec" title="Permalink to this definition">¶</a></dt>
+<dd><table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first simple">
+<li><strong>time</strong> &#8211; </li>
+<li><strong>unit</strong> &#8211; </li>
+</ul>
+</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><p class="first last"></p>
+</td>
+</tr>
+</tbody>
+</table>
 </dd></dl>
 
 </div>
@@ -357,7 +760,7 @@ done with WtoAlgorith.observable and to assign a score</p>
 
 <dl class="function">
 <dt id="wtoAlgorithm.observable">
-<tt class="descclassname">wtoAlgorithm.</tt><tt class="descname">observable</tt><big>(</big><em>solarSystem</em>, <em>sourcename</em>, <em>RA</em>, <em>DEC</em>, <em>horizon</em>, <em>isQuery</em>, <em>ephemeris</em>, <em>alma=&lt;ephem.Observer date='2014/6/28 18:23:41' epoch='2000/1/1 12:00:00' lon=-67:45:18.5 lat=-23:01:34.3 elevation=5060.0m horizon=0:00:00.0 temp=15.0C pressure=1010.0mBar&gt;</em><big>)</big><a class="reference internal" href="_modules/wtoAlgorithm.html#observable"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#wtoAlgorithm.observable" title="Permalink to this definition">¶</a></dt>
+<tt class="descclassname">wtoAlgorithm.</tt><tt class="descname">observable</tt><big>(</big><em>solarSystem</em>, <em>sourcename</em>, <em>RA</em>, <em>DEC</em>, <em>horizon</em>, <em>isQuery</em>, <em>ephemeris</em>, <em>alma</em><big>)</big><a class="reference internal" href="_modules/wtoAlgorithm.html#observable"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#wtoAlgorithm.observable" title="Permalink to this definition">¶</a></dt>
 <dd><table class="docutils field-list" frame="void" rules="none">
 <col class="field-name" />
 <col class="field-body" />
@@ -403,9 +806,9 @@ done with WtoAlgorith.observable and to assign a score</p>
 
 </div>
 <div class="section" id="the-wto-data-frames">
-<h1><a class="toc-backref" href="#id5">The WTO Data Frames</a><a class="headerlink" href="#the-wto-data-frames" title="Permalink to this headline">¶</a></h1>
+<h1><a class="toc-backref" href="#id6">The WTO Data Frames</a><a class="headerlink" href="#the-wto-data-frames" title="Permalink to this headline">¶</a></h1>
 <div class="section" id="wtodatabase-obsprojects">
-<h2><a class="toc-backref" href="#id6">wtoDatabase.obsprojects</a><a class="headerlink" href="#wtodatabase-obsprojects" title="Permalink to this headline">¶</a></h2>
+<h2><a class="toc-backref" href="#id7">wtoDatabase.obsprojects</a><a class="headerlink" href="#wtodatabase-obsprojects" title="Permalink to this headline">¶</a></h2>
 <table border="1" class="docutils">
 <colgroup>
 <col width="33%" />
@@ -466,7 +869,7 @@ done with WtoAlgorith.observable and to assign a score</p>
 </table>
 </div>
 <div class="section" id="wtodatabase-sciencegoals">
-<h2><a class="toc-backref" href="#id7">wtoDatabase.sciencegoals</a><a class="headerlink" href="#wtodatabase-sciencegoals" title="Permalink to this headline">¶</a></h2>
+<h2><a class="toc-backref" href="#id8">wtoDatabase.sciencegoals</a><a class="headerlink" href="#wtodatabase-sciencegoals" title="Permalink to this headline">¶</a></h2>
 <table border="1" class="docutils">
 <colgroup>
 <col width="27%" />
@@ -533,7 +936,7 @@ done with WtoAlgorith.observable and to assign a score</p>
 </table>
 </div>
 <div class="section" id="wtodatabase-schedblocks">
-<h2><a class="toc-backref" href="#id8">wtoDatabase.schedblocks</a><a class="headerlink" href="#wtodatabase-schedblocks" title="Permalink to this headline">¶</a></h2>
+<h2><a class="toc-backref" href="#id9">wtoDatabase.schedblocks</a><a class="headerlink" href="#wtodatabase-schedblocks" title="Permalink to this headline">¶</a></h2>
 <table border="1" class="docutils">
 <colgroup>
 <col width="27%" />
@@ -561,7 +964,7 @@ done with WtoAlgorith.observable and to assign a score</p>
 </table>
 </div>
 <div class="section" id="wtodatabase-schedblock-info">
-<h2><a class="toc-backref" href="#id9">wtoDatabase.schedblock_info</a><a class="headerlink" href="#wtodatabase-schedblock-info" title="Permalink to this headline">¶</a></h2>
+<h2><a class="toc-backref" href="#id10">wtoDatabase.schedblock_info</a><a class="headerlink" href="#wtodatabase-schedblock-info" title="Permalink to this headline">¶</a></h2>
 <table border="1" class="docutils">
 <colgroup>
 <col width="27%" />
@@ -643,7 +1046,7 @@ done with WtoAlgorith.observable and to assign a score</p>
 </table>
 </div>
 <div class="section" id="wtodatabase-target">
-<h2><a class="toc-backref" href="#id10">wtoDatabase.target</a><a class="headerlink" href="#wtodatabase-target" title="Permalink to this headline">¶</a></h2>
+<h2><a class="toc-backref" href="#id11">wtoDatabase.target</a><a class="headerlink" href="#wtodatabase-target" title="Permalink to this headline">¶</a></h2>
 <table border="1" class="docutils">
 <colgroup>
 <col width="27%" />
@@ -671,7 +1074,7 @@ done with WtoAlgorith.observable and to assign a score</p>
 </table>
 </div>
 <div class="section" id="wtodatabase-fieldsource">
-<h2><a class="toc-backref" href="#id11">wtoDatabase.fieldsource</a><a class="headerlink" href="#wtodatabase-fieldsource" title="Permalink to this headline">¶</a></h2>
+<h2><a class="toc-backref" href="#id12">wtoDatabase.fieldsource</a><a class="headerlink" href="#wtodatabase-fieldsource" title="Permalink to this headline">¶</a></h2>
 <table border="1" class="docutils">
 <colgroup>
 <col width="27%" />
@@ -738,7 +1141,7 @@ done with WtoAlgorith.observable and to assign a score</p>
 </table>
 </div>
 <div class="section" id="wtodatabase-spectralconf">
-<h2><a class="toc-backref" href="#id12">wtoDatabase.spectralconf</a><a class="headerlink" href="#wtodatabase-spectralconf" title="Permalink to this headline">¶</a></h2>
+<h2><a class="toc-backref" href="#id13">wtoDatabase.spectralconf</a><a class="headerlink" href="#wtodatabase-spectralconf" title="Permalink to this headline">¶</a></h2>
 <table border="1" class="docutils">
 <colgroup>
 <col width="27%" />
@@ -766,7 +1169,7 @@ done with WtoAlgorith.observable and to assign a score</p>
 </table>
 </div>
 <div class="section" id="wtodatabase-sb-summary-view">
-<h2><a class="toc-backref" href="#id13">wtoDatabase.sb_summary (<em>&#8220;view&#8221;</em>)</a><a class="headerlink" href="#wtodatabase-sb-summary-view" title="Permalink to this headline">¶</a></h2>
+<h2><a class="toc-backref" href="#id14">wtoDatabase.sb_summary (<em>&#8220;view&#8221;</em>)</a><a class="headerlink" href="#wtodatabase-sb-summary-view" title="Permalink to this headline">¶</a></h2>
 <table border="1" class="docutils">
 <colgroup>
 <col width="36%" />
@@ -878,7 +1281,7 @@ done with WtoAlgorith.observable and to assign a score</p>
 </table>
 </div>
 <div class="section" id="wtodatabase-qa0">
-<h2><a class="toc-backref" href="#id14">wtoDatabase.qa0</a><a class="headerlink" href="#wtodatabase-qa0" title="Permalink to this headline">¶</a></h2>
+<h2><a class="toc-backref" href="#id15">wtoDatabase.qa0</a><a class="headerlink" href="#wtodatabase-qa0" title="Permalink to this headline">¶</a></h2>
 <table border="1" class="docutils">
 <colgroup>
 <col width="42%" />
@@ -900,7 +1303,7 @@ done with WtoAlgorith.observable and to assign a score</p>
 </table>
 </div>
 <div class="section" id="wtodatabase-scheduling-proj">
-<h2><a class="toc-backref" href="#id15">wtoDatabase.scheduling_proj</a><a class="headerlink" href="#wtodatabase-scheduling-proj" title="Permalink to this headline">¶</a></h2>
+<h2><a class="toc-backref" href="#id16">wtoDatabase.scheduling_proj</a><a class="headerlink" href="#wtodatabase-scheduling-proj" title="Permalink to this headline">¶</a></h2>
 <table border="1" class="docutils">
 <colgroup>
 <col width="36%" />
@@ -976,7 +1379,7 @@ done with WtoAlgorith.observable and to assign a score</p>
 </table>
 </div>
 <div class="section" id="wtodatabase-scheduling-sb">
-<h2><a class="toc-backref" href="#id16">wtoDatabase.scheduling_sb</a><a class="headerlink" href="#wtodatabase-scheduling-sb" title="Permalink to this headline">¶</a></h2>
+<h2><a class="toc-backref" href="#id17">wtoDatabase.scheduling_sb</a><a class="headerlink" href="#wtodatabase-scheduling-sb" title="Permalink to this headline">¶</a></h2>
 <table border="1" class="docutils">
 <colgroup>
 <col width="36%" />
@@ -1016,11 +1419,11 @@ done with WtoAlgorith.observable and to assign a score</p>
 </table>
 </div>
 <div class="section" id="wtodatabase-sbstate">
-<h2><a class="toc-backref" href="#id17">wtoDatabase.sbstate</a><a class="headerlink" href="#wtodatabase-sbstate" title="Permalink to this headline">¶</a></h2>
+<h2><a class="toc-backref" href="#id18">wtoDatabase.sbstate</a><a class="headerlink" href="#wtodatabase-sbstate" title="Permalink to this headline">¶</a></h2>
 </div>
 </div>
 <div class="section" id="indices-and-tables">
-<h1><a class="toc-backref" href="#id18">Indices and tables</a><a class="headerlink" href="#indices-and-tables" title="Permalink to this headline">¶</a></h1>
+<h1><a class="toc-backref" href="#id19">Indices and tables</a><a class="headerlink" href="#indices-and-tables" title="Permalink to this headline">¶</a></h1>
 <ul class="simple">
 <li><a class="reference internal" href="genindex.html"><em>Index</em></a></li>
 <li><a class="reference internal" href="py-modindex.html"><em>Module Index</em></a></li>
@@ -1038,6 +1441,7 @@ done with WtoAlgorith.observable and to assign a score</p>
   <ul>
 <li><a class="reference internal" href="#">The gWTO2 Documentation</a></li>
 <li><a class="reference internal" href="#using-gwto2">Using gWTO2</a></li>
+<li><a class="reference internal" href="#playing-with-the-libraries">Playing with the libraries:</a></li>
 <li><a class="reference internal" href="#module-wtoDatabase">The WTO API</a><ul>
 <li><a class="reference internal" href="#wtodatabase-py-the-gwto-database-library">wtoDatabase.py: the gWTO database library.</a></li>
 </ul>
