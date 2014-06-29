@@ -150,7 +150,86 @@ ALMA.XML_OBSPROJECT_ENTITIES.</p>
 <span class="target" id="module-wtoAlgorithm"></span><dl class="class">
 <dt id="wtoAlgorithm.WtoAlgorithm">
 <em class="property">class </em><tt class="descclassname">wtoAlgorithm.</tt><tt class="descname">WtoAlgorithm</tt><big>(</big><em>path='/.wto/'</em>, <em>source=None</em>, <em>forcenew=False</em><big>)</big><a class="reference internal" href="_modules/wtoAlgorithm.html#WtoAlgorithm"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#wtoAlgorithm.WtoAlgorithm" title="Permalink to this definition">¶</a></dt>
-<dd><dl class="method">
+<dd><table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first simple">
+<li><strong>path</strong> &#8211; </li>
+<li><strong>source</strong> &#8211; </li>
+<li><strong>forcenew</strong> &#8211; </li>
+</ul>
+</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><p class="first last"></p>
+</td>
+</tr>
+</tbody>
+</table>
+<dl class="method">
+<dt id="wtoAlgorithm.WtoAlgorithm.calculate_score">
+<tt class="descname">calculate_score</tt><big>(</big><em>ecount</em>, <em>tcount</em>, <em>srank</em>, <em>ar</em>, <em>aminar</em>, <em>amaxar</em>, <em>tsysfrac</em>, <em>blfrac</em>, <em>grade</em>, <em>repfreq</em>, <em>dec</em>, <em>execu</em>, <em>array</em>, <em>frac</em><big>)</big><a class="reference internal" href="_modules/wtoAlgorithm.html#WtoAlgorithm.calculate_score"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#wtoAlgorithm.WtoAlgorithm.calculate_score" title="Permalink to this definition">¶</a></dt>
+<dd><table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first simple">
+<li><strong>ecount</strong> &#8211; </li>
+<li><strong>tcount</strong> &#8211; </li>
+<li><strong>srank</strong> &#8211; </li>
+<li><strong>ar</strong> &#8211; </li>
+<li><strong>aminar</strong> &#8211; </li>
+<li><strong>amaxar</strong> &#8211; </li>
+<li><strong>tsysfrac</strong> &#8211; </li>
+<li><strong>blfrac</strong> &#8211; </li>
+<li><strong>grade</strong> &#8211; </li>
+<li><strong>repfreq</strong> &#8211; </li>
+<li><strong>dec</strong> &#8211; </li>
+<li><strong>execu</strong> &#8211; </li>
+<li><strong>array</strong> &#8211; </li>
+<li><strong>frac</strong> &#8211; </li>
+</ul>
+</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><p class="first last"></p>
+</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="method">
+<dt id="wtoAlgorithm.WtoAlgorithm.check_observability">
+<tt class="descname">check_observability</tt><big>(</big><big>)</big><a class="reference internal" href="_modules/wtoAlgorithm.html#WtoAlgorithm.check_observability"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#wtoAlgorithm.WtoAlgorithm.check_observability" title="Permalink to this definition">¶</a></dt>
+<dd><table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Returns:</th><td class="field-body"></td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="method">
+<dt id="wtoAlgorithm.WtoAlgorithm.query_arrays">
+<tt class="descname">query_arrays</tt><big>(</big><big>)</big><a class="reference internal" href="_modules/wtoAlgorithm.html#WtoAlgorithm.query_arrays"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#wtoAlgorithm.WtoAlgorithm.query_arrays" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="wtoAlgorithm.WtoAlgorithm.scorer">
+<tt class="descname">scorer</tt><big>(</big><em>array</em><big>)</big><a class="reference internal" href="_modules/wtoAlgorithm.html#WtoAlgorithm.scorer"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#wtoAlgorithm.WtoAlgorithm.scorer" title="Permalink to this definition">¶</a></dt>
+<dd><table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><strong>array</strong> &#8211; </td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="method">
 <dt id="wtoAlgorithm.WtoAlgorithm.selector">
 <tt class="descname">selector</tt><big>(</big><em>array</em>, <em>array_name=None</em><big>)</big><a class="reference internal" href="_modules/wtoAlgorithm.html#WtoAlgorithm.selector"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#wtoAlgorithm.WtoAlgorithm.selector" title="Permalink to this definition">¶</a></dt>
 <dd><p>Selects SBs that can be observed given the current weather conditions,
@@ -170,6 +249,156 @@ done with WtoAlgorith.observable and to assign a score</p>
 </table>
 </dd></dl>
 
+<dl class="method">
+<dt id="wtoAlgorithm.WtoAlgorithm.set_array_ar">
+<tt class="descname">set_array_ar</tt><big>(</big><em>ar</em><big>)</big><a class="reference internal" href="_modules/wtoAlgorithm.html#WtoAlgorithm.set_array_ar"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#wtoAlgorithm.WtoAlgorithm.set_array_ar" title="Permalink to this definition">¶</a></dt>
+<dd><table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><strong>ar</strong> &#8211; </td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="method">
+<dt id="wtoAlgorithm.WtoAlgorithm.set_arrayar">
+<tt class="descname">set_arrayar</tt><big>(</big><em>ar</em><big>)</big><a class="reference internal" href="_modules/wtoAlgorithm.html#WtoAlgorithm.set_arrayar"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#wtoAlgorithm.WtoAlgorithm.set_arrayar" title="Permalink to this definition">¶</a></dt>
+<dd><table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><strong>ar</strong> &#8211; </td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="method">
+<dt id="wtoAlgorithm.WtoAlgorithm.set_bl_prop">
+<tt class="descname">set_bl_prop</tt><big>(</big><em>array_name</em><big>)</big><a class="reference internal" href="_modules/wtoAlgorithm.html#WtoAlgorithm.set_bl_prop"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#wtoAlgorithm.WtoAlgorithm.set_bl_prop" title="Permalink to this definition">¶</a></dt>
+<dd><table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><strong>array_name</strong> &#8211; </td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="method">
+<dt id="wtoAlgorithm.WtoAlgorithm.set_date">
+<tt class="descname">set_date</tt><big>(</big><em>date</em><big>)</big><a class="reference internal" href="_modules/wtoAlgorithm.html#WtoAlgorithm.set_date"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#wtoAlgorithm.WtoAlgorithm.set_date" title="Permalink to this definition">¶</a></dt>
+<dd><table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><strong>date</strong> &#8211; </td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="method">
+<dt id="wtoAlgorithm.WtoAlgorithm.set_maxha">
+<tt class="descname">set_maxha</tt><big>(</big><em>ha</em><big>)</big><a class="reference internal" href="_modules/wtoAlgorithm.html#WtoAlgorithm.set_maxha"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#wtoAlgorithm.WtoAlgorithm.set_maxha" title="Permalink to this definition">¶</a></dt>
+<dd><table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><strong>ha</strong> &#8211; </td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="method">
+<dt id="wtoAlgorithm.WtoAlgorithm.set_minha">
+<tt class="descname">set_minha</tt><big>(</big><em>ha</em><big>)</big><a class="reference internal" href="_modules/wtoAlgorithm.html#WtoAlgorithm.set_minha"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#wtoAlgorithm.WtoAlgorithm.set_minha" title="Permalink to this definition">¶</a></dt>
+<dd><table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><strong>ha</strong> &#8211; </td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="method">
+<dt id="wtoAlgorithm.WtoAlgorithm.set_pwv">
+<tt class="descname">set_pwv</tt><big>(</big><em>pwv</em><big>)</big><a class="reference internal" href="_modules/wtoAlgorithm.html#WtoAlgorithm.set_pwv"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#wtoAlgorithm.WtoAlgorithm.set_pwv" title="Permalink to this definition">¶</a></dt>
+<dd><table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><strong>pwv</strong> &#8211; </td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="method">
+<dt id="wtoAlgorithm.WtoAlgorithm.set_trans">
+<tt class="descname">set_trans</tt><big>(</big><em>transmission</em><big>)</big><a class="reference internal" href="_modules/wtoAlgorithm.html#WtoAlgorithm.set_trans"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#wtoAlgorithm.WtoAlgorithm.set_trans" title="Permalink to this definition">¶</a></dt>
+<dd><table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><strong>transmission</strong> &#8211; </td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+</dd></dl>
+
+<dl class="function">
+<dt id="wtoAlgorithm.observable">
+<tt class="descclassname">wtoAlgorithm.</tt><tt class="descname">observable</tt><big>(</big><em>solarSystem</em>, <em>sourcename</em>, <em>RA</em>, <em>DEC</em>, <em>horizon</em>, <em>isQuery</em>, <em>ephemeris</em>, <em>alma=&lt;ephem.Observer date='2014/6/28 18:23:41' epoch='2000/1/1 12:00:00' lon=-67:45:18.5 lat=-23:01:34.3 elevation=5060.0m horizon=0:00:00.0 temp=15.0C pressure=1010.0mBar&gt;</em><big>)</big><a class="reference internal" href="_modules/wtoAlgorithm.html#observable"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#wtoAlgorithm.observable" title="Permalink to this definition">¶</a></dt>
+<dd><table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first simple">
+<li><strong>solarSystem</strong> &#8211; </li>
+<li><strong>sourcename</strong> &#8211; </li>
+<li><strong>RA</strong> &#8211; </li>
+<li><strong>DEC</strong> &#8211; </li>
+<li><strong>horizon</strong> &#8211; </li>
+<li><strong>isQuery</strong> &#8211; </li>
+<li><strong>ephemeris</strong> &#8211; </li>
+<li><strong>alma</strong> &#8211; </li>
+</ul>
+</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><p class="first last"></p>
+</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="function">
+<dt id="wtoAlgorithm.read_ephemeris">
+<tt class="descclassname">wtoAlgorithm.</tt><tt class="descname">read_ephemeris</tt><big>(</big><em>ephemeris</em>, <em>date</em><big>)</big><a class="reference internal" href="_modules/wtoAlgorithm.html#read_ephemeris"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#wtoAlgorithm.read_ephemeris" title="Permalink to this definition">¶</a></dt>
+<dd><table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first simple">
+<li><strong>ephemeris</strong> &#8211; </li>
+<li><strong>date</strong> &#8211; </li>
+</ul>
+</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><p class="first last"></p>
+</td>
+</tr>
+</tbody>
+</table>
 </dd></dl>
 
 </div>

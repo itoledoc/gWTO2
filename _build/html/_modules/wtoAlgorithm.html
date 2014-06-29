@@ -86,7 +86,10 @@
 <div class="viewcode-block" id="WtoAlgorithm"><a class="viewcode-back" href="../index.html#wtoAlgorithm.WtoAlgorithm">[docs]</a><span class="k">class</span> <span class="nc">WtoAlgorithm</span><span class="p">(</span><span class="n">WtoDatabase</span><span class="p">):</span>
     <span class="sd">&quot;&quot;&quot;</span>
 
-
+<span class="sd">    :param path:</span>
+<span class="sd">    :param source:</span>
+<span class="sd">    :param forcenew:</span>
+<span class="sd">    :return:</span>
 <span class="sd">    &quot;&quot;&quot;</span>
     <span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">path</span><span class="o">=</span><span class="s">&#39;/.wto/&#39;</span><span class="p">,</span> <span class="n">source</span><span class="o">=</span><span class="bp">None</span><span class="p">,</span> <span class="n">forcenew</span><span class="o">=</span><span class="bp">False</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot;</span>
@@ -101,15 +104,15 @@
         <span class="bp">self</span><span class="o">.</span><span class="n">date</span> <span class="o">=</span> <span class="n">ephem</span><span class="o">.</span><span class="n">now</span><span class="p">()</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">old_date</span> <span class="o">=</span> <span class="mi">0</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">array_ar</span> <span class="o">=</span> <span class="mf">0.94</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">transmission</span> <span class="o">=</span> <span class="mf">0.7</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">transmission</span> <span class="o">=</span> <span class="mf">0.5</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">minha</span> <span class="o">=</span> <span class="o">-</span><span class="mf">5.0</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">maxha</span> <span class="o">=</span> <span class="mf">3.0</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">minfrac</span> <span class="o">=</span> <span class="mf">0.75</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">maxfrac</span> <span class="o">=</span> <span class="mf">1.2</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">horizon</span> <span class="o">=</span> <span class="mf">30.</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">maxblfrac</span> <span class="o">=</span> <span class="mf">1.5</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">exec_prio</span> <span class="o">=</span> <span class="p">{</span><span class="s">&#39;EA&#39;</span><span class="p">:</span> <span class="mf">1.</span><span class="p">,</span> <span class="s">&#39;NA&#39;</span><span class="p">:</span> <span class="mf">1.</span><span class="p">,</span> <span class="s">&#39;EU&#39;</span><span class="p">:</span> <span class="mf">1.</span><span class="p">,</span> <span class="s">&#39;CL&#39;</span><span class="p">:</span> <span class="mf">1.</span><span class="p">,</span>
-                          <span class="s">&#39;OTHER&#39;</span><span class="p">:</span> <span class="mf">1.</span><span class="p">}</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">exec_prio</span> <span class="o">=</span> <span class="p">{</span><span class="s">&#39;EA&#39;</span><span class="p">:</span> <span class="mf">10.</span><span class="p">,</span> <span class="s">&#39;NA&#39;</span><span class="p">:</span> <span class="mf">10.</span><span class="p">,</span> <span class="s">&#39;EU&#39;</span><span class="p">:</span> <span class="mf">10.</span><span class="p">,</span> <span class="s">&#39;CL&#39;</span><span class="p">:</span> <span class="mf">10.</span><span class="p">,</span>
+                          <span class="s">&#39;OTHER&#39;</span><span class="p">:</span> <span class="mf">10.</span><span class="p">}</span>
 
         <span class="bp">self</span><span class="o">.</span><span class="n">num_ant_user</span> <span class="o">=</span> <span class="bp">None</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">defarrays</span> <span class="o">=</span> <span class="p">[</span><span class="s">&#39;C34-1&#39;</span><span class="p">,</span> <span class="s">&#39;C34-2&#39;</span><span class="p">,</span> <span class="s">&#39;C34-3&#39;</span><span class="p">,</span> <span class="s">&#39;C34-4&#39;</span><span class="p">,</span> <span class="s">&#39;C34-5&#39;</span><span class="p">,</span> <span class="s">&#39;C34-6&#39;</span><span class="p">,</span>
@@ -148,8 +151,13 @@
             <span class="bp">self</span><span class="o">.</span><span class="n">antpad</span><span class="o">.</span><span class="n">loc</span><span class="p">[</span><span class="n">n</span><span class="p">]</span> <span class="o">=</span> <span class="p">(</span><span class="n">p</span><span class="p">,</span> <span class="n">a</span><span class="p">)</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">query_arrays</span><span class="p">()</span>
 
-    <span class="k">def</span> <span class="nf">check_observability</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+<div class="viewcode-block" id="WtoAlgorithm.check_observability"><a class="viewcode-back" href="../index.html#wtoAlgorithm.WtoAlgorithm.check_observability">[docs]</a>    <span class="k">def</span> <span class="nf">check_observability</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
 
+        <span class="sd">&quot;&quot;&quot;</span>
+
+
+<span class="sd">        :return:</span>
+<span class="sd">        &quot;&quot;&quot;</span>
         <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">date</span> <span class="o">==</span> <span class="bp">self</span><span class="o">.</span><span class="n">old_date</span><span class="p">:</span>
             <span class="k">return</span> <span class="bp">None</span>
         <span class="n">alma1</span><span class="o">.</span><span class="n">date</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">date</span>
@@ -190,18 +198,24 @@
             <span class="n">fs_2g</span><span class="o">.</span><span class="n">lsts</span><span class="o">.</span><span class="n">max</span><span class="p">())</span>
         <span class="n">lsts</span><span class="o">.</span><span class="n">columns</span> <span class="o">=</span> <span class="n">pd</span><span class="o">.</span><span class="n">Index</span><span class="p">([</span><span class="s">u&#39;lsts&#39;</span><span class="p">])</span>
 
+        <span class="n">dec</span> <span class="o">=</span> <span class="n">pd</span><span class="o">.</span><span class="n">DataFrame</span><span class="p">(</span>
+            <span class="n">fs_2g</span><span class="o">.</span><span class="n">DEC</span><span class="o">.</span><span class="n">mean</span><span class="p">())</span>
+        <span class="n">dec</span><span class="o">.</span><span class="n">columns</span> <span class="o">=</span> <span class="n">pd</span><span class="o">.</span><span class="n">Index</span><span class="p">([</span><span class="s">u&#39;DEC&#39;</span><span class="p">])</span>
+
         <span class="n">fs_3</span> <span class="o">=</span> <span class="n">pd</span><span class="o">.</span><span class="n">merge</span><span class="p">(</span><span class="n">allup</span><span class="p">,</span> <span class="n">etime</span><span class="p">,</span> <span class="n">right_index</span><span class="o">=</span><span class="bp">True</span><span class="p">,</span> <span class="n">left_index</span><span class="o">=</span><span class="bp">True</span><span class="p">,</span>
                         <span class="n">how</span><span class="o">=</span><span class="s">&#39;left&#39;</span><span class="p">)</span>
         <span class="n">fs_4</span> <span class="o">=</span> <span class="n">pd</span><span class="o">.</span><span class="n">merge</span><span class="p">(</span><span class="n">fs_3</span><span class="p">,</span> <span class="n">elevation</span><span class="p">,</span> <span class="n">right_index</span><span class="o">=</span><span class="bp">True</span><span class="p">,</span>
                         <span class="n">left_index</span><span class="o">=</span><span class="bp">True</span><span class="p">,</span> <span class="n">how</span><span class="o">=</span><span class="s">&#39;left&#39;</span><span class="p">)</span>
         <span class="n">fs_5</span> <span class="o">=</span> <span class="n">pd</span><span class="o">.</span><span class="n">merge</span><span class="p">(</span><span class="n">fs_4</span><span class="p">,</span> <span class="n">lstr</span><span class="p">,</span> <span class="n">right_index</span><span class="o">=</span><span class="bp">True</span><span class="p">,</span>
                         <span class="n">left_index</span><span class="o">=</span><span class="bp">True</span><span class="p">,</span> <span class="n">how</span><span class="o">=</span><span class="s">&#39;left&#39;</span><span class="p">)</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">sb_summary</span><span class="o">.</span><span class="n">loc</span><span class="p">[</span><span class="n">dec</span><span class="o">.</span><span class="n">index</span><span class="p">,</span> <span class="s">&#39;DEC&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">dec</span><span class="o">.</span><span class="n">loc</span><span class="p">[</span><span class="n">dec</span><span class="o">.</span><span class="n">index</span><span class="p">,</span> <span class="s">&#39;DEC&#39;</span><span class="p">]</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">obser_prop</span> <span class="o">=</span> <span class="n">pd</span><span class="o">.</span><span class="n">merge</span><span class="p">(</span><span class="n">fs_5</span><span class="p">,</span> <span class="n">lsts</span><span class="p">,</span> <span class="n">right_index</span><span class="o">=</span><span class="bp">True</span><span class="p">,</span>
                                    <span class="n">left_index</span><span class="o">=</span><span class="bp">True</span><span class="p">,</span> <span class="n">how</span><span class="o">=</span><span class="s">&#39;left&#39;</span><span class="p">)</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">old_date</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">date</span>
         <span class="k">print</span> <span class="bp">self</span><span class="o">.</span><span class="n">old_date</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">date</span>
 
-    <span class="c"># noinspection PyAugmentAssignment</span>
+    <span class="c"># noinspection PyAugmentAssignment</span></div>
 <div class="viewcode-block" id="WtoAlgorithm.selector"><a class="viewcode-back" href="../index.html#wtoAlgorithm.WtoAlgorithm.selector">[docs]</a>    <span class="k">def</span> <span class="nf">selector</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">array</span><span class="p">,</span> <span class="n">array_name</span><span class="o">=</span><span class="bp">None</span><span class="p">):</span>
 
         <span class="sd">&quot;&quot;&quot;</span>
@@ -362,46 +376,171 @@
         <span class="c"># TODO: merge t1 with fieldsource on fieldRef (and SB_UID) (t2)</span>
         <span class="c"># TODO: group t2 by SB_UID and calculate mean RA_y and DEC_y</span>
 </div>
-    <span class="k">def</span> <span class="nf">scorer</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">array</span><span class="p">):</span>
+<div class="viewcode-block" id="WtoAlgorithm.scorer"><a class="viewcode-back" href="../index.html#wtoAlgorithm.WtoAlgorithm.scorer">[docs]</a>    <span class="k">def</span> <span class="nf">scorer</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">array</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+
+<span class="sd">        :param array:</span>
+<span class="sd">        &quot;&quot;&quot;</span>
         <span class="k">if</span> <span class="n">array</span> <span class="o">==</span> <span class="s">&#39;12m&#39;</span><span class="p">:</span>
             <span class="n">df</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">select12m</span>
         <span class="k">elif</span> <span class="n">array</span> <span class="o">==</span> <span class="s">&#39;7m&#39;</span><span class="p">:</span>
             <span class="n">df</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">select7m</span>
         <span class="k">else</span><span class="p">:</span>
             <span class="n">df</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">selecttp</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">max_scirank</span> <span class="o">=</span> <span class="n">df</span><span class="o">.</span><span class="n">scienceRank</span><span class="o">.</span><span class="n">max</span><span class="p">()</span>
+        <span class="n">scores</span> <span class="o">=</span> <span class="n">df</span><span class="o">.</span><span class="n">apply</span><span class="p">(</span>
+            <span class="k">lambda</span> <span class="n">r</span><span class="p">:</span> <span class="bp">self</span><span class="o">.</span><span class="n">calculate_score</span><span class="p">(</span>
+                <span class="n">r</span><span class="p">[</span><span class="s">&#39;execount&#39;</span><span class="p">],</span> <span class="n">r</span><span class="p">[</span><span class="s">&#39;Total&#39;</span><span class="p">],</span> <span class="n">r</span><span class="p">[</span><span class="s">&#39;scienceRank&#39;</span><span class="p">],</span> <span class="n">r</span><span class="p">[</span><span class="s">&#39;AR&#39;</span><span class="p">],</span>
+                <span class="n">r</span><span class="p">[</span><span class="s">&#39;arrayMinAR&#39;</span><span class="p">],</span> <span class="n">r</span><span class="p">[</span><span class="s">&#39;arrayMaxAR&#39;</span><span class="p">],</span> <span class="n">r</span><span class="p">[</span><span class="s">&#39;tsysfrac&#39;</span><span class="p">],</span> <span class="n">r</span><span class="p">[</span><span class="s">&#39;blfrac&#39;</span><span class="p">],</span>
+                <span class="n">r</span><span class="p">[</span><span class="s">&#39;grade&#39;</span><span class="p">],</span> <span class="n">r</span><span class="p">[</span><span class="s">&#39;repfreq&#39;</span><span class="p">],</span> <span class="n">r</span><span class="p">[</span><span class="s">&#39;DEC&#39;</span><span class="p">],</span> <span class="n">r</span><span class="p">[</span><span class="s">&#39;EXEC&#39;</span><span class="p">],</span> <span class="n">array</span><span class="p">,</span>
+                <span class="n">r</span><span class="p">[</span><span class="s">&#39;frac&#39;</span><span class="p">]),</span>
+            <span class="n">axis</span><span class="o">=</span><span class="mi">1</span><span class="p">)</span>
+        <span class="n">scores</span> <span class="o">=</span> <span class="n">pd</span><span class="o">.</span><span class="n">DataFrame</span><span class="p">(</span><span class="n">scores</span><span class="o">.</span><span class="n">values</span><span class="o">.</span><span class="n">tolist</span><span class="p">(),</span> <span class="n">index</span><span class="o">=</span><span class="n">scores</span><span class="o">.</span><span class="n">index</span><span class="p">)</span>
+        <span class="n">scores</span><span class="o">.</span><span class="n">columns</span> <span class="o">=</span> <span class="n">pd</span><span class="o">.</span><span class="n">Index</span><span class="p">(</span>
+            <span class="p">[</span><span class="s">u&#39;sb_cond_score&#39;</span><span class="p">,</span> <span class="s">u&#39;sb_array_score&#39;</span><span class="p">,</span> <span class="s">u&#39;sb_completion_score&#39;</span><span class="p">,</span>
+             <span class="s">u&#39;sb_exec_score&#39;</span><span class="p">,</span> <span class="s">u&#39;sb_science_score&#39;</span><span class="p">,</span> <span class="s">u&#39;sb_grade_score&#39;</span><span class="p">,</span> <span class="s">u&#39;arcorr&#39;</span><span class="p">,</span>
+             <span class="s">u&#39;score&#39;</span><span class="p">])</span>
+        <span class="k">if</span> <span class="n">array</span> <span class="o">==</span> <span class="s">&#39;12m&#39;</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">select12m</span> <span class="o">=</span> <span class="n">pd</span><span class="o">.</span><span class="n">merge</span><span class="p">(</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">select12m</span><span class="p">,</span> <span class="n">scores</span><span class="p">,</span> <span class="n">left_on</span><span class="o">=</span><span class="s">&#39;SB_UID&#39;</span><span class="p">,</span> <span class="n">right_index</span><span class="o">=</span><span class="bp">True</span><span class="p">)</span>
+        <span class="k">elif</span> <span class="n">array</span> <span class="o">==</span> <span class="s">&#39;7m&#39;</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">select7m</span> <span class="o">=</span> <span class="n">pd</span><span class="o">.</span><span class="n">merge</span><span class="p">(</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">select7m</span><span class="p">,</span> <span class="n">scores</span><span class="p">,</span> <span class="n">left_on</span><span class="o">=</span><span class="s">&#39;SB_UID&#39;</span><span class="p">,</span> <span class="n">right_index</span><span class="o">=</span><span class="bp">True</span><span class="p">)</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">selecttp</span> <span class="o">=</span> <span class="n">pd</span><span class="o">.</span><span class="n">merge</span><span class="p">(</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">selecttp</span><span class="p">,</span> <span class="n">scores</span><span class="p">,</span> <span class="n">left_on</span><span class="o">=</span><span class="s">&#39;SB_UID&#39;</span><span class="p">,</span> <span class="n">right_index</span><span class="o">=</span><span class="bp">True</span><span class="p">)</span>
+</div>
+<div class="viewcode-block" id="WtoAlgorithm.calculate_score"><a class="viewcode-back" href="../index.html#wtoAlgorithm.WtoAlgorithm.calculate_score">[docs]</a>    <span class="k">def</span> <span class="nf">calculate_score</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">ecount</span><span class="p">,</span> <span class="n">tcount</span><span class="p">,</span> <span class="n">srank</span><span class="p">,</span> <span class="n">ar</span><span class="p">,</span> <span class="n">aminar</span><span class="p">,</span> <span class="n">amaxar</span><span class="p">,</span>
+                        <span class="n">tsysfrac</span><span class="p">,</span> <span class="n">blfrac</span><span class="p">,</span> <span class="n">grade</span><span class="p">,</span> <span class="n">repfreq</span><span class="p">,</span> <span class="n">dec</span><span class="p">,</span> <span class="n">execu</span><span class="p">,</span> <span class="n">array</span><span class="p">,</span>
+                        <span class="n">frac</span><span class="p">):</span>
 
-        <span class="n">min_scirank</span> <span class="o">=</span> <span class="n">df</span><span class="o">.</span><span class="n">scienceRank</span><span class="o">.</span><span class="n">min</span><span class="p">()</span>
-        <span class="n">max_scirank</span> <span class="o">=</span> <span class="n">df</span><span class="o">.</span><span class="n">scienceRank</span><span class="o">.</span><span class="n">max</span><span class="p">()</span>
+        <span class="c"># set sb completion score</span>
+        <span class="sd">&quot;&quot;&quot;</span>
 
-    <span class="k">def</span> <span class="nf">calculate_score</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">ecount</span><span class="p">,</span> <span class="n">tcount</span><span class="p">,</span> <span class="n">srank</span><span class="p">,</span> <span class="n">aminar</span><span class="p">,</span> <span class="n">amaxar</span><span class="p">,</span> <span class="n">blfrac</span><span class="p">,</span>
-                        <span class="n">grade</span><span class="p">,</span> <span class="n">frac</span><span class="p">,</span> <span class="n">array</span><span class="p">):</span>
+<span class="sd">        :param ecount:</span>
+<span class="sd">        :param tcount:</span>
+<span class="sd">        :param srank:</span>
+<span class="sd">        :param ar:</span>
+<span class="sd">        :param aminar:</span>
+<span class="sd">        :param amaxar:</span>
+<span class="sd">        :param tsysfrac:</span>
+<span class="sd">        :param blfrac:</span>
+<span class="sd">        :param grade:</span>
+<span class="sd">        :param repfreq:</span>
+<span class="sd">        :param dec:</span>
+<span class="sd">        :param execu:</span>
+<span class="sd">        :param array:</span>
+<span class="sd">        :param frac:</span>
+<span class="sd">        :return:</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">sb_completion</span> <span class="o">=</span> <span class="n">tcount</span> <span class="o">/</span> <span class="n">ecount</span>
+        <span class="n">sb_completion_score</span> <span class="o">=</span> <span class="mf">10.</span> <span class="o">*</span> <span class="n">sb_completion</span>
 
-        <span class="n">sb_completition</span> <span class="o">=</span> <span class="n">tcount</span> <span class="o">/</span> <span class="n">ecount</span>
+        <span class="c"># set sb priority score</span>
+        <span class="k">if</span> <span class="n">grade</span> <span class="o">==</span> <span class="s">&#39;A&#39;</span><span class="p">:</span>
+            <span class="n">sb_grade_score</span> <span class="o">=</span> <span class="mf">10.</span>
+        <span class="k">elif</span> <span class="n">grade</span> <span class="o">==</span> <span class="s">&#39;B&#39;</span><span class="p">:</span>
+            <span class="n">sb_grade_score</span> <span class="o">=</span> <span class="mf">5.</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="n">sb_grade_score</span> <span class="o">=</span> <span class="o">-</span><span class="mf">100.</span>
 
-        <span class="k">pass</span>
+        <span class="c"># set science score</span>
+        <span class="n">sb_science_score</span> <span class="o">=</span> <span class="mf">10.</span> <span class="o">*</span> <span class="n">srank</span> <span class="o">/</span> <span class="bp">self</span><span class="o">.</span><span class="n">max_scirank</span>
 
-    <span class="k">def</span> <span class="nf">set_trans</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">transmission</span><span class="p">):</span>
+        <span class="c"># set array score</span>
+        <span class="k">if</span> <span class="n">array</span> <span class="o">==</span> <span class="s">&#39;7m&#39;</span> <span class="ow">or</span> <span class="n">array</span> <span class="o">==</span> <span class="s">&#39;tp&#39;</span><span class="p">:</span>
+            <span class="n">sb_array_score</span> <span class="o">=</span> <span class="mf">10.</span>
+            <span class="n">arcorr</span> <span class="o">=</span> <span class="mf">0.</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="n">c_bmax</span> <span class="o">=</span> <span class="mf">0.862</span> <span class="o">/</span> <span class="n">pd</span><span class="o">.</span><span class="n">np</span><span class="o">.</span><span class="n">cos</span><span class="p">(</span><span class="n">pd</span><span class="o">.</span><span class="n">np</span><span class="o">.</span><span class="n">radians</span><span class="p">(</span><span class="o">-</span><span class="mf">23.0262015</span><span class="p">)</span> <span class="o">-</span>
+                                       <span class="n">pd</span><span class="o">.</span><span class="n">np</span><span class="o">.</span><span class="n">radians</span><span class="p">(</span><span class="n">dec</span><span class="p">))</span> <span class="o">+</span> <span class="mf">0.138</span>
+            <span class="n">c_freq</span> <span class="o">=</span> <span class="n">repfreq</span> <span class="o">/</span> <span class="mf">100.</span>
+            <span class="n">corr</span> <span class="o">=</span> <span class="n">c_freq</span> <span class="o">/</span> <span class="n">c_bmax</span>
+            <span class="n">arcorr</span> <span class="o">=</span> <span class="n">ar</span> <span class="o">*</span> <span class="n">corr</span>
+            <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">array_ar</span> <span class="o">&lt;</span> <span class="n">arcorr</span><span class="p">:</span>
+                <span class="n">l</span> <span class="o">=</span> <span class="n">arcorr</span> <span class="o">-</span> <span class="n">aminar</span>
+                <span class="n">s</span> <span class="o">=</span> <span class="mf">10.</span> <span class="o">/</span> <span class="n">l</span>
+                <span class="n">sb_array_score</span> <span class="o">=</span> <span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">array_ar</span> <span class="o">-</span> <span class="n">aminar</span><span class="p">)</span> <span class="o">*</span> <span class="n">s</span>
+            <span class="k">elif</span> <span class="bp">self</span><span class="o">.</span><span class="n">array_ar</span> <span class="o">==</span> <span class="n">arcorr</span><span class="p">:</span>
+                <span class="n">sb_array_score</span> <span class="o">=</span> <span class="mf">10.</span>
+            <span class="k">else</span><span class="p">:</span>
+                <span class="n">l</span> <span class="o">=</span> <span class="n">arcorr</span> <span class="o">-</span> <span class="n">amaxar</span>
+                <span class="n">s</span> <span class="o">=</span> <span class="mf">10.</span> <span class="o">/</span> <span class="n">l</span>
+                <span class="n">sb_array_score</span> <span class="o">=</span> <span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">array_ar</span> <span class="o">-</span> <span class="n">amaxar</span><span class="p">)</span> <span class="o">*</span> <span class="n">s</span>
+        <span class="c"># set exec score:</span>
+        <span class="n">sb_exec_score</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">exec_prio</span><span class="p">[</span><span class="n">execu</span><span class="p">]</span>
+
+        <span class="c"># set condition score:</span>
+        <span class="k">if</span> <span class="n">frac</span> <span class="o">&lt;</span> <span class="mi">1</span><span class="p">:</span>
+            <span class="n">sb_cond_score</span> <span class="o">=</span> <span class="mf">10.</span> <span class="o">-</span> <span class="mf">2.</span> <span class="o">*</span> <span class="n">frac</span><span class="o">**</span><span class="mi">1</span><span class="o">/</span><span class="mf">2.</span>
+        <span class="k">elif</span> <span class="n">frac</span> <span class="o">==</span> <span class="mi">1</span><span class="p">:</span>
+            <span class="n">sb_cond_score</span> <span class="o">=</span> <span class="mf">10.</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="n">sb_cond_score</span> <span class="o">=</span> <span class="p">(</span><span class="mi">1</span><span class="o">/</span><span class="n">frac</span><span class="o">**</span><span class="mi">6</span><span class="p">)</span> <span class="o">*</span> <span class="mf">10.</span>
+
+        <span class="n">score</span> <span class="o">=</span> <span class="p">(</span><span class="mf">0.3</span> <span class="o">*</span> <span class="n">sb_cond_score</span> <span class="o">+</span>
+                 <span class="mf">0.25</span> <span class="o">*</span> <span class="n">sb_array_score</span> <span class="o">+</span>
+                 <span class="mf">0.15</span> <span class="o">*</span> <span class="n">sb_completion_score</span> <span class="o">+</span>
+                 <span class="mf">0.1</span> <span class="o">*</span> <span class="n">sb_exec_score</span> <span class="o">+</span>
+                 <span class="mf">0.05</span> <span class="o">*</span> <span class="n">sb_science_score</span> <span class="o">+</span>
+                 <span class="mf">0.15</span> <span class="o">*</span> <span class="n">sb_grade_score</span><span class="p">)</span>
+        <span class="k">return</span> <span class="p">(</span><span class="n">sb_cond_score</span><span class="p">,</span> <span class="n">sb_array_score</span><span class="p">,</span> <span class="n">sb_completion_score</span><span class="p">,</span>
+                <span class="n">sb_exec_score</span><span class="p">,</span> <span class="n">sb_science_score</span><span class="p">,</span> <span class="n">sb_grade_score</span><span class="p">,</span> <span class="n">arcorr</span><span class="p">,</span> <span class="n">score</span><span class="p">)</span>
+</div>
+<div class="viewcode-block" id="WtoAlgorithm.set_trans"><a class="viewcode-back" href="../index.html#wtoAlgorithm.WtoAlgorithm.set_trans">[docs]</a>    <span class="k">def</span> <span class="nf">set_trans</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">transmission</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+
+<span class="sd">        :param transmission:</span>
+<span class="sd">        &quot;&quot;&quot;</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">transmission</span> <span class="o">=</span> <span class="n">transmission</span>
+</div>
+<div class="viewcode-block" id="WtoAlgorithm.set_pwv"><a class="viewcode-back" href="../index.html#wtoAlgorithm.WtoAlgorithm.set_pwv">[docs]</a>    <span class="k">def</span> <span class="nf">set_pwv</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">pwv</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
 
-    <span class="k">def</span> <span class="nf">set_pwv</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">pwv</span><span class="p">):</span>
+<span class="sd">        :param pwv:</span>
+<span class="sd">        &quot;&quot;&quot;</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">pwv</span> <span class="o">=</span> <span class="n">pwv</span>
+</div>
+<div class="viewcode-block" id="WtoAlgorithm.set_date"><a class="viewcode-back" href="../index.html#wtoAlgorithm.WtoAlgorithm.set_date">[docs]</a>    <span class="k">def</span> <span class="nf">set_date</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">date</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
 
-    <span class="k">def</span> <span class="nf">set_date</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">date</span><span class="p">):</span>
+<span class="sd">        :param date:</span>
+<span class="sd">        &quot;&quot;&quot;</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">date</span> <span class="o">=</span> <span class="n">date</span>
+</div>
+<div class="viewcode-block" id="WtoAlgorithm.set_arrayar"><a class="viewcode-back" href="../index.html#wtoAlgorithm.WtoAlgorithm.set_arrayar">[docs]</a>    <span class="k">def</span> <span class="nf">set_arrayar</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">ar</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
 
-    <span class="k">def</span> <span class="nf">set_arrayar</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">ar</span><span class="p">):</span>
+<span class="sd">        :param ar:</span>
+<span class="sd">        &quot;&quot;&quot;</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">array_ar</span> <span class="o">=</span> <span class="n">ar</span>
+</div>
+<div class="viewcode-block" id="WtoAlgorithm.set_minha"><a class="viewcode-back" href="../index.html#wtoAlgorithm.WtoAlgorithm.set_minha">[docs]</a>    <span class="k">def</span> <span class="nf">set_minha</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">ha</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
 
-    <span class="k">def</span> <span class="nf">set_minha</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">ha</span><span class="p">):</span>
+<span class="sd">        :param ha:</span>
+<span class="sd">        &quot;&quot;&quot;</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">minha</span> <span class="o">=</span> <span class="n">ha</span>
+</div>
+<div class="viewcode-block" id="WtoAlgorithm.set_maxha"><a class="viewcode-back" href="../index.html#wtoAlgorithm.WtoAlgorithm.set_maxha">[docs]</a>    <span class="k">def</span> <span class="nf">set_maxha</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">ha</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
 
-    <span class="k">def</span> <span class="nf">set_maxha</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">ha</span><span class="p">):</span>
+<span class="sd">        :param ha:</span>
+<span class="sd">        &quot;&quot;&quot;</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">maxha</span> <span class="o">=</span> <span class="n">ha</span>
+</div>
+<div class="viewcode-block" id="WtoAlgorithm.set_array_ar"><a class="viewcode-back" href="../index.html#wtoAlgorithm.WtoAlgorithm.set_array_ar">[docs]</a>    <span class="k">def</span> <span class="nf">set_array_ar</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">ar</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
 
-    <span class="k">def</span> <span class="nf">set_array_ar</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">ar</span><span class="p">):</span>
+<span class="sd">        :param ar:</span>
+<span class="sd">        &quot;&quot;&quot;</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">array_ar</span> <span class="o">=</span> <span class="n">ar</span>
+</div>
+<div class="viewcode-block" id="WtoAlgorithm.query_arrays"><a class="viewcode-back" href="../index.html#wtoAlgorithm.WtoAlgorithm.query_arrays">[docs]</a>    <span class="k">def</span> <span class="nf">query_arrays</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
 
-    <span class="k">def</span> <span class="nf">query_arrays</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+
+<span class="sd">        &quot;&quot;&quot;</span>
         <span class="n">a</span> <span class="o">=</span> <span class="nb">str</span><span class="p">(</span>
             <span class="s">&quot;with t1 as ( &quot;</span>
             <span class="s">&quot;select se.SE_TIMESTAMP ts1, sa.SLOG_ATTR_VALUE av1, se.SE_ID se1 &quot;</span>
@@ -458,9 +597,13 @@
                 <span class="n">columns</span><span class="o">=</span><span class="n">pd</span><span class="o">.</span><span class="n">Index</span><span class="p">(</span>
                     <span class="p">[</span><span class="s">u&#39;TS1&#39;</span><span class="p">,</span> <span class="s">u&#39;AV1&#39;</span><span class="p">,</span> <span class="s">u&#39;SE1&#39;</span><span class="p">,</span> <span class="s">u&#39;AV2&#39;</span><span class="p">],</span> <span class="n">dtype</span><span class="o">=</span><span class="s">&#39;object&#39;</span><span class="p">))</span>
             <span class="k">print</span> <span class="s">&quot;No ACA arrays have been created in the last 6 hours.&quot;</span>
-
-    <span class="k">def</span> <span class="nf">set_bl_prop</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">array_name</span><span class="p">):</span>
+</div>
+<div class="viewcode-block" id="WtoAlgorithm.set_bl_prop"><a class="viewcode-back" href="../index.html#wtoAlgorithm.WtoAlgorithm.set_bl_prop">[docs]</a>    <span class="k">def</span> <span class="nf">set_bl_prop</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">array_name</span><span class="p">):</span>
         <span class="c"># TODO: check uv coverage to remove baselines that are outliers</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+
+<span class="sd">        :param array_name:</span>
+<span class="sd">        &quot;&quot;&quot;</span>
         <span class="k">if</span> <span class="p">(</span><span class="n">array_name</span> <span class="ow">is</span> <span class="ow">not</span> <span class="bp">None</span> <span class="ow">and</span> <span class="nb">len</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">bl_arrays</span><span class="p">)</span> <span class="o">!=</span> <span class="mi">0</span>
                 <span class="ow">and</span> <span class="n">array_name</span> <span class="ow">not</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">defarrays</span><span class="p">):</span>
             <span class="n">id1</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">bl_arrays</span><span class="o">.</span><span class="n">query</span><span class="p">(</span><span class="s">&#39;AV1 == &quot;</span><span class="si">%s</span><span class="s">&quot;&#39;</span> <span class="o">%</span> <span class="n">array_name</span><span class="p">)</span><span class="o">.</span><span class="n">iloc</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">SE1</span>
@@ -501,14 +644,30 @@
             <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">ruv</span><span class="p">)</span> <span class="o">&gt;</span> <span class="mf">33.</span> <span class="o">*</span> <span class="mf">17.</span><span class="p">:</span>
                 <span class="bp">self</span><span class="o">.</span><span class="n">ruv</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">ruv</span><span class="p">[</span><span class="o">-</span><span class="mi">561</span><span class="p">:]</span>
                 <span class="bp">self</span><span class="o">.</span><span class="n">num_bl</span> <span class="o">=</span> <span class="nb">len</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">ruv</span><span class="p">)</span>
-                <span class="bp">self</span><span class="o">.</span><span class="n">num_ant</span> <span class="o">=</span> <span class="mf">34.</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">num_ant</span> <span class="o">=</span> <span class="mi">34</span>
+                <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">num_ant_user</span> <span class="ow">is</span> <span class="ow">not</span> <span class="bp">None</span><span class="p">:</span>
+                    <span class="bp">self</span><span class="o">.</span><span class="n">num_ant</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">num_ant_user</span>
             <span class="k">else</span><span class="p">:</span>
                 <span class="bp">self</span><span class="o">.</span><span class="n">num_bl</span> <span class="o">=</span> <span class="nb">len</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">ruv</span><span class="p">)</span>
                 <span class="bp">self</span><span class="o">.</span><span class="n">num_ant</span> <span class="o">=</span> <span class="nb">int</span><span class="p">((</span><span class="mi">1</span> <span class="o">+</span> <span class="n">pd</span><span class="o">.</span><span class="n">np</span><span class="o">.</span><span class="n">sqrt</span><span class="p">(</span><span class="mi">1</span> <span class="o">+</span> <span class="mi">8</span> <span class="o">*</span> <span class="bp">self</span><span class="o">.</span><span class="n">num_bl</span><span class="p">))</span> <span class="o">/</span> <span class="mf">2.</span><span class="p">)</span>
+                <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">num_ant_user</span> <span class="ow">is</span> <span class="ow">not</span> <span class="bp">None</span><span class="p">:</span>
+                    <span class="bp">self</span><span class="o">.</span><span class="n">num_ant</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">num_ant_user</span>
 
-</div>
-<span class="k">def</span> <span class="nf">observable</span><span class="p">(</span><span class="n">solarSystem</span><span class="p">,</span> <span class="n">sourcename</span><span class="p">,</span> <span class="n">RA</span><span class="p">,</span> <span class="n">DEC</span><span class="p">,</span> <span class="n">horizon</span><span class="p">,</span> <span class="n">isQuery</span><span class="p">,</span> <span class="n">ephemeris</span><span class="p">,</span>
+</div></div>
+<div class="viewcode-block" id="observable"><a class="viewcode-back" href="../index.html#wtoAlgorithm.observable">[docs]</a><span class="k">def</span> <span class="nf">observable</span><span class="p">(</span><span class="n">solarSystem</span><span class="p">,</span> <span class="n">sourcename</span><span class="p">,</span> <span class="n">RA</span><span class="p">,</span> <span class="n">DEC</span><span class="p">,</span> <span class="n">horizon</span><span class="p">,</span> <span class="n">isQuery</span><span class="p">,</span> <span class="n">ephemeris</span><span class="p">,</span>
                <span class="n">alma</span><span class="o">=</span><span class="n">alma1</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;</span>
+
+<span class="sd">    :param solarSystem:</span>
+<span class="sd">    :param sourcename:</span>
+<span class="sd">    :param RA:</span>
+<span class="sd">    :param DEC:</span>
+<span class="sd">    :param horizon:</span>
+<span class="sd">    :param isQuery:</span>
+<span class="sd">    :param ephemeris:</span>
+<span class="sd">    :param alma:</span>
+<span class="sd">    :return:</span>
+<span class="sd">    &quot;&quot;&quot;</span>
     <span class="n">dtemp</span> <span class="o">=</span> <span class="n">alma</span><span class="o">.</span><span class="n">date</span>
     <span class="n">alma</span><span class="o">.</span><span class="n">horizon</span> <span class="o">=</span> <span class="n">ephem</span><span class="o">.</span><span class="n">degrees</span><span class="p">(</span><span class="nb">str</span><span class="p">(</span><span class="n">horizon</span><span class="p">))</span>
     <span class="k">if</span> <span class="n">isQuery</span><span class="p">:</span>
@@ -544,6 +703,7 @@
             <span class="n">dec</span> <span class="o">=</span> <span class="n">obj</span><span class="o">.</span><span class="n">dec</span>
             <span class="n">elev</span> <span class="o">=</span> <span class="n">obj</span><span class="o">.</span><span class="n">alt</span>
             <span class="n">neverup</span> <span class="o">=</span> <span class="n">obj</span><span class="o">.</span><span class="n">neverup</span>
+
         <span class="k">else</span><span class="p">:</span>
             <span class="n">alma</span><span class="o">.</span><span class="n">date</span> <span class="o">=</span> <span class="n">dtemp</span>
             <span class="k">return</span> <span class="mi">0</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="bp">False</span>
@@ -603,12 +763,19 @@
 
     <span class="n">alma</span><span class="o">.</span><span class="n">date</span> <span class="o">=</span> <span class="n">dtemp</span>
     <span class="n">alma</span><span class="o">.</span><span class="n">horizon</span> <span class="o">=</span> <span class="n">ephem</span><span class="o">.</span><span class="n">degrees</span><span class="p">(</span><span class="nb">str</span><span class="p">(</span><span class="n">horizon</span><span class="p">))</span>
-    <span class="k">return</span> <span class="nb">str</span><span class="p">(</span><span class="n">ra</span><span class="p">),</span> <span class="nb">str</span><span class="p">(</span><span class="n">dec</span><span class="p">),</span> <span class="n">pd</span><span class="o">.</span><span class="n">np</span><span class="o">.</span><span class="n">degrees</span><span class="p">(</span><span class="n">elev</span><span class="p">),</span> <span class="n">remaining</span><span class="o">.</span><span class="n">total_seconds</span><span class="p">()</span> <span class="o">/</span> <span class="mf">3600.</span><span class="p">,</span> <span class="n">rise</span><span class="p">,</span> <span class="n">sets</span><span class="p">,</span> <span class="n">lstr</span><span class="p">,</span>\
-        <span class="n">lsts</span><span class="p">,</span> <span class="n">obs</span>
+    <span class="k">return</span> <span class="nb">str</span><span class="p">(</span><span class="n">ra</span><span class="p">),</span> <span class="n">pd</span><span class="o">.</span><span class="n">np</span><span class="o">.</span><span class="n">degrees</span><span class="p">(</span><span class="n">dec</span><span class="p">),</span> <span class="n">pd</span><span class="o">.</span><span class="n">np</span><span class="o">.</span><span class="n">degrees</span><span class="p">(</span><span class="n">elev</span><span class="p">),</span>\
+        <span class="n">remaining</span><span class="o">.</span><span class="n">total_seconds</span><span class="p">()</span> <span class="o">/</span> <span class="mf">3600.</span><span class="p">,</span> <span class="n">rise</span><span class="p">,</span> <span class="n">sets</span><span class="p">,</span> <span class="n">lstr</span><span class="p">,</span> <span class="n">lsts</span><span class="p">,</span> <span class="n">obs</span>
 
+</div>
+<div class="viewcode-block" id="read_ephemeris"><a class="viewcode-back" href="../index.html#wtoAlgorithm.read_ephemeris">[docs]</a><span class="k">def</span> <span class="nf">read_ephemeris</span><span class="p">(</span><span class="n">ephemeris</span><span class="p">,</span> <span class="n">date</span><span class="p">):</span>
+    <span class="c"># TODO: is the ephemeris file fixed in col positions?</span>
 
-<span class="k">def</span> <span class="nf">read_ephemeris</span><span class="p">(</span><span class="n">ephemeris</span><span class="p">,</span> <span class="n">date</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;</span>
 
+<span class="sd">    :param ephemeris:</span>
+<span class="sd">    :param date:</span>
+<span class="sd">    :return:</span>
+<span class="sd">    &quot;&quot;&quot;</span>
     <span class="n">in_data</span> <span class="o">=</span> <span class="bp">False</span>
     <span class="n">now</span> <span class="o">=</span> <span class="n">date</span>
     <span class="n">month_ints</span> <span class="o">=</span> <span class="p">{</span>
@@ -640,11 +807,12 @@
                     <span class="n">dec</span> <span class="o">=</span> <span class="n">ephem</span><span class="o">.</span><span class="n">degrees</span><span class="p">(</span><span class="s">&#39;00:00:00&#39;</span><span class="p">)</span>
                     <span class="n">ephe</span> <span class="o">=</span> <span class="bp">False</span>
                     <span class="k">return</span> <span class="n">ra</span><span class="p">,</span> <span class="n">dec</span><span class="p">,</span> <span class="n">ephe</span>
-                <span class="n">ra</span> <span class="o">=</span> <span class="n">ephem</span><span class="o">.</span><span class="n">hours</span><span class="p">(</span><span class="n">data</span><span class="p">[</span><span class="mi">23</span><span class="p">:</span><span class="mi">34</span><span class="p">]</span><span class="o">.</span><span class="n">strip</span><span class="p">()</span><span class="o">.</span><span class="n">replace</span><span class="p">(</span><span class="s">&#39; &#39;</span><span class="p">,</span> <span class="s">&#39;:&#39;</span><span class="p">))</span>
-                <span class="n">dec</span> <span class="o">=</span> <span class="n">ephem</span><span class="o">.</span><span class="n">degrees</span><span class="p">(</span><span class="n">data</span><span class="p">[</span><span class="mi">35</span><span class="p">:</span><span class="mi">46</span><span class="p">]</span><span class="o">.</span><span class="n">strip</span><span class="p">()</span><span class="o">.</span><span class="n">replace</span><span class="p">(</span><span class="s">&#39; &#39;</span><span class="p">,</span> <span class="s">&#39;:&#39;</span><span class="p">))</span>
+                <span class="n">ra</span> <span class="o">=</span> <span class="n">ephem</span><span class="o">.</span><span class="n">hours</span><span class="p">(</span><span class="n">data</span><span class="p">[</span><span class="mi">23</span><span class="p">:</span><span class="mi">36</span><span class="p">]</span><span class="o">.</span><span class="n">strip</span><span class="p">()</span><span class="o">.</span><span class="n">replace</span><span class="p">(</span><span class="s">&#39; &#39;</span><span class="p">,</span> <span class="s">&#39;:&#39;</span><span class="p">))</span>
+                <span class="n">dec</span> <span class="o">=</span> <span class="n">ephem</span><span class="o">.</span><span class="n">degrees</span><span class="p">(</span><span class="n">data</span><span class="p">[</span><span class="mi">37</span><span class="p">:</span><span class="mi">51</span><span class="p">]</span><span class="o">.</span><span class="n">strip</span><span class="p">()</span><span class="o">.</span><span class="n">replace</span><span class="p">(</span><span class="s">&#39; &#39;</span><span class="p">,</span> <span class="s">&#39;:&#39;</span><span class="p">))</span>
                 <span class="n">ephe</span> <span class="o">=</span> <span class="bp">True</span>
-                <span class="k">return</span> <span class="n">ra</span><span class="p">,</span> <span class="n">dec</span><span class="p">,</span> <span class="n">ephe</span>
-
+                <span class="k">print</span> <span class="n">ra</span><span class="p">,</span> <span class="n">dec</span><span class="p">,</span> <span class="n">ephe</span>
+                <span class="k">return</span> <span class="n">pd</span><span class="o">.</span><span class="n">np</span><span class="o">.</span><span class="n">degrees</span><span class="p">(</span><span class="n">ra</span><span class="p">),</span> <span class="n">pd</span><span class="o">.</span><span class="n">np</span><span class="o">.</span><span class="n">degrees</span><span class="p">(</span><span class="n">dec</span><span class="p">),</span> <span class="n">ephe</span>
+</div>
 <span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">To fit the ruv distribution</span>
 <span class="sd">from scipy.stats import norm,rayleigh</span>
