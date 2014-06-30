@@ -364,16 +364,6 @@
                </property>
               </widget>
              </item>
-             <item row="2" column="6">
-              <widget class="QCheckBox" name="B09_b">
-               <property name="text">
-                <string>B09</string>
-               </property>
-               <property name="checked">
-                <bool>true</bool>
-               </property>
-              </widget>
-             </item>
              <item row="1" column="6">
               <widget class="QSpinBox" name="antennas_spin">
                <property name="minimum">
@@ -414,6 +404,16 @@
                </property>
               </widget>
              </item>
+             <item row="2" column="6">
+              <widget class="QCheckBox" name="B09_b">
+               <property name="text">
+                <string>B09</string>
+               </property>
+               <property name="checked">
+                <bool>true</bool>
+               </property>
+              </widget>
+             </item>
             </layout>
            </widget>
           </item>
@@ -429,7 +429,7 @@
           <item row="0" column="0">
            <widget class="QTabWidget" name="tabWidget">
             <property name="currentIndex">
-             <number>0</number>
+             <number>3</number>
             </property>
             <widget class="QWidget" name="bl_tab">
              <property name="accessibleName">
@@ -466,11 +466,21 @@
             </widget>
             <widget class="QWidget" name="pol_tab">
              <attribute name="title">
-              <string>Pol/Sessions</string>
+              <string>Polarization</string>
              </attribute>
              <layout class="QGridLayout" name="gridLayout_8">
               <item row="0" column="0">
                <widget class="QTableView" name="pol_sheet"/>
+              </item>
+             </layout>
+            </widget>
+            <widget class="QWidget" name="session_tab">
+             <attribute name="title">
+              <string>Sessions</string>
+             </attribute>
+             <layout class="QGridLayout" name="gridLayout_9">
+              <item row="0" column="0">
+               <widget class="QTableView" name="session_sheet"/>
               </item>
              </layout>
             </widget>

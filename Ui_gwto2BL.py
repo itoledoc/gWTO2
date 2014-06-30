@@ -2,7 +2,7 @@
 
 # Form implementation generated from reading ui file '/home/itoledo/Work/gWTO2/gwto2BL.ui'
 #
-# Created: Sun Jun 29 14:17:18 2014
+# Created: Sun Jun 29 20:02:57 2014
 #      by: PyQt4 UI code generator 4.10.4
 #
 # WARNING! All changes made in this file will be lost!
@@ -178,10 +178,6 @@ class Ui_BLMainWindow(object):
         self.B08_b = QtGui.QCheckBox(self.ArraysFrame)
         self.B08_b.setObjectName(_fromUtf8("B08_b"))
         self.gridLayout_7.addWidget(self.B08_b, 2, 5, 1, 1)
-        self.B09_b = QtGui.QCheckBox(self.ArraysFrame)
-        self.B09_b.setChecked(True)
-        self.B09_b.setObjectName(_fromUtf8("B09_b"))
-        self.gridLayout_7.addWidget(self.B09_b, 2, 6, 1, 1)
         self.antennas_spin = QtGui.QSpinBox(self.ArraysFrame)
         self.antennas_spin.setMinimum(20)
         self.antennas_spin.setMaximum(54)
@@ -200,6 +196,10 @@ class Ui_BLMainWindow(object):
         self.antennas_label = QtGui.QLabel(self.ArraysFrame)
         self.antennas_label.setObjectName(_fromUtf8("antennas_label"))
         self.gridLayout_7.addWidget(self.antennas_label, 1, 5, 1, 1)
+        self.B09_b = QtGui.QCheckBox(self.ArraysFrame)
+        self.B09_b.setChecked(True)
+        self.B09_b.setObjectName(_fromUtf8("B09_b"))
+        self.gridLayout_7.addWidget(self.B09_b, 2, 6, 1, 1)
         self.gridLayout_6.addWidget(self.ArraysFrame, 0, 12, 2, 1)
         self.gridLayout_2.addWidget(self.OptionsFrame, 0, 0, 1, 1)
         self.TabFrame = QtGui.QFrame(self.MainFrame)
@@ -237,6 +237,14 @@ class Ui_BLMainWindow(object):
         self.pol_sheet.setObjectName(_fromUtf8("pol_sheet"))
         self.gridLayout_8.addWidget(self.pol_sheet, 0, 0, 1, 1)
         self.tabWidget.addTab(self.pol_tab, _fromUtf8(""))
+        self.session_tab = QtGui.QWidget()
+        self.session_tab.setObjectName(_fromUtf8("session_tab"))
+        self.gridLayout_9 = QtGui.QGridLayout(self.session_tab)
+        self.gridLayout_9.setObjectName(_fromUtf8("gridLayout_9"))
+        self.session_sheet = QtGui.QTableView(self.session_tab)
+        self.session_sheet.setObjectName(_fromUtf8("session_sheet"))
+        self.gridLayout_9.addWidget(self.session_sheet, 0, 0, 1, 1)
+        self.tabWidget.addTab(self.session_tab, _fromUtf8(""))
         self.gridLayout_3.addWidget(self.tabWidget, 0, 0, 1, 1)
         self.gridLayout_2.addWidget(self.TabFrame, 2, 0, 1, 1)
         self.gridLayout.addWidget(self.MainFrame, 0, 0, 1, 1)
@@ -269,7 +277,7 @@ class Ui_BLMainWindow(object):
         self.menubar.addAction(self.menuOutputs.menuAction())
 
         self.retranslateUi(BLMainWindow)
-        self.tabWidget.setCurrentIndex(0)
+        self.tabWidget.setCurrentIndex(3)
         QtCore.QMetaObject.connectSlotsByName(BLMainWindow)
 
     def retranslateUi(self, BLMainWindow):
@@ -297,12 +305,13 @@ class Ui_BLMainWindow(object):
         self.B06_b.setText(_translate("BLMainWindow", "B06", None))
         self.B07_b.setText(_translate("BLMainWindow", "B07", None))
         self.B08_b.setText(_translate("BLMainWindow", "B08", None))
-        self.B09_b.setText(_translate("BLMainWindow", "B09", None))
         self.arrayAR_label.setText(_translate("BLMainWindow", "Array AR:", None))
         self.antennas_label.setText(_translate("BLMainWindow", "Antennas:", None))
+        self.B09_b.setText(_translate("BLMainWindow", "B09", None))
         self.tabWidget.setTabText(self.tabWidget.indexOf(self.bl_tab), _translate("BLMainWindow", "Standard", None))
         self.tabWidget.setTabText(self.tabWidget.indexOf(self.tc_tab), _translate("BLMainWindow", "Time Const.", None))
-        self.tabWidget.setTabText(self.tabWidget.indexOf(self.pol_tab), _translate("BLMainWindow", "Pol/Sessions", None))
+        self.tabWidget.setTabText(self.tabWidget.indexOf(self.pol_tab), _translate("BLMainWindow", "Polarization", None))
+        self.tabWidget.setTabText(self.tabWidget.indexOf(self.session_tab), _translate("BLMainWindow", "Sessions", None))
         self.menuMenu.setTitle(_translate("BLMainWindow", "Menu", None))
         self.menuOutputs.setTitle(_translate("BLMainWindow", "Outputs", None))
         self.actionAll_SBs.setText(_translate("BLMainWindow", "All SBs", None))
