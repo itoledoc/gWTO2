@@ -8,6 +8,13 @@
 # WARNING! All changes made in this file will be lost!
 
 from PyQt4 import QtCore, QtGui
+import datetime
+import ephem
+
+alma = ephem.Observer()
+alma.lat = '-23.0262015'
+alma.long = '-67.7551257'
+alma.elev = 5060
 
 try:
     _fromUtf8 = QtCore.QString.fromUtf8
@@ -17,14 +24,18 @@ except AttributeError:
 
 try:
     _encoding = QtGui.QApplication.UnicodeUTF8
+
     def _translate(context, text, disambig):
         return QtGui.QApplication.translate(context, text, disambig, _encoding)
 except AttributeError:
+
     def _translate(context, text, disambig):
         return QtGui.QApplication.translate(context, text, disambig)
 
+
 class Ui_BLMainWindow(object):
     def setupUi(self, BLMainWindow):
+        date = datetime.datetime.now()
         BLMainWindow.setObjectName(_fromUtf8("BLMainWindow"))
         BLMainWindow.resize(1090, 836)
         self.centralwidget = QtGui.QWidget(BLMainWindow)
@@ -32,10 +43,12 @@ class Ui_BLMainWindow(object):
         self.gridLayout = QtGui.QGridLayout(self.centralwidget)
         self.gridLayout.setObjectName(_fromUtf8("gridLayout"))
         self.MainFrame = QtGui.QFrame(self.centralwidget)
-        sizePolicy = QtGui.QSizePolicy(QtGui.QSizePolicy.Expanding, QtGui.QSizePolicy.Expanding)
+        sizePolicy = QtGui.QSizePolicy(
+            QtGui.QSizePolicy.Expanding, QtGui.QSizePolicy.Expanding)
         sizePolicy.setHorizontalStretch(0)
         sizePolicy.setVerticalStretch(0)
-        sizePolicy.setHeightForWidth(self.MainFrame.sizePolicy().hasHeightForWidth())
+        sizePolicy.setHeightForWidth(
+            self.MainFrame.sizePolicy().hasHeightForWidth())
         self.MainFrame.setSizePolicy(sizePolicy)
         self.MainFrame.setFrameShape(QtGui.QFrame.StyledPanel)
         self.MainFrame.setFrameShadow(QtGui.QFrame.Raised)
@@ -44,10 +57,12 @@ class Ui_BLMainWindow(object):
         self.gridLayout_2.setObjectName(_fromUtf8("gridLayout_2"))
         self.OptionsFrame = QtGui.QFrame(self.MainFrame)
         self.OptionsFrame.setEnabled(True)
-        sizePolicy = QtGui.QSizePolicy(QtGui.QSizePolicy.Preferred, QtGui.QSizePolicy.Fixed)
+        sizePolicy = QtGui.QSizePolicy(
+            QtGui.QSizePolicy.Preferred, QtGui.QSizePolicy.Fixed)
         sizePolicy.setHorizontalStretch(0)
         sizePolicy.setVerticalStretch(0)
-        sizePolicy.setHeightForWidth(self.OptionsFrame.sizePolicy().hasHeightForWidth())
+        sizePolicy.setHeightForWidth(
+            self.OptionsFrame.sizePolicy().hasHeightForWidth())
         self.OptionsFrame.setSizePolicy(sizePolicy)
         self.OptionsFrame.setMinimumSize(QtCore.QSize(0, 30))
         self.OptionsFrame.setFrameShape(QtGui.QFrame.Box)
@@ -65,6 +80,16 @@ class Ui_BLMainWindow(object):
         self.gridLayout_6.addWidget(self.maxha_spin, 1, 5, 1, 1)
         self.date_datetime = QtGui.QDateTimeEdit(self.OptionsFrame)
         self.date_datetime.setCurrentSection(QtGui.QDateTimeEdit.YearSection)
+        self.date_datetime.setWrapping(True)
+        self.date_datetime.setDateTime(
+            QtCore.QDateTime(
+                QtCore.QDate(date.date().year, date.date().month,
+                             date.date().day),
+                QtCore.QTime(date.time().hour, date.time().minute,
+                             date.time().second)))
+        self.date_datetime.setTime(
+            QtCore.QTime(
+                date.time().hour, date.time().minute, date.time().second))
         self.date_datetime.setTimeSpec(QtCore.Qt.UTC)
         self.date_datetime.setObjectName(_fromUtf8("date_datetime"))
         self.gridLayout_6.addWidget(self.date_datetime, 0, 1, 1, 1)
@@ -101,20 +126,31 @@ class Ui_BLMainWindow(object):
         self.lst_label = QtGui.QLabel(self.OptionsFrame)
         self.lst_label.setObjectName(_fromUtf8("lst_label"))
         self.gridLayout_6.addWidget(self.lst_label, 0, 4, 1, 1)
-        spacerItem = QtGui.QSpacerItem(40, 20, QtGui.QSizePolicy.Expanding, QtGui.QSizePolicy.Minimum)
+        spacerItem = QtGui.QSpacerItem(
+            40, 20, QtGui.QSizePolicy.Expanding, QtGui.QSizePolicy.Minimum)
         self.gridLayout_6.addItem(spacerItem, 0, 7, 1, 1)
-        spacerItem1 = QtGui.QSpacerItem(40, 20, QtGui.QSizePolicy.Expanding, QtGui.QSizePolicy.Minimum)
+        spacerItem1 = QtGui.QSpacerItem(
+            40, 20, QtGui.QSizePolicy.Expanding, QtGui.QSizePolicy.Minimum)
         self.gridLayout_6.addItem(spacerItem1, 1, 7, 1, 1)
         self.lst_spin = QtGui.QTimeEdit(self.OptionsFrame)
         self.lst_spin.setEnabled(True)
         self.lst_spin.setReadOnly(True)
+        self.lst_spin.setCurrentSection(QtGui.QDateTimeEdit.HourSection)
+        self.lst_spin.setTimeSpec(QtCore.Qt.UTC)
+        alma.date = self.date_datetime.dateTime().toPyDateTime()
+        lst = alma.sidereal_time()
+        lst_time = datetime.datetime.strptime(str(lst), '%H:%M:%S.%f').time()
+        self.lst_spin.setTime(
+            QtCore.QTime(lst_time.hour, lst_time.minute, lst_time.second))
         self.lst_spin.setObjectName(_fromUtf8("lst_spin"))
         self.gridLayout_6.addWidget(self.lst_spin, 0, 5, 1, 1)
         self.now_button = QtGui.QPushButton(self.OptionsFrame)
-        sizePolicy = QtGui.QSizePolicy(QtGui.QSizePolicy.Fixed, QtGui.QSizePolicy.Fixed)
+        sizePolicy = QtGui.QSizePolicy(
+            QtGui.QSizePolicy.Fixed, QtGui.QSizePolicy.Fixed)
         sizePolicy.setHorizontalStretch(0)
         sizePolicy.setVerticalStretch(0)
-        sizePolicy.setHeightForWidth(self.now_button.sizePolicy().hasHeightForWidth())
+        sizePolicy.setHeightForWidth(
+            self.now_button.sizePolicy().hasHeightForWidth())
         self.now_button.setSizePolicy(sizePolicy)
         self.now_button.setMinimumSize(QtCore.QSize(30, 0))
         self.now_button.setObjectName(_fromUtf8("now_button"))
@@ -135,10 +171,12 @@ class Ui_BLMainWindow(object):
         self.array_label.setObjectName(_fromUtf8("array_label"))
         self.gridLayout_7.addWidget(self.array_label, 0, 0, 1, 1)
         self.stdarrays_combo = QtGui.QComboBox(self.ArraysFrame)
-        sizePolicy = QtGui.QSizePolicy(QtGui.QSizePolicy.Fixed, QtGui.QSizePolicy.Fixed)
+        sizePolicy = QtGui.QSizePolicy(
+            QtGui.QSizePolicy.Fixed, QtGui.QSizePolicy.Fixed)
         sizePolicy.setHorizontalStretch(0)
         sizePolicy.setVerticalStretch(0)
-        sizePolicy.setHeightForWidth(self.stdarrays_combo.sizePolicy().hasHeightForWidth())
+        sizePolicy.setHeightForWidth(
+            self.stdarrays_combo.sizePolicy().hasHeightForWidth())
         self.stdarrays_combo.setSizePolicy(sizePolicy)
         self.stdarrays_combo.setMinimumSize(QtCore.QSize(100, 0))
         self.stdarrays_combo.setObjectName(_fromUtf8("stdarrays_combo"))
@@ -155,10 +193,12 @@ class Ui_BLMainWindow(object):
         self.std_conf_label.setObjectName(_fromUtf8("std_conf_label"))
         self.gridLayout_7.addWidget(self.std_conf_label, 1, 0, 1, 1)
         self.blarrays_combo = QtGui.QComboBox(self.ArraysFrame)
-        sizePolicy = QtGui.QSizePolicy(QtGui.QSizePolicy.Fixed, QtGui.QSizePolicy.Fixed)
+        sizePolicy = QtGui.QSizePolicy(
+            QtGui.QSizePolicy.Fixed, QtGui.QSizePolicy.Fixed)
         sizePolicy.setHorizontalStretch(0)
         sizePolicy.setVerticalStretch(0)
-        sizePolicy.setHeightForWidth(self.blarrays_combo.sizePolicy().hasHeightForWidth())
+        sizePolicy.setHeightForWidth(
+            self.blarrays_combo.sizePolicy().hasHeightForWidth())
         self.blarrays_combo.setSizePolicy(sizePolicy)
         self.blarrays_combo.setMinimumSize(QtCore.QSize(100, 0))
         self.blarrays_combo.setObjectName(_fromUtf8("blarrays_combo"))
@@ -264,9 +304,11 @@ class Ui_BLMainWindow(object):
         self.actionQuit = QtGui.QAction(BLMainWindow)
         self.actionQuit.setObjectName(_fromUtf8("actionQuit"))
         self.actionGenerate_all_sbinfo = QtGui.QAction(BLMainWindow)
-        self.actionGenerate_all_sbinfo.setObjectName(_fromUtf8("actionGenerate_all_sbinfo"))
+        self.actionGenerate_all_sbinfo.setObjectName(
+            _fromUtf8("actionGenerate_all_sbinfo"))
         self.actionGenerate_excel_stat = QtGui.QAction(BLMainWindow)
-        self.actionGenerate_excel_stat.setObjectName(_fromUtf8("actionGenerate_excel_stat"))
+        self.actionGenerate_excel_stat.setObjectName(
+            _fromUtf8("actionGenerate_excel_stat"))
         self.menuMenu.addAction(self.actionAll_SBs)
         self.menuMenu.addAction(self.actionPlanning)
         self.menuMenu.addSeparator()
@@ -281,44 +323,76 @@ class Ui_BLMainWindow(object):
         QtCore.QMetaObject.connectSlotsByName(BLMainWindow)
 
     def retranslateUi(self, BLMainWindow):
-        BLMainWindow.setWindowTitle(_translate("BLMainWindow", "gWTO2 - BL", None))
-        self.pwv_label.setText(_translate("BLMainWindow", "PWV", None))
-        self.date_datetime.setDisplayFormat(_translate("BLMainWindow", "yyyy/MM/dd HH:mm", None))
-        self.horizon_label.setText(_translate("BLMainWindow", "Horizon", None))
-        self.minha_label.setText(_translate("BLMainWindow", "minHA", None))
-        self.date_label.setText(_translate("BLMainWindow", "Date", None))
-        self.maxha_label.setText(_translate("BLMainWindow", "maxHA", None))
-        self.lst_label.setText(_translate("BLMainWindow", "LST", None))
-        self.now_button.setText(_translate("BLMainWindow", "Now", None))
-        self.B04_b.setText(_translate("BLMainWindow", "B04", None))
-        self.array_label.setText(_translate("BLMainWindow", "BL Arrays:", None))
-        self.stdarrays_combo.setItemText(0, _translate("BLMainWindow", "Current Conf.", None))
-        self.stdarrays_combo.setItemText(1, _translate("BLMainWindow", "C34-1", None))
-        self.stdarrays_combo.setItemText(2, _translate("BLMainWindow", "C34-2", None))
-        self.stdarrays_combo.setItemText(3, _translate("BLMainWindow", "C34-3", None))
-        self.stdarrays_combo.setItemText(4, _translate("BLMainWindow", "C34-4", None))
-        self.stdarrays_combo.setItemText(5, _translate("BLMainWindow", "C34-5", None))
-        self.stdarrays_combo.setItemText(6, _translate("BLMainWindow", "C34-6", None))
-        self.stdarrays_combo.setItemText(7, _translate("BLMainWindow", "C34-7", None))
+        BLMainWindow.setWindowTitle(
+            _translate("BLMainWindow", "gWTO2 - BL", None))
+        self.pwv_label.setText(
+            _translate("BLMainWindow", "PWV", None))
+        self.date_datetime.setDisplayFormat(
+            _translate("BLMainWindow", "yyyy/MM/dd HH:mm", None))
+        self.horizon_label.setText(
+            _translate("BLMainWindow", "Horizon", None))
+        self.minha_label.setText(
+            _translate("BLMainWindow", "minHA", None))
+        self.date_label.setText(
+            _translate("BLMainWindow", "Date", None))
+        self.maxha_label.setText(
+            _translate("BLMainWindow", "maxHA", None))
+        self.lst_label.setText(
+            _translate("BLMainWindow", "LST", None))
+        self.now_button.setText(
+            _translate("BLMainWindow", "Now", None))
+        self.B04_b.setText(
+            _translate("BLMainWindow", "B04", None))
+        self.array_label.setText(
+            _translate("BLMainWindow", "BL Arrays:", None))
+        self.stdarrays_combo.setItemText(
+            0, _translate("BLMainWindow", "Current Conf.", None))
+        self.stdarrays_combo.setItemText(
+            1, _translate("BLMainWindow", "C34-1", None))
+        self.stdarrays_combo.setItemText(
+            2, _translate("BLMainWindow", "C34-2", None))
+        self.stdarrays_combo.setItemText(
+            3, _translate("BLMainWindow", "C34-3", None))
+        self.stdarrays_combo.setItemText(
+            4, _translate("BLMainWindow", "C34-4", None))
+        self.stdarrays_combo.setItemText(
+            5, _translate("BLMainWindow", "C34-5", None))
+        self.stdarrays_combo.setItemText(
+            6, _translate("BLMainWindow", "C34-6", None))
+        self.stdarrays_combo.setItemText(
+            7, _translate("BLMainWindow", "C34-7", None))
         self.std_conf_label.setText(_translate("BLMainWindow", "Std. Conf.:", None))
         self.B03_b.setText(_translate("BLMainWindow", "B03", None))
         self.B06_b.setText(_translate("BLMainWindow", "B06", None))
         self.B07_b.setText(_translate("BLMainWindow", "B07", None))
         self.B08_b.setText(_translate("BLMainWindow", "B08", None))
-        self.arrayAR_label.setText(_translate("BLMainWindow", "Array AR:", None))
-        self.antennas_label.setText(_translate("BLMainWindow", "Antennas:", None))
+        self.arrayAR_label.setText(
+            _translate("BLMainWindow", "Array AR:", None))
+        self.antennas_label.setText(
+            _translate("BLMainWindow", "Antennas:", None))
         self.B09_b.setText(_translate("BLMainWindow", "B09", None))
-        self.tabWidget.setTabText(self.tabWidget.indexOf(self.bl_tab), _translate("BLMainWindow", "Standard", None))
-        self.tabWidget.setTabText(self.tabWidget.indexOf(self.tc_tab), _translate("BLMainWindow", "Time Const.", None))
-        self.tabWidget.setTabText(self.tabWidget.indexOf(self.pol_tab), _translate("BLMainWindow", "Polarization", None))
-        self.tabWidget.setTabText(self.tabWidget.indexOf(self.session_tab), _translate("BLMainWindow", "Sessions", None))
+        self.tabWidget.setTabText(
+            self.tabWidget.indexOf(self.bl_tab), _translate(
+                "BLMainWindow", "Standard", None))
+        self.tabWidget.setTabText(
+            self.tabWidget.indexOf(self.tc_tab), _translate(
+                "BLMainWindow", "Time Const.", None))
+        self.tabWidget.setTabText(
+            self.tabWidget.indexOf(self.pol_tab), _translate(
+                "BLMainWindow", "Polarization", None))
+        self.tabWidget.setTabText(
+            self.tabWidget.indexOf(self.session_tab), _translate(
+                "BLMainWindow", "Sessions", None))
         self.menuMenu.setTitle(_translate("BLMainWindow", "Menu", None))
         self.menuOutputs.setTitle(_translate("BLMainWindow", "Outputs", None))
         self.actionAll_SBs.setText(_translate("BLMainWindow", "All SBs", None))
-        self.actionPlanning.setText(_translate("BLMainWindow", "Planning", None))
+        self.actionPlanning.setText(_translate(
+            "BLMainWindow", "Planning", None))
         self.actionQuit.setText(_translate("BLMainWindow", "Quit", None))
-        self.actionGenerate_all_sbinfo.setText(_translate("BLMainWindow", "Generate all.sbinfo", None))
-        self.actionGenerate_excel_stat.setText(_translate("BLMainWindow", "Generate excel stat.", None))
+        self.actionGenerate_all_sbinfo.setText(
+            _translate("BLMainWindow", "Generate all.sbinfo", None))
+        self.actionGenerate_excel_stat.setText(
+            _translate("BLMainWindow", "Generate excel stat.", None))
 
 
 if __name__ == "__main__":
