@@ -302,6 +302,13 @@
             </property>
            </widget>
           </item>
+          <item row="1" column="6">
+           <widget class="QPushButton" name="run_button">
+            <property name="text">
+             <string>Run</string>
+            </property>
+           </widget>
+          </item>
          </layout>
         </widget>
        </item>
@@ -314,7 +321,7 @@
           <item row="0" column="0">
            <widget class="QTabWidget" name="tabWidget">
             <property name="currentIndex">
-             <number>4</number>
+             <number>0</number>
             </property>
             <widget class="QWidget" name="seven_tab">
              <property name="accessibleName">

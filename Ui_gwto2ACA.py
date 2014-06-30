@@ -2,19 +2,12 @@
 
 # Form implementation generated from reading ui file '/home/itoledo/Work/gWTO2/gwto2ACA.ui'
 #
-# Created: Sun Jun 29 20:02:57 2014
+# Created: Mon Jun 30 16:24:14 2014
 #      by: PyQt4 UI code generator 4.10.4
 #
 # WARNING! All changes made in this file will be lost!
 
 from PyQt4 import QtCore, QtGui
-import datetime
-import ephem
-
-alma = ephem.Observer()
-alma.lat = '-23.0262015'
-alma.long = '-67.7551257'
-alma.elev = 5060
 
 try:
     _fromUtf8 = QtCore.QString.fromUtf8
@@ -32,7 +25,6 @@ except AttributeError:
 
 class Ui_ACAMainWindow(object):
     def setupUi(self, ACAMainWindow):
-        date = datetime.datetime.now()
         ACAMainWindow.setObjectName(_fromUtf8("ACAMainWindow"))
         ACAMainWindow.resize(1090, 822)
         self.centralwidget = QtGui.QWidget(ACAMainWindow)
@@ -73,15 +65,6 @@ class Ui_ACAMainWindow(object):
         self.gridLayout_6.addWidget(self.maxha_spin, 1, 5, 1, 1)
         self.date_datetime = QtGui.QDateTimeEdit(self.OptionsFrame)
         self.date_datetime.setCurrentSection(QtGui.QDateTimeEdit.YearSection)
-        self.date_datetime.setDateTime(
-            QtCore.QDateTime(
-                QtCore.QDate(date.date().year, date.date().month,
-                             date.date().day),
-                QtCore.QTime(date.time().hour, date.time().minute,
-                             date.time().second)))
-        self.date_datetime.setTime(
-            QtCore.QTime(
-                date.time().hour, date.time().minute, date.time().second))
         self.date_datetime.setTimeSpec(QtCore.Qt.UTC)
         self.date_datetime.setObjectName(_fromUtf8("date_datetime"))
         self.gridLayout_6.addWidget(self.date_datetime, 0, 1, 1, 1)
@@ -125,14 +108,6 @@ class Ui_ACAMainWindow(object):
         self.lst_spin = QtGui.QTimeEdit(self.OptionsFrame)
         self.lst_spin.setEnabled(True)
         self.lst_spin.setReadOnly(True)
-        self.lst_spin.setCurrentSection(QtGui.QDateTimeEdit.HourSection)
-        self.lst_spin.setTimeSpec(QtCore.Qt.UTC)
-        alma.date = self.date_datetime.dateTime().toPyDateTime()
-        lst = alma.sidereal_time()
-        lst_time = datetime.datetime.strptime(str(lst), '%H:%M:%S.%f').time()
-        self.lst_spin.setTime(
-            QtCore.QTime(lst_time.hour, lst_time.minute, lst_time.second))
-        self.lst_spin.setObjectName(_fromUtf8("lst_spin"))
         self.lst_spin.setObjectName(_fromUtf8("lst_spin"))
         self.gridLayout_6.addWidget(self.lst_spin, 0, 5, 1, 1)
         self.ArraysFrame = QtGui.QFrame(self.OptionsFrame)
@@ -184,6 +159,9 @@ class Ui_ACAMainWindow(object):
         self.now_button = QtGui.QPushButton(self.OptionsFrame)
         self.now_button.setObjectName(_fromUtf8("now_button"))
         self.gridLayout_6.addWidget(self.now_button, 0, 6, 1, 1)
+        self.run_button = QtGui.QPushButton(self.OptionsFrame)
+        self.run_button.setObjectName(_fromUtf8("run_button"))
+        self.gridLayout_6.addWidget(self.run_button, 1, 6, 1, 1)
         self.gridLayout_2.addWidget(self.OptionsFrame, 0, 0, 1, 1)
         self.TabFrame = QtGui.QFrame(self.MainFrame)
         self.TabFrame.setFrameShape(QtGui.QFrame.Box)
@@ -259,7 +237,7 @@ class Ui_ACAMainWindow(object):
         self.menubar.addAction(self.menuMenu.menuAction())
 
         self.retranslateUi(ACAMainWindow)
-        self.tabWidget.setCurrentIndex(4)
+        self.tabWidget.setCurrentIndex(0)
         QtCore.QMetaObject.connectSlotsByName(ACAMainWindow)
 
     def retranslateUi(self, ACAMainWindow):
@@ -279,6 +257,7 @@ class Ui_ACAMainWindow(object):
         self.band3_b.setText(_translate("ACAMainWindow", "B03", None))
         self.antennas_label.setText(_translate("ACAMainWindow", "Antennas", None))
         self.now_button.setText(_translate("ACAMainWindow", "Now", None))
+        self.run_button.setText(_translate("ACAMainWindow", "Run", None))
         self.tabWidget.setTabText(self.tabWidget.indexOf(self.seven_tab), _translate("ACAMainWindow", "ACA", None))
         self.tabWidget.setTabText(self.tabWidget.indexOf(self.tp_tab), _translate("ACAMainWindow", "TP", None))
         self.tabWidget.setTabText(self.tabWidget.indexOf(self.tc_tab), _translate("ACAMainWindow", "Time Constr.", None))

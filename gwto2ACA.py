@@ -315,3 +315,11 @@ class ACAMainWindow(QMainWindow, Ui_ACAMainWindow):
         """
         # TODO: not implemented yet
         raise NotImplementedError
+    
+    @pyqtSignature("")
+    def on_run_button_clicked(self):
+        """
+        Slot documentation goes here.
+        """
+        # TODO: not implemented yet
+        raise NotImplementedError

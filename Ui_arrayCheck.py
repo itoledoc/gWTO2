@@ -2,7 +2,7 @@
 
 # Form implementation generated from reading ui file '/home/itoledo/Work/gWTO2/arrayCheck.ui'
 #
-# Created: Sun Jun 29 20:02:56 2014
+# Created: Mon Jun 30 16:24:14 2014
 #      by: PyQt4 UI code generator 4.10.4
 #
 # WARNING! All changes made in this file will be lost!
