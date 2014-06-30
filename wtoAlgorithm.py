@@ -392,7 +392,7 @@ class WtoAlgorithm(WtoDatabase):
         if grade == 'A':
             sb_grade_score = 10.
         elif grade == 'B':
-            sb_grade_score = 5.
+            sb_grade_score = 8.
         else:
             sb_grade_score = -100.
 
@@ -415,7 +415,7 @@ class WtoAlgorithm(WtoDatabase):
 
                 if las == 0:
                     sb_array_score = (
-                        ((self.array_ar - aminar) / l)**(1/7.)) * s
+                        ((self.array_ar - aminar) / l)**(1/8.)) * 8. + 2.
                 else:
                     sb_array_score = (
                         ((self.array_ar - aminar) / l)**(1/3.)) * s
@@ -445,10 +445,10 @@ class WtoAlgorithm(WtoDatabase):
             else:
                 sb_cond_score = 0.
 
-        score = (0.3 * sb_cond_score +
-                 0.25 * sb_array_score +
+        score = (0.35 * sb_cond_score +
+                 0.20 * sb_array_score +
                  0.15 * sb_completion_score +
-                 0.1 * sb_exec_score +
+                 0.10 * sb_exec_score +
                  0.05 * sb_science_score +
                  0.15 * sb_grade_score)
         return (sb_cond_score, sb_array_score, sb_completion_score,
