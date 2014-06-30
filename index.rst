@@ -44,11 +44,11 @@ And the run the following script. You can copy the code, and then paste into
 python with %paste, or copy it into a file, and then execute it inside the
 ipython session::
 
-    def runwto(pwv, array_name='default', d=None, num_ant=34):
-        if array_name == None:
-            array_name = datas.bl_arrays.AV1.values[0]
-        else:
+    def runwto(pwv, array_name=None, d=None, num_ant=34):
+        if array_name == 'default':
             array_name = None
+        else:
+            array_name = datas.bl_arrays.AV1.values[0]
         if d == None:
             d = ephem.now()
         if num_ant != 34:

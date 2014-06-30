@@ -106,11 +106,11 @@ ipython
 <p>And the run the following script. You can copy the code, and then paste into
 python with %paste, or copy it into a file, and then execute it inside the
 ipython session:</p>
-<div class="highlight-python"><div class="highlight"><pre><span class="k">def</span> <span class="nf">runwto</span><span class="p">(</span><span class="n">pwv</span><span class="p">,</span> <span class="n">array_name</span><span class="o">=</span><span class="s">&#39;default&#39;</span><span class="p">,</span> <span class="n">d</span><span class="o">=</span><span class="bp">None</span><span class="p">,</span> <span class="n">num_ant</span><span class="o">=</span><span class="mi">34</span><span class="p">):</span>
-    <span class="k">if</span> <span class="n">array_name</span> <span class="o">==</span> <span class="bp">None</span><span class="p">:</span>
-        <span class="n">array_name</span> <span class="o">=</span> <span class="n">datas</span><span class="o">.</span><span class="n">bl_arrays</span><span class="o">.</span><span class="n">AV1</span><span class="o">.</span><span class="n">values</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>
-    <span class="k">else</span><span class="p">:</span>
+<div class="highlight-python"><div class="highlight"><pre><span class="k">def</span> <span class="nf">runwto</span><span class="p">(</span><span class="n">pwv</span><span class="p">,</span> <span class="n">array_name</span><span class="o">=</span><span class="bp">None</span><span class="p">,</span> <span class="n">d</span><span class="o">=</span><span class="bp">None</span><span class="p">,</span> <span class="n">num_ant</span><span class="o">=</span><span class="mi">34</span><span class="p">):</span>
+    <span class="k">if</span> <span class="n">array_name</span> <span class="o">==</span> <span class="s">&#39;default&#39;</span><span class="p">:</span>
         <span class="n">array_name</span> <span class="o">=</span> <span class="bp">None</span>
+    <span class="k">else</span><span class="p">:</span>
+        <span class="n">array_name</span> <span class="o">=</span> <span class="n">datas</span><span class="o">.</span><span class="n">bl_arrays</span><span class="o">.</span><span class="n">AV1</span><span class="o">.</span><span class="n">values</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>
     <span class="k">if</span> <span class="n">d</span> <span class="o">==</span> <span class="bp">None</span><span class="p">:</span>
         <span class="n">d</span> <span class="o">=</span> <span class="n">ephem</span><span class="o">.</span><span class="n">now</span><span class="p">()</span>
     <span class="k">if</span> <span class="n">num_ant</span> <span class="o">!=</span> <span class="mi">34</span><span class="p">:</span>

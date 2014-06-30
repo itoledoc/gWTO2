@@ -280,6 +280,7 @@ class WtoAlgorithm(WtoDatabase):
             ' and SB_state != "FullyObserved"'
             ' and PRJ_state != "Phase2Submitted"'
             ' and PRJ_state != "Completed"')
+        sel4 = sel4[sel4.name.str.contains('not', case=False) == False]
         print("SBs with Ok state: %d" % len(sel4))
         sel4 = sel4.query('execount > Total')
         print("SBs with missing exec: %d" % len(sel4))
@@ -422,17 +423,19 @@ class WtoAlgorithm(WtoDatabase):
         sb_exec_score = self.exec_prio[execu]
 
         # set condition score:
+        pwv_corr = 1 - (abs(self.pwv - maxpwvc)/6.)
+        if pwv_corr > 6:
+            pwv_corr = 0.
+
         if frac < 1:
-            sb_cond_score = (8. + 2. * (frac**(1/4.))) * (
-                (self.pwv / maxpwvc)**(1/2.))
+            x = frac - 1.
+            sb_cond_score = 10 * (1 - (x ** 2.)) * pwv_corr
         elif frac == 1:
             sb_cond_score = 10.
         else:
-            m = -1/0.4
+            x = frac - 1
             if frac <= 1.4:
-                sb_cond_score = (((3.5 + m*frac)**(1/2.)) * 10.)
-                if self.pwv < maxpwvc:
-                    sb_cond_score *= (self.pwv / maxpwvc)**(1/2.)
+                sb_cond_score = (1. - (x / 0.4)**3.) * 10. * pwv_corr
             else:
                 sb_cond_score = 0.
 
