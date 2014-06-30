@@ -60,7 +60,7 @@ class WtoAlgorithm(WtoDatabase):
         self.maxha = 3.0
         self.minfrac = 0.75
         self.maxfrac = 1.2
-        self.horizon = 30.
+        self.horizon = 20.
         self.maxblfrac = 1.5
         self.exec_prio = {'EA': 10., 'NA': 10., 'EU': 10., 'CL': 10.,
                           'OTHER': 10.}

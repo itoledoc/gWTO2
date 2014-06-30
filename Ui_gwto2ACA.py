@@ -8,6 +8,13 @@
 # WARNING! All changes made in this file will be lost!
 
 from PyQt4 import QtCore, QtGui
+import datetime
+import ephem
+
+alma = ephem.Observer()
+alma.lat = '-23.0262015'
+alma.long = '-67.7551257'
+alma.elev = 5060
 
 try:
     _fromUtf8 = QtCore.QString.fromUtf8
@@ -25,6 +32,7 @@ except AttributeError:
 
 class Ui_ACAMainWindow(object):
     def setupUi(self, ACAMainWindow):
+        date = datetime.datetime.now()
         ACAMainWindow.setObjectName(_fromUtf8("ACAMainWindow"))
         ACAMainWindow.resize(1090, 822)
         self.centralwidget = QtGui.QWidget(ACAMainWindow)
@@ -65,6 +73,15 @@ class Ui_ACAMainWindow(object):
         self.gridLayout_6.addWidget(self.maxha_spin, 1, 5, 1, 1)
         self.date_datetime = QtGui.QDateTimeEdit(self.OptionsFrame)
         self.date_datetime.setCurrentSection(QtGui.QDateTimeEdit.YearSection)
+        self.date_datetime.setDateTime(
+            QtCore.QDateTime(
+                QtCore.QDate(date.date().year, date.date().month,
+                             date.date().day),
+                QtCore.QTime(date.time().hour, date.time().minute,
+                             date.time().second)))
+        self.date_datetime.setTime(
+            QtCore.QTime(
+                date.time().hour, date.time().minute, date.time().second))
         self.date_datetime.setTimeSpec(QtCore.Qt.UTC)
         self.date_datetime.setObjectName(_fromUtf8("date_datetime"))
         self.gridLayout_6.addWidget(self.date_datetime, 0, 1, 1, 1)
@@ -108,6 +125,14 @@ class Ui_ACAMainWindow(object):
         self.lst_spin = QtGui.QTimeEdit(self.OptionsFrame)
         self.lst_spin.setEnabled(True)
         self.lst_spin.setReadOnly(True)
+        self.lst_spin.setCurrentSection(QtGui.QDateTimeEdit.HourSection)
+        self.lst_spin.setTimeSpec(QtCore.Qt.UTC)
+        alma.date = self.date_datetime.dateTime().toPyDateTime()
+        lst = alma.sidereal_time()
+        lst_time = datetime.datetime.strptime(str(lst), '%H:%M:%S.%f').time()
+        self.lst_spin.setTime(
+            QtCore.QTime(lst_time.hour, lst_time.minute, lst_time.second))
+        self.lst_spin.setObjectName(_fromUtf8("lst_spin"))
         self.lst_spin.setObjectName(_fromUtf8("lst_spin"))
         self.gridLayout_6.addWidget(self.lst_spin, 0, 5, 1, 1)
         self.ArraysFrame = QtGui.QFrame(self.OptionsFrame)

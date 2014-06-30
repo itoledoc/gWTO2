@@ -41,7 +41,7 @@ Once in ipython:::
     datas = wto.Algorithm(path='./wto_testing/')
 
 And the run the following script. You can copy the code, and then paste into
-python with %paste, or copy it into a file, and then execute it inside the
+python with ``%paste``, or copy it into a file, and then execute it inside the
 ipython session::
 
     def runwto(pwv, array_name=None, d=None, num_ant=34):
@@ -73,10 +73,10 @@ ipython session::
 
 The to run the wto algorith use a pwv value between 0 and 20, with steps of
 0.05 (e.g., 0.4, 0.45, but no 0.42), and assuming the latest BL Array. Set
-array_name='default' when running runwto (e.g.
-runwto(X.XX, array_name='default')) to use the Current configuration parameters
+``array_name='default'`` when running runwto (e.g.
+``runwto(X.XX, array_name='default')``) to use the Current configuration parameters
 calculated with arrayConfigurationTools and 34 antennas. Also, to change the
-date to current date use runwto(X.XX, d=ephem.Date('2014-06-28 03:45')
+date to current date use ``runwto(X.XX, d=ephem.Date('2014-06-28 03:45')``
 
 This will display the top 25 values of datas.scorer12m dataFrame. To check full
 output in an excel table run:::

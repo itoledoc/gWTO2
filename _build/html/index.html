@@ -104,7 +104,7 @@ ipython
 </pre></div>
 </div>
 <p>And the run the following script. You can copy the code, and then paste into
-python with %paste, or copy it into a file, and then execute it inside the
+python with <tt class="docutils literal"><span class="pre">%paste</span></tt>, or copy it into a file, and then execute it inside the
 ipython session:</p>
 <div class="highlight-python"><div class="highlight"><pre><span class="k">def</span> <span class="nf">runwto</span><span class="p">(</span><span class="n">pwv</span><span class="p">,</span> <span class="n">array_name</span><span class="o">=</span><span class="bp">None</span><span class="p">,</span> <span class="n">d</span><span class="o">=</span><span class="bp">None</span><span class="p">,</span> <span class="n">num_ant</span><span class="o">=</span><span class="mi">34</span><span class="p">):</span>
     <span class="k">if</span> <span class="n">array_name</span> <span class="o">==</span> <span class="s">&#39;default&#39;</span><span class="p">:</span>
@@ -136,10 +136,10 @@ ipython session:</p>
 </div>
 <p>The to run the wto algorith use a pwv value between 0 and 20, with steps of
 0.05 (e.g., 0.4, 0.45, but no 0.42), and assuming the latest BL Array. Set
-array_name=&#8217;default&#8217; when running runwto (e.g.
-runwto(X.XX, array_name=&#8217;default&#8217;)) to use the Current configuration parameters
+<tt class="docutils literal"><span class="pre">array_name='default'</span></tt> when running runwto (e.g.
+<tt class="docutils literal"><span class="pre">runwto(X.XX,</span> <span class="pre">array_name='default')</span></tt>) to use the Current configuration parameters
 calculated with arrayConfigurationTools and 34 antennas. Also, to change the
-date to current date use runwto(X.XX, d=ephem.Date(&#8216;2014-06-28 03:45&#8217;)</p>
+date to current date use <tt class="docutils literal"><span class="pre">runwto(X.XX,</span> <span class="pre">d=ephem.Date('2014-06-28</span> <span class="pre">03:45')</span></tt></p>
 <p>This will display the top 25 values of datas.scorer12m dataFrame. To check full
 output in an excel table run::</p>
 <div class="highlight-python"><div class="highlight"><pre><span class="n">datas</span><span class="o">.</span><span class="n">score12m</span><span class="o">.</span><span class="n">to_excel</span><span class="p">(</span><span class="s">&#39;output_path/score.xls&#39;</span><span class="p">)</span>
@@ -583,7 +583,7 @@ ALMA.XML_OBSPROJECT_ENTITIES.</p>
 </table>
 <dl class="method">
 <dt id="wtoAlgorithm.WtoAlgorithm.calculate_score">
-<tt class="descname">calculate_score</tt><big>(</big><em>ecount</em>, <em>tcount</em>, <em>srank</em>, <em>ar</em>, <em>aminar</em>, <em>amaxar</em>, <em>tsysfrac</em>, <em>blfrac</em>, <em>grade</em>, <em>repfreq</em>, <em>dec</em>, <em>execu</em>, <em>array</em>, <em>frac</em>, <em>maxpwvc</em><big>)</big><a class="reference internal" href="_modules/wtoAlgorithm.html#WtoAlgorithm.calculate_score"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#wtoAlgorithm.WtoAlgorithm.calculate_score" title="Permalink to this definition">¶</a></dt>
+<tt class="descname">calculate_score</tt><big>(</big><em>ecount</em>, <em>tcount</em>, <em>srank</em>, <em>ar</em>, <em>aminar</em>, <em>amaxar</em>, <em>las</em>, <em>grade</em>, <em>repfreq</em>, <em>dec</em>, <em>execu</em>, <em>array</em>, <em>frac</em>, <em>maxpwvc</em><big>)</big><a class="reference internal" href="_modules/wtoAlgorithm.html#WtoAlgorithm.calculate_score"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#wtoAlgorithm.WtoAlgorithm.calculate_score" title="Permalink to this definition">¶</a></dt>
 <dd><table class="docutils field-list" frame="void" rules="none">
 <col class="field-name" />
 <col class="field-body" />
