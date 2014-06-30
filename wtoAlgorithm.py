@@ -343,7 +343,7 @@ class WtoAlgorithm(WtoDatabase):
         scores = df.apply(
             lambda r: self.calculate_score(
                 r['execount'], r['Total'], r['scienceRank'], r['AR'],
-                r['arrayMinAR'], r['arrayMaxAR'], r['tsysfrac'], r['blfrac'],
+                r['arrayMinAR'], r['arrayMaxAR'], r['LAS'],
                 r['grade'], r['repfreq'], r['DEC'], r['EXEC'], array,
                 r['frac'], r['maxPWVC']),
             axis=1)
@@ -363,7 +363,7 @@ class WtoAlgorithm(WtoDatabase):
                 self.selecttp, scores, left_on='SB_UID', right_index=True)
 
     def calculate_score(self, ecount, tcount, srank, ar, aminar, amaxar,
-                        tsysfrac, blfrac, grade, repfreq, dec, execu, array,
+                        las, grade, repfreq, dec, execu, array,
                         frac, maxpwvc):
 
         # set sb completion score
@@ -412,7 +412,13 @@ class WtoAlgorithm(WtoDatabase):
             if self.array_ar < arcorr:
                 l = arcorr - aminar
                 s = 10.
-                sb_array_score = (((self.array_ar - aminar) / l)**(1/3.)) * s
+
+                if las == 0:
+                    sb_array_score = (
+                        ((self.array_ar - aminar) / l)**(1/7.)) * s
+                else:
+                    sb_array_score = (
+                        ((self.array_ar - aminar) / l)**(1/3.)) * s
             elif self.array_ar == arcorr:
                 sb_array_score = 10.
             else:
