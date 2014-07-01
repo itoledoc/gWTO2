@@ -26,6 +26,7 @@ try:
     _encoding = QtGui.QApplication.UnicodeUTF8
     def _translate(context, text, disambig):
         return QtGui.QApplication.translate(context, text, disambig, _encoding)
+
 except AttributeError:
     def _translate(context, text, disambig):
         return QtGui.QApplication.translate(context, text, disambig)
@@ -175,6 +176,7 @@ class Ui_BLMainWindow(object):
         self.stdarrays_combo.addItem(_fromUtf8(""))
         self.stdarrays_combo.addItem(_fromUtf8(""))
         self.stdarrays_combo.addItem(_fromUtf8(""))
+        self.stdarrays_combo.addItem(_fromUtf8(""))
         self.gridLayout_7.addWidget(self.stdarrays_combo, 1, 2, 1, 1)
         self.std_conf_label = QtGui.QLabel(self.ArraysFrame)
         self.std_conf_label.setObjectName(_fromUtf8("std_conf_label"))
@@ -303,10 +305,10 @@ class Ui_BLMainWindow(object):
         self.menuOutputs.addAction(self.actionGenerate_excel_stat)
         self.menubar.addAction(self.menuMenu.menuAction())
         self.menubar.addAction(self.menuOutputs.menuAction())
-
         self.retranslateUi(BLMainWindow)
         self.tabWidget.setCurrentIndex(0)
         QtCore.QMetaObject.connectSlotsByName(BLMainWindow)
+        self.stdarrays_combo.setCurrentIndex(1)
 
     def retranslateUi(self, BLMainWindow):
         BLMainWindow.setWindowTitle(_translate("BLMainWindow", "gWTO2 - BL", None))
@@ -320,14 +322,15 @@ class Ui_BLMainWindow(object):
         self.now_button.setText(_translate("BLMainWindow", "Now", None))
         self.B04_b.setText(_translate("BLMainWindow", "B04", None))
         self.array_label.setText(_translate("BLMainWindow", "BL Arrays:", None))
-        self.stdarrays_combo.setItemText(0, _translate("BLMainWindow", "Current Conf.", None))
-        self.stdarrays_combo.setItemText(1, _translate("BLMainWindow", "C34-1", None))
-        self.stdarrays_combo.setItemText(2, _translate("BLMainWindow", "C34-2", None))
-        self.stdarrays_combo.setItemText(3, _translate("BLMainWindow", "C34-3", None))
-        self.stdarrays_combo.setItemText(4, _translate("BLMainWindow", "C34-4", None))
-        self.stdarrays_combo.setItemText(5, _translate("BLMainWindow", "C34-5", None))
-        self.stdarrays_combo.setItemText(6, _translate("BLMainWindow", "C34-6", None))
-        self.stdarrays_combo.setItemText(7, _translate("BLMainWindow", "C34-7", None))
+        self.stdarrays_combo.setItemText(0, _translate("BLMainWindow", " ", None))
+        self.stdarrays_combo.setItemText(1, _translate("BLMainWindow", "Current Conf.", None))
+        self.stdarrays_combo.setItemText(2, _translate("BLMainWindow", "C34-1", None))
+        self.stdarrays_combo.setItemText(3, _translate("BLMainWindow", "C34-2", None))
+        self.stdarrays_combo.setItemText(4, _translate("BLMainWindow", "C34-3", None))
+        self.stdarrays_combo.setItemText(5, _translate("BLMainWindow", "C34-4", None))
+        self.stdarrays_combo.setItemText(6, _translate("BLMainWindow", "C34-5", None))
+        self.stdarrays_combo.setItemText(7, _translate("BLMainWindow", "C34-6", None))
+        self.stdarrays_combo.setItemText(8, _translate("BLMainWindow", "C34-7", None))
         self.std_conf_label.setText(_translate("BLMainWindow", "Std. Conf.:", None))
         self.B03_b.setText(_translate("BLMainWindow", "B03", None))
         self.B06_b.setText(_translate("BLMainWindow", "B06", None))

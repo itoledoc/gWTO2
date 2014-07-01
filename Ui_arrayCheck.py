@@ -2,7 +2,7 @@
 
 # Form implementation generated from reading ui file '/home/itoledo/Work/gWTO2/arrayCheck.ui'
 #
-# Created: Mon Jun 30 16:24:14 2014
+# Created: Mon Jun 30 18:09:04 2014
 #      by: PyQt4 UI code generator 4.10.4
 #
 # WARNING! All changes made in this file will be lost!
@@ -26,7 +26,7 @@ except AttributeError:
 class Ui_ArrayCheck(object):
     def setupUi(self, ArrayCheck):
         ArrayCheck.setObjectName(_fromUtf8("ArrayCheck"))
-        ArrayCheck.resize(615, 497)
+        ArrayCheck.resize(632, 542)
         self.centralwidget = QtGui.QWidget(ArrayCheck)
         self.centralwidget.setObjectName(_fromUtf8("centralwidget"))
         self.gridLayout = QtGui.QGridLayout(self.centralwidget)
@@ -38,7 +38,7 @@ class Ui_ArrayCheck(object):
         self.gridLayout_2 = QtGui.QGridLayout(self.frame)
         self.gridLayout_2.setObjectName(_fromUtf8("gridLayout_2"))
         self.frame_2 = QtGui.QFrame(self.frame)
-        sizePolicy = QtGui.QSizePolicy(QtGui.QSizePolicy.Preferred, QtGui.QSizePolicy.Minimum)
+        sizePolicy = QtGui.QSizePolicy(QtGui.QSizePolicy.Preferred, QtGui.QSizePolicy.Fixed)
         sizePolicy.setHorizontalStretch(0)
         sizePolicy.setVerticalStretch(0)
         sizePolicy.setHeightForWidth(self.frame_2.sizePolicy().hasHeightForWidth())
@@ -71,13 +71,18 @@ class Ui_ArrayCheck(object):
         spacerItem = QtGui.QSpacerItem(40, 20, QtGui.QSizePolicy.Expanding, QtGui.QSizePolicy.Minimum)
         self.gridLayout_3.addItem(spacerItem, 0, 4, 1, 1)
         self.gridLayout_2.addWidget(self.frame_2, 2, 0, 1, 1)
-        self.graphicsView = QtGui.QGraphicsView(self.frame)
-        self.graphicsView.setObjectName(_fromUtf8("graphicsView"))
-        self.gridLayout_2.addWidget(self.graphicsView, 1, 0, 1, 1)
         self.title = QtGui.QLabel(self.frame)
+        sizePolicy = QtGui.QSizePolicy(QtGui.QSizePolicy.Preferred, QtGui.QSizePolicy.Fixed)
+        sizePolicy.setHorizontalStretch(0)
+        sizePolicy.setVerticalStretch(0)
+        sizePolicy.setHeightForWidth(self.title.sizePolicy().hasHeightForWidth())
+        self.title.setSizePolicy(sizePolicy)
         self.title.setAlignment(QtCore.Qt.AlignCenter)
         self.title.setObjectName(_fromUtf8("title"))
         self.gridLayout_2.addWidget(self.title, 0, 0, 1, 1)
+        self.graphic_widget = QtGui.QWidget(self.frame)
+        self.graphic_widget.setObjectName(_fromUtf8("graphic_widget"))
+        self.gridLayout_2.addWidget(self.graphic_widget, 1, 0, 1, 1)
         self.gridLayout.addWidget(self.frame, 0, 0, 1, 1)
         ArrayCheck.setCentralWidget(self.centralwidget)
 

@@ -6,8 +6,8 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>615</width>
-    <height>497</height>
+    <width>632</width>
+    <height>542</height>
    </rect>
   </property>
   <property name="windowTitle">
@@ -27,7 +27,7 @@
        <item row="2" column="0">
         <widget class="QFrame" name="frame_2">
          <property name="sizePolicy">
-          <sizepolicy hsizetype="Preferred" vsizetype="Minimum">
+          <sizepolicy hsizetype="Preferred" vsizetype="Fixed">
            <horstretch>0</horstretch>
            <verstretch>0</verstretch>
           </sizepolicy>
@@ -97,11 +97,14 @@
          </layout>
         </widget>
        </item>
-       <item row="1" column="0">
-        <widget class="QGraphicsView" name="graphicsView"/>
-       </item>
        <item row="0" column="0">
         <widget class="QLabel" name="title">
+         <property name="sizePolicy">
+          <sizepolicy hsizetype="Preferred" vsizetype="Fixed">
+           <horstretch>0</horstretch>
+           <verstretch>0</verstretch>
+          </sizepolicy>
+         </property>
          <property name="text">
           <string>BL Array Assesment</string>
          </property>
@@ -109,6 +112,9 @@
           <set>Qt::AlignCenter</set>
          </property>
         </widget>
+       </item>
+       <item row="1" column="0">
+        <widget class="QWidget" name="graphic_widget" native="true"/>
        </item>
       </layout>
      </widget>
