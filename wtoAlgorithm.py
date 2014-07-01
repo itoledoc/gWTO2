@@ -112,6 +112,7 @@ class WtoAlgorithm(WtoDatabase):
         if self.date == self.old_date:
             return None
         alma1.date = self.date
+        print alma1.date
         fs = self.fieldsource.apply(
             lambda r: observable(
                 r['solarSystem'], r['sourcename'], r['RA'], r['DEC'],
@@ -253,8 +254,9 @@ class WtoAlgorithm(WtoDatabase):
 
         self.alma.date = self.date
         lst = pd.np.degrees(self.alma.sidereal_time())
+        print self.alma.date, lst
         ha = (lst - sel2.RA) / 15.
-        ha.loc[ha > 12] = 24. - ha.loc[ha > 12]
+        ha.loc[ha > 12] = ha.loc[ha > 12] - 24.
         ha.loc[ha < -12] = 24. + ha.loc[ha < -12]
         sel2['HA'] = ha
         sel2 = sel2
