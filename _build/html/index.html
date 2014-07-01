@@ -107,20 +107,23 @@ ipython
 python with <tt class="docutils literal"><span class="pre">%paste</span></tt>, or copy it into a file, and then execute it inside the
 ipython session:</p>
 <div class="highlight-python"><div class="highlight"><pre><span class="k">def</span> <span class="nf">runwto</span><span class="p">(</span><span class="n">pwv</span><span class="p">,</span> <span class="n">array_name</span><span class="o">=</span><span class="bp">None</span><span class="p">,</span> <span class="n">d</span><span class="o">=</span><span class="bp">None</span><span class="p">,</span> <span class="n">num_ant</span><span class="o">=</span><span class="mi">34</span><span class="p">):</span>
+    <span class="n">datas</span><span class="o">.</span><span class="n">query_arrays</span><span class="p">()</span>
     <span class="k">if</span> <span class="n">array_name</span> <span class="o">==</span> <span class="s">&#39;default&#39;</span><span class="p">:</span>
         <span class="n">array_name</span> <span class="o">=</span> <span class="bp">None</span>
+        <span class="n">datas</span><span class="o">.</span><span class="n">set_bl_prop</span><span class="p">(</span><span class="n">array_name</span><span class="p">)</span>
     <span class="k">else</span><span class="p">:</span>
         <span class="n">array_name</span> <span class="o">=</span> <span class="n">datas</span><span class="o">.</span><span class="n">bl_arrays</span><span class="o">.</span><span class="n">AV1</span><span class="o">.</span><span class="n">values</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>
+        <span class="n">datas</span><span class="o">.</span><span class="n">set_bl_prop</span><span class="p">(</span><span class="n">array_name</span><span class="p">)</span>
+        <span class="n">datas</span><span class="o">.</span><span class="n">array_ar</span> <span class="o">=</span> <span class="mi">61800</span> <span class="o">/</span> <span class="p">(</span><span class="mf">100.</span> <span class="o">*</span> <span class="n">datas</span><span class="o">.</span><span class="n">ruv</span><span class="o">.</span><span class="n">max</span><span class="p">())</span>
     <span class="k">if</span> <span class="n">d</span> <span class="o">==</span> <span class="bp">None</span><span class="p">:</span>
         <span class="n">d</span> <span class="o">=</span> <span class="n">ephem</span><span class="o">.</span><span class="n">now</span><span class="p">()</span>
     <span class="k">if</span> <span class="n">num_ant</span> <span class="o">!=</span> <span class="mi">34</span><span class="p">:</span>
-        <span class="n">datas</span><span class="o">.</span><span class="n">num_ant_user</span> <span class="o">=</span> <span class="n">num_ant</span>
-    <span class="n">array_name</span> <span class="o">=</span> <span class="n">array_name</span>
+        <span class="n">datas</span><span class="o">.</span><span class="n">num_ant</span> <span class="o">=</span> <span class="n">num_ant</span>
+    <span class="n">datas</span><span class="o">.</span><span class="n">array_name</span> <span class="o">=</span> <span class="n">array_name</span>
     <span class="n">datas</span><span class="o">.</span><span class="n">update</span><span class="p">()</span>
     <span class="n">datas</span><span class="o">.</span><span class="n">date</span> <span class="o">=</span> <span class="n">d</span>
     <span class="n">datas</span><span class="o">.</span><span class="n">pwv</span> <span class="o">=</span> <span class="n">pwv</span>
-    <span class="n">datas</span><span class="o">.</span><span class="n">query_arrays</span><span class="p">()</span>
-    <span class="n">datas</span><span class="o">.</span><span class="n">selector</span><span class="p">(</span><span class="s">&#39;12m&#39;</span><span class="p">,</span> <span class="n">array_name</span><span class="p">)</span>
+    <span class="n">datas</span><span class="o">.</span><span class="n">selector</span><span class="p">(</span><span class="s">&#39;12m&#39;</span><span class="p">)</span>
     <span class="n">datas</span><span class="o">.</span><span class="n">scorer</span><span class="p">(</span><span class="s">&#39;12m&#39;</span><span class="p">)</span>
     <span class="k">print</span> <span class="n">datas</span><span class="o">.</span><span class="n">score12m</span><span class="o">.</span><span class="n">sort</span><span class="p">(</span>
         <span class="s">&#39;score&#39;</span><span class="p">,</span> <span class="n">ascending</span><span class="o">=</span><span class="bp">False</span><span class="p">)</span><span class="o">.</span><span class="n">query</span><span class="p">(</span>
@@ -646,7 +649,7 @@ ALMA.XML_OBSPROJECT_ENTITIES.</p>
 
 <dl class="method">
 <dt id="wtoAlgorithm.WtoAlgorithm.selector">
-<tt class="descname">selector</tt><big>(</big><em>array</em>, <em>array_name=None</em><big>)</big><a class="reference internal" href="_modules/wtoAlgorithm.html#WtoAlgorithm.selector"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#wtoAlgorithm.WtoAlgorithm.selector" title="Permalink to this definition">¶</a></dt>
+<tt class="descname">selector</tt><big>(</big><em>array</em><big>)</big><a class="reference internal" href="_modules/wtoAlgorithm.html#WtoAlgorithm.selector"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#wtoAlgorithm.WtoAlgorithm.selector" title="Permalink to this definition">¶</a></dt>
 <dd><p>Selects SBs that can be observed given the current weather conditions,
 HA range, array type and array configuration (in the case of 12m array
 type) and SB/Project Status. To limit the calculation of pyephem, the

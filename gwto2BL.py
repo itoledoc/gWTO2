@@ -63,7 +63,7 @@ class BLMainWindow(QMainWindow, Ui_BLMainWindow):
         Slot documentation goes here.
         """
         # TODO: not implemented yet
-        raise NotImplementedError
+        self.datas.maxha = p0
     
     @pyqtSignature("")
     def on_date_datetime_editingFinished(self):
@@ -89,7 +89,7 @@ class BLMainWindow(QMainWindow, Ui_BLMainWindow):
         Slot documentation goes here.
         """
         # TODO: not implemented yet
-        raise NotImplementedError
+        self.datas.horizon = p0
     
     @pyqtSignature("int")
     def on_minha_spin_valueChanged(self, p0):
@@ -97,7 +97,7 @@ class BLMainWindow(QMainWindow, Ui_BLMainWindow):
         Slot documentation goes here.
         """
         # TODO: not implemented yet
-        raise NotImplementedError
+        self.datas.minha = p0
     
     @pyqtSignature("double")
     def on_pwv_spin_valueChanged(self, p0):
@@ -410,15 +410,26 @@ class BLMainWindow(QMainWindow, Ui_BLMainWindow):
         self.datas.selector('12m')
         self.datas.scorer('12m')
         std12 = self.datas.score12m.sort(
-            'score', ascending=False).query(
-                'band != "ALMA_RB_04" and band '
-                '!= "ALMA_RB_08" and isPolarization == False')[
+            'score', ascending=False).query('isPolarization == False')[
                     ['score', 'CODE', 'SB_UID', 'name', 'SB_state', 'band',
                      'maxPWVC', 'HA', 'elev', 'etime', 'execount', 'Total',
                      'arrayMinAR', 'arcorr', 'arrayMaxAR', 'tsysfrac', 'blfrac',
-                     'frac','sb_array_score', 'sb_cond_score', 'DEC', 'RA',
-                     'isTimeConstrained', 'integrationTime',
+                     'frac','sb_array_score', 'sb_cond_score', 'RA', 'DEC',
+                     'isTimeConstrained','integrationTime',
                      'PRJ_ARCHIVE_UID']]
+        if not self.B03_b.isChecked():
+            std12 = std12.query('band != "ALMA_RB_03"')
+        if not self.B04_b.isChecked():
+            std12 = std12.query('band != "ALMA_RB_04"')
+        if not self.B06_b.isChecked():
+            std12 = std12.query('band != "ALMA_RB_06"')
+        if not self.B07_b.isChecked():
+            std12 = std12.query('band != "ALMA_RB_07"')
+        if not self.B08_b.isChecked():
+            std12 = std12.query('band != "ALMA_RB_08"')
+        if not self.B09_b.isChecked():
+            std12 = std12.query('band != "ALMA_RB_09"')
+
         print std12.head(10)
         std12n = std12.to_records(index=False)
         header = std12n.dtype.names

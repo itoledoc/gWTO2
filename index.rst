@@ -45,20 +45,23 @@ python with ``%paste``, or copy it into a file, and then execute it inside the
 ipython session::
 
     def runwto(pwv, array_name=None, d=None, num_ant=34):
+        datas.query_arrays()
         if array_name == 'default':
             array_name = None
+            datas.set_bl_prop(array_name)
         else:
             array_name = datas.bl_arrays.AV1.values[0]
+            datas.set_bl_prop(array_name)
+            datas.array_ar = 61800 / (100. * datas.ruv.max())
         if d == None:
             d = ephem.now()
         if num_ant != 34:
-            datas.num_ant_user = num_ant
-        array_name = array_name
+            datas.num_ant = num_ant
+        datas.array_name = array_name
         datas.update()
         datas.date = d
         datas.pwv = pwv
-        datas.query_arrays()
-        datas.selector('12m', array_name)
+        datas.selector('12m')
         datas.scorer('12m')
         print datas.score12m.sort(
             'score', ascending=False).query(
