@@ -167,7 +167,7 @@ class WtoAlgorithm(WtoDatabase):
         print self.old_date, self.date
 
     # noinspection PyAugmentAssignment
-    def selector(self, array, array_name=None):
+    def selector(self, array):
 
         """
         Selects SBs that can be observed given the current weather conditions,
@@ -196,12 +196,6 @@ class WtoAlgorithm(WtoDatabase):
         else:
             if array == '12m':
                 array1 = ['TWELVE-M']
-                if (array_name is not None or
-                        array_name in self.defarrays):
-                    self.set_bl_prop(array_name=array_name)
-                    self.array_ar = 61800 / (100.0 * self.ruv.max())
-                else:
-                    self.set_bl_prop(array_name=array_name)
             elif array == '7m':
                 array1 = ['SEVEN-M', 'ACA']
             else:
@@ -293,7 +287,7 @@ class WtoAlgorithm(WtoDatabase):
                   (len(sel4), self.array_ar, self.num_bl, self.num_ant))
             sel4['blmax'] = sel4.apply(
                 lambda row: rUV.computeBL(row['AR'], row['repfreq']), axis=1)
-            if self.num_ant_user == 34:
+            if self.array_name is not None:
                 sel4['blfrac'] = sel4.apply(
                     lambda row: (33. * 17) / (1.*len(
                         self.ruv[self.ruv < row['blmax']]))
@@ -302,8 +296,17 @@ class WtoAlgorithm(WtoDatabase):
                          (self.num_ant*(self.num_ant - 1) / 2.),
                     axis=1)
             else:
-                sel4['blfrac'] = sel4.RA * 0. + (
-                    33 * 17 / (self.num_ant_user*(self.num_ant_user - 1) / 2.))
+                sel4['blfrac'] = sel4.apply(
+                    lambda row: (33. * 17) / (1.*len(
+                        self.ruv[self.ruv < row['blmax']]))
+                    if (row['LAS'] != 0)
+                    else (33. * 17) /
+                         (34.*(34. - 1) / 2.),
+                    axis=1)
+                if self.num_ant != 34:
+                    sel4['blfrac'] = sel4.blfrac * (
+                        33 * 17 / (self.num_ant*(
+                            self.num_ant - 1) / 2.))
             sel4['frac'] = sel4.tsysfrac * sel4.blfrac
             self.select12m = sel4
 
@@ -571,6 +574,7 @@ class WtoAlgorithm(WtoDatabase):
 
         :param array_name:
         """
+        # In case a bl_array is selected
         if (array_name is not None and len(self.bl_arrays) != 0
                 and array_name not in self.defarrays):
             id1 = self.bl_arrays.query('AV1 == "%s"' % array_name).iloc[0].SE1
@@ -592,6 +596,7 @@ class WtoAlgorithm(WtoDatabase):
             self.num_bl = len(self.ruv)
             self.num_ant = len(ap)
 
+        # If default or C34 is selected
         else:
             if array_name is None:
                 conf_file = self.wto_path + 'conf/default.txt'
@@ -612,13 +617,6 @@ class WtoAlgorithm(WtoDatabase):
                 self.ruv = self.ruv[-561:]
                 self.num_bl = len(self.ruv)
                 self.num_ant = 34
-                if self.num_ant_user != 34:
-                    self.num_ant = self.num_ant_user
-            else:
-                self.num_bl = len(self.ruv)
-                self.num_ant = int((1 + pd.np.sqrt(1 + 8 * self.num_bl)) / 2.)
-                if self.num_ant_user != 34:
-                    self.num_ant = self.num_ant_user
 
 
 def observable(solarSystem, sourcename, RA, DEC, horizon, isQuery, ephemeris,

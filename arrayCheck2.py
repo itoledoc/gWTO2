@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 
 """
-Module implementing ArrayCheck.
+Module implementing arrayCheck2.
 """
 
 from PyQt4.QtGui import *
@@ -10,7 +10,7 @@ from matplotlib.backends.backend_qt4agg import FigureCanvasQTAgg as FigureCanvas
 from matplotlib.figure import Figure
 import numpy as np
 from scipy.stats import norm,rayleigh
-from Ui_arrayCheck import Ui_ArrayCheck
+from Ui_arrayCheck2 import Ui_Dialog
 
 try:
     _encoding = QApplication.UnicodeUTF8
@@ -20,7 +20,8 @@ except AttributeError:
     def _translate(context, text, disambig):
         return QApplication.translate(context, text, disambig)
 
-class ArrayCheck(QMainWindow, Ui_ArrayCheck):
+
+class arrayCheck2(QDialog, Ui_Dialog):
     """
     Class documentation goes here.
     """
@@ -28,40 +29,33 @@ class ArrayCheck(QMainWindow, Ui_ArrayCheck):
         """
         Constructor
         """
-        QMainWindow.__init__(self, parent)
+        QDialog.__init__(self, parent)
         self.setupUi(self)
-        l = QVBoxLayout(self.graphic_widget)
-        self.plot = MyStaticMplCanvas(self.graphic_widget, ruv=ruv)
-        l.addWidget(self.plot)
-        self.array_ar = 61800 / (100. * self.plot.interval[1])
+        self.num_ant = num_ant
+        l = QVBoxLayout(self.widget)
+        self.plot = MyStaticMplCanvas(self.widget, ruv=ruv)
+        ruvmax = min(self.plot.interval[1], ruv.max())
+        self.array_ar = 61800 / (100. * ruvmax)
         self.arrayar_line.setText(_translate("ArrayCheck", "%.2f" % self.array_ar, None))
-        self.antennas_line_line.setText(_translate("ArrayCheck", "%d" % num_ant, None))
+        self.antenna_line_2.setText(_translate("ArrayCheck", "%d" % self.num_ant, None))
+        l.addWidget(self.plot)
     
     @pyqtSignature("")
-    def on_cancel_button_clicked(self):
+    def on_buttonBox_accepted(self):
         """
         Slot documentation goes here.
         """
         # TODO: not implemented yet
-        self.hide()
+        self.accept()
     
     @pyqtSignature("")
-    def on_ok_button_clicked(self):
+    def on_buttonBox_rejected(self):
         """
         Slot documentation goes here.
         """
         # TODO: not implemented yet
-        print self.plot.interval[1]
-        self.hide()
-        return self.plot.interval[1]
+        self.reject()
 
-    @pyqtSignature("QPoint")
-    def on_graphicsView_customContextMenuRequested(self, pos):
-        """
-        Slot documentation goes here.
-        """
-        # TODO: not implemented yet
-        raise NotImplementedError
 
 class MyMplCanvas(FigureCanvas):
     """Ultimately, this is a QWidget (as well as a FigureCanvasAgg, etc.)."""
