@@ -379,11 +379,9 @@ class BLMainWindow(QMainWindow, Ui_BLMainWindow):
             self.datas.horizon, self.datas.array_name, self.datas.array_ar,
             self.datas.num_ant
         )
-        QCoreApplication.processEvents()
+
         self.datas.selector('12m')
-        QCoreApplication.processEvents()
         self.datas.scorer('12m')
-        QCoreApplication.processEvents()
         std12 = self.datas.score12m.sort(
             'score', ascending=False).query('isPolarization == False')[
                 ['score', 'CODE', 'SB_UID', 'name', 'SB_state', 'band',
@@ -489,11 +487,15 @@ class MyTableModel(QAbstractTableModel):
                        20, 21, 22, 23]:
                 return QVariant(int(Qt.AlignRight|Qt.AlignVCenter))
             return QVariant(int(Qt.AlignLeft|Qt.AlignVCenter))
-        # elif role == Qt.BackgroundColorRole:
-        #     if sb[0] > 50:
-        #         return QVariant(QColor(255, 215, 0))
-        #     else:
-        #         return QVariant(QColor(250, 250, 250))
+        elif role == Qt.BackgroundColorRole:
+            if 0 == index.row() % 2:
+                c = QVariant(QColor(235, 245, 255))
+            else:
+                c = QVariant(QColor(250, 250, 250))
+            if sb[17] == 0:
+                c = QVariant(QColor(255, 110, 110))
+            return c
+
         return QVariant()
 
     def headerData(self, col, orientation, role):
