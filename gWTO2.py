@@ -9,7 +9,7 @@ from gwto2ACA import ACAMainWindow
 
 def main():
     """
-
+    Starts the gWTO2 gui in one of its two flavors: BL or ACA
 
     :return:
     """
