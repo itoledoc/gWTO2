@@ -8,29 +8,45 @@
 # WARNING! All changes made in this file will be lost!
 
 from PyQt4 import QtCore, QtGui
+import datetime
+import ephem
+
+alma = ephem.Observer()
+alma.lat = '-23.0262015'
+alma.long = '-67.7551257'
+alma.elev = 5060
 
 try:
     _fromUtf8 = QtCore.QString.fromUtf8
+
 except AttributeError:
+    # noinspection PyPep8Naming
     def _fromUtf8(s):
         return s
 
 try:
     _encoding = QtGui.QApplication.UnicodeUTF8
+
     def _translate(context, text, disambig):
         return QtGui.QApplication.translate(context, text, disambig, _encoding)
 except AttributeError:
     def _translate(context, text, disambig):
         return QtGui.QApplication.translate(context, text, disambig)
 
+
+# noinspection PyArgumentList,PyPep8Naming,PyShadowingNames
 class Ui_ACAMainWindow(object):
     def setupUi(self, ACAMainWindow):
+        # Set date
+        date = datetime.datetime.now()
         ACAMainWindow.setObjectName(_fromUtf8("ACAMainWindow"))
-        ACAMainWindow.resize(1090, 822)
+        ACAMainWindow.resize(1200, 800)
+
         self.centralwidget = QtGui.QWidget(ACAMainWindow)
         self.centralwidget.setObjectName(_fromUtf8("centralwidget"))
         self.gridLayout = QtGui.QGridLayout(self.centralwidget)
         self.gridLayout.setObjectName(_fromUtf8("gridLayout"))
+
         self.MainFrame = QtGui.QFrame(self.centralwidget)
         sizePolicy = QtGui.QSizePolicy(QtGui.QSizePolicy.Expanding, QtGui.QSizePolicy.Expanding)
         sizePolicy.setHorizontalStretch(0)
@@ -42,6 +58,7 @@ class Ui_ACAMainWindow(object):
         self.MainFrame.setObjectName(_fromUtf8("MainFrame"))
         self.gridLayout_2 = QtGui.QGridLayout(self.MainFrame)
         self.gridLayout_2.setObjectName(_fromUtf8("gridLayout_2"))
+
         self.OptionsFrame = QtGui.QFrame(self.MainFrame)
         self.OptionsFrame.setEnabled(True)
         sizePolicy = QtGui.QSizePolicy(QtGui.QSizePolicy.Preferred, QtGui.QSizePolicy.Fixed)
@@ -54,20 +71,34 @@ class Ui_ACAMainWindow(object):
         self.OptionsFrame.setObjectName(_fromUtf8("OptionsFrame"))
         self.gridLayout_6 = QtGui.QGridLayout(self.OptionsFrame)
         self.gridLayout_6.setObjectName(_fromUtf8("gridLayout_6"))
+
         self.pwv_label = QtGui.QLabel(self.OptionsFrame)
         self.pwv_label.setObjectName(_fromUtf8("pwv_label"))
         self.gridLayout_6.addWidget(self.pwv_label, 0, 2, 1, 1)
+
         self.maxha_spin = QtGui.QSpinBox(self.OptionsFrame)
         self.maxha_spin.setMinimum(-12)
         self.maxha_spin.setMaximum(12)
         self.maxha_spin.setProperty("value", 3)
         self.maxha_spin.setObjectName(_fromUtf8("maxha_spin"))
         self.gridLayout_6.addWidget(self.maxha_spin, 1, 5, 1, 1)
+
         self.date_datetime = QtGui.QDateTimeEdit(self.OptionsFrame)
         self.date_datetime.setCurrentSection(QtGui.QDateTimeEdit.YearSection)
+        self.date_datetime.setWrapping(True)
+        self.date_datetime.setDateTime(
+            QtCore.QDateTime(
+                QtCore.QDate(date.date().year, date.date().month,
+                             date.date().day),
+                QtCore.QTime(date.time().hour, date.time().minute,
+                             date.time().second)))
+        self.date_datetime.setTime(
+            QtCore.QTime(
+                date.time().hour, date.time().minute, date.time().second))
         self.date_datetime.setTimeSpec(QtCore.Qt.UTC)
         self.date_datetime.setObjectName(_fromUtf8("date_datetime"))
         self.gridLayout_6.addWidget(self.date_datetime, 0, 1, 1, 1)
+
         self.horizon_spin = QtGui.QSpinBox(self.OptionsFrame)
         self.horizon_spin.setMaximum(90)
         self.horizon_spin.setProperty("value", 20)
@@ -105,11 +136,20 @@ class Ui_ACAMainWindow(object):
         self.gridLayout_6.addItem(spacerItem, 0, 7, 1, 1)
         spacerItem1 = QtGui.QSpacerItem(40, 20, QtGui.QSizePolicy.Expanding, QtGui.QSizePolicy.Minimum)
         self.gridLayout_6.addItem(spacerItem1, 1, 7, 1, 1)
+
         self.lst_spin = QtGui.QTimeEdit(self.OptionsFrame)
         self.lst_spin.setEnabled(True)
         self.lst_spin.setReadOnly(True)
+        self.lst_spin.setCurrentSection(QtGui.QDateTimeEdit.HourSection)
+        self.lst_spin.setTimeSpec(QtCore.Qt.UTC)
+        alma.date = self.date_datetime.dateTime().toPyDateTime()
+        lst = alma.sidereal_time()
+        lst_time = datetime.datetime.strptime(str(lst), '%H:%M:%S.%f').time()
+        self.lst_spin.setTime(
+            QtCore.QTime(lst_time.hour, lst_time.minute, lst_time.second))
         self.lst_spin.setObjectName(_fromUtf8("lst_spin"))
         self.gridLayout_6.addWidget(self.lst_spin, 0, 5, 1, 1)
+
         self.ArraysFrame = QtGui.QFrame(self.OptionsFrame)
         self.ArraysFrame.setMinimumSize(QtCore.QSize(200, 0))
         self.ArraysFrame.setAutoFillBackground(True)
@@ -156,6 +196,7 @@ class Ui_ACAMainWindow(object):
         self.antennas_label.setObjectName(_fromUtf8("antennas_label"))
         self.gridLayout_7.addWidget(self.antennas_label, 0, 1, 1, 1)
         self.gridLayout_6.addWidget(self.ArraysFrame, 0, 12, 2, 1)
+
         self.now_button = QtGui.QPushButton(self.OptionsFrame)
         self.now_button.setObjectName(_fromUtf8("now_button"))
         self.gridLayout_6.addWidget(self.now_button, 0, 6, 1, 1)

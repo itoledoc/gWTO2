@@ -41,6 +41,9 @@ class BLMainWindow(QMainWindow, Ui_BLMainWindow):
     """
     Class documentation goes here.
     """
+
+    # TODO: Add column with type of observation (Mosaic, multisource, single...)
+    # TODO: Add repFreq column
     def __init__(self, parent=None, path='/.wto/', source=None, forceup=False):
         """
         Constructor
@@ -580,7 +583,7 @@ class MyStdTableModel(QAbstractTableModel):
                 return QVariant(str(d)[:-2])
             elif col in [0, 13, 14, 15, 18, 19, 20, 21]:
                 return QVariant(QString("%1").arg(sb[col], 0, 'f', 2))
-            elif col in [9, 16, 17, 23]:
+            elif col in [9, 16, 17, 22]:
                 return QVariant(QString("%1").arg(sb[col], 0, 'f', 1))
             elif col in [11, 12]:
                 return QVariant(QString("%1").arg(sb[col], 0, 'i', 0))
@@ -666,7 +669,7 @@ class MyTcTableModel(QAbstractTableModel):
                 return QVariant(str(d)[:-2])
             elif col in [0, 13, 14, 15, 18, 19, 20, 21]:
                 return QVariant(QString("%1").arg(sb[col], 0, 'f', 2))
-            elif col in [9, 16, 17]:
+            elif col in [9, 16, 17, 22]:
                 return QVariant(QString("%1").arg(sb[col], 0, 'f', 1))
             elif col in [11, 12]:
                 return QVariant(QString("%1").arg(sb[col], 0, 'i', 0))
@@ -741,7 +744,7 @@ class MyPolTableModel(QAbstractTableModel):
                 return QVariant(str(d)[:-2])
             elif col in [0, 13, 14, 15, 18, 19, 20, 21]:
                 return QVariant(QString("%1").arg(sb[col], 0, 'f', 2))
-            elif col in [9, 16, 17]:
+            elif col in [9, 16, 17, 22]:
                 return QVariant(QString("%1").arg(sb[col], 0, 'f', 1))
             elif col in [11, 12]:
                 return QVariant(QString("%1").arg(sb[col], 0, 'i', 0))
