@@ -9,11 +9,12 @@ from PyQt4.QtCore import *
 from matplotlib.backends.backend_qt4agg import FigureCanvasQTAgg as FigureCanvas
 from matplotlib.figure import Figure
 import numpy as np
-from scipy.stats import norm,rayleigh
+from scipy.stats import rayleigh
 from Ui_arrayCheck2 import Ui_Dialog
 
 try:
     _encoding = QApplication.UnicodeUTF8
+
     def _translate(context, text, disambig):
         return QApplication.translate(context, text, disambig, _encoding)
 except AttributeError:
@@ -21,7 +22,7 @@ except AttributeError:
         return QApplication.translate(context, text, disambig)
 
 
-class arrayCheck2(QDialog, Ui_Dialog):
+class ArrayCheck2(QDialog, Ui_Dialog):
     """
     Class documentation goes here.
     """

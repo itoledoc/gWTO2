@@ -473,4 +473,3 @@ if __name__ == "__main__":
     ui.setupUi(BLMainWindow)
     BLMainWindow.show()
     sys.exit(app.exec_())
-
