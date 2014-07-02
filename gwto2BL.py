@@ -370,16 +370,16 @@ class BLMainWindow(QMainWindow, Ui_BLMainWindow):
         progress.setLabelText('Running WTO...')
         progress.show()
         progress.setAutoClose(True)
-        progress.setMaximum(3)
         QCoreApplication.processEvents()
 
         self.datas.update()
+        QCoreApplication.processEvents()
         print(
             self.datas.date, self.datas.pwv, self.datas.minha, self.datas.maxha,
             self.datas.horizon, self.datas.array_name, self.datas.array_ar,
             self.datas.num_ant
         )
-
+        QCoreApplication.processEvents()
         self.datas.selector('12m')
         self.datas.scorer('12m')
         std12 = self.datas.score12m.sort(
