@@ -1,21 +1,34 @@
 #!/usr/bin/env python
 __author__ = 'itoledo'
 
+import optparse
 from PyQt4.QtGui import QApplication
 from gwto2BL import BLMainWindow
 from gwto2ACA import ACAMainWindow
 
 
 def main():
+    """
+
+
+    :return:
+    """
     import sys
-    app = QApplication(sys.argv)
-    if len(sys.argv) == 1:
+    parser = optparse.OptionParser()
+    parser.add_option(
+        '-c', '--clean', dest='clean', default=False, action='store_true',
+        help="Force clean up of gWTO2 cache")
+    parser.add_option('-p', '--path', default='/.wto/',
+                      help="Path for cache")
+    (options, args) = parser.parse_args()
+    app = QApplication(args)
+    if len(args) == 0:
         print("Please specify ACA or BL")
         return None
-    if sys.argv[1] == 'ACA':
+    if args[0] == 'ACA':
         wnd = ACAMainWindow()
-    elif sys.argv[1] == 'BL':
-        wnd = BLMainWindow()
+    elif args[0] == 'BL':
+        wnd = BLMainWindow(path=options.path, forceup=options.clean)
     else:
         print("The argument must be ACA or BL")
         return None

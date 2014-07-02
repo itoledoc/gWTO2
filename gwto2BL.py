@@ -37,14 +37,15 @@ class BLMainWindow(QMainWindow, Ui_BLMainWindow):
     """
     Class documentation goes here.
     """
-    def __init__(self, parent=None, path='/.wto/', source=None, forcenew=False):
+    def __init__(self, parent=None, path='/.wto/', source=None, forceup=False):
         """
         Constructor
         """
         QMainWindow.__init__(self, parent)
         self.setupUi(self)
         self.alma = alma
-        self.datas = WTO.WtoAlgorithm(path=path, source=source, forcenew=False)
+        self.datas = WTO.WtoAlgorithm(path=path, source=source,
+                                      forcenew=forceup)
         self.datas.set_pwv(self.pwv_spin.value())
         self.datas.set_minha(self.minha_spin.value())
         self.datas.set_maxha(self.maxha_spin.value())
@@ -495,6 +496,9 @@ class MyTableModel(QAbstractTableModel):
             if sb[17] == 0:
                 c = QVariant(QColor(255, 110, 110))
             return c
+        elif role == Qt.FontRole:
+            if col in [0, 15, 17]:
+                return QVariant(QFont("Cantarel", 10, QFont.Bold))
 
         return QVariant()
 
