@@ -15,6 +15,18 @@ The gWTO2 Documentation
 Using gWTO2
 ===========
 
+.. figure:: Selection_003.png
+   :scale: 50
+
+   Screenshot of gWTO2 RC
+
+**NOTICE 1: currently gWTO2 will only work with the "BL" option, i.e. only for**
+**the baseline correlator (2014-07-02).**
+
+**NOTICE 2: only the tab "Standard" is operative. Please check the column**
+**"Time Const" to avoid running SBs with time constrains**
+**until the tab "Time Const." is operational (2014-07-02).**
+
 gWTO is tested and deployed at the osf-red machine, within the aod account.
 A virtual environment of python, based on the Anaconda distribution, must be
 loaded before using it. This is achieved by running:::
@@ -23,6 +35,101 @@ loaded before using it. This is achieved by running:::
 
 The Anaconda distribution is based on python 2.7.6 and includes numpy, pandas,
 pyephem and other libraries need by gWTO.
+
+The gui is run executing the gWTO2.py comand:::
+
+    Usage: gWTO2.py arg1 [options]
+        arg1 must be BL or ACA
+
+    Options:
+      -h, --help            show this help message and exit
+      -c, --clean           Force clean up of gWTO2 cache
+      -p PATH, --path=PATH  Path for cache
+
+So, to run gWTO2 for baseline correlator use ``BL``, and ``ACA`` for Total Power
+and ACA. The ``-c`` option should only be used once per day.
+
+I would also recommend to set the option ``-p`` to something like
+``'/.wto_myname/'`` so different users running gWTO won't mess up the cache
+for each other.
+
+Start up
+--------
+
+After starting gWTO2 you will be presented with the gui shown on figure 2.
+If the -c option was used, or the cache have been manually erased it, the time
+until you are presented the gui can take up to 5-7 minutes.
+
+.. figure:: gWTO2__BL_001.png
+   :scale: 50
+
+   Figure 2
+
+Setting up variables
+--------------------
+
+After opening, the date will be by defaul the current UTC time, pwv is set to
+1.2 mm., the horizon limit is 20 degrees, minimum hour angle is -5 and maximum
+hour angle is 3. The LST field is not editable, and it shows the LST for the
+date time set in the Date field.
+
+The box with the array variables will have the *Std. Conf.:* field set to
+"Current Conf.". This "Current Conf" comes from the output of the CASA script
+``arrayConfigurationTools.py``, which can be found at
+AIV/science/ArrayConfiguration/Tools/arrayConfigurationTools.py. It is made
+with the antennas that in principle can be used for the current ES Block. **It**
+**is the AoD lead duty to create the relevant files from time to time to**
+**account for the antenna movements or being added**.
+
+The values given at *Array AR* are set according to the *current array's* angular
+resolution and number of antennas offered officially for cycle 2. **The only**
+**field you can modify at this stage in the 'Antenna' field, which is the**
+**number of antennas**. The idea is that the user will use this information
+to have an idea of the current configuratin characteristics, and to run gWTO2 to
+plan observations ahead of time, or when Baseline arrays have not been created
+in the last 6 to 12 hours.
+
+**When observing** the user should press the button *Now*, and a pop up window
+similar to the one showed in figure 3 will appear.
+
+.. figure:: gWTO2__BL_002.png
+
+   Figure 3
+
+The window show the normalized histogram of the baseline lengths, and a fit to
+this distribution, taking the data from latest Baseline Array created.
+From this distribution the array's resolution is estimated, and the number of
+antennas is also show. **The user should check that the array resolution is**
+**close the the "Current Conf." value, and that no outliers are fitted**. If
+happy press the OK button, and this will set the Array AR and Antennas fields
+in the main window. If Cancel is pressed instead, the main window will go back
+to "Current Conf.". Also, when accepting the new array estimates you will not
+longer be able to change the number of antennas unless you go back to
+"Current Conf."
+
+The "BL Arrays:" Combo menu is populated also with the list of the baselines
+arrays created in the last 6 to 12 hours.
+
+Running and setting scores
+--------------------------
+
+When you are happy with the date, pwv and array variables (and also the horizon,
+minHA and maxHA values) you can run the selector and scoring algorithms pressing
+the button "Now".
+
+After and interval of a few seconds (5 to 15 seconds) you will be presented
+with something similar to Figure 4.
+
+.. figure:: gWTO2__BL_003.png
+   :scale: 50
+
+   Figure 4
+
+
+Reading the output ranking
+--------------------------
+
+**TBD**
 
 
 Playing with the libraries:

@@ -1,3 +1,10 @@
+"""
+wtoAlgorithm.py: the gWTO selector and scorer library.
+------------------------------------------------------
+This library contains the classes and functions required to select and rank
+SBs from the information that is stored in a WtoDatabse object.
+"""
+
 __author__ = 'itoledo'
 
 from datetime import datetime
@@ -398,9 +405,9 @@ class WtoAlgorithm(WtoDatabase):
         if grade == 'A':
             sb_grade_score = 10.
         elif str(code).startswith('2012'):
-            sb_grade_score = 8.
-        elif grade == 'B':
             sb_grade_score = 7.
+        elif grade == 'B':
+            sb_grade_score = 6.
         else:
             sb_grade_score = -100.
 

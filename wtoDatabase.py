@@ -43,7 +43,7 @@ class WtoDatabase(object):
     :param path: Path for data cache.
     :type path: str, default '$HOME/.wto'
     :param source: File or list of strings with the codes of the projects
-    to be ingested by WtoDatabase.
+        to be ingested by WtoDatabase.
     :type source: list or str
     :param forcenew: Force cache cleaning and reload from archive.
     :type forcenew: boolean, default False

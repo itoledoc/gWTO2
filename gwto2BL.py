@@ -368,7 +368,7 @@ class BLMainWindow(QMainWindow, Ui_BLMainWindow):
         """
         # TODO: not implemented yet
         progress = QProgressDialog(self)
-        progress.setLabelText('Running WTO...')
+        progress.setLabelText('Running WTO2...')
         progress.show()
         progress.setAutoClose(True)
         QCoreApplication.processEvents()
@@ -412,8 +412,6 @@ class BLMainWindow(QMainWindow, Ui_BLMainWindow):
              u'Array Score', u'Cond. Score', u'maxPWVC', u'ArrayMinAR',
              u'ARcorr', u'ArrayMaxAR', u'Time Const.', u'TimeOnSource',
              u'PRJ UID', u'Grade'], dtype='object')
-
-        QCoreApplication.processEvents()
         print std12.head(10)
         std12n = std12.to_records(index=False)
         header = std12n.dtype.names

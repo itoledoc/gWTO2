@@ -14,7 +14,8 @@ def main():
     :return:
     """
     import sys
-    parser = optparse.OptionParser()
+    usage = "usage: %prog arg1 [options]\n\targ1 must be BL or ACA"
+    parser = optparse.OptionParser(usage=usage)
     parser.add_option(
         '-c', '--clean', dest='clean', default=False, action='store_true',
         help="Force clean up of gWTO2 cache")

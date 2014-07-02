@@ -50,28 +50,35 @@
 <p class="topic-title first">Table of Contents</p>
 <ul class="simple">
 <li><a class="reference internal" href="#the-gwto2-documentation" id="id1">The gWTO2 Documentation</a></li>
-<li><a class="reference internal" href="#using-gwto2" id="id2">Using gWTO2</a></li>
-<li><a class="reference internal" href="#playing-with-the-libraries" id="id3">Playing with the libraries:</a></li>
-<li><a class="reference internal" href="#module-wtoDatabase" id="id4">The WTO API</a><ul>
-<li><a class="reference internal" href="#wtodatabase-py-the-gwto-database-library" id="id5">wtoDatabase.py: the gWTO database library.</a></li>
+<li><a class="reference internal" href="#using-gwto2" id="id2">Using gWTO2</a><ul>
+<li><a class="reference internal" href="#start-up" id="id3">Start up</a></li>
+<li><a class="reference internal" href="#setting-up-variables" id="id4">Setting up variables</a></li>
+<li><a class="reference internal" href="#running-and-setting-scores" id="id5">Running and setting scores</a></li>
+<li><a class="reference internal" href="#reading-the-output-ranking" id="id6">Reading the output ranking</a></li>
 </ul>
 </li>
-<li><a class="reference internal" href="#the-wto-data-frames" id="id6">The WTO Data Frames</a><ul>
-<li><a class="reference internal" href="#wtodatabase-obsprojects" id="id7">wtoDatabase.obsprojects</a></li>
-<li><a class="reference internal" href="#wtodatabase-sciencegoals" id="id8">wtoDatabase.sciencegoals</a></li>
-<li><a class="reference internal" href="#wtodatabase-schedblocks" id="id9">wtoDatabase.schedblocks</a></li>
-<li><a class="reference internal" href="#wtodatabase-schedblock-info" id="id10">wtoDatabase.schedblock_info</a></li>
-<li><a class="reference internal" href="#wtodatabase-target" id="id11">wtoDatabase.target</a></li>
-<li><a class="reference internal" href="#wtodatabase-fieldsource" id="id12">wtoDatabase.fieldsource</a></li>
-<li><a class="reference internal" href="#wtodatabase-spectralconf" id="id13">wtoDatabase.spectralconf</a></li>
-<li><a class="reference internal" href="#wtodatabase-sb-summary-view" id="id14">wtoDatabase.sb_summary (<em>&#8220;view&#8221;</em>)</a></li>
-<li><a class="reference internal" href="#wtodatabase-qa0" id="id15">wtoDatabase.qa0</a></li>
-<li><a class="reference internal" href="#wtodatabase-scheduling-proj" id="id16">wtoDatabase.scheduling_proj</a></li>
-<li><a class="reference internal" href="#wtodatabase-scheduling-sb" id="id17">wtoDatabase.scheduling_sb</a></li>
-<li><a class="reference internal" href="#wtodatabase-sbstate" id="id18">wtoDatabase.sbstate</a></li>
+<li><a class="reference internal" href="#playing-with-the-libraries" id="id7">Playing with the libraries:</a></li>
+<li><a class="reference internal" href="#module-wtoDatabase" id="id8">The WTO API</a><ul>
+<li><a class="reference internal" href="#wtodatabase-py-the-gwto-database-library" id="id9">wtoDatabase.py: the gWTO database library.</a></li>
+<li><a class="reference internal" href="#wtoalgorithm-py-the-gwto-selector-and-scorer-library" id="id10">wtoAlgorithm.py: the gWTO selector and scorer library.</a></li>
 </ul>
 </li>
-<li><a class="reference internal" href="#indices-and-tables" id="id19">Indices and tables</a></li>
+<li><a class="reference internal" href="#the-wto-data-frames" id="id11">The WTO Data Frames</a><ul>
+<li><a class="reference internal" href="#wtodatabase-obsprojects" id="id12">wtoDatabase.obsprojects</a></li>
+<li><a class="reference internal" href="#wtodatabase-sciencegoals" id="id13">wtoDatabase.sciencegoals</a></li>
+<li><a class="reference internal" href="#wtodatabase-schedblocks" id="id14">wtoDatabase.schedblocks</a></li>
+<li><a class="reference internal" href="#wtodatabase-schedblock-info" id="id15">wtoDatabase.schedblock_info</a></li>
+<li><a class="reference internal" href="#wtodatabase-target" id="id16">wtoDatabase.target</a></li>
+<li><a class="reference internal" href="#wtodatabase-fieldsource" id="id17">wtoDatabase.fieldsource</a></li>
+<li><a class="reference internal" href="#wtodatabase-spectralconf" id="id18">wtoDatabase.spectralconf</a></li>
+<li><a class="reference internal" href="#wtodatabase-sb-summary-view" id="id19">wtoDatabase.sb_summary (<em>&#8220;view&#8221;</em>)</a></li>
+<li><a class="reference internal" href="#wtodatabase-qa0" id="id20">wtoDatabase.qa0</a></li>
+<li><a class="reference internal" href="#wtodatabase-scheduling-proj" id="id21">wtoDatabase.scheduling_proj</a></li>
+<li><a class="reference internal" href="#wtodatabase-scheduling-sb" id="id22">wtoDatabase.scheduling_sb</a></li>
+<li><a class="reference internal" href="#wtodatabase-sbstate" id="id23">wtoDatabase.sbstate</a></li>
+</ul>
+</li>
+<li><a class="reference internal" href="#indices-and-tables" id="id24">Indices and tables</a></li>
 </ul>
 </div>
 <div class="toctree-wrapper compound">
@@ -81,6 +88,15 @@
 </div>
 <div class="section" id="using-gwto2">
 <h1><a class="toc-backref" href="#id2">Using gWTO2</a><a class="headerlink" href="#using-gwto2" title="Permalink to this headline">¶</a></h1>
+<div class="figure">
+<a class="reference internal image-reference" href="_images/Selection_003.png"><img alt="_images/Selection_003.png" src="_images/Selection_003.png" style="width: 678.5px; height: 458.0px;" /></a>
+<p class="caption">Screenshot of gWTO2 RC</p>
+</div>
+<p><strong>NOTICE 1: currently gWTO2 will only work with the &#8220;BL&#8221; option, i.e. only for</strong>
+<strong>the baseline correlator (2014-07-02).</strong></p>
+<p><strong>NOTICE 2: only the tab &#8220;Standard&#8221; is operative. Please check the column</strong>
+<strong>&#8220;Time Const&#8221; to avoid running SBs with time constrains</strong>
+<strong>until the tab &#8220;Time Const.&#8221; is operational (2014-07-02).</strong></p>
 <p>gWTO is tested and deployed at the osf-red machine, within the aod account.
 A virtual environment of python, based on the Anaconda distribution, must be
 loaded before using it. This is achieved by running::</p>
@@ -89,9 +105,89 @@ loaded before using it. This is achieved by running::</p>
 </div>
 <p>The Anaconda distribution is based on python 2.7.6 and includes numpy, pandas,
 pyephem and other libraries need by gWTO.</p>
+<p>The gui is run executing the gWTO2.py comand::</p>
+<div class="highlight-python"><div class="highlight"><pre>Usage: gWTO2.py arg1 [options]
+    arg1 must be BL or ACA
+
+Options:
+  -h, --help            show this help message and exit
+  -c, --clean           Force clean up of gWTO2 cache
+  -p PATH, --path=PATH  Path for cache
+</pre></div>
+</div>
+<p>So, to run gWTO2 for baseline correlator use <tt class="docutils literal"><span class="pre">BL</span></tt>, and <tt class="docutils literal"><span class="pre">ACA</span></tt> for Total Power
+and ACA. The <tt class="docutils literal"><span class="pre">-c</span></tt> option should only be used once per day.</p>
+<p>I would also recommend to set the option <tt class="docutils literal"><span class="pre">-p</span></tt> to something like
+<tt class="docutils literal"><span class="pre">'/.wto_myname/'</span></tt> so different users running gWTO won&#8217;t mess up the cache
+for each other.</p>
+<div class="section" id="start-up">
+<h2><a class="toc-backref" href="#id3">Start up</a><a class="headerlink" href="#start-up" title="Permalink to this headline">¶</a></h2>
+<p>After starting gWTO2 you will be presented with the gui shown on figure 2.
+If the -c option was used, or the cache have been manually erased it, the time
+until you are presented the gui can take up to 5-7 minutes.</p>
+<div class="figure">
+<a class="reference internal image-reference" href="_images/gWTO2__BL_001.png"><img alt="_images/gWTO2__BL_001.png" src="_images/gWTO2__BL_001.png" style="width: 546.0px; height: 438.0px;" /></a>
+<p class="caption">Figure 2</p>
+</div>
+</div>
+<div class="section" id="setting-up-variables">
+<h2><a class="toc-backref" href="#id4">Setting up variables</a><a class="headerlink" href="#setting-up-variables" title="Permalink to this headline">¶</a></h2>
+<p>After opening, the date will be by defaul the current UTC time, pwv is set to
+1.2 mm., the horizon limit is 20 degrees, minimum hour angle is -5 and maximum
+hour angle is 3. The LST field is not editable, and it shows the LST for the
+date time set in the Date field.</p>
+<p>The box with the array variables will have the <em>Std. Conf.:</em> field set to
+&#8220;Current Conf.&#8221;. This &#8220;Current Conf&#8221; comes from the output of the CASA script
+<tt class="docutils literal"><span class="pre">arrayConfigurationTools.py</span></tt>, which can be found at
+AIV/science/ArrayConfiguration/Tools/arrayConfigurationTools.py. It is made
+with the antennas that in principle can be used for the current ES Block. <strong>It</strong>
+<strong>is the AoD lead duty to create the relevant files from time to time to</strong>
+<strong>account for the antenna movements or being added</strong>.</p>
+<p>The values given at <em>Array AR</em> are set according to the <em>current array&#8217;s</em> angular
+resolution and number of antennas offered officially for cycle 2. <strong>The only</strong>
+<strong>field you can modify at this stage in the &#8216;Antenna&#8217; field, which is the</strong>
+<strong>number of antennas</strong>. The idea is that the user will use this information
+to have an idea of the current configuratin characteristics, and to run gWTO2 to
+plan observations ahead of time, or when Baseline arrays have not been created
+in the last 6 to 12 hours.</p>
+<p><strong>When observing</strong> the user should press the button <em>Now</em>, and a pop up window
+similar to the one showed in figure 3 will appear.</p>
+<div class="figure">
+<img alt="_images/gWTO2__BL_002.png" src="_images/gWTO2__BL_002.png" />
+<p class="caption">Figure 3</p>
+</div>
+<p>The window show the normalized histogram of the baseline lengths, and a fit to
+this distribution, taking the data from latest Baseline Array created.
+From this distribution the array&#8217;s resolution is estimated, and the number of
+antennas is also show. <strong>The user should check that the array resolution is</strong>
+<strong>close the the &#8220;Current Conf.&#8221; value, and that no outliers are fitted</strong>. If
+happy press the OK button, and this will set the Array AR and Antennas fields
+in the main window. If Cancel is pressed instead, the main window will go back
+to &#8220;Current Conf.&#8221;. Also, when accepting the new array estimates you will not
+longer be able to change the number of antennas unless you go back to
+&#8220;Current Conf.&#8221;</p>
+<p>The &#8220;BL Arrays:&#8221; Combo menu is populated also with the list of the baselines
+arrays created in the last 6 to 12 hours.</p>
+</div>
+<div class="section" id="running-and-setting-scores">
+<h2><a class="toc-backref" href="#id5">Running and setting scores</a><a class="headerlink" href="#running-and-setting-scores" title="Permalink to this headline">¶</a></h2>
+<p>When you are happy with the date, pwv and array variables (and also the horizon,
+minHA and maxHA values) you can run the selector and scoring algorithms pressing
+the button &#8220;Now&#8221;.</p>
+<p>After and interval of a few seconds (5 to 15 seconds) you will be presented
+with something similar to Figure 4.</p>
+<div class="figure">
+<a class="reference internal image-reference" href="_images/gWTO2__BL_003.png"><img alt="_images/gWTO2__BL_003.png" src="_images/gWTO2__BL_003.png" style="width: 943.0px; height: 456.0px;" /></a>
+<p class="caption">Figure 4</p>
+</div>
+</div>
+<div class="section" id="reading-the-output-ranking">
+<h2><a class="toc-backref" href="#id6">Reading the output ranking</a><a class="headerlink" href="#reading-the-output-ranking" title="Permalink to this headline">¶</a></h2>
+<p><strong>TBD</strong></p>
+</div>
 </div>
 <div class="section" id="playing-with-the-libraries">
-<h1><a class="toc-backref" href="#id3">Playing with the libraries:</a><a class="headerlink" href="#playing-with-the-libraries" title="Permalink to this headline">¶</a></h1>
+<h1><a class="toc-backref" href="#id7">Playing with the libraries:</a><a class="headerlink" href="#playing-with-the-libraries" title="Permalink to this headline">¶</a></h1>
 <div class="highlight-python"><div class="highlight"><pre>. activateC2Test
 ipython
 </pre></div>
@@ -152,9 +248,9 @@ output in an excel table run::</p>
 score.xls excel spreadsheet.</p>
 </div>
 <div class="section" id="module-wtoDatabase">
-<span id="the-wto-api"></span><h1><a class="toc-backref" href="#id4">The WTO API</a><a class="headerlink" href="#module-wtoDatabase" title="Permalink to this headline">¶</a></h1>
+<span id="the-wto-api"></span><h1><a class="toc-backref" href="#id8">The WTO API</a><a class="headerlink" href="#module-wtoDatabase" title="Permalink to this headline">¶</a></h1>
 <div class="section" id="wtodatabase-py-the-gwto-database-library">
-<h2><a class="toc-backref" href="#id5">wtoDatabase.py: the gWTO database library.</a><a class="headerlink" href="#wtodatabase-py-the-gwto-database-library" title="Permalink to this headline">¶</a></h2>
+<h2><a class="toc-backref" href="#id9">wtoDatabase.py: the gWTO database library.</a><a class="headerlink" href="#wtodatabase-py-the-gwto-database-library" title="Permalink to this headline">¶</a></h2>
 <p>This library contains the classes and functions required to query, parse and
 organize the Projects and SchedBlock information stored at the OSF archive in
 different tables.</p>
@@ -206,16 +302,14 @@ all information will be processed again.</p>
 <tbody valign="top">
 <tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first last simple">
 <li><strong>path</strong> (<em>str, default &#8216;$HOME/.wto&#8217;</em>) &#8211; Path for data cache.</li>
-<li><strong>source</strong> &#8211; File or list of strings with the codes of the projects</li>
+<li><strong>source</strong> (<em>list or str</em>) &#8211; File or list of strings with the codes of the projects
+to be ingested by WtoDatabase.</li>
+<li><strong>forcenew</strong> (<em>boolean, default False</em>) &#8211; Force cache cleaning and reload from archive.</li>
 </ul>
 </td>
 </tr>
 </tbody>
 </table>
-<p>to be ingested by WtoDatabase.
-:type source: list or str
-:param forcenew: Force cache cleaning and reload from archive.
-:type forcenew: boolean, default False</p>
 <dl class="method">
 <dt id="wtoDatabase.WtoDatabase.create_allsb">
 <tt class="descname">create_allsb</tt><big>(</big><em>split=False</em>, <em>path=None</em><big>)</big><a class="reference internal" href="_modules/wtoDatabase.html#WtoDatabase.create_allsb"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#wtoDatabase.WtoDatabase.create_allsb" title="Permalink to this definition">¶</a></dt>
@@ -565,7 +659,11 @@ ALMA.XML_OBSPROJECT_ENTITIES.</p>
 </dd></dl>
 
 </div>
-<span class="target" id="module-wtoAlgorithm"></span><dl class="class">
+<span class="target" id="module-wtoAlgorithm"></span><div class="section" id="wtoalgorithm-py-the-gwto-selector-and-scorer-library">
+<h2><a class="toc-backref" href="#id10">wtoAlgorithm.py: the gWTO selector and scorer library.</a><a class="headerlink" href="#wtoalgorithm-py-the-gwto-selector-and-scorer-library" title="Permalink to this headline">¶</a></h2>
+<p>This library contains the classes and functions required to select and rank
+SBs from the information that is stored in a WtoDatabse object.</p>
+<dl class="class">
 <dt id="wtoAlgorithm.WtoAlgorithm">
 <em class="property">class </em><tt class="descclassname">wtoAlgorithm.</tt><tt class="descname">WtoAlgorithm</tt><big>(</big><em>path='/.wto/'</em>, <em>source=None</em>, <em>forcenew=False</em><big>)</big><a class="reference internal" href="_modules/wtoAlgorithm.html#WtoAlgorithm"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#wtoAlgorithm.WtoAlgorithm" title="Permalink to this definition">¶</a></dt>
 <dd><table class="docutils field-list" frame="void" rules="none">
@@ -586,7 +684,7 @@ ALMA.XML_OBSPROJECT_ENTITIES.</p>
 </table>
 <dl class="method">
 <dt id="wtoAlgorithm.WtoAlgorithm.calculate_score">
-<tt class="descname">calculate_score</tt><big>(</big><em>ecount</em>, <em>tcount</em>, <em>srank</em>, <em>ar</em>, <em>aminar</em>, <em>amaxar</em>, <em>las</em>, <em>grade</em>, <em>repfreq</em>, <em>dec</em>, <em>execu</em>, <em>array</em>, <em>frac</em>, <em>maxpwvc</em><big>)</big><a class="reference internal" href="_modules/wtoAlgorithm.html#WtoAlgorithm.calculate_score"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#wtoAlgorithm.WtoAlgorithm.calculate_score" title="Permalink to this definition">¶</a></dt>
+<tt class="descname">calculate_score</tt><big>(</big><em>ecount</em>, <em>tcount</em>, <em>srank</em>, <em>ar</em>, <em>aminar</em>, <em>amaxar</em>, <em>las</em>, <em>grade</em>, <em>repfreq</em>, <em>dec</em>, <em>execu</em>, <em>array</em>, <em>frac</em>, <em>maxpwvc</em>, <em>code</em><big>)</big><a class="reference internal" href="_modules/wtoAlgorithm.html#WtoAlgorithm.calculate_score"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#wtoAlgorithm.WtoAlgorithm.calculate_score" title="Permalink to this definition">¶</a></dt>
 <dd><table class="docutils field-list" frame="void" rules="none">
 <col class="field-name" />
 <col class="field-body" />
@@ -820,10 +918,11 @@ done with WtoAlgorith.observable and to assign a score</p>
 </dd></dl>
 
 </div>
+</div>
 <div class="section" id="the-wto-data-frames">
-<h1><a class="toc-backref" href="#id6">The WTO Data Frames</a><a class="headerlink" href="#the-wto-data-frames" title="Permalink to this headline">¶</a></h1>
+<h1><a class="toc-backref" href="#id11">The WTO Data Frames</a><a class="headerlink" href="#the-wto-data-frames" title="Permalink to this headline">¶</a></h1>
 <div class="section" id="wtodatabase-obsprojects">
-<h2><a class="toc-backref" href="#id7">wtoDatabase.obsprojects</a><a class="headerlink" href="#wtodatabase-obsprojects" title="Permalink to this headline">¶</a></h2>
+<h2><a class="toc-backref" href="#id12">wtoDatabase.obsprojects</a><a class="headerlink" href="#wtodatabase-obsprojects" title="Permalink to this headline">¶</a></h2>
 <table border="1" class="docutils">
 <colgroup>
 <col width="33%" />
@@ -884,7 +983,7 @@ done with WtoAlgorith.observable and to assign a score</p>
 </table>
 </div>
 <div class="section" id="wtodatabase-sciencegoals">
-<h2><a class="toc-backref" href="#id8">wtoDatabase.sciencegoals</a><a class="headerlink" href="#wtodatabase-sciencegoals" title="Permalink to this headline">¶</a></h2>
+<h2><a class="toc-backref" href="#id13">wtoDatabase.sciencegoals</a><a class="headerlink" href="#wtodatabase-sciencegoals" title="Permalink to this headline">¶</a></h2>
 <table border="1" class="docutils">
 <colgroup>
 <col width="27%" />
@@ -951,7 +1050,7 @@ done with WtoAlgorith.observable and to assign a score</p>
 </table>
 </div>
 <div class="section" id="wtodatabase-schedblocks">
-<h2><a class="toc-backref" href="#id9">wtoDatabase.schedblocks</a><a class="headerlink" href="#wtodatabase-schedblocks" title="Permalink to this headline">¶</a></h2>
+<h2><a class="toc-backref" href="#id14">wtoDatabase.schedblocks</a><a class="headerlink" href="#wtodatabase-schedblocks" title="Permalink to this headline">¶</a></h2>
 <table border="1" class="docutils">
 <colgroup>
 <col width="27%" />
@@ -979,7 +1078,7 @@ done with WtoAlgorith.observable and to assign a score</p>
 </table>
 </div>
 <div class="section" id="wtodatabase-schedblock-info">
-<h2><a class="toc-backref" href="#id10">wtoDatabase.schedblock_info</a><a class="headerlink" href="#wtodatabase-schedblock-info" title="Permalink to this headline">¶</a></h2>
+<h2><a class="toc-backref" href="#id15">wtoDatabase.schedblock_info</a><a class="headerlink" href="#wtodatabase-schedblock-info" title="Permalink to this headline">¶</a></h2>
 <table border="1" class="docutils">
 <colgroup>
 <col width="27%" />
@@ -1061,7 +1160,7 @@ done with WtoAlgorith.observable and to assign a score</p>
 </table>
 </div>
 <div class="section" id="wtodatabase-target">
-<h2><a class="toc-backref" href="#id11">wtoDatabase.target</a><a class="headerlink" href="#wtodatabase-target" title="Permalink to this headline">¶</a></h2>
+<h2><a class="toc-backref" href="#id16">wtoDatabase.target</a><a class="headerlink" href="#wtodatabase-target" title="Permalink to this headline">¶</a></h2>
 <table border="1" class="docutils">
 <colgroup>
 <col width="27%" />
@@ -1089,7 +1188,7 @@ done with WtoAlgorith.observable and to assign a score</p>
 </table>
 </div>
 <div class="section" id="wtodatabase-fieldsource">
-<h2><a class="toc-backref" href="#id12">wtoDatabase.fieldsource</a><a class="headerlink" href="#wtodatabase-fieldsource" title="Permalink to this headline">¶</a></h2>
+<h2><a class="toc-backref" href="#id17">wtoDatabase.fieldsource</a><a class="headerlink" href="#wtodatabase-fieldsource" title="Permalink to this headline">¶</a></h2>
 <table border="1" class="docutils">
 <colgroup>
 <col width="27%" />
@@ -1156,7 +1255,7 @@ done with WtoAlgorith.observable and to assign a score</p>
 </table>
 </div>
 <div class="section" id="wtodatabase-spectralconf">
-<h2><a class="toc-backref" href="#id13">wtoDatabase.spectralconf</a><a class="headerlink" href="#wtodatabase-spectralconf" title="Permalink to this headline">¶</a></h2>
+<h2><a class="toc-backref" href="#id18">wtoDatabase.spectralconf</a><a class="headerlink" href="#wtodatabase-spectralconf" title="Permalink to this headline">¶</a></h2>
 <table border="1" class="docutils">
 <colgroup>
 <col width="27%" />
@@ -1184,7 +1283,7 @@ done with WtoAlgorith.observable and to assign a score</p>
 </table>
 </div>
 <div class="section" id="wtodatabase-sb-summary-view">
-<h2><a class="toc-backref" href="#id14">wtoDatabase.sb_summary (<em>&#8220;view&#8221;</em>)</a><a class="headerlink" href="#wtodatabase-sb-summary-view" title="Permalink to this headline">¶</a></h2>
+<h2><a class="toc-backref" href="#id19">wtoDatabase.sb_summary (<em>&#8220;view&#8221;</em>)</a><a class="headerlink" href="#wtodatabase-sb-summary-view" title="Permalink to this headline">¶</a></h2>
 <table border="1" class="docutils">
 <colgroup>
 <col width="36%" />
@@ -1296,7 +1395,7 @@ done with WtoAlgorith.observable and to assign a score</p>
 </table>
 </div>
 <div class="section" id="wtodatabase-qa0">
-<h2><a class="toc-backref" href="#id15">wtoDatabase.qa0</a><a class="headerlink" href="#wtodatabase-qa0" title="Permalink to this headline">¶</a></h2>
+<h2><a class="toc-backref" href="#id20">wtoDatabase.qa0</a><a class="headerlink" href="#wtodatabase-qa0" title="Permalink to this headline">¶</a></h2>
 <table border="1" class="docutils">
 <colgroup>
 <col width="42%" />
@@ -1318,7 +1417,7 @@ done with WtoAlgorith.observable and to assign a score</p>
 </table>
 </div>
 <div class="section" id="wtodatabase-scheduling-proj">
-<h2><a class="toc-backref" href="#id16">wtoDatabase.scheduling_proj</a><a class="headerlink" href="#wtodatabase-scheduling-proj" title="Permalink to this headline">¶</a></h2>
+<h2><a class="toc-backref" href="#id21">wtoDatabase.scheduling_proj</a><a class="headerlink" href="#wtodatabase-scheduling-proj" title="Permalink to this headline">¶</a></h2>
 <table border="1" class="docutils">
 <colgroup>
 <col width="36%" />
@@ -1394,7 +1493,7 @@ done with WtoAlgorith.observable and to assign a score</p>
 </table>
 </div>
 <div class="section" id="wtodatabase-scheduling-sb">
-<h2><a class="toc-backref" href="#id17">wtoDatabase.scheduling_sb</a><a class="headerlink" href="#wtodatabase-scheduling-sb" title="Permalink to this headline">¶</a></h2>
+<h2><a class="toc-backref" href="#id22">wtoDatabase.scheduling_sb</a><a class="headerlink" href="#wtodatabase-scheduling-sb" title="Permalink to this headline">¶</a></h2>
 <table border="1" class="docutils">
 <colgroup>
 <col width="36%" />
@@ -1434,11 +1533,11 @@ done with WtoAlgorith.observable and to assign a score</p>
 </table>
 </div>
 <div class="section" id="wtodatabase-sbstate">
-<h2><a class="toc-backref" href="#id18">wtoDatabase.sbstate</a><a class="headerlink" href="#wtodatabase-sbstate" title="Permalink to this headline">¶</a></h2>
+<h2><a class="toc-backref" href="#id23">wtoDatabase.sbstate</a><a class="headerlink" href="#wtodatabase-sbstate" title="Permalink to this headline">¶</a></h2>
 </div>
 </div>
 <div class="section" id="indices-and-tables">
-<h1><a class="toc-backref" href="#id19">Indices and tables</a><a class="headerlink" href="#indices-and-tables" title="Permalink to this headline">¶</a></h1>
+<h1><a class="toc-backref" href="#id24">Indices and tables</a><a class="headerlink" href="#indices-and-tables" title="Permalink to this headline">¶</a></h1>
 <ul class="simple">
 <li><a class="reference internal" href="genindex.html"><em>Index</em></a></li>
 <li><a class="reference internal" href="py-modindex.html"><em>Module Index</em></a></li>
@@ -1455,10 +1554,17 @@ done with WtoAlgorith.observable and to assign a score</p>
   <h3><a href="#">Table Of Contents</a></h3>
   <ul>
 <li><a class="reference internal" href="#">The gWTO2 Documentation</a></li>
-<li><a class="reference internal" href="#using-gwto2">Using gWTO2</a></li>
+<li><a class="reference internal" href="#using-gwto2">Using gWTO2</a><ul>
+<li><a class="reference internal" href="#start-up">Start up</a></li>
+<li><a class="reference internal" href="#setting-up-variables">Setting up variables</a></li>
+<li><a class="reference internal" href="#running-and-setting-scores">Running and setting scores</a></li>
+<li><a class="reference internal" href="#reading-the-output-ranking">Reading the output ranking</a></li>
+</ul>
+</li>
 <li><a class="reference internal" href="#playing-with-the-libraries">Playing with the libraries:</a></li>
 <li><a class="reference internal" href="#module-wtoDatabase">The WTO API</a><ul>
 <li><a class="reference internal" href="#wtodatabase-py-the-gwto-database-library">wtoDatabase.py: the gWTO database library.</a></li>
+<li><a class="reference internal" href="#wtoalgorithm-py-the-gwto-selector-and-scorer-library">wtoAlgorithm.py: the gWTO selector and scorer library.</a></li>
 </ul>
 </li>
 <li><a class="reference internal" href="#the-wto-data-frames">The WTO Data Frames</a><ul>
