@@ -390,38 +390,90 @@ class BLMainWindow(QMainWindow, Ui_BLMainWindow):
         self.datas.selector('12m')
         self.datas.scorer('12m')
         std12 = self.datas.score12m.sort(
-            'score', ascending=False).query('isPolarization == False')[
-                ['score', 'CODE', 'SB_UID', 'name', 'SB_state', 'band',
-                 'RA', 'DEC', 'HA', 'elev', 'etime', 'execount', 'Total',
-                 'tsysfrac', 'blfrac', 'frac', 'sb_array_score',
-                 'sb_cond_score', 'maxPWVC', 'arrayMinAR', 'arcorr',
-                 'arrayMaxAR', 'isTimeConstrained', 'integrationTime',
-                 'PRJ_ARCHIVE_UID', 'grade']]
+            'score', ascending=False).query(
+                'isPolarization == False and isTimeConstrained == False')[
+                    ['score', 'CODE', 'SB_UID', 'name', 'SB_state', 'band',
+                     'RA', 'DEC', 'HA', 'elev', 'etime', 'execount', 'Total',
+                     'tsysfrac', 'blfrac', 'frac', 'sb_array_score',
+                     'sb_cond_score', 'maxPWVC', 'arrayMinAR', 'arcorr',
+                     'arrayMaxAR', 'integrationTime',
+                     'PRJ_ARCHIVE_UID', 'grade']]
+
+        tc12 = self.datas.score12m.sort(
+            'score', ascending=False).query(
+                'isPolarization == False and isTimeConstrained == True')[
+                    ['score', 'CODE', 'SB_UID', 'name', 'SB_state', 'band',
+                     'RA', 'DEC', 'HA', 'elev', 'etime', 'execount', 'Total',
+                     'tsysfrac', 'blfrac', 'frac', 'sb_array_score',
+                     'sb_cond_score', 'maxPWVC', 'arrayMinAR', 'arcorr',
+                     'arrayMaxAR', 'integrationTime',
+                     'PRJ_ARCHIVE_UID', 'grade', 'startTime', 'endTime',
+                     'allowedMargin', 'allowedUnits', 'repeats', 'isavoid']]
+
+        pol12 = self.datas.score12m.sort(
+            'score', ascending=False).query(
+                'isPolarization == True')[
+                    ['score', 'CODE', 'SB_UID', 'name', 'SB_state', 'band',
+                     'RA', 'DEC', 'HA', 'elev', 'etime', 'execount', 'Total',
+                     'tsysfrac', 'blfrac', 'frac', 'sb_array_score',
+                     'sb_cond_score', 'maxPWVC', 'arrayMinAR', 'arcorr',
+                     'arrayMaxAR', 'integrationTime', 'isPolarization',
+                     'PRJ_ARCHIVE_UID', 'grade']]
 
         if not self.B03_b.isChecked():
             std12 = std12.query('band != "ALMA_RB_03"')
+            tc12 = tc12.query('band != "ALMA_RB_03"')
+            pol12 = pol12.query('band != "ALMA_RB_03"')
         if not self.B04_b.isChecked():
             std12 = std12.query('band != "ALMA_RB_04"')
+            tc12 = tc12.query('band != "ALMA_RB_04"')
+            pol12 = pol12.query('band != "ALMA_RB_04"')
         if not self.B06_b.isChecked():
             std12 = std12.query('band != "ALMA_RB_06"')
+            tc12 = tc12.query('band != "ALMA_RB_06"')
+            pol12 = pol12.query('band != "ALMA_RB_06"')
         if not self.B07_b.isChecked():
             std12 = std12.query('band != "ALMA_RB_07"')
+            tc12 = tc12.query('band != "ALMA_RB_07"')
+            pol12 = pol12.query('band != "ALMA_RB_07"')
         if not self.B08_b.isChecked():
             std12 = std12.query('band != "ALMA_RB_08"')
+            tc12 = tc12.query('band != "ALMA_RB_08"')
+            pol12 = pol12.query('band != "ALMA_RB_08"')
         if not self.B09_b.isChecked():
             std12 = std12.query('band != "ALMA_RB_09"')
+            tc12 = tc12.query('band != "ALMA_RB_09"')
+            pol12 = pol12.query('band != "ALMA_RB_09"')
 
         std12.columns = Wto.pd.Index(
             [u'Score', u'CODE', u'SB UID', u'SB Name', u'SB State', u'Band',
              u'RA', u'DEC', u'HA', u'Elev.', u'Sets in', u'Exec. Req.',
              u'Exec. Done', u'TSysFrac', u'BLFrac', u'TotalFrac',
              u'Array Score', u'Cond. Score', u'maxPWVC', u'ArrayMinAR',
-             u'ARcorr', u'ArrayMaxAR', u'Time Const.', u'TimeOnSource',
+             u'ARcorr', u'ArrayMaxAR', u'TimeOnSource',
              u'PRJ UID', u'Grade'], dtype='object')
+
+        tc12.columns = Wto.pd.Index(
+            [u'Score', u'CODE', u'SB UID', u'SB Name', u'SB State', u'Band',
+             u'RA', u'DEC', u'HA', u'Elev.', u'Sets in', u'Exec. Req.',
+             u'Exec. Done', u'TSysFrac', u'BLFrac', u'TotalFrac',
+             u'Array Score', u'Cond. Score', u'maxPWVC', u'ArrayMinAR',
+             u'ARcorr', u'ArrayMaxAR', u'ToS',
+             u'PRJ UID', u'Grade',  u'StartTime', u'EndTime', u'AllowedMargin',
+             u'AllowedUnits', u'repeats', u'isavoid'], dtype='object')
+
+        pol12.columns = Wto.pd.Index(
+            [u'Score', u'CODE', u'SB UID', u'SB Name', u'SB State', u'Band',
+             u'RA', u'DEC', u'HA', u'Elev.', u'Sets in', u'Exec. Req.',
+             u'Exec. Done', u'TSysFrac', u'BLFrac', u'TotalFrac',
+             u'Array Score', u'Cond. Score', u'maxPWVC', u'ArrayMinAR',
+             u'ARcorr', u'ArrayMaxAR', u'Int. Time', u'isPolarization',
+             u'PRJ UID', u'Grade'], dtype='object')
+
         print std12.head(10)
         std12n = std12.to_records(index=False)
         header = std12n.dtype.names
-        self.tmstd12 = MyTableModel(std12n, header, self)
+        self.tmstd12 = MyStdTableModel(std12n, header, self)
         self.proxyBLC = QSortFilterProxyModel(self)
         self.proxyBLC.setSourceModel(self.tmstd12)
         self.bl_sheet.setModel(self.proxyBLC)
@@ -432,17 +484,59 @@ class BLMainWindow(QMainWindow, Ui_BLMainWindow):
         self.bl_sheet.sortByColumn(0, Qt.DescendingOrder)
         self.bl_sheet.resizeRowsToContents()
         for column in range(25):
-            if column in [1, 2, 3, 4, 5, 6, 7, 22, 23]:
+            if column in [1, 2, 3, 4, 5, 6, 7, 22]:
                 self.bl_sheet.resizeColumnToContents(column)
             elif column in [11, 12, 16, 17, 19, 21]:
                 self.bl_sheet.setColumnWidth(column, 80)
             else:
                 self.bl_sheet.setColumnWidth(column, 66)
+        QCoreApplication.processEvents()
+
+        tc12n = tc12.to_records(index=False)
+        header = tc12n.dtype.names
+        self.tmtc12 = MyTcTableModel(tc12n, header, self)
+        self.proxyTC = QSortFilterProxyModel(self)
+        self.proxyTC.setSourceModel(self.tmtc12)
+        self.tc_sheet.setModel(self.proxyTC)
+        self.horizontalHeader = self.tc_sheet.horizontalHeader()
+        self.horizontalHeader.setContextMenuPolicy(Qt.CustomContextMenu)
+        self.tc_sheet.verticalHeader().setStretchLastSection(False)
+        self.tc_sheet.setSortingEnabled(True)
+        self.tc_sheet.sortByColumn(0, Qt.DescendingOrder)
+        self.tc_sheet.resizeRowsToContents()
+        for column in range(25):
+            if column in [1, 2, 3, 4, 5, 6, 7, 22]:
+                self.tc_sheet.resizeColumnToContents(column)
+            elif column in [11, 12, 16, 17, 19, 21]:
+                self.tc_sheet.setColumnWidth(column, 80)
+            else:
+                self.tc_sheet.setColumnWidth(column, 66)
+        QCoreApplication.processEvents()
+
+        pol12n = pol12.to_records(index=False)
+        header = pol12n.dtype.names
+        self.tmpol12 = MyPolTableModel(pol12n, header, self)
+        self.proxyPOL = QSortFilterProxyModel(self)
+        self.proxyPOL.setSourceModel(self.tmpol12)
+        self.pol_sheet.setModel(self.proxyPOL)
+        self.horizontalHeader = self.pol_sheet.horizontalHeader()
+        self.horizontalHeader.setContextMenuPolicy(Qt.CustomContextMenu)
+        self.pol_sheet.verticalHeader().setStretchLastSection(False)
+        self.pol_sheet.setSortingEnabled(True)
+        self.pol_sheet.sortByColumn(0, Qt.DescendingOrder)
+        self.pol_sheet.resizeRowsToContents()
+        for column in range(25):
+            if column in [1, 2, 3, 4, 5, 6, 7, 22]:
+                self.pol_sheet.resizeColumnToContents(column)
+            elif column in [11, 12, 16, 17, 19, 21]:
+                self.pol_sheet.setColumnWidth(column, 80)
+            else:
+                self.pol_sheet.setColumnWidth(column, 66)
         progress.close()
 
 
 # noinspection PyMethodOverriding
-class MyTableModel(QAbstractTableModel):
+class MyStdTableModel(QAbstractTableModel):
     def __init__(self, datain, headerdata, parent=None):
         """ datain: a list of lists
             headerdata: a list of strings
@@ -494,7 +588,168 @@ class MyTableModel(QAbstractTableModel):
             return QVariant(str(self.arraydata[index.row()][index.column()]))
         elif role == Qt.TextAlignmentRole:
             if col in [0, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19,
-                       20, 21, 22, 23]:
+                       20, 21, 22]:
+                return QVariant(int(Qt.AlignRight | Qt.AlignVCenter))
+            return QVariant(int(Qt.AlignLeft | Qt.AlignVCenter))
+        elif role == Qt.BackgroundColorRole:
+            if 0 == index.row() % 2:
+                c = QVariant(QColor(235, 245, 255))
+            else:
+                c = QVariant(QColor(250, 250, 250))
+            if sb[17] == 0:
+                c = QVariant(QColor(255, 110, 110))
+            return c
+        elif role == Qt.FontRole:
+            if col in [0, 15, 17]:
+                return QVariant(QFont("Cantarel", 10, QFont.Bold))
+
+        return QVariant()
+
+    def headerData(self, col, orientation, role):
+        if orientation == Qt.Horizontal and role == Qt.DisplayRole:
+            return QVariant(self.headerdata[col])
+        return QVariant()
+
+    # noinspection PyPep8Naming
+    def sort(self, Ncol, order):
+        """Sort table by given column number.
+        """
+        self.emit(SIGNAL("layoutAboutToBeChanged()"))
+        self.arraydata = sorted(self.arraydata, key=operator.itemgetter(Ncol))
+        if order == Qt.DescendingOrder:
+            self.arraydata.reverse()
+        self.emit(SIGNAL("layoutChanged()"))
+
+
+# noinspection PyMethodOverriding
+class MyTcTableModel(QAbstractTableModel):
+    def __init__(self, datain, headerdata, parent=None):
+        """ datain: a list of lists
+            headerdata: a list of strings
+        """
+        QAbstractTableModel.__init__(self, parent)
+        self.arraydata = datain
+        self.headerdata = headerdata
+
+    def rowCount(self, parent):
+        return len(self.arraydata)
+
+    def columnCount(self, parent):
+        return len(self.arraydata[0])
+
+    # noinspection PyTypeChecker
+    def data(self, index, role):
+        if not index.isValid():
+            print "whaat?"
+            return QVariant()
+        sb = self.arraydata[index.row()]
+        col = index.column()
+        if role == Qt.DisplayRole:
+            if col in [8, 10]:
+                if sb[col] < 0:
+                    neg = '-'
+                    ha_t = str(ephem.hours(str(abs(sb[col]))))
+                    # noinspection PyCallByClass
+                    ha = QTime.fromString(ha_t, 'h:m:s.z')
+                else:
+                    neg = ''
+                    ha_t = str(ephem.hours(str(sb[col])))
+                    # noinspection PyCallByClass
+                    ha = QTime.fromString(ha_t, 'h:m:s.z')
+                hastr = QString("%1").arg(neg + ha.toString('h:mm'))
+                return QVariant(hastr)
+            elif col == 6:
+                h = ephem.hours(str(sb[col] / 15.))
+                return QVariant(str(h)[:-3])
+            elif col == 7:
+                d = ephem.degrees(str(sb[col]))
+                return QVariant(str(d)[:-2])
+            elif col in [0, 13, 14, 15, 18, 19, 20, 21]:
+                return QVariant(QString("%1").arg(sb[col], 0, 'f', 2))
+            elif col in [9, 16, 17]:
+                return QVariant(QString("%1").arg(sb[col], 0, 'f', 1))
+            elif col in [11, 12]:
+                return QVariant(QString("%1").arg(sb[col], 0, 'i', 0))
+
+            return QVariant(str(self.arraydata[index.row()][index.column()]))
+        elif role == Qt.TextAlignmentRole:
+            if col in [0, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19,
+                       20, 21, 22]:
+                return QVariant(int(Qt.AlignRight | Qt.AlignVCenter))
+            return QVariant(int(Qt.AlignLeft | Qt.AlignVCenter))
+        elif role == Qt.BackgroundColorRole:
+            if 0 == index.row() % 2:
+                c = QVariant(QColor(235, 245, 255))
+            else:
+                c = QVariant(QColor(250, 250, 250))
+            if sb[17] == 0:
+                c = QVariant(QColor(255, 110, 110))
+            return c
+        elif role == Qt.FontRole:
+            if col in [0, 15, 17]:
+                return QVariant(QFont("Cantarel", 10, QFont.Bold))
+
+        return QVariant()
+
+    def headerData(self, col, orientation, role):
+        if orientation == Qt.Horizontal and role == Qt.DisplayRole:
+            return QVariant(self.headerdata[col])
+        return QVariant()
+
+# noinspection PyMethodOverriding
+class MyPolTableModel(QAbstractTableModel):
+    def __init__(self, datain, headerdata, parent=None):
+        """ datain: a list of lists
+            headerdata: a list of strings
+        """
+        QAbstractTableModel.__init__(self, parent)
+        self.arraydata = datain
+        self.headerdata = headerdata
+
+    def rowCount(self, parent):
+        return len(self.arraydata)
+
+    def columnCount(self, parent):
+        return len(self.arraydata[0])
+
+    # noinspection PyTypeChecker
+    def data(self, index, role):
+        if not index.isValid():
+            print "whaat?"
+            return QVariant()
+        sb = self.arraydata[index.row()]
+        col = index.column()
+        if role == Qt.DisplayRole:
+            if col in [8, 10]:
+                if sb[col] < 0:
+                    neg = '-'
+                    ha_t = str(ephem.hours(str(abs(sb[col]))))
+                    # noinspection PyCallByClass
+                    ha = QTime.fromString(ha_t, 'h:m:s.z')
+                else:
+                    neg = ''
+                    ha_t = str(ephem.hours(str(sb[col])))
+                    # noinspection PyCallByClass
+                    ha = QTime.fromString(ha_t, 'h:m:s.z')
+                hastr = QString("%1").arg(neg + ha.toString('h:mm'))
+                return QVariant(hastr)
+            elif col == 6:
+                h = ephem.hours(str(sb[col] / 15.))
+                return QVariant(str(h)[:-3])
+            elif col == 7:
+                d = ephem.degrees(str(sb[col]))
+                return QVariant(str(d)[:-2])
+            elif col in [0, 13, 14, 15, 18, 19, 20, 21]:
+                return QVariant(QString("%1").arg(sb[col], 0, 'f', 2))
+            elif col in [9, 16, 17]:
+                return QVariant(QString("%1").arg(sb[col], 0, 'f', 1))
+            elif col in [11, 12]:
+                return QVariant(QString("%1").arg(sb[col], 0, 'i', 0))
+
+            return QVariant(str(self.arraydata[index.row()][index.column()]))
+        elif role == Qt.TextAlignmentRole:
+            if col in [0, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19,
+                       20, 21, 22]:
                 return QVariant(int(Qt.AlignRight | Qt.AlignVCenter))
             return QVariant(int(Qt.AlignLeft | Qt.AlignVCenter))
         elif role == Qt.BackgroundColorRole:

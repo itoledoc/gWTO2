@@ -319,16 +319,16 @@ class WtoAlgorithm(WtoDatabase):
             sel4['frac'] = sel4.tsysfrac * sel4.blfrac
             self.select12m = sel4
 
-            special = sel4.query(
-                'PRJ_state != "Completed" and SB_state != "FullyObserved"'
-                ' and SB_state != "Deleted" and isTimeConstrained == False'
-                ' and frac < 1.3 and PRJ_state != "Phase2Submitted"')
-            special = special[
-                special.name.str.contains('not', case=False) == False]
-            special = special[special.isPolarization == False]
-            special[['SB_UID', 'name']].to_csv(
-                self.path + 'special.sbinfo', header=False, index=False,
-                sep=' ')
+            # special = sel4.query(
+            #     'PRJ_state != "Completed" and SB_state != "FullyObserved"'
+            #     ' and SB_state != "Deleted" and isTimeConstrained == False'
+            #     ' and frac < 1.3 and PRJ_state != "Phase2Submitted"')
+            # special = special[
+            #     special.name.str.contains('not', case=False) == False]
+            # special = special[special.isPolarization == False]
+            # special[['SB_UID', 'name']].to_csv(
+            #     self.path + 'special.sbinfo', header=False, index=False,
+            #     sep=' ')
         elif array == '7m':
             self.select7m = sel4
         else:
