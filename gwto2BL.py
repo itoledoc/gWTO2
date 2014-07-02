@@ -6,18 +6,20 @@ Module implementing BLMainWindow.
 import operator
 from PyQt4.QtGui import *
 from PyQt4.QtCore import *
-import wtoAlgorithm as WTO
+import wtoAlgorithm as Wto
 
 import ephem
 
 try:
     _fromUtf8 = QString.fromUtf8
 except AttributeError:
+    # noinspection PyPep8Naming
     def _fromUtf8(s):
         return s
 
 try:
     _encoding = QApplication.UnicodeUTF8
+
     def _translate(context, text, disambig):
         return QApplication.translate(context, text, disambig, _encoding)
 
@@ -31,8 +33,10 @@ alma.long = '-67.7551257'
 alma.elev = 5060
 
 from Ui_gwto2BL import Ui_BLMainWindow
-from arrayCheck2 import arrayCheck2
+from arrayCheck2 import ArrayCheck2
 
+
+# noinspection PyPep8Naming
 class BLMainWindow(QMainWindow, Ui_BLMainWindow):
     """
     Class documentation goes here.
@@ -44,7 +48,7 @@ class BLMainWindow(QMainWindow, Ui_BLMainWindow):
         QMainWindow.__init__(self, parent)
         self.setupUi(self)
         self.alma = alma
-        self.datas = WTO.WtoAlgorithm(path=path, source=source,
+        self.datas = Wto.WtoAlgorithm(path=path, source=source,
                                       forcenew=forceup)
         self.datas.set_pwv(self.pwv_spin.value())
         self.datas.set_minha(self.minha_spin.value())
@@ -78,8 +82,9 @@ class BLMainWindow(QMainWindow, Ui_BLMainWindow):
         self.datas.date = date.toPyDateTime()
         self.datas.alma.date = self.datas.date
         lst = self.datas.alma.sidereal_time()
-        lst_time = WTO.datetime.strptime(str(lst), '%H:%M:%S.%f').time()
-        self.lst_spin.setTime(QTime(lst_time.hour, lst_time.minute, lst_time.second))
+        lst_time = Wto.datetime.strptime(str(lst), '%H:%M:%S.%f').time()
+        self.lst_spin.setTime(QTime(
+            lst_time.hour, lst_time.minute, lst_time.second))
     
     @pyqtSignature("int")
     def on_horizon_spin_valueChanged(self, p0):
@@ -100,7 +105,7 @@ class BLMainWindow(QMainWindow, Ui_BLMainWindow):
         """
         Slot documentation goes here.
         """
-        e1 = "%.2f" % WTO.pd.np.around(p0, decimals=2)
+        e1 = "%.2f" % Wto.pd.np.around(p0, decimals=2)
         e = e1[-1]
         c = e1[:-1]
         if 0 <= int(e) < 3:
@@ -112,7 +117,7 @@ class BLMainWindow(QMainWindow, Ui_BLMainWindow):
         else:
             p = float(c) + 0.1
 
-        self.datas.pwv = WTO.pd.np.around(p, decimals=2)
+        self.datas.pwv = Wto.pd.np.around(p, decimals=2)
 
     @pyqtSignature("bool")
     def on_B03_b_toggled(self, checked):
@@ -296,7 +301,7 @@ class BLMainWindow(QMainWindow, Ui_BLMainWindow):
         self.stdarrays_combo.setCurrentIndex(0)
         self.antennas_spin.setReadOnly(True)
         self.datas.set_bl_prop(array_name=self.datas.array_name)
-        self.pop = arrayCheck2(ruv=self.datas.ruv, num_ant=self.datas.num_ant)
+        self.pop = ArrayCheck2(ruv=self.datas.ruv, num_ant=self.datas.num_ant)
         self.pop.show()
         ret = self.pop.exec_()
         if ret:
@@ -315,7 +320,7 @@ class BLMainWindow(QMainWindow, Ui_BLMainWindow):
         """
         Slot documentation goes here.
         """
-        date = WTO.datetime.utcnow()
+        date = Wto.datetime.utcnow()
         self.date_datetime.setDateTime(
             QDateTime(
                 QDate(date.date().year, date.date().month, date.date().day),
@@ -326,7 +331,7 @@ class BLMainWindow(QMainWindow, Ui_BLMainWindow):
         self.datas.date = date
         self.datas.alma.date = self.datas.date
         lst = self.datas.alma.sidereal_time()
-        lst_time = WTO.datetime.strptime(str(lst), '%H:%M:%S.%f').time()
+        lst_time = Wto.datetime.strptime(str(lst), '%H:%M:%S.%f').time()
         self.lst_spin.setTime(
             QTime(lst_time.hour, lst_time.minute, lst_time.second))
         self.datas.query_arrays()
@@ -345,7 +350,7 @@ class BLMainWindow(QMainWindow, Ui_BLMainWindow):
         self.antennas_spin.setReadOnly(True)
         self.datas.array_name = self.blarrays_combo.currentText()
         self.datas.set_bl_prop(array_name=self.datas.array_name)
-        self.pop = arrayCheck2(ruv=self.datas.ruv, num_ant=self.datas.num_ant)
+        self.pop = ArrayCheck2(ruv=self.datas.ruv, num_ant=self.datas.num_ant)
         self.pop.show()
         ret = self.pop.exec_()
         if ret:
@@ -361,6 +366,7 @@ class BLMainWindow(QMainWindow, Ui_BLMainWindow):
             self.on_stdarrays_combo_activated()
         print self.datas.array_name, self.datas.array_ar, self.datas.num_ant
 
+    # noinspection PyArgumentList
     @pyqtSignature("")
     def on_run_button_clicked(self):
         """
@@ -405,7 +411,7 @@ class BLMainWindow(QMainWindow, Ui_BLMainWindow):
         if not self.B09_b.isChecked():
             std12 = std12.query('band != "ALMA_RB_09"')
 
-        std12.columns = WTO.pd.Index(
+        std12.columns = Wto.pd.Index(
             [u'Score', u'CODE', u'SB UID', u'SB Name', u'SB State', u'Band',
              u'RA', u'DEC', u'HA', u'Elev.', u'Sets in', u'Exec. Req.',
              u'Exec. Done', u'TSysFrac', u'BLFrac', u'TotalFrac',
@@ -434,6 +440,8 @@ class BLMainWindow(QMainWindow, Ui_BLMainWindow):
                 self.bl_sheet.setColumnWidth(column, 66)
         progress.close()
 
+
+# noinspection PyMethodOverriding
 class MyTableModel(QAbstractTableModel):
     def __init__(self, datain, headerdata, parent=None):
         """ datain: a list of lists
@@ -449,6 +457,7 @@ class MyTableModel(QAbstractTableModel):
     def columnCount(self, parent):
         return len(self.arraydata[0])
 
+    # noinspection PyTypeChecker
     def data(self, index, role):
         if not index.isValid():
             print "whaat?"
@@ -460,10 +469,12 @@ class MyTableModel(QAbstractTableModel):
                 if sb[col] < 0:
                     neg = '-'
                     ha_t = str(ephem.hours(str(abs(sb[col]))))
+                    # noinspection PyCallByClass
                     ha = QTime.fromString(ha_t, 'h:m:s.z')
                 else:
                     neg = ''
                     ha_t = str(ephem.hours(str(sb[col])))
+                    # noinspection PyCallByClass
                     ha = QTime.fromString(ha_t, 'h:m:s.z')
                 hastr = QString("%1").arg(neg + ha.toString('h:mm'))
                 return QVariant(hastr)
@@ -484,8 +495,8 @@ class MyTableModel(QAbstractTableModel):
         elif role == Qt.TextAlignmentRole:
             if col in [0, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19,
                        20, 21, 22, 23]:
-                return QVariant(int(Qt.AlignRight|Qt.AlignVCenter))
-            return QVariant(int(Qt.AlignLeft|Qt.AlignVCenter))
+                return QVariant(int(Qt.AlignRight | Qt.AlignVCenter))
+            return QVariant(int(Qt.AlignLeft | Qt.AlignVCenter))
         elif role == Qt.BackgroundColorRole:
             if 0 == index.row() % 2:
                 c = QVariant(QColor(235, 245, 255))
@@ -505,6 +516,7 @@ class MyTableModel(QAbstractTableModel):
             return QVariant(self.headerdata[col])
         return QVariant()
 
+    # noinspection PyPep8Naming
     def sort(self, Ncol, order):
         """Sort table by given column number.
         """
