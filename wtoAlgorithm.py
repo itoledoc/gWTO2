@@ -330,6 +330,8 @@ class WtoAlgorithm(WtoDatabase):
             #     self.path + 'special.sbinfo', header=False, index=False,
             #     sep=' ')
         elif array == '7m':
+            sel4['blfrac'] = sel4.RA * 0. + 1.
+            sel4['frac'] = sel4.tsysfrac * sel4.blfrac
             self.select7m = sel4
         else:
             self.selecttp = sel4

@@ -19,7 +19,7 @@ def main():
     parser.add_option(
         '-c', '--clean', dest='clean', default=False, action='store_true',
         help="Force clean up of gWTO2 cache")
-    parser.add_option('-p', '--path', default='/.wto/',
+    parser.add_option('-p', '--path', default='/.wto',
                       help="Path for cache")
     (options, args) = parser.parse_args()
     app = QApplication(args)
@@ -27,9 +27,9 @@ def main():
         print("Please specify ACA or BL")
         return None
     if args[0] == 'ACA':
-        wnd = ACAMainWindow()
+        wnd = ACAMainWindow(path=options.path + '_aca/', forceup=options.clean)
     elif args[0] == 'BL':
-        wnd = BLMainWindow(path=options.path, forceup=options.clean)
+        wnd = BLMainWindow(path=options.path + '/', forceup=options.clean)
     else:
         print("The argument must be ACA or BL")
         return None

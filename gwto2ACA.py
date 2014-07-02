@@ -48,7 +48,6 @@ class ACAMainWindow(QMainWindow, Ui_ACAMainWindow):
         """
         QMainWindow.__init__(self, parent)
         self.setupUi(self)
-        self.setupUi(self)
         self.alma = alma
         self.datas = Wto.WtoAlgorithm(path=path, source=source,
                                       forcenew=forceup)
@@ -344,73 +343,7 @@ class ACAMainWindow(QMainWindow, Ui_ACAMainWindow):
         self.lst_spin.setTime(
             QTime(lst_time.hour, lst_time.minute, lst_time.second))
 
-        progress = QProgressDialog(self)
-        progress.setLabelText('Running WTO2...')
-        progress.show()
-        progress.setAutoClose(True)
-        QCoreApplication.processEvents()
 
-        self.datas.update()
-        QCoreApplication.processEvents()
-        print(
-            self.datas.date, self.datas.pwv, self.datas.minha, self.datas.maxha,
-            self.datas.horizon, self.datas.array_name, self.datas.array_ar,
-            self.datas.num_ant
-        )
-        QCoreApplication.processEvents()
-        self.datas.selector('7m')
-        self.datas.scorer('7m')
-        std7 = self.datas.score7m.sort(
-            'score', ascending=False).query(
-                'isPolarization == False and isTimeConstrained == False')[
-                    ['score', 'CODE', 'SB_UID', 'name', 'SB_state', 'band',
-                     'RA', 'DEC', 'HA', 'elev', 'etime', 'execount', 'Total',
-                     'tsysfrac', 'blfrac', 'frac', 'sb_array_score',
-                     'sb_cond_score', 'maxPWVC', 'arrayMinAR', 'arcorr',
-                     'arrayMaxAR', 'integrationTime',
-                     'PRJ_ARCHIVE_UID', 'grade']]
-
-        if not self.B03_b.isChecked():
-            std7 = std7.query('band != "ALMA_RB_03"')
-        if not self.B04_b.isChecked():
-            std7 = std7.query('band != "ALMA_RB_04"')
-        if not self.B06_b.isChecked():
-            std7 = std7.query('band != "ALMA_RB_06"')
-        if not self.B07_b.isChecked():
-            std7 = std7.query('band != "ALMA_RB_07"')
-        if not self.B08_b.isChecked():
-            std7 = std7.query('band != "ALMA_RB_08"')
-        if not self.B09_b.isChecked():
-            std7 = std7.query('band != "ALMA_RB_09"')
-
-        std7.columns = Wto.pd.Index(
-            [u'Score', u'CODE', u'SB UID', u'SB Name', u'SB State', u'Band',
-             u'RA', u'DEC', u'HA', u'Elev.', u'Sets in', u'Exec. Req.',
-             u'Exec. Done', u'TSysFrac', u'BLFrac', u'TotalFrac',
-             u'Array Score', u'Cond. Score', u'maxPWVC', u'ArrayMinAR',
-             u'ARcorr', u'ArrayMaxAR', u'TimeOnSource',
-             u'PRJ UID', u'Grade'], dtype='object')
-
-        print std7.head(10)
-        std7n = std7.to_records(index=False)
-        header = std7n.dtype.names
-        self.tmstd7 = MyStdTableModel(std7n, header, self)
-        self.proxyACA = QSortFilterProxyModel(self)
-        self.proxyACA.setSourceModel(self.tmstd7)
-        self.seven_sheet.setModel(self.proxyACA)
-        self.horizontalHeader = self.seven_sheet.horizontalHeader()
-        self.horizontalHeader.setContextMenuPolicy(Qt.CustomContextMenu)
-        self.seven_sheet.verticalHeader().setStretchLastSection(False)
-        self.seven_sheet.setSortingEnabled(True)
-        self.seven_sheet.sortByColumn(0, Qt.DescendingOrder)
-        self.seven_sheet.resizeRowsToContents()
-        for column in range(25):
-            if column in [1, 2, 3, 4, 5, 6, 7, 22]:
-                self.seven_sheet.resizeColumnToContents(column)
-            elif column in [11, 12, 16, 17, 19, 21]:
-                self.seven_sheet.setColumnWidth(column, 80)
-            else:
-                self.seven_sheet.setColumnWidth(column, 66)
 
     @pyqtSignature("")
     def on_actionAll_SBs_triggered(self):
@@ -465,8 +398,73 @@ class ACAMainWindow(QMainWindow, Ui_ACAMainWindow):
         """
         Slot documentation goes here.
         """
-        # TODO: not implemented yet
-        raise NotImplementedError
+        progress = QProgressDialog(self)
+        progress.setLabelText('Running WTO2...')
+        progress.show()
+        progress.setAutoClose(True)
+        QCoreApplication.processEvents()
+
+        self.datas.update()
+        QCoreApplication.processEvents()
+        print(
+            self.datas.date, self.datas.pwv, self.datas.minha, self.datas.maxha,
+            self.datas.horizon
+        )
+        QCoreApplication.processEvents()
+        self.datas.selector('7m')
+        self.datas.scorer('7m')
+        std7 = self.datas.score7m.sort(
+            'score', ascending=False).query(
+                'isPolarization == False and isTimeConstrained == False')[
+                    ['score', 'CODE', 'SB_UID', 'name', 'SB_state', 'band',
+                     'RA', 'DEC', 'HA', 'elev', 'etime', 'execount', 'Total',
+                     'tsysfrac', 'blfrac', 'frac', 'sb_array_score',
+                     'sb_cond_score', 'maxPWVC', 'arrayMinAR', 'arcorr',
+                     'arrayMaxAR', 'integrationTime',
+                     'PRJ_ARCHIVE_UID', 'grade']]
+
+        if not self.band3_b.isChecked():
+            std7 = std7.query('band != "ALMA_RB_03"')
+        if not self.band4_b.isChecked():
+            std7 = std7.query('band != "ALMA_RB_04"')
+        if not self.band6_b.isChecked():
+            std7 = std7.query('band != "ALMA_RB_06"')
+        if not self.band7_b.isChecked():
+            std7 = std7.query('band != "ALMA_RB_07"')
+        if not self.band8_b.isChecked():
+            std7 = std7.query('band != "ALMA_RB_08"')
+        if not self.band9_b.isChecked():
+            std7 = std7.query('band != "ALMA_RB_09"')
+
+        std7.columns = Wto.pd.Index(
+            [u'Score', u'CODE', u'SB UID', u'SB Name', u'SB State', u'Band',
+             u'RA', u'DEC', u'HA', u'Elev.', u'Sets in', u'Exec. Req.',
+             u'Exec. Done', u'TSysFrac', u'BLFrac', u'TotalFrac',
+             u'Array Score', u'Cond. Score', u'maxPWVC', u'ArrayMinAR',
+             u'ARcorr', u'ArrayMaxAR', u'TimeOnSource',
+             u'PRJ UID', u'Grade'], dtype='object')
+
+        print std7.head(10)
+        std7n = std7.to_records(index=False)
+        header = std7n.dtype.names
+        self.tmstd7 = MyStdTableModel(std7n, header, self)
+        self.proxyACA = QSortFilterProxyModel(self)
+        self.proxyACA.setSourceModel(self.tmstd7)
+        self.seven_sheet.setModel(self.proxyACA)
+        self.horizontalHeader = self.seven_sheet.horizontalHeader()
+        self.horizontalHeader.setContextMenuPolicy(Qt.CustomContextMenu)
+        self.seven_sheet.verticalHeader().setStretchLastSection(False)
+        self.seven_sheet.setSortingEnabled(True)
+        self.seven_sheet.sortByColumn(0, Qt.DescendingOrder)
+        self.seven_sheet.resizeRowsToContents()
+        for column in range(25):
+            if column in [1, 2, 3, 4, 5, 6, 7, 22]:
+                self.seven_sheet.resizeColumnToContents(column)
+            elif column in [11, 12, 16, 17, 19, 21]:
+                self.seven_sheet.setColumnWidth(column, 80)
+            else:
+                self.seven_sheet.setColumnWidth(column, 66)
+        progress.close()
 
 
 # noinspection PyMethodOverriding
