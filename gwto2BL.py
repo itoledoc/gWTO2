@@ -53,9 +53,6 @@ class BLMainWindow(QMainWindow, Ui_BLMainWindow):
         self.datas.num_ant = self.antennas_spin.value()
         self.datas.set_bl_prop(array_name=None)
         self.array_ar_spin.setValue(self.datas.array_ar)
-
-        print self.datas.date, self.datas.pwv, self.datas.minha, self.datas.maxha
-        self.datas.horizon, type(self.datas.horizon)
     
     @pyqtSignature("int")
     def on_maxha_spin_valueChanged(self, p0):
@@ -88,7 +85,6 @@ class BLMainWindow(QMainWindow, Ui_BLMainWindow):
         """
         Slot documentation goes here.
         """
-        # TODO: not implemented yet
         self.datas.horizon = p0
     
     @pyqtSignature("int")
@@ -96,7 +92,6 @@ class BLMainWindow(QMainWindow, Ui_BLMainWindow):
         """
         Slot documentation goes here.
         """
-        # TODO: not implemented yet
         self.datas.minha = p0
     
     @pyqtSignature("double")
@@ -104,57 +99,20 @@ class BLMainWindow(QMainWindow, Ui_BLMainWindow):
         """
         Slot documentation goes here.
         """
-        # TODO: not implemented yet
-        self.datas.pwv = p0
-    
-    @pyqtSignature("")
-    def on_B04_b_clicked(self):
-        """
-        Slot documentation goes here.
-        """
-        # TODO: not implemented yet
-        raise NotImplementedError
-    
-    @pyqtSignature("bool")
-    def on_B04_b_toggled(self, checked):
-        """
-        Slot documentation goes here.
-        """
-        # TODO: not implemented yet
-        raise NotImplementedError
-    
-    @pyqtSignature("QString")
-    def on_blarrays_combo_activated(self):
-        """
-        Slot documentation goes here.
-        """
-        self.datas.array_name = self.blarrays_combo.currentText()
-        self.stdarrays_combo.setCurrentIndex(0)
-        self.antennas_spin.setReadOnly(True)
-        self.datas.set_bl_prop(array_name=self.datas.array_name)
-        self.pop = arrayCheck2(ruv=self.datas.ruv, num_ant=self.datas.num_ant)
-        self.pop.show()
-        ret = self.pop.exec_()
-        if ret:
-            self.datas.array_ar = self.pop.array_ar
-            self.datas.num_ant = self.pop.num_ant
-            self.array_ar_spin.setValue(self.datas.array_ar)
-            self.antennas_spin.setValue(self.datas.num_ant)
+        e1 = "%.2f" % WTO.pd.np.around(p0, decimals=2)
+        e = e1[-1]
+        c = e1[:-1]
+        if 0 <= int(e) < 3:
+            e = '0'
+            p = float(c + e)
+        elif 3 <= int(e) < 7:
+            e = '5'
+            p = float(c + e)
         else:
-            self.datas.array_name = None
-            self.stdarrays_combo.setCurrentIndex(1)
-            self.on_stdarrays_combo_activated()
-        print self.datas.array_name, self.datas.array_ar, self.datas.num_ant
+            p = float(c) + 0.1
 
-    
-    @pyqtSignature("")
-    def on_B03_b_clicked(self):
-        """
-        Slot documentation goes here.
-        """
-        # TODO: not implemented yet
-        raise NotImplementedError
-    
+        self.datas.pwv = WTO.pd.np.around(p, decimals=2)
+
     @pyqtSignature("bool")
     def on_B03_b_toggled(self, checked):
         """
@@ -162,15 +120,15 @@ class BLMainWindow(QMainWindow, Ui_BLMainWindow):
         """
         # TODO: not implemented yet
         raise NotImplementedError
-    
-    @pyqtSignature("")
-    def on_B06_b_clicked(self):
+
+    @pyqtSignature("bool")
+    def on_B04_b_toggled(self, checked):
         """
         Slot documentation goes here.
         """
         # TODO: not implemented yet
         raise NotImplementedError
-    
+
     @pyqtSignature("bool")
     def on_B06_b_toggled(self, checked):
         """
@@ -178,25 +136,9 @@ class BLMainWindow(QMainWindow, Ui_BLMainWindow):
         """
         # TODO: not implemented yet
         raise NotImplementedError
-    
-    @pyqtSignature("")
-    def on_B07_b_clicked(self):
-        """
-        Slot documentation goes here.
-        """
-        # TODO: not implemented yet
-        raise NotImplementedError
-    
+
     @pyqtSignature("bool")
     def on_B07_b_toggled(self, checked):
-        """
-        Slot documentation goes here.
-        """
-        # TODO: not implemented yet
-        raise NotImplementedError
-    
-    @pyqtSignature("")
-    def on_B08_b_clicked(self):
         """
         Slot documentation goes here.
         """
@@ -212,50 +154,12 @@ class BLMainWindow(QMainWindow, Ui_BLMainWindow):
         raise NotImplementedError
 
     @pyqtSignature("bool")
-    def on_now_button_clicked(self):
+    def on_B09_b_toggled(self, checked):
         """
         Slot documentation goes here.
         """
-        date = WTO.datetime.utcnow()
-        self.date_datetime.setDateTime(QDateTime(QDate(date.date().year, date.date().month, date.date().day),
-                                               QTime(date.time().hour, date.time().minute, date.time().second)))
-        self.date_datetime.setTime(QTime(date.time().hour, date.time().minute, date.time().second))
-        self.datas.date = date
-        self.datas.alma.date = self.datas.date
-        lst = self.datas.alma.sidereal_time()
-        lst_time = WTO.datetime.strptime(str(lst), '%H:%M:%S.%f').time()
-        self.lst_spin.setTime(QTime(lst_time.hour, lst_time.minute, lst_time.second))
-        self.datas.query_arrays()
-        arrays = self.datas.bl_arrays.AV1.values
-        c = 1
-        self.blarrays_combo.addItem(_fromUtf8(""))
-        self.blarrays_combo.setItemText(
-            c, _translate("BLMainWindow", " ", None))
-        for a in arrays:
-            self.blarrays_combo.addItem(_fromUtf8(""))
-            self.blarrays_combo.setItemText(
-                c, _translate("BLMainWindow", a, None))
-            c += 1
-        self.blarrays_combo.setCurrentIndex(1)
-        self.stdarrays_combo.setCurrentIndex(0)
-        self.antennas_spin.setReadOnly(True)
-        self.datas.array_name = self.blarrays_combo.currentText()
-        self.datas.set_bl_prop(array_name=self.datas.array_name)
-        self.pop = arrayCheck2(ruv=self.datas.ruv, num_ant=self.datas.num_ant)
-        self.pop.show()
-        ret = self.pop.exec_()
-        if ret:
-            self.datas.array_ar = self.pop.array_ar
-            self.datas.num_ant = self.pop.num_ant
-            self.array_ar_spin.setValue(self.datas.array_ar)
-            self.antennas_spin.setValue(self.datas.num_ant)
-            self.stdarrays_combo.setCurrentIndex(0)
-        else:
-            self.datas.array_name = None
-            self.stdarrays_combo.setCurrentIndex(1)
-            self.blarrays_combo.setCurrentIndex(0)
-            self.on_stdarrays_combo_activated()
-        print self.datas.array_name, self.datas.array_ar, self.datas.num_ant
+        # TODO: not implemented yet
+        pass
 
     @pyqtSignature("int")
     def on_antennas_spin_valueChanged(self, p0):
@@ -281,22 +185,6 @@ class BLMainWindow(QMainWindow, Ui_BLMainWindow):
         """
         # TODO: not implemented yet
         self.datas.array_ar = p0
-    
-    @pyqtSignature("")
-    def on_B09_b_clicked(self):
-        """
-        Slot documentation goes here.
-        """
-        # TODO: not implemented yet
-        raise NotImplementedError
-    
-    @pyqtSignature("bool")
-    def on_B09_b_toggled(self, checked):
-        """
-        Slot documentation goes here.
-        """
-        # TODO: not implemented yet
-        raise NotImplementedError
     
     @pyqtSignature("bool")
     def on_actionAll_SBs_triggered(self, checked):
@@ -398,6 +286,79 @@ class BLMainWindow(QMainWindow, Ui_BLMainWindow):
         self.antennas_spin.setValue(self.datas.num_ant)
         print self.datas.array_name, self.datas.array_ar, self.datas.num_ant
 
+    @pyqtSignature("QString")
+    def on_blarrays_combo_activated(self):
+        """
+        Slot documentation goes here.
+        """
+        self.datas.array_name = self.blarrays_combo.currentText()
+        self.stdarrays_combo.setCurrentIndex(0)
+        self.antennas_spin.setReadOnly(True)
+        self.datas.set_bl_prop(array_name=self.datas.array_name)
+        self.pop = arrayCheck2(ruv=self.datas.ruv, num_ant=self.datas.num_ant)
+        self.pop.show()
+        ret = self.pop.exec_()
+        if ret:
+            self.datas.array_ar = self.pop.array_ar
+            self.datas.num_ant = self.pop.num_ant
+            self.array_ar_spin.setValue(self.datas.array_ar)
+            self.antennas_spin.setValue(self.datas.num_ant)
+        else:
+            self.datas.array_name = None
+            self.stdarrays_combo.setCurrentIndex(1)
+            self.on_stdarrays_combo_activated()
+        print self.datas.array_name, self.datas.array_ar, self.datas.num_ant
+
+    @pyqtSignature("bool")
+    def on_now_button_clicked(self):
+        """
+        Slot documentation goes here.
+        """
+        date = WTO.datetime.utcnow()
+        self.date_datetime.setDateTime(
+            QDateTime(
+                QDate(date.date().year, date.date().month, date.date().day),
+                QTime(date.time().hour, date.time().minute,
+                      date.time().second)))
+        self.date_datetime.setTime(
+            QTime(date.time().hour, date.time().minute, date.time().second))
+        self.datas.date = date
+        self.datas.alma.date = self.datas.date
+        lst = self.datas.alma.sidereal_time()
+        lst_time = WTO.datetime.strptime(str(lst), '%H:%M:%S.%f').time()
+        self.lst_spin.setTime(
+            QTime(lst_time.hour, lst_time.minute, lst_time.second))
+        self.datas.query_arrays()
+        arrays = self.datas.bl_arrays.AV1.values
+        c = 1
+        self.blarrays_combo.addItem(_fromUtf8(""))
+        self.blarrays_combo.setItemText(
+            c, _translate("BLMainWindow", " ", None))
+        for a in arrays:
+            self.blarrays_combo.addItem(_fromUtf8(""))
+            self.blarrays_combo.setItemText(
+                c, _translate("BLMainWindow", a, None))
+            c += 1
+        self.blarrays_combo.setCurrentIndex(1)
+        self.stdarrays_combo.setCurrentIndex(0)
+        self.antennas_spin.setReadOnly(True)
+        self.datas.array_name = self.blarrays_combo.currentText()
+        self.datas.set_bl_prop(array_name=self.datas.array_name)
+        self.pop = arrayCheck2(ruv=self.datas.ruv, num_ant=self.datas.num_ant)
+        self.pop.show()
+        ret = self.pop.exec_()
+        if ret:
+            self.datas.array_ar = self.pop.array_ar
+            self.datas.num_ant = self.pop.num_ant
+            self.array_ar_spin.setValue(self.datas.array_ar)
+            self.antennas_spin.setValue(self.datas.num_ant)
+            self.stdarrays_combo.setCurrentIndex(0)
+        else:
+            self.datas.array_name = None
+            self.stdarrays_combo.setCurrentIndex(1)
+            self.blarrays_combo.setCurrentIndex(0)
+            self.on_stdarrays_combo_activated()
+        print self.datas.array_name, self.datas.array_ar, self.datas.num_ant
 
     @pyqtSignature("")
     def on_run_button_clicked(self):
@@ -405,18 +366,33 @@ class BLMainWindow(QMainWindow, Ui_BLMainWindow):
         Slot documentation goes here.
         """
         # TODO: not implemented yet
+        progress = QProgressDialog(self)
+        progress.setLabelText('Running WTO...')
+        progress.show()
+        progress.setAutoClose(True)
+        progress.setMaximum(3)
+        QCoreApplication.processEvents()
 
         self.datas.update()
+        print(
+            self.datas.date, self.datas.pwv, self.datas.minha, self.datas.maxha,
+            self.datas.horizon, self.datas.array_name, self.datas.array_ar,
+            self.datas.num_ant
+        )
+        QCoreApplication.processEvents()
         self.datas.selector('12m')
+        QCoreApplication.processEvents()
         self.datas.scorer('12m')
+        QCoreApplication.processEvents()
         std12 = self.datas.score12m.sort(
             'score', ascending=False).query('isPolarization == False')[
-                    ['score', 'CODE', 'SB_UID', 'name', 'SB_state', 'band',
-                     'maxPWVC', 'HA', 'elev', 'etime', 'execount', 'Total',
-                     'arrayMinAR', 'arcorr', 'arrayMaxAR', 'tsysfrac', 'blfrac',
-                     'frac','sb_array_score', 'sb_cond_score', 'RA', 'DEC',
-                     'isTimeConstrained','integrationTime',
-                     'PRJ_ARCHIVE_UID']]
+                ['score', 'CODE', 'SB_UID', 'name', 'SB_state', 'band',
+                 'RA', 'DEC', 'HA', 'elev', 'etime', 'execount', 'Total',
+                 'tsysfrac', 'blfrac', 'frac', 'sb_array_score',
+                 'sb_cond_score', 'maxPWVC', 'arrayMinAR', 'arcorr',
+                 'arrayMaxAR', 'isTimeConstrained', 'integrationTime',
+                 'PRJ_ARCHIVE_UID', 'grade']]
+
         if not self.B03_b.isChecked():
             std12 = std12.query('band != "ALMA_RB_03"')
         if not self.B04_b.isChecked():
@@ -430,6 +406,15 @@ class BLMainWindow(QMainWindow, Ui_BLMainWindow):
         if not self.B09_b.isChecked():
             std12 = std12.query('band != "ALMA_RB_09"')
 
+        std12.columns = WTO.pd.Index(
+            [u'Score', u'CODE', u'SB UID', u'SB Name', u'SB State', u'Band',
+             u'RA', u'DEC', u'HA', u'Elev.', u'Sets in', u'Exec. Req.',
+             u'Exec. Done', u'TSysFrac', u'BLFrac', u'TotalFrac',
+             u'Array Score', u'Cond. Score', u'maxPWVC', u'ArrayMinAR',
+             u'ARcorr', u'ArrayMaxAR', u'Time Const.', u'TimeOnSource',
+             u'PRJ UID', u'Grade'], dtype='object')
+
+        QCoreApplication.processEvents()
         print std12.head(10)
         std12n = std12.to_records(index=False)
         header = std12n.dtype.names
@@ -439,17 +424,18 @@ class BLMainWindow(QMainWindow, Ui_BLMainWindow):
         self.bl_sheet.setModel(self.proxyBLC)
         self.horizontalHeader = self.bl_sheet.horizontalHeader()
         self.horizontalHeader.setContextMenuPolicy(Qt.CustomContextMenu)
-        # self.horizontalHeader.customContextMenuRequested.connect(self.on_bl_sheet_horizontalHeader_sectionClicked)
         self.bl_sheet.verticalHeader().setStretchLastSection(False)
         self.bl_sheet.setSortingEnabled(True)
         self.bl_sheet.sortByColumn(0, Qt.DescendingOrder)
         self.bl_sheet.resizeRowsToContents()
         for column in range(25):
-            if column in [1, 2, 3]:
+            if column in [1, 2, 3, 4, 5, 6, 7, 22, 23]:
                 self.bl_sheet.resizeColumnToContents(column)
+            elif column in [11, 12, 16, 17, 19, 21]:
+                self.bl_sheet.setColumnWidth(column, 80)
             else:
                 self.bl_sheet.setColumnWidth(column, 66)
-
+        progress.close()
 
 class MyTableModel(QAbstractTableModel):
     def __init__(self, datain, headerdata, parent=None):
@@ -473,8 +459,35 @@ class MyTableModel(QAbstractTableModel):
         sb = self.arraydata[index.row()]
         col = index.column()
         if role == Qt.DisplayRole:
+            if col in [8, 10]:
+                if sb[col] < 0:
+                    neg = '-'
+                    ha_t = str(ephem.hours(str(abs(sb[col]))))
+                    ha = QTime.fromString(ha_t, 'h:m:s.z')
+                else:
+                    neg = ''
+                    ha_t = str(ephem.hours(str(sb[col])))
+                    ha = QTime.fromString(ha_t, 'h:m:s.z')
+                hastr = QString("%1").arg(neg + ha.toString('h:mm'))
+                return QVariant(hastr)
+            elif col == 6:
+                h = ephem.hours(str(sb[col] / 15.))
+                return QVariant(str(h)[:-3])
+            elif col == 7:
+                d = ephem.degrees(str(sb[col]))
+                return QVariant(str(d)[:-2])
+            elif col in [0, 13, 14, 15, 18, 19, 20, 21]:
+                return QVariant(QString("%1").arg(sb[col], 0, 'f', 2))
+            elif col in [9, 16, 17, 23]:
+                return QVariant(QString("%1").arg(sb[col], 0, 'f', 1))
+            elif col in [11, 12]:
+                return QVariant(QString("%1").arg(sb[col], 0, 'i', 0))
+
             return QVariant(str(self.arraydata[index.row()][index.column()]))
         elif role == Qt.TextAlignmentRole:
+            if col in [0, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19,
+                       20, 21, 22, 23]:
+                return QVariant(int(Qt.AlignRight|Qt.AlignVCenter))
             return QVariant(int(Qt.AlignLeft|Qt.AlignVCenter))
         # elif role == Qt.BackgroundColorRole:
         #     if sb[0] > 50:

@@ -350,7 +350,7 @@ class WtoAlgorithm(WtoDatabase):
                 r['execount'], r['Total'], r['scienceRank'], r['AR'],
                 r['arrayMinAR'], r['arrayMaxAR'], r['LAS'],
                 r['grade'], r['repfreq'], r['DEC'], r['EXEC'], array,
-                r['frac'], r['maxPWVC']),
+                r['frac'], r['maxPWVC'], r['CODE']),
             axis=1)
         scores = pd.DataFrame(scores.values.tolist(), index=scores.index)
         scores.columns = pd.Index(
@@ -369,7 +369,7 @@ class WtoAlgorithm(WtoDatabase):
 
     def calculate_score(self, ecount, tcount, srank, ar, aminar, amaxar,
                         las, grade, repfreq, dec, execu, array,
-                        frac, maxpwvc):
+                        frac, maxpwvc, code):
 
         # set sb completion score
         """
@@ -394,10 +394,13 @@ class WtoAlgorithm(WtoDatabase):
         sb_completion_score = 6. * sb_completion + 4.
 
         # set sb priority score
+
         if grade == 'A':
             sb_grade_score = 10.
-        elif grade == 'B':
+        elif str(code).startswith('2012'):
             sb_grade_score = 8.
+        elif grade == 'B':
+            sb_grade_score = 7.
         else:
             sb_grade_score = -100.
 
