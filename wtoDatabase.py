@@ -57,6 +57,8 @@ class WtoDatabase(object):
         self.source = source
         self.new = forcenew
         # Default Paths and Preferences
+        if path[-1] != '/':
+            path += '/'
         self.path = os.environ['HOME'] + path
         self.wto_path = os.environ['WTO']
         self.sbxml = self.path + 'sbxml/'
