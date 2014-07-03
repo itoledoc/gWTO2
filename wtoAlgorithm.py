@@ -109,7 +109,7 @@ class WtoAlgorithm(WtoDatabase):
             self.antpad.loc[n] = (p, a)
         self.query_arrays()
 
-    def check_observability(self):
+    def check_observability(self, array):
 
         """
 
@@ -120,7 +120,15 @@ class WtoAlgorithm(WtoDatabase):
             return None
         alma1.date = self.date
         print alma1.date
-        fs = self.fieldsource.apply(
+        if array == '12m':
+            fs_arr = self.fieldsource.query('arraySB == "TWELVE-M"')
+        elif array == '7m':
+            fs_arr = self.fieldsource.query('arraySB == "ACA" or '
+                                            'arraySB == "SEVEN-M"')
+        else:
+            fs_arr = self.fieldsource.query('arraySB == "TP-Array"')
+
+        fs = fs_arr.apply(
             lambda r: observable(
                 r['solarSystem'], r['sourcename'], r['RA'], r['DEC'],
                 self.horizon, r['isQuery'], r['ephemeris'], alma=alma1),
@@ -195,7 +203,7 @@ class WtoAlgorithm(WtoDatabase):
 
         print("Calculating observability for %d sources..." %
               len(self.fieldsource))
-        self.check_observability()
+        self.check_observability(array)
 
         if array not in ['12m', '7m', 'tp']:
             print("Use 12m, 7m or tp for array selection.")

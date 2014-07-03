@@ -663,10 +663,11 @@ class WtoDatabase(object):
 
         for n in range(n_fs):
             if new:
-                self.row_fieldsource(xml.data.FieldSource[n], sb_uid, new=new)
+                self.row_fieldsource(xml.data.FieldSource[n], sb_uid, array,
+                                     new=new)
                 new = False
             else:
-                self.row_fieldsource(xml.data.FieldSource[n], sb_uid)
+                self.row_fieldsource(xml.data.FieldSource[n], sb_uid, array)
 
         new = new_orig
         for n in range(n_tg):
@@ -705,7 +706,7 @@ class WtoDatabase(object):
                 amplitude, bandpass, polarization, phase, delay, science,
                 integrationtime, subscandur, maxpwv)
 
-    def row_fieldsource(self, fs, sbuid, new=False):
+    def row_fieldsource(self, fs, sbuid, array, new=False):
         """
 
         :param fs:
@@ -747,18 +748,18 @@ class WtoDatabase(object):
             self.fieldsource = pd.DataFrame(
                 [(partid, sbuid, solarsystem, sourcename, name, ra, dec, isquery,
                   qc_intendeduse, qc_ra, qc_dec, qc_use, qc_radius,
-                  qc_radius_unit, ephemeris, pointings, ismosaic)],
+                  qc_radius_unit, ephemeris, pointings, ismosaic, array)],
                 columns=['fieldRef', 'SB_UID', 'solarSystem', 'sourcename',
                          'name', 'RA',
                          'DEC', 'isQuery', 'intendedUse', 'qRA', 'qDEC', 'use',
                          'search_radius', 'rad_unit', 'ephemeris',
-                         'pointings', 'isMosaic'],
+                         'pointings', 'isMosaic', 'arraySB'],
                 index=[partid]
             )
         self.fieldsource.ix[partid] = (
             partid, sbuid, solarsystem, sourcename, name, ra, dec, isquery,
             qc_intendeduse, qc_ra, qc_dec, qc_use, qc_radius, qc_radius_unit,
-            ephemeris, pointings, ismosaic)
+            ephemeris, pointings, ismosaic, array)
 
     def row_target(self, tg, sbuid, new=False):
         """

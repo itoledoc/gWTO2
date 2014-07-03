@@ -108,6 +108,7 @@ class Ui_BLMainWindow(object):
         self.pwv_spin = QtGui.QDoubleSpinBox(self.OptionsFrame)
         self.pwv_spin.setReadOnly(False)
         self.pwv_spin.setMaximum(20.0)
+        self.pwv_spin.setMinimum(0.0)
         self.pwv_spin.setSingleStep(0.05)
         self.pwv_spin.setProperty("value", 1.2)
         self.pwv_spin.setObjectName(_fromUtf8("pwv_spin"))

@@ -104,27 +104,34 @@ class Ui_ACAMainWindow(object):
         self.horizon_spin.setProperty("value", 20)
         self.horizon_spin.setObjectName(_fromUtf8("horizon_spin"))
         self.gridLayout_6.addWidget(self.horizon_spin, 1, 1, 1, 1)
+
         self.minha_spin = QtGui.QSpinBox(self.OptionsFrame)
         self.minha_spin.setMinimum(-12)
         self.minha_spin.setMaximum(12)
         self.minha_spin.setProperty("value", -5)
         self.minha_spin.setObjectName(_fromUtf8("minha_spin"))
         self.gridLayout_6.addWidget(self.minha_spin, 1, 3, 1, 1)
+
         self.horizon_label = QtGui.QLabel(self.OptionsFrame)
         self.horizon_label.setObjectName(_fromUtf8("horizon_label"))
         self.gridLayout_6.addWidget(self.horizon_label, 1, 0, 1, 1)
+
         self.minha_label = QtGui.QLabel(self.OptionsFrame)
         self.minha_label.setObjectName(_fromUtf8("minha_label"))
         self.gridLayout_6.addWidget(self.minha_label, 1, 2, 1, 1)
+
         self.date_label = QtGui.QLabel(self.OptionsFrame)
         self.date_label.setObjectName(_fromUtf8("date_label"))
         self.gridLayout_6.addWidget(self.date_label, 0, 0, 1, 1)
+
         self.maxha_label = QtGui.QLabel(self.OptionsFrame)
         self.maxha_label.setObjectName(_fromUtf8("maxha_label"))
         self.gridLayout_6.addWidget(self.maxha_label, 1, 4, 1, 1)
+
         self.pwv_spin = QtGui.QDoubleSpinBox(self.OptionsFrame)
         self.pwv_spin.setReadOnly(False)
         self.pwv_spin.setMaximum(20.0)
+        self.pwv_spin.setMinimum(0.0)
         self.pwv_spin.setSingleStep(0.05)
         self.pwv_spin.setProperty("value", 1.2)
         self.pwv_spin.setObjectName(_fromUtf8("pwv_spin"))
@@ -189,7 +196,7 @@ class Ui_ACAMainWindow(object):
         self.antennas_spin = QtGui.QSpinBox(self.ArraysFrame)
         self.antennas_spin.setMinimum(5)
         self.antennas_spin.setMaximum(12)
-        self.antennas_spin.setProperty("value", 10)
+        self.antennas_spin.setProperty("value", 9)
         self.antennas_spin.setObjectName(_fromUtf8("antennas_spin"))
         self.gridLayout_7.addWidget(self.antennas_spin, 0, 2, 1, 1)
         self.antennas_label = QtGui.QLabel(self.ArraysFrame)
@@ -308,6 +315,8 @@ class Ui_ACAMainWindow(object):
         self.actionAll_SBs.setText(_translate("ACAMainWindow", "All SBs", None))
         self.actionPlanning.setText(_translate("ACAMainWindow", "Planning", None))
         self.actionQuit.setText(_translate("ACAMainWindow", "Quit", None))
+        self.lst_spin.setDisplayFormat(
+            _translate("MainWindow", "hh:mm", None))
 
 
 if __name__ == "__main__":
