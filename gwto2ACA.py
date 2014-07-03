@@ -56,6 +56,7 @@ class ACAMainWindow(QMainWindow, Ui_ACAMainWindow):
         self.datas.set_maxha(self.maxha_spin.value())
         self.datas.horizon = self.horizon_spin.value()
         self.datas.date = self.date_datetime.dateTime().toPyDateTime()
+        self.datas.num_ant = self.antennas_spin.value()
 
     @pyqtSignature("bool")
     def on_actionAll_SBs_triggered(self, checked):
@@ -111,15 +112,7 @@ class ACAMainWindow(QMainWindow, Ui_ACAMainWindow):
         Slot documentation goes here.
         """
         # TODO: not implemented yet
-        raise NotImplementedError
-    
-    @pyqtSignature("")
-    def on_date_datetime_editingFinished(self):
-        """
-        Slot documentation goes here.
-        """
-        # TODO: not implemented yet
-        raise NotImplementedError
+        self.datas.maxha = p0
     
     @pyqtSignature("QDateTime")
     def on_date_datetime_dateTimeChanged(self, date):
@@ -139,7 +132,7 @@ class ACAMainWindow(QMainWindow, Ui_ACAMainWindow):
         Slot documentation goes here.
         """
         # TODO: not implemented yet
-        raise NotImplementedError
+        self.datas.horizon = p0
     
     @pyqtSignature("int")
     def on_minha_spin_valueChanged(self, p0):
@@ -147,7 +140,7 @@ class ACAMainWindow(QMainWindow, Ui_ACAMainWindow):
         Slot documentation goes here.
         """
         # TODO: not implemented yet
-        raise NotImplementedError
+        self.datas.minha = p0
     
     @pyqtSignature("double")
     def on_pwv_spin_valueChanged(self, p0):
@@ -174,9 +167,7 @@ class ACAMainWindow(QMainWindow, Ui_ACAMainWindow):
         Slot documentation goes here.
         """
         # TODO: not implemented yet
-        # self.datas.num_ant = p0
-        print "Implementing this change"
-
+        self.datas.num_ant = p0
 
     @pyqtSignature("")
     def on_band9_b_clicked(self):
@@ -342,8 +333,6 @@ class ACAMainWindow(QMainWindow, Ui_ACAMainWindow):
         lst_time = Wto.datetime.strptime(str(lst), '%H:%M:%S.%f').time()
         self.lst_spin.setTime(
             QTime(lst_time.hour, lst_time.minute, lst_time.second))
-
-
 
     @pyqtSignature("")
     def on_actionAll_SBs_triggered(self):
