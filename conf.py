@@ -51,7 +51,7 @@ master_doc = 'index'
 
 # General information about the project.
 project = u'gWTO'
-copyright = u'2014, IToledo'
+copyright = u'2014, I. Toledo'
 
 # The version info for the project you're documenting, acts as replacement for
 # |version| and |release|, also used in various other places throughout the
@@ -110,7 +110,7 @@ html_theme = 'default'
 # Theme options are theme-specific and customize the look and feel of a theme
 # further.  For a list of options available for each theme, see the
 # documentation.
-#html_theme_options = {}
+html_theme_options = {'stickysidebar': True}
 
 # Add any paths that contain custom themes here, relative to this directory.
 #html_theme_path = []
@@ -190,7 +190,7 @@ htmlhelp_basename = 'gWTOdoc'
 
 latex_elements = {
 # The paper size ('letterpaper' or 'a4paper').
-#'papersize': 'letterpaper',
+'papersize': 'a4paper',
 
 # The font size ('10pt', '11pt' or '12pt').
 #'pointsize': '10pt',
@@ -203,8 +203,8 @@ latex_elements = {
 # (source start file, target name, title,
 #  author, documentclass [howto, manual, or own class]).
 latex_documents = [
-  ('index', 'gWTO.tex', u'gWTO Documentation',
-   u'IToledo', 'manual'),
+  ('index', 'gWTO2.tex', u'gWTO2 Documentation (Draft)',
+   u'PMGs', 'manual'),
 ]
 
 # The name of an image file (relative to this directory) to place at the top of
@@ -216,10 +216,10 @@ latex_documents = [
 #latex_use_parts = False
 
 # If true, show page references after internal links.
-#latex_show_pagerefs = False
+latex_show_pagerefs = True
 
 # If true, show URL addresses after external links.
-#latex_show_urls = False
+latex_show_urls = True
 
 # Documents to append as an appendix to all manuals.
 #latex_appendices = []
@@ -234,7 +234,7 @@ latex_documents = [
 # (source start file, name, description, authors, manual section).
 man_pages = [
     ('index', 'gwto', u'gWTO Documentation',
-     [u'IToledo'], 1)
+     [u'I. Toledo'], 1)
 ]
 
 # If true, show URL addresses after external links.

@@ -106,6 +106,8 @@
         <span class="bp">self</span><span class="o">.</span><span class="n">source</span> <span class="o">=</span> <span class="n">source</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">new</span> <span class="o">=</span> <span class="n">forcenew</span>
         <span class="c"># Default Paths and Preferences</span>
+        <span class="k">if</span> <span class="n">path</span><span class="p">[</span><span class="o">-</span><span class="mi">1</span><span class="p">]</span> <span class="o">!=</span> <span class="s">&#39;/&#39;</span><span class="p">:</span>
+            <span class="n">path</span> <span class="o">+=</span> <span class="s">&#39;/&#39;</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">path</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">environ</span><span class="p">[</span><span class="s">&#39;HOME&#39;</span><span class="p">]</span> <span class="o">+</span> <span class="n">path</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">wto_path</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">environ</span><span class="p">[</span><span class="s">&#39;WTO&#39;</span><span class="p">]</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">sbxml</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">path</span> <span class="o">+</span> <span class="s">&#39;sbxml/&#39;</span>
@@ -710,10 +712,11 @@
 
         <span class="k">for</span> <span class="n">n</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">n_fs</span><span class="p">):</span>
             <span class="k">if</span> <span class="n">new</span><span class="p">:</span>
-                <span class="bp">self</span><span class="o">.</span><span class="n">row_fieldsource</span><span class="p">(</span><span class="n">xml</span><span class="o">.</span><span class="n">data</span><span class="o">.</span><span class="n">FieldSource</span><span class="p">[</span><span class="n">n</span><span class="p">],</span> <span class="n">sb_uid</span><span class="p">,</span> <span class="n">new</span><span class="o">=</span><span class="n">new</span><span class="p">)</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">row_fieldsource</span><span class="p">(</span><span class="n">xml</span><span class="o">.</span><span class="n">data</span><span class="o">.</span><span class="n">FieldSource</span><span class="p">[</span><span class="n">n</span><span class="p">],</span> <span class="n">sb_uid</span><span class="p">,</span> <span class="n">array</span><span class="p">,</span>
+                                     <span class="n">new</span><span class="o">=</span><span class="n">new</span><span class="p">)</span>
                 <span class="n">new</span> <span class="o">=</span> <span class="bp">False</span>
             <span class="k">else</span><span class="p">:</span>
-                <span class="bp">self</span><span class="o">.</span><span class="n">row_fieldsource</span><span class="p">(</span><span class="n">xml</span><span class="o">.</span><span class="n">data</span><span class="o">.</span><span class="n">FieldSource</span><span class="p">[</span><span class="n">n</span><span class="p">],</span> <span class="n">sb_uid</span><span class="p">)</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">row_fieldsource</span><span class="p">(</span><span class="n">xml</span><span class="o">.</span><span class="n">data</span><span class="o">.</span><span class="n">FieldSource</span><span class="p">[</span><span class="n">n</span><span class="p">],</span> <span class="n">sb_uid</span><span class="p">,</span> <span class="n">array</span><span class="p">)</span>
 
         <span class="n">new</span> <span class="o">=</span> <span class="n">new_orig</span>
         <span class="k">for</span> <span class="n">n</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">n_tg</span><span class="p">):</span>
@@ -752,7 +755,7 @@
                 <span class="n">amplitude</span><span class="p">,</span> <span class="n">bandpass</span><span class="p">,</span> <span class="n">polarization</span><span class="p">,</span> <span class="n">phase</span><span class="p">,</span> <span class="n">delay</span><span class="p">,</span> <span class="n">science</span><span class="p">,</span>
                 <span class="n">integrationtime</span><span class="p">,</span> <span class="n">subscandur</span><span class="p">,</span> <span class="n">maxpwv</span><span class="p">)</span>
 </div>
-<div class="viewcode-block" id="WtoDatabase.row_fieldsource"><a class="viewcode-back" href="../index.html#wtoDatabase.WtoDatabase.row_fieldsource">[docs]</a>    <span class="k">def</span> <span class="nf">row_fieldsource</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">fs</span><span class="p">,</span> <span class="n">sbuid</span><span class="p">,</span> <span class="n">new</span><span class="o">=</span><span class="bp">False</span><span class="p">):</span>
+<div class="viewcode-block" id="WtoDatabase.row_fieldsource"><a class="viewcode-back" href="../index.html#wtoDatabase.WtoDatabase.row_fieldsource">[docs]</a>    <span class="k">def</span> <span class="nf">row_fieldsource</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">fs</span><span class="p">,</span> <span class="n">sbuid</span><span class="p">,</span> <span class="n">array</span><span class="p">,</span> <span class="n">new</span><span class="o">=</span><span class="bp">False</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot;</span>
 
 <span class="sd">        :param fs:</span>
@@ -794,18 +797,18 @@
             <span class="bp">self</span><span class="o">.</span><span class="n">fieldsource</span> <span class="o">=</span> <span class="n">pd</span><span class="o">.</span><span class="n">DataFrame</span><span class="p">(</span>
                 <span class="p">[(</span><span class="n">partid</span><span class="p">,</span> <span class="n">sbuid</span><span class="p">,</span> <span class="n">solarsystem</span><span class="p">,</span> <span class="n">sourcename</span><span class="p">,</span> <span class="n">name</span><span class="p">,</span> <span class="n">ra</span><span class="p">,</span> <span class="n">dec</span><span class="p">,</span> <span class="n">isquery</span><span class="p">,</span>
                   <span class="n">qc_intendeduse</span><span class="p">,</span> <span class="n">qc_ra</span><span class="p">,</span> <span class="n">qc_dec</span><span class="p">,</span> <span class="n">qc_use</span><span class="p">,</span> <span class="n">qc_radius</span><span class="p">,</span>
-                  <span class="n">qc_radius_unit</span><span class="p">,</span> <span class="n">ephemeris</span><span class="p">,</span> <span class="n">pointings</span><span class="p">,</span> <span class="n">ismosaic</span><span class="p">)],</span>
+                  <span class="n">qc_radius_unit</span><span class="p">,</span> <span class="n">ephemeris</span><span class="p">,</span> <span class="n">pointings</span><span class="p">,</span> <span class="n">ismosaic</span><span class="p">,</span> <span class="n">array</span><span class="p">)],</span>
                 <span class="n">columns</span><span class="o">=</span><span class="p">[</span><span class="s">&#39;fieldRef&#39;</span><span class="p">,</span> <span class="s">&#39;SB_UID&#39;</span><span class="p">,</span> <span class="s">&#39;solarSystem&#39;</span><span class="p">,</span> <span class="s">&#39;sourcename&#39;</span><span class="p">,</span>
                          <span class="s">&#39;name&#39;</span><span class="p">,</span> <span class="s">&#39;RA&#39;</span><span class="p">,</span>
                          <span class="s">&#39;DEC&#39;</span><span class="p">,</span> <span class="s">&#39;isQuery&#39;</span><span class="p">,</span> <span class="s">&#39;intendedUse&#39;</span><span class="p">,</span> <span class="s">&#39;qRA&#39;</span><span class="p">,</span> <span class="s">&#39;qDEC&#39;</span><span class="p">,</span> <span class="s">&#39;use&#39;</span><span class="p">,</span>
                          <span class="s">&#39;search_radius&#39;</span><span class="p">,</span> <span class="s">&#39;rad_unit&#39;</span><span class="p">,</span> <span class="s">&#39;ephemeris&#39;</span><span class="p">,</span>
-                         <span class="s">&#39;pointings&#39;</span><span class="p">,</span> <span class="s">&#39;isMosaic&#39;</span><span class="p">],</span>
+                         <span class="s">&#39;pointings&#39;</span><span class="p">,</span> <span class="s">&#39;isMosaic&#39;</span><span class="p">,</span> <span class="s">&#39;arraySB&#39;</span><span class="p">],</span>
                 <span class="n">index</span><span class="o">=</span><span class="p">[</span><span class="n">partid</span><span class="p">]</span>
             <span class="p">)</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">fieldsource</span><span class="o">.</span><span class="n">ix</span><span class="p">[</span><span class="n">partid</span><span class="p">]</span> <span class="o">=</span> <span class="p">(</span>
             <span class="n">partid</span><span class="p">,</span> <span class="n">sbuid</span><span class="p">,</span> <span class="n">solarsystem</span><span class="p">,</span> <span class="n">sourcename</span><span class="p">,</span> <span class="n">name</span><span class="p">,</span> <span class="n">ra</span><span class="p">,</span> <span class="n">dec</span><span class="p">,</span> <span class="n">isquery</span><span class="p">,</span>
             <span class="n">qc_intendeduse</span><span class="p">,</span> <span class="n">qc_ra</span><span class="p">,</span> <span class="n">qc_dec</span><span class="p">,</span> <span class="n">qc_use</span><span class="p">,</span> <span class="n">qc_radius</span><span class="p">,</span> <span class="n">qc_radius_unit</span><span class="p">,</span>
-            <span class="n">ephemeris</span><span class="p">,</span> <span class="n">pointings</span><span class="p">,</span> <span class="n">ismosaic</span><span class="p">)</span>
+            <span class="n">ephemeris</span><span class="p">,</span> <span class="n">pointings</span><span class="p">,</span> <span class="n">ismosaic</span><span class="p">,</span> <span class="n">array</span><span class="p">)</span>
 </div>
 <div class="viewcode-block" id="WtoDatabase.row_target"><a class="viewcode-back" href="../index.html#wtoDatabase.WtoDatabase.row_target">[docs]</a>    <span class="k">def</span> <span class="nf">row_target</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">tg</span><span class="p">,</span> <span class="n">sbuid</span><span class="p">,</span> <span class="n">new</span><span class="o">=</span><span class="bp">False</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot;</span>
@@ -1312,7 +1315,7 @@
       </ul>
     </div>
     <div class="footer">
-        &copy; Copyright 2014, IToledo.
+        &copy; Copyright 2014, I. Toledo.
       Created using <a href="http://sphinx-doc.org/">Sphinx</a> 1.2.2.
     </div>
   </body>

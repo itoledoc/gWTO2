@@ -217,6 +217,12 @@ class WtoAlgorithm(WtoDatabase):
             else:
                 array1 = ['TP-Array']
 
+        fg = self.fieldsource.query(
+            'isQuery == False and name == "Primary:"'
+        ).groupby('SB_UID')
+        p = pd.DataFrame(
+            [fg.pointings.mean(), fg.pointings.count()],
+            index=['pointings', 'sources']).transpose()
         pwvcol = self.pwvdata[[str(self.pwv)]]
         sum2 = pd.merge(
             self.sb_summary, pwvcol, left_on='repfreq', right_index=True)
@@ -295,6 +301,8 @@ class WtoAlgorithm(WtoDatabase):
         print("SBs with Ok state: %d" % len(sel4))
         sel4 = sel4.query('execount > Total')
         print("SBs with missing exec: %d" % len(sel4))
+        sel4 = pd.merge(sel4, p, left_on='SB_UID', right_index=True, how='left')
+
         if array == '12m':
             sel4 = sel4.query(
                 '(arrayMinAR < %f and %f < arrayMaxAR) ' %

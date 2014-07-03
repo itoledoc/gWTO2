@@ -3,6 +3,7 @@
    You can adapt this file completely to your liking, but it should at least
    contain the root `toctree` directive.
 
+
 The gWTO2 Documentation
 =======================
 
@@ -15,17 +16,17 @@ The gWTO2 Documentation
 Using gWTO2
 ===========
 
+**NOTICE 1: gWTO2 now works for both Baseline and ACA correlators (2014-07-02).**
+
+**NOTICE 2: gWTO2, BL version now makes use of "Time Const." and "Pol" Tabs.**
+**Tab "Sessions" is still on development (2014-07-02)**
+
 .. figure:: Selection_003.png
    :scale: 50
 
    Screenshot of gWTO2 RC
 
-**NOTICE 1: currently gWTO2 will only work with the "BL" option, i.e. only for**
-**the baseline correlator (2014-07-02).**
 
-**NOTICE 2: only the tab "Standard" is operative. Please check the column**
-**"Time Const" to avoid running SBs with time constrains**
-**until the tab "Time Const." is operational (2014-07-02).**
 
 gWTO is tested and deployed at the osf-red machine, within the aod account.
 A virtual environment of python, based on the Anaconda distribution, must be
@@ -51,12 +52,13 @@ and ACA. The ``-c`` option should only be used once per day.
 
 I would also recommend to set the option ``-p`` to something like
 ``'/.wto_myname/'`` so different users running gWTO won't mess up the cache
-for each other.
+for each other. **After playing with gWTO2 using a different path, please**
+**delete the directory created with the name .wto_myname**
 
 Start up
 --------
 
-After starting gWTO2 you will be presented with the gui shown on figure 2.
+After starting ``gWTO2 BL`` you will be presented with the gui shown on figure 2.
 If the -c option was used, or the cache have been manually erased it, the time
 until you are presented the gui can take up to 5-7 minutes.
 
@@ -65,15 +67,19 @@ until you are presented the gui can take up to 5-7 minutes.
 
    Figure 2
 
+The gui for ACA (``gWTO2 ACA``) is almost the same, except for the lack of
+"Array Options", and a tab "TP" that will be used for handling Total Power SBs
+
 Setting up variables
 --------------------
 
-After opening, the date will be by defaul the current UTC time, pwv is set to
+After opening, the date will be by default the current UTC time, pwv is set to
 1.2 mm., the horizon limit is 20 degrees, minimum hour angle is -5 and maximum
 hour angle is 3. The LST field is not editable, and it shows the LST for the
 date time set in the Date field.
 
-The box with the array variables will have the *Std. Conf.:* field set to
+**For BL GUI only.** The box with the array variables will have the
+*Std. Conf.:* field set to
 "Current Conf.". This "Current Conf" comes from the output of the CASA script
 ``arrayConfigurationTools.py``, which can be found at
 AIV/science/ArrayConfiguration/Tools/arrayConfigurationTools.py. It is made
@@ -81,16 +87,16 @@ with the antennas that in principle can be used for the current ES Block. **It**
 **is the AoD lead duty to create the relevant files from time to time to**
 **account for the antenna movements or being added**.
 
-The values given at *Array AR* are set according to the *current array's* angular
-resolution and number of antennas offered officially for cycle 2. **The only**
-**field you can modify at this stage in the 'Antenna' field, which is the**
-**number of antennas**. The idea is that the user will use this information
-to have an idea of the current configuratin characteristics, and to run gWTO2 to
-plan observations ahead of time, or when Baseline arrays have not been created
-in the last 6 to 12 hours.
+**For BL GUI only.**The values given at *Array AR* are set according to the
+*current array's* angular resolution and number of antennas offered officially
+for cycle 2. **The only field you can modify at this stage in the 'Antenna'**
+**field, which is the number of antennas**. The idea is that the user will use
+this information to have an idea of the current configuration characteristics,
+and to run gWTO2 to plan observations ahead of time, or when Baseline arrays
+have not been created in the last 6 to 12 hours.
 
-**When observing** the user should press the button *Now*, and a pop up window
-similar to the one showed in figure 3 will appear.
+**For BL GUI only. When observing** the user should press the button *Now*,
+and a pop up window similar to the one shown in figure 3 will appear.
 
 .. figure:: gWTO2__BL_002.png
 
@@ -110,6 +116,9 @@ longer be able to change the number of antennas unless you go back to
 The "BL Arrays:" Combo menu is populated also with the list of the baselines
 arrays created in the last 6 to 12 hours.
 
+**For ACA GUI only** The number of antennas is 9 by default. Change the number
+according to the number of antennas that are available.
+
 Running and setting scores
 --------------------------
 
@@ -117,7 +126,7 @@ When you are happy with the date, pwv and array variables (and also the horizon,
 minHA and maxHA values) you can run the selector and scoring algorithms pressing
 the button "Now".
 
-After and interval of a few seconds (5 to 15 seconds) you will be presented
+After an interval of a few seconds (5 to 15 seconds) you will be presented
 with something similar to Figure 4.
 
 .. figure:: gWTO2__BL_003.png
@@ -126,10 +135,64 @@ with something similar to Figure 4.
    Figure 4
 
 
-Reading the output ranking
---------------------------
+Reading the output Scores
+=========================
 
-**TBD**
+Standard (ACA) Tab in BL (ACA) GUI
+----------------------------------
+
+#. **Score:** The score is the weighted mean of different scores calculated
+   for each observable SB. The score is a value between 0 and 10,
+   10 being the highest score.
+
+   #. Condition Score, 35%.
+   #. Array Score, 20%.
+   #. SB Completition Score, 15%.
+   #. Letter Grade Score, 15%.
+   #. Executive Score, 10%.
+   #. Science Rank Score, 5%.
+
+#. **CODE:** Project Code
+#. **SB UID:** Scheduling Block's UID
+#. **SB Name:** Scheduling Block's Name
+#. **SB State:** Scheduling Block's state, or status, taken from the project
+   tracker
+#. **Band:** Receiver(s) asked by the SB.
+#. **RA:** Representative Right Ascension.
+#. **DEC:** Representative Declination.
+#. **HA:** Hour Angle for the given date and time.
+#. **Elev.:** Elevation, in degrees, for the given date and time.
+#. **Sets in:** Time left until the first of the field sources (science targets)
+   goes down the horizon limit. *This calculated by checking the field sources*
+   *coordinates of the SB, and not by the representative coordinates.*
+#. **Exec. Req.:** Number of executions requested for this SB.
+#. **Exec. Done.:** Number of execution blocks for this SB, that have the QA0
+   status set to PASS, or in Unset state.
+#. **TsysFrac:** Given the TSys assumed by the PI in the OT, and the actual TSys
+   with the given pwv, this is the multiplicative factor for the time on source
+   (integration time) to reach the sensitivity asked by the PI. E.G., if the
+   TSysFrac is 0.8 it means that with the 80% of the asked integration time the
+   rms will be achieved.
+#. **BLFrac.:** Given the current number of antennas and array configuration the
+   number of usable baselines is calculated, and is compared with the SB
+   requirements, e.g., 34 antennas for BL, 9 for ACA. The ratio of these two
+   number gives the corrective factor needed to achieve the PI requested rms.
+   E.G., if the factor is 1.22, it means that the ToS should be a 22% higher to
+   achieve the rms.
+#. **TotalFrac.:** The total multiplicative factor for the time on source needed
+   given the calculated TsysFrac and BLFrac. If TotalFrac is higher than 1.3,
+   which means that if the SB is run with these conditions the rms achieved
+   would be sqrt(1/1.3) ~ 87% of the asked rms, the whole row will have a
+   red background.
+   **This does not mean the AoD should change the ToS, unless**
+   **a clear policy has been given by PMG or the ES leader.**
+#. **Array Score:**
+#. **Cond. Score:**
+#. **maxPWVC:**
+#. **ArrayMinAR:**
+
+**TBC (2014-07-03)**
+
 
 
 Playing with the libraries:
@@ -181,9 +244,9 @@ ipython session::
              'integrationTime', 'PRJ_ARCHIVE_UID']].head(25)
         datas.num_ant_user = 34
 
-The to run the wto algorith use a pwv value between 0 and 20, with steps of
+The to run the wto algorithm use a pwv value between 0 and 20, with steps of
 0.05 (e.g., 0.4, 0.45, but no 0.42), and assuming the latest BL Array. Set
-``array_name='default'`` when running runwto (e.g.
+``array_name='default'`` when running ``runwto`` (e.g.
 ``runwto(X.XX, array_name='default')``) to use the Current configuration parameters
 calculated with arrayConfigurationTools and 34 antennas. Also, to change the
 date to current date use ``runwto(X.XX, d=ephem.Date('2014-06-28 03:45')``

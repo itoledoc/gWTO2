@@ -555,7 +555,11 @@ class MyStdTableModel(QAbstractTableModel):
         return len(self.arraydata)
 
     def columnCount(self, parent):
-        return len(self.arraydata[0])
+        try:
+            return len(self.arraydata[0])
+        except IndexError:
+            print "Table Std is empty"
+            return 0
 
     # noinspection PyTypeChecker
     def data(self, index, role):
@@ -641,7 +645,11 @@ class MyTcTableModel(QAbstractTableModel):
         return len(self.arraydata)
 
     def columnCount(self, parent):
-        return len(self.arraydata[0])
+        try:
+            return len(self.arraydata[0])
+        except IndexError:
+            print "Table TC is empty"
+            return 0
 
     # noinspection PyTypeChecker
     def data(self, index, role):
@@ -716,7 +724,11 @@ class MyPolTableModel(QAbstractTableModel):
         return len(self.arraydata)
 
     def columnCount(self, parent):
-        return len(self.arraydata[0])
+        try:
+            return len(self.arraydata[0])
+        except IndexError:
+            print "Table Pol is empty"
+            return 0
 
     # noinspection PyTypeChecker
     def data(self, index, role):
