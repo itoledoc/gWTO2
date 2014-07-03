@@ -285,6 +285,7 @@ class BLMainWindow(QMainWindow, Ui_BLMainWindow):
         self.datas.array_name = self.stdarrays_combo.currentText()
         self.antennas_spin.setReadOnly(True)
         self.blarrays_combo.setCurrentIndex(0)
+
         if self.datas.array_name == 'Current Conf.':
             self.datas.array_name = None
             self.antennas_spin.setReadOnly(False)
@@ -293,6 +294,8 @@ class BLMainWindow(QMainWindow, Ui_BLMainWindow):
             self.datas.set_bl_prop(array_name=str(self.datas.array_name))
         self.array_ar_spin.setValue(self.datas.array_ar)
         self.antennas_spin.setValue(self.datas.num_ant)
+        self.pop = ArrayCheck2(ruv=self.datas.ruv, num_ant=self.datas.num_ant)
+        self.pop.show()
         print self.datas.array_name, self.datas.array_ar, self.datas.num_ant
 
     @pyqtSignature("QString")

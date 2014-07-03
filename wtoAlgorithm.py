@@ -128,6 +128,8 @@ class WtoAlgorithm(WtoDatabase):
         else:
             fs_arr = self.fieldsource.query('arraySB == "TP-Array"')
 
+        print("Calculating observability for %d sources..." %
+              len(fs_arr))
         fs = fs_arr.apply(
             lambda r: observable(
                 r['solarSystem'], r['sourcename'], r['RA'], r['DEC'],
@@ -139,7 +141,7 @@ class WtoAlgorithm(WtoDatabase):
             columns=['RA', 'DEC', 'elev', 'remaining', 'rise', 'sets', 'lstr',
                      'lsts', 'observable'])
         fs_1 = pd.merge(
-            self.fieldsource[['fieldRef', 'SB_UID', 'isQuery']],
+            fs_arr[['fieldRef', 'SB_UID', 'isQuery']],
             df_fs, left_index=True, right_index=True,
             how='left')
         fs_1g = fs_1.query('isQuery == False').groupby('SB_UID')
@@ -201,8 +203,6 @@ class WtoAlgorithm(WtoDatabase):
         # TODO: add a 5% padding to fraction selection.
         # TODO: check with Jorge Garcia the rms fraction against reality.
 
-        print("Calculating observability for %d sources..." %
-              len(self.fieldsource))
         self.check_observability(array)
 
         if array not in ['12m', '7m', 'tp']:
@@ -339,6 +339,11 @@ class WtoAlgorithm(WtoDatabase):
             #     sep=' ')
         elif array == '7m':
             sel4['blfrac'] = sel4.RA * 0. + 1.
+            print self.num_ant
+            if self.num_ant != 9:
+                sel4['blfrac'] = sel4.blfrac * (
+                    9 * 4 / (self.num_ant*(
+                        self.num_ant - 1) / 2.))
             sel4['frac'] = sel4.tsysfrac * sel4.blfrac
             self.select7m = sel4
         else:
