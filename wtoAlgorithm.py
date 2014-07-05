@@ -109,81 +109,6 @@ class WtoAlgorithm(WtoDatabase):
             self.antpad.loc[n] = (p, a)
         self.query_arrays()
 
-    def check_observability(self, array):
-
-        """
-
-
-        :return:
-        """
-        if self.date == self.old_date:
-            return None
-        alma1.date = self.date
-        print alma1.date
-        if array == '12m':
-            fs_arr = self.fieldsource.query('arraySB == "TWELVE-M"')
-        elif array == '7m':
-            fs_arr = self.fieldsource.query('arraySB == "ACA" or '
-                                            'arraySB == "SEVEN-M"')
-        else:
-            fs_arr = self.fieldsource.query('arraySB == "TP-Array"')
-
-        print("Calculating observability for %d sources..." %
-              len(fs_arr))
-        fs = fs_arr.apply(
-            lambda r: observable(
-                r['solarSystem'], r['sourcename'], r['RA'], r['DEC'],
-                self.horizon, r['isQuery'], r['ephemeris'], alma=alma1),
-            axis=1)
-        df_fs = pd.DataFrame(
-            fs.values.tolist(),
-            index=fs.index,
-            columns=['RA', 'DEC', 'elev', 'remaining', 'rise', 'sets', 'lstr',
-                     'lsts', 'observable'])
-        fs_1 = pd.merge(
-            fs_arr[['fieldRef', 'SB_UID', 'isQuery']],
-            df_fs, left_index=True, right_index=True,
-            how='left')
-        fs_1g = fs_1.query('isQuery == False').groupby('SB_UID')
-        allup = pd.DataFrame(
-            fs_1g.observable.mean())
-        allup.columns = pd.Index([u'up'])
-        fs_2 = pd.merge(fs_1, allup, left_on='SB_UID', right_index=True,
-                        how='left')
-        fs_2g = fs_2.query('isQuery == False').groupby('SB_UID')
-        etime = pd.DataFrame(
-            fs_2g.remaining.min()[fs_2g.remaining.min() > 1.5])
-        etime.columns = pd.Index([u'etime'])
-
-        elevation = pd.DataFrame(
-            fs_2g.elev.mean())
-        elevation.columns = pd.Index([u'elev'])
-
-        lstr = pd.DataFrame(
-            fs_2g.lstr.max())
-        lstr.columns = pd.Index([u'lstr'])
-
-        lsts = pd.DataFrame(
-            fs_2g.lsts.max())
-        lsts.columns = pd.Index([u'lsts'])
-
-        dec = pd.DataFrame(
-            fs_2g.DEC.mean())
-        dec.columns = pd.Index([u'DEC'])
-
-        fs_3 = pd.merge(allup, etime, right_index=True, left_index=True,
-                        how='left')
-        fs_4 = pd.merge(fs_3, elevation, right_index=True,
-                        left_index=True, how='left')
-        fs_5 = pd.merge(fs_4, lstr, right_index=True,
-                        left_index=True, how='left')
-
-        self.sb_summary.loc[dec.index, 'DEC'] = dec.loc[dec.index, 'DEC']
-        self.obser_prop = pd.merge(fs_5, lsts, right_index=True,
-                                   left_index=True, how='left')
-        self.old_date = self.date
-        print self.old_date, self.date
-
     # noinspection PyAugmentAssignment
     def selector(self, array):
 
@@ -217,12 +142,8 @@ class WtoAlgorithm(WtoDatabase):
             else:
                 array1 = ['TP-Array']
 
-        fg = self.fieldsource.query(
-            'isQuery == False and name == "Primary:"'
-        ).groupby('SB_UID')
-        p = pd.DataFrame(
-            [fg.pointings.mean(), fg.pointings.count()],
-            index=['pointings', 'sources']).transpose()
+
+
         pwvcol = self.pwvdata[[str(self.pwv)]]
         sum2 = pd.merge(
             self.sb_summary, pwvcol, left_on='repfreq', right_index=True)
@@ -294,13 +215,21 @@ class WtoAlgorithm(WtoDatabase):
         sel4 = sel4.query(
             'SB_state != "Phase2Submitted"'
             ' and SB_state != "FullyObserved"'
-            ' and SB_state != "FullyObserved"'
+            ' and SB_state != "Deleted"'
             ' and PRJ_state != "Phase2Submitted"'
             ' and PRJ_state != "Completed"')
         sel4 = sel4[sel4.name.str.contains('not', case=False) == False]
         print("SBs with Ok state: %d" % len(sel4))
         sel4 = sel4.query('execount > Total')
         print("SBs with missing exec: %d" % len(sel4))
+
+        fg = self.fieldsource.query(
+            'isQuery == False and name == "Primary:"'
+        ).groupby('SB_UID')
+        p = pd.DataFrame(
+            [fg.pointings.mean(), fg.pointings.count()],
+            index=['mpointings', 'sources']).transpose()
+
         sel4 = pd.merge(sel4, p, left_on='SB_UID', right_index=True, how='left')
 
         if array == '12m':
@@ -335,16 +264,6 @@ class WtoAlgorithm(WtoDatabase):
             sel4['frac'] = sel4.tsysfrac * sel4.blfrac
             self.select12m = sel4
 
-            # special = sel4.query(
-            #     'PRJ_state != "Completed" and SB_state != "FullyObserved"'
-            #     ' and SB_state != "Deleted" and isTimeConstrained == False'
-            #     ' and frac < 1.3 and PRJ_state != "Phase2Submitted"')
-            # special = special[
-            #     special.name.str.contains('not', case=False) == False]
-            # special = special[special.isPolarization == False]
-            # special[['SB_UID', 'name']].to_csv(
-            #     self.path + 'special.sbinfo', header=False, index=False,
-            #     sep=' ')
         elif array == '7m':
             sel4['blfrac'] = sel4.RA * 0. + 1.
             print self.num_ant
@@ -356,14 +275,9 @@ class WtoAlgorithm(WtoDatabase):
             self.select7m = sel4
         else:
             self.selecttp = sel4
-        pass
-
-        # TODO: merge sb_summary with target left on SB_UID, science, right on
-        #       SB_UID, paramRef (t1)
-        # TODO: merge t1 with fieldsource on fieldRef (and SB_UID) (t2)
-        # TODO: group t2 by SB_UID and calculate mean RA_y and DEC_y
 
     def scorer(self, array):
+
         """
 
         :param array:
@@ -491,6 +405,81 @@ class WtoAlgorithm(WtoDatabase):
                  0.15 * sb_grade_score)
         return (sb_cond_score, sb_array_score, sb_completion_score,
                 sb_exec_score, sb_science_score, sb_grade_score, arcorr, score)
+
+    def check_observability(self, array):
+
+        """
+
+        :param array:
+        :return:
+        """
+        if self.date == self.old_date:
+            return None
+        alma1.date = self.date
+        print alma1.date
+        if array == '12m':
+            fs_arr = self.fieldsource.query('arraySB == "TWELVE-M"')
+        elif array == '7m':
+            fs_arr = self.fieldsource.query('arraySB == "ACA" or '
+                                            'arraySB == "SEVEN-M"')
+        else:
+            fs_arr = self.fieldsource.query('arraySB == "TP-Array"')
+
+        print("Calculating observability for %d sources..." %
+              len(fs_arr))
+        fs = fs_arr.apply(
+            lambda r: observable(
+                r['solarSystem'], r['sourcename'], r['RA'], r['DEC'],
+                self.horizon, r['isQuery'], r['ephemeris'], alma=alma1),
+            axis=1)
+        df_fs = pd.DataFrame(
+            fs.values.tolist(),
+            index=fs.index,
+            columns=['RA', 'DEC', 'elev', 'remaining', 'rise', 'sets', 'lstr',
+                     'lsts', 'observable'])
+        fs_1 = pd.merge(
+            fs_arr[['fieldRef', 'SB_UID', 'isQuery']],
+            df_fs, left_index=True, right_index=True,
+            how='left')
+        fs_1g = fs_1.query('isQuery == False').groupby('SB_UID')
+        allup = pd.DataFrame(
+            fs_1g.observable.mean())
+        allup.columns = pd.Index([u'up'])
+        fs_2 = pd.merge(fs_1, allup, left_on='SB_UID', right_index=True,
+                        how='left')
+        fs_2g = fs_2.query('isQuery == False').groupby('SB_UID')
+        etime = pd.DataFrame(
+            fs_2g.remaining.min()[fs_2g.remaining.min() > 1.5])
+        etime.columns = pd.Index([u'etime'])
+
+        elevation = pd.DataFrame(
+            fs_2g.elev.mean())
+        elevation.columns = pd.Index([u'elev'])
+
+        lstr = pd.DataFrame(
+            fs_2g.lstr.max())
+        lstr.columns = pd.Index([u'lstr'])
+
+        lsts = pd.DataFrame(
+            fs_2g.lsts.max())
+        lsts.columns = pd.Index([u'lsts'])
+
+        dec = pd.DataFrame(
+            fs_2g.DEC.mean())
+        dec.columns = pd.Index([u'DEC'])
+
+        fs_3 = pd.merge(allup, etime, right_index=True, left_index=True,
+                        how='left')
+        fs_4 = pd.merge(fs_3, elevation, right_index=True,
+                        left_index=True, how='left')
+        fs_5 = pd.merge(fs_4, lstr, right_index=True,
+                        left_index=True, how='left')
+
+        self.sb_summary.loc[dec.index, 'DEC'] = dec.loc[dec.index, 'DEC']
+        self.obser_prop = pd.merge(fs_5, lsts, right_index=True,
+                                   left_index=True, how='left')
+        self.old_date = self.date
+        print self.old_date, self.date
 
     def set_trans(self, transmission):
         """
