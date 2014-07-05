@@ -16,7 +16,7 @@ The gWTO2 Documentation
 Using gWTO2
 ===========
 
-**NOTICE 1: gWTO2 now works for both Baseline and ACA correlators (2014-07-02).**
+**NOTICE 1: Updated Standard Columns description (2014-07-04)**
 
 **NOTICE 2: gWTO2, BL version now makes use of "Time Const." and "Pol" Tabs.**
 **Tab "Sessions" is still on development (2014-07-02)**
@@ -145,12 +145,16 @@ Standard (ACA) Tab in BL (ACA) GUI
    for each observable SB. The score is a value between 0 and 10,
    10 being the highest score.
 
-   #. Condition Score, 35%.
-   #. Array Score, 20%.
-   #. SB Completition Score, 15%.
-   #. Letter Grade Score, 15%.
-   #. Executive Score, 10%.
-   #. Science Rank Score, 5%.
+   #. Condition Score, 35%. A score depending on the current PWV, number of
+      available antennas, and pwv used by the OT.
+   #. Array Score, 20%. Depends in how close to the current array's resolution
+      is the SB asked angular resolution. For ACA and TP this is fixed to 10.
+   #. SB Completition Score, 15%. SBs already started and closer to be completed
+      get higher scores
+   #. Letter Grade Score, 15%. Score given by Cycle and letter grade.
+   #. Executive Score, 10%. Score given by the executive of the Project.
+   #. Science Rank Score, 5%. Score given by the scientific ranking of the
+      project.
 
 #. **CODE:** Project Code
 #. **SB UID:** Scheduling Block's UID
@@ -186,12 +190,27 @@ Standard (ACA) Tab in BL (ACA) GUI
    red background.
    **This does not mean the AoD should change the ToS, unless**
    **a clear policy has been given by PMG or the ES leader.**
-#. **Array Score:**
-#. **Cond. Score:**
-#. **maxPWVC:**
-#. **ArrayMinAR:**
+#. **Array Score:** The array score, given for information purposes.
+#. **Cond. Score:** The condition score, given for information purposes.
+#. **maxPWVC:** The PWV used by the PI/P2G on the OT to calculate how much
+   integration time is needed to get the sensitivy requested.
+#. **ArrayMinAR:** The minimum array's resolution that the current SB will
+   accept. This value comes from Stephane's script, and is corrected for all SBs
+   to the equivalent resolution at a 100GHZ and a source that would transit at
+   zenith.
+#. **ArrCorr:** The angular resolution requiered by the SB, corrected to the
+   equivalent resolution at 100GHz and source with DEC -23.
+#. **ArrayMinAR:** The maximum array's resolution that the current SB will
+   accept.
+#. **TimeOnSource:** Integration time, in seconds, for the science target(s).
+   In the case of multisources, this time should be multiplied by the number of
+   sources.
+#. **PRJ UID:** The SB's project UID.
+#. **Grade:** Grade letter for the SB's project.
 
-**TBC (2014-07-03)**
+
+Selection and Score algorithms
+==============================
 
 
 

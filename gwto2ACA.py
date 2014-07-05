@@ -408,8 +408,7 @@ class ACAMainWindow(QMainWindow, Ui_ACAMainWindow):
                     ['score', 'CODE', 'SB_UID', 'name', 'SB_state', 'band',
                      'RA', 'DEC', 'HA', 'elev', 'etime', 'execount', 'Total',
                      'tsysfrac', 'blfrac', 'frac', 'sb_array_score',
-                     'sb_cond_score', 'maxPWVC', 'arrayMinAR', 'arcorr',
-                     'arrayMaxAR', 'integrationTime',
+                     'sb_cond_score', 'maxPWVC', 'integrationTime',
                      'PRJ_ARCHIVE_UID', 'grade']]
 
         if not self.band3_b.isChecked():
@@ -429,8 +428,7 @@ class ACAMainWindow(QMainWindow, Ui_ACAMainWindow):
             [u'Score', u'CODE', u'SB UID', u'SB Name', u'SB State', u'Band',
              u'RA', u'DEC', u'HA', u'Elev.', u'Sets in', u'Exec. Req.',
              u'Exec. Done', u'TSysFrac', u'BLFrac', u'TotalFrac',
-             u'Array Score', u'Cond. Score', u'maxPWVC', u'ArrayMinAR',
-             u'ARcorr', u'ArrayMaxAR', u'TimeOnSource',
+             u'Array Score', u'Cond. Score', u'maxPWVC', u'TimeOnSource',
              u'PRJ UID', u'Grade'], dtype='object')
 
         print std7.head(10)
@@ -447,9 +445,9 @@ class ACAMainWindow(QMainWindow, Ui_ACAMainWindow):
         self.seven_sheet.sortByColumn(0, Qt.DescendingOrder)
         self.seven_sheet.resizeRowsToContents()
         for column in range(25):
-            if column in [1, 2, 3, 4, 5, 6, 7, 22]:
+            if column in [1, 2, 3, 4, 5, 6, 7, 19]:
                 self.seven_sheet.resizeColumnToContents(column)
-            elif column in [11, 12, 16, 17, 19, 21]:
+            elif column in [11, 12, 16, 17]:
                 self.seven_sheet.setColumnWidth(column, 80)
             else:
                 self.seven_sheet.setColumnWidth(column, 66)
@@ -499,9 +497,9 @@ class MyStdTableModel(QAbstractTableModel):
             elif col == 7:
                 d = ephem.degrees(str(sb[col]))
                 return QVariant(str(d)[:-2])
-            elif col in [0, 13, 14, 15, 18, 19, 20, 21]:
+            elif col in [0, 13, 14, 15, 18]:
                 return QVariant(QString("%1").arg(sb[col], 0, 'f', 2))
-            elif col in [9, 16, 17, 22]:
+            elif col in [9, 16, 17, 19]:
                 return QVariant(QString("%1").arg(sb[col], 0, 'f', 1))
             elif col in [11, 12]:
                 return QVariant(QString("%1").arg(sb[col], 0, 'i', 0))
@@ -509,7 +507,7 @@ class MyStdTableModel(QAbstractTableModel):
             return QVariant(str(self.arraydata[index.row()][index.column()]))
         elif role == Qt.TextAlignmentRole:
             if col in [0, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19,
-                       20, 21, 22]:
+                       20, 21]:
                 return QVariant(int(Qt.AlignRight | Qt.AlignVCenter))
             return QVariant(int(Qt.AlignLeft | Qt.AlignVCenter))
         elif role == Qt.BackgroundColorRole:
