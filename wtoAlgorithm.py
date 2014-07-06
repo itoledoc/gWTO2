@@ -591,7 +591,7 @@ class WtoAlgorithm(WtoDatabase):
             print "No ACA arrays have been created in the last 6 hours."
 
     def set_bl_prop(self, array_name):
-        # TODO: check uv coverage to remove baselines that are outliers
+
         """
 
         :param array_name:

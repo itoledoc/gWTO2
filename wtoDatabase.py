@@ -25,6 +25,7 @@ val = '{Alma/ValueTypes}'
 sbl = '{Alma/ObsPrep/SchedBlock}'
 
 
+# noinspection PyPep8Naming
 class WtoDatabase(object):
 
     """
@@ -188,6 +189,7 @@ class WtoDatabase(object):
 
         :return: None
         """
+        # noinspection PyUnusedLocal
         states = self.states
 
         sql2 = str(
@@ -551,6 +553,7 @@ class WtoDatabase(object):
                         None, None, None, None)
 
                 try:
+                    # noinspection PyUnusedLocal
                     ss = sciencegoal.SpectralSetupParameters.SpectralScan
                     isspectralscan = True
                 except AttributeError:
@@ -746,8 +749,8 @@ class WtoDatabase(object):
             ephemeris = None
         if new:
             self.fieldsource = pd.DataFrame(
-                [(partid, sbuid, solarsystem, sourcename, name, ra, dec, isquery,
-                  qc_intendeduse, qc_ra, qc_dec, qc_use, qc_radius,
+                [(partid, sbuid, solarsystem, sourcename, name, ra, dec,
+                  isquery, qc_intendeduse, qc_ra, qc_dec, qc_use, qc_radius,
                   qc_radius_unit, ephemeris, pointings, ismosaic, array)],
                 columns=['fieldRef', 'SB_UID', 'solarSystem', 'sourcename',
                          'name', 'RA',
@@ -838,6 +841,7 @@ class WtoDatabase(object):
         else:
             self.schedblocks.ix[sb_uid] = (sb_uid, partid, data[0][0], xml)
 
+    # noinspection PyUnboundLocalVariable
     def row_newar(self, sbuid, new=False):
         """
 
@@ -904,7 +908,7 @@ class WtoDatabase(object):
         else:
             if sbnum == 1:
                 self.newar.ix[sbuidE] = (minarE, maxarE, minarE * corr,
-                                        maxarE * corr)
+                                         maxarE * corr)
             if sbnum == 2:
                 self.newar.ix[sbuidE] = (minarE, maxarE, minarE * corr,
                                          maxarE * corr)
@@ -925,7 +929,7 @@ class WtoDatabase(object):
         check_c1 = pd.merge(
             self.obsproject[self.obsproject.CODE.str.startswith('2012')],
             toc2, on='CODE', how='right').set_index(
-            'CODE', drop=False)[['CODE']]
+                'CODE', drop=False)[['CODE']]
         check_c2 = self.obsproject[
             self.obsproject.CODE.str.startswith('2013')][['CODE']]
         self.checked = pd.concat([check_c1, check_c2])

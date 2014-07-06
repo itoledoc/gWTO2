@@ -4,8 +4,8 @@
    contain the root `toctree` directive.
 
 
-The gWTO2 Documentation
-=======================
+The gWTO2 (What To Observe Cycle 2 GUI) Documentation
+=====================================================
 
 .. contents:: Table of Contents
 
@@ -28,7 +28,7 @@ Using gWTO2
 
 
 
-gWTO is tested and deployed at the osf-red machine, within the aod account.
+gWTO2 is tested and deployed at the osf-red machine, within the aod account.
 A virtual environment of python, based on the Anaconda distribution, must be
 loaded before using it. This is achieved by running:::
 
@@ -58,9 +58,9 @@ for each other. **After playing with gWTO2 using a different path, please**
 Start up
 --------
 
-After starting ``gWTO2 BL`` you will be presented with the gui shown on figure 2.
-If the -c option was used, or the cache have been manually erased it, the time
-until you are presented the gui can take up to 5-7 minutes.
+After starting ``gWTO2 BL`` you will be presented with the gui shown on figure
+2. If the -c option was used, or the cache have been manually erased it,
+the time until the gui is ready can be up to 5-7 minutes.
 
 .. figure:: gWTO2__BL_001.png
    :scale: 50
