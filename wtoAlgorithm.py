@@ -142,8 +142,6 @@ class WtoAlgorithm(WtoDatabase):
             else:
                 array1 = ['TP-Array']
 
-
-
         pwvcol = self.pwvdata[[str(self.pwv)]]
         sum2 = pd.merge(
             self.sb_summary, pwvcol, left_on='repfreq', right_index=True)
@@ -153,7 +151,7 @@ class WtoAlgorithm(WtoDatabase):
         ind2 = pd.np.around(sum2.maxPWVC, decimals=1).astype(str)
         sum2['tau_org'] = self.tau.lookup(ind1, ind2)
         sum2['tsky_org'] = self.tsky.lookup(ind1, ind2)
-        sum2['airmass'] = 1/pd.np.cos(pd.np.radians(-23.0262015 - sum2.DEC))
+        sum2['airmass'] = 1 / pd.np.cos(pd.np.radians(-23.0262015 - sum2.DEC))
         sum2 = pd.merge(sum2, self.reciever, left_on='band', right_index=True,
                         how='left')
         tskycol = self.tsky[[str(self.pwv)]]
@@ -161,7 +159,7 @@ class WtoAlgorithm(WtoDatabase):
         taucol = self.tau[[str(self.pwv)]]
         sum2 = sum2.rename(
             columns={str(self.pwv): 'tsky'})
-        sum2 = pd.merge(sum2, taucol,  left_on='repfreq', right_index=True)
+        sum2 = pd.merge(sum2, taucol, left_on='repfreq', right_index=True)
         sum2 = sum2.rename(
             columns={str(self.pwv): 'tau'})
         print("SBs in sb_summary: %d. SBs merged with tau/tsky info: %d." %
@@ -170,13 +168,13 @@ class WtoAlgorithm(WtoDatabase):
         sum2['tsys'] = (
             1 + sum2['g']) * \
             (sum2['trx'] + sum2['tsky'] *
-             ((1 - pd.np.exp(-1*sum2['airmass']*sum2['tau'])) /
+             ((1 - pd.np.exp(-1 * sum2['airmass'] * sum2['tau'])) /
               (1 - pd.np.exp(-1. * sum2['tau']))) * 0.95 + 0.05 * 270.) / \
             (0.95 * pd.np.exp(-1 * sum2['tau'] * sum2['airmass']))
         sum2['tsys_org'] = (
             1 + sum2['g']) * \
             (sum2['trx'] + sum2['tsky_org'] *
-             ((1 - pd.np.exp(-1*sum2['airmass']*sum2['tau_org'])) /
+             ((1 - pd.np.exp(-1 * sum2['airmass'] * sum2['tau_org'])) /
               (1 - pd.np.exp(-1. * sum2['tau_org']))) * 0.95 + 0.05 * 270.) / \
             (0.95 * pd.np.exp(-1 * sum2['tau_org'] * sum2['airmass']))
 
@@ -243,23 +241,23 @@ class WtoAlgorithm(WtoDatabase):
                 lambda row: rUV.computeBL(row['AR'], row['repfreq']), axis=1)
             if self.array_name is not None:
                 sel4['blfrac'] = sel4.apply(
-                    lambda row: (33. * 17) / (1.*len(
+                    lambda row: (33. * 17) / (1. * len(
                         self.ruv[self.ruv < row['blmax']]))
                     if (row['LAS'] != 0)
                     else (33. * 17) /
-                         (self.num_ant*(self.num_ant - 1) / 2.),
+                         (self.num_ant * (self.num_ant - 1) / 2.),
                     axis=1)
             else:
                 sel4['blfrac'] = sel4.apply(
-                    lambda row: (33. * 17) / (1.*len(
+                    lambda row: (33. * 17) / (1. * len(
                         self.ruv[self.ruv < row['blmax']]))
                     if (row['LAS'] != 0)
                     else (33. * 17) /
-                         (34.*(34. - 1) / 2.),
+                         (34. * (34. - 1) / 2.),
                     axis=1)
                 if self.num_ant != 34:
                     sel4['blfrac'] = sel4.blfrac * (
-                        33 * 17 / (self.num_ant*(
+                        33 * 17 / (self.num_ant * (
                             self.num_ant - 1) / 2.))
             sel4['frac'] = sel4.tsysfrac * sel4.blfrac
             self.select12m = sel4
@@ -269,7 +267,7 @@ class WtoAlgorithm(WtoDatabase):
             print self.num_ant
             if self.num_ant != 9:
                 sel4['blfrac'] = sel4.blfrac * (
-                    9 * 4 / (self.num_ant*(
+                    9 * 4 / (self.num_ant * (
                         self.num_ant - 1) / 2.))
             sel4['frac'] = sel4.tsysfrac * sel4.blfrac
             self.select7m = sel4
@@ -315,7 +313,6 @@ class WtoAlgorithm(WtoDatabase):
                         las, grade, repfreq, dec, execu, array,
                         frac, maxpwvc, code):
 
-        # set sb completion score
         """
 
         :param ecount:
@@ -324,14 +321,15 @@ class WtoAlgorithm(WtoDatabase):
         :param ar:
         :param aminar:
         :param amaxar:
-        :param tsysfrac:
-        :param blfrac:
+        :param las:
         :param grade:
         :param repfreq:
         :param dec:
         :param execu:
         :param array:
         :param frac:
+        :param maxpwvc:
+        :param code:
         :return:
         """
         sb_completion = tcount / ecount
@@ -367,10 +365,10 @@ class WtoAlgorithm(WtoDatabase):
 
                 if las == 0:
                     sb_array_score = (
-                        ((self.array_ar - aminar) / l)**(1/8.)) * 8. + 2.
+                        ((self.array_ar - aminar) / l) ** (1 / 8.)) * 8. + 2.
                 else:
                     sb_array_score = (
-                        ((self.array_ar - aminar) / l)**(1/3.)) * s
+                        ((self.array_ar - aminar) / l) ** (1 / 3.)) * s
             elif self.array_ar == arcorr:
                 sb_array_score = 10.
             else:
@@ -381,7 +379,7 @@ class WtoAlgorithm(WtoDatabase):
         sb_exec_score = self.exec_prio[execu]
 
         # set condition score:
-        pwv_corr = 1 - (abs(self.pwv - maxpwvc)/6.)
+        pwv_corr = 1 - (abs(self.pwv - maxpwvc) / 6.)
         if pwv_corr > 6:
             pwv_corr = 0.
 
@@ -393,7 +391,7 @@ class WtoAlgorithm(WtoDatabase):
         else:
             x = frac - 1
             if frac <= 1.4:
-                sb_cond_score = (1. - (x / 0.4)**3.) * 10. * pwv_corr
+                sb_cond_score = (1. - (x / 0.4) ** 3.) * 10. * pwv_corr
             else:
                 sb_cond_score = 0.
 
@@ -634,6 +632,7 @@ class WtoAlgorithm(WtoDatabase):
             else:
                 conf_file = self.wto_path + 'conf/%s.txt.cfg' % array_name
                 self.ruv = rUV.computeRuv(conf_file)
+                # noinspection PyTypeChecker
                 self.array_ar = self.arr_ar_def[array_name]
                 self.num_ant = 34
 
@@ -643,6 +642,7 @@ class WtoAlgorithm(WtoDatabase):
                 self.num_ant = 34
 
 
+# noinspection PyPep8Naming
 def observable(solarSystem, sourcename, RA, DEC, horizon, isQuery, ephemeris,
                alma):
     """
@@ -770,6 +770,7 @@ def read_ephemeris(ephemeris, date):
     month_ints = {
         'Jan': 1, 'Feb': 2, 'Mar': 3, 'Apr': 4, 'May': 5, 'Jun': 6,
         'Jul': 7, 'Aug': 8, 'Sep': 9, 'Oct': 10, 'Nov': 11, 'Dec': 12}
+    found = False
     for line in ephemeris.split('\n'):
         if line.startswith('$$SOE'):
             in_data = True
@@ -787,37 +788,19 @@ def read_ephemeris(ephemeris, date):
             if now.datetime() > date:
                 data = line
                 found = False
+                # noinspection PyUnboundLocalVariable
                 c1 += 1
             else:
+                # noinspection PyUnboundLocalVariable
                 if c1 == 0:
-                    #print("NO EPHEMERIS FOR CURRENT DATE. Setting RA=0,"
-                    #      " DEC=0")
+
                     ra = ephem.hours('00:00:00')
                     dec = ephem.degrees('00:00:00')
                     ephe = False
                     return ra, dec, ephe
+                # noinspection PyUnboundLocalVariable
                 ra = ephem.hours(data[23:36].strip().replace(' ', ':'))
                 dec = ephem.degrees(data[37:51].strip().replace(' ', ':'))
                 ephe = True
                 print ra, dec, ephe
                 return pd.np.degrees(ra), pd.np.degrees(dec), ephe
-
-"""
-To fit the ruv distribution
-from scipy.stats import norm,rayleigh
-
-samp = rayleigh.rvs(loc=5,scale=2,size=150) # samples generation
-
-param = rayleigh.fit(samp) # distribution fitting
-
-x = linspace(5,13,100)
-# fitted distribution
-pdf_fitted = rayleigh.pdf(x,loc=param[0],scale=param[1])
-# original distribution
-pdf = rayleigh.pdf(x,loc=5,scale=2)
-
-title('Rayleigh distribution')
-plot(x,pdf_fitted,'r-',x,pdf,'b-')
-hist(samp,normed=1,alpha=.3)
-show()
-"""
