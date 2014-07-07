@@ -158,11 +158,306 @@
             <span class="bp">self</span><span class="o">.</span><span class="n">antpad</span><span class="o">.</span><span class="n">loc</span><span class="p">[</span><span class="n">n</span><span class="p">]</span> <span class="o">=</span> <span class="p">(</span><span class="n">p</span><span class="p">,</span> <span class="n">a</span><span class="p">)</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">query_arrays</span><span class="p">()</span>
 
+    <span class="c"># noinspection PyAugmentAssignment</span>
+<div class="viewcode-block" id="WtoAlgorithm.selector"><a class="viewcode-back" href="../index.html#wtoAlgorithm.WtoAlgorithm.selector">[docs]</a>    <span class="k">def</span> <span class="nf">selector</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">array</span><span class="p">):</span>
+
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Selects SBs that can be observed given the current weather conditions,</span>
+<span class="sd">        HA range, array type and array configuration (in the case of 12m array</span>
+<span class="sd">        type) and SB/Project Status. To limit the calculation of pyephem, the</span>
+<span class="sd">        selection based on current position in the sky is done afterwards.</span>
+
+<span class="sd">        Selector get stored in either twelvem, sevenm or totalp tables. These</span>
+<span class="sd">        tables contain all the data needed for the calculations to be</span>
+<span class="sd">        done with WtoAlgorith.observable and to assign a score</span>
+
+<span class="sd">        :param array: &#39;12m&#39;, &#39;7m&#39;, &#39;tp&#39;</span>
+<span class="sd">        :type array: str</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="c"># TODO: add a 5% padding to fraction selection.</span>
+        <span class="c"># TODO: check with Jorge Garcia the rms fraction against reality.</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">check_observability</span><span class="p">(</span><span class="n">array</span><span class="p">)</span>
+
+        <span class="k">if</span> <span class="n">array</span> <span class="ow">not</span> <span class="ow">in</span> <span class="p">[</span><span class="s">&#39;12m&#39;</span><span class="p">,</span> <span class="s">&#39;7m&#39;</span><span class="p">,</span> <span class="s">&#39;tp&#39;</span><span class="p">]:</span>
+            <span class="k">print</span><span class="p">(</span><span class="s">&quot;Use 12m, 7m or tp for array selection.&quot;</span><span class="p">)</span>
+            <span class="k">return</span> <span class="bp">None</span>
+
+        <span class="k">else</span><span class="p">:</span>
+            <span class="k">if</span> <span class="n">array</span> <span class="o">==</span> <span class="s">&#39;12m&#39;</span><span class="p">:</span>
+                <span class="n">array1</span> <span class="o">=</span> <span class="p">[</span><span class="s">&#39;TWELVE-M&#39;</span><span class="p">]</span>
+            <span class="k">elif</span> <span class="n">array</span> <span class="o">==</span> <span class="s">&#39;7m&#39;</span><span class="p">:</span>
+                <span class="n">array1</span> <span class="o">=</span> <span class="p">[</span><span class="s">&#39;SEVEN-M&#39;</span><span class="p">,</span> <span class="s">&#39;ACA&#39;</span><span class="p">]</span>
+            <span class="k">else</span><span class="p">:</span>
+                <span class="n">array1</span> <span class="o">=</span> <span class="p">[</span><span class="s">&#39;TP-Array&#39;</span><span class="p">]</span>
+
+        <span class="n">pwvcol</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">pwvdata</span><span class="p">[[</span><span class="nb">str</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">pwv</span><span class="p">)]]</span>
+        <span class="n">sum2</span> <span class="o">=</span> <span class="n">pd</span><span class="o">.</span><span class="n">merge</span><span class="p">(</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">sb_summary</span><span class="p">,</span> <span class="n">pwvcol</span><span class="p">,</span> <span class="n">left_on</span><span class="o">=</span><span class="s">&#39;repfreq&#39;</span><span class="p">,</span> <span class="n">right_index</span><span class="o">=</span><span class="bp">True</span><span class="p">)</span>
+        <span class="n">sum2</span> <span class="o">=</span> <span class="n">sum2</span><span class="o">.</span><span class="n">rename</span><span class="p">(</span>
+            <span class="n">columns</span><span class="o">=</span><span class="p">{</span><span class="nb">str</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">pwv</span><span class="p">):</span> <span class="s">&#39;transmission&#39;</span><span class="p">})</span>
+        <span class="n">ind1</span> <span class="o">=</span> <span class="n">sum2</span><span class="o">.</span><span class="n">repfreq</span>
+        <span class="n">ind2</span> <span class="o">=</span> <span class="n">pd</span><span class="o">.</span><span class="n">np</span><span class="o">.</span><span class="n">around</span><span class="p">(</span><span class="n">sum2</span><span class="o">.</span><span class="n">maxPWVC</span><span class="p">,</span> <span class="n">decimals</span><span class="o">=</span><span class="mi">1</span><span class="p">)</span><span class="o">.</span><span class="n">astype</span><span class="p">(</span><span class="nb">str</span><span class="p">)</span>
+        <span class="n">sum2</span><span class="p">[</span><span class="s">&#39;tau_org&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">tau</span><span class="o">.</span><span class="n">lookup</span><span class="p">(</span><span class="n">ind1</span><span class="p">,</span> <span class="n">ind2</span><span class="p">)</span>
+        <span class="n">sum2</span><span class="p">[</span><span class="s">&#39;tsky_org&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">tsky</span><span class="o">.</span><span class="n">lookup</span><span class="p">(</span><span class="n">ind1</span><span class="p">,</span> <span class="n">ind2</span><span class="p">)</span>
+        <span class="n">sum2</span><span class="p">[</span><span class="s">&#39;airmass&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="mi">1</span> <span class="o">/</span> <span class="n">pd</span><span class="o">.</span><span class="n">np</span><span class="o">.</span><span class="n">cos</span><span class="p">(</span><span class="n">pd</span><span class="o">.</span><span class="n">np</span><span class="o">.</span><span class="n">radians</span><span class="p">(</span><span class="o">-</span><span class="mf">23.0262015</span> <span class="o">-</span> <span class="n">sum2</span><span class="o">.</span><span class="n">DEC</span><span class="p">))</span>
+        <span class="n">sum2</span> <span class="o">=</span> <span class="n">pd</span><span class="o">.</span><span class="n">merge</span><span class="p">(</span><span class="n">sum2</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">reciever</span><span class="p">,</span> <span class="n">left_on</span><span class="o">=</span><span class="s">&#39;band&#39;</span><span class="p">,</span> <span class="n">right_index</span><span class="o">=</span><span class="bp">True</span><span class="p">,</span>
+                        <span class="n">how</span><span class="o">=</span><span class="s">&#39;left&#39;</span><span class="p">)</span>
+        <span class="n">tskycol</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">tsky</span><span class="p">[[</span><span class="nb">str</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">pwv</span><span class="p">)]]</span>
+        <span class="n">sum2</span> <span class="o">=</span> <span class="n">pd</span><span class="o">.</span><span class="n">merge</span><span class="p">(</span><span class="n">sum2</span><span class="p">,</span> <span class="n">tskycol</span><span class="p">,</span> <span class="n">left_on</span><span class="o">=</span><span class="s">&#39;repfreq&#39;</span><span class="p">,</span> <span class="n">right_index</span><span class="o">=</span><span class="bp">True</span><span class="p">)</span>
+        <span class="n">taucol</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">tau</span><span class="p">[[</span><span class="nb">str</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">pwv</span><span class="p">)]]</span>
+        <span class="n">sum2</span> <span class="o">=</span> <span class="n">sum2</span><span class="o">.</span><span class="n">rename</span><span class="p">(</span>
+            <span class="n">columns</span><span class="o">=</span><span class="p">{</span><span class="nb">str</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">pwv</span><span class="p">):</span> <span class="s">&#39;tsky&#39;</span><span class="p">})</span>
+        <span class="n">sum2</span> <span class="o">=</span> <span class="n">pd</span><span class="o">.</span><span class="n">merge</span><span class="p">(</span><span class="n">sum2</span><span class="p">,</span> <span class="n">taucol</span><span class="p">,</span> <span class="n">left_on</span><span class="o">=</span><span class="s">&#39;repfreq&#39;</span><span class="p">,</span> <span class="n">right_index</span><span class="o">=</span><span class="bp">True</span><span class="p">)</span>
+        <span class="n">sum2</span> <span class="o">=</span> <span class="n">sum2</span><span class="o">.</span><span class="n">rename</span><span class="p">(</span>
+            <span class="n">columns</span><span class="o">=</span><span class="p">{</span><span class="nb">str</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">pwv</span><span class="p">):</span> <span class="s">&#39;tau&#39;</span><span class="p">})</span>
+        <span class="k">print</span><span class="p">(</span><span class="s">&quot;SBs in sb_summary: </span><span class="si">%d</span><span class="s">. SBs merged with tau/tsky info: </span><span class="si">%d</span><span class="s">.&quot;</span> <span class="o">%</span>
+              <span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">sb_summary</span><span class="p">),</span> <span class="nb">len</span><span class="p">(</span><span class="n">sum2</span><span class="p">)))</span>
+
+        <span class="n">sum2</span><span class="p">[</span><span class="s">&#39;tsys&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="p">(</span>
+            <span class="mi">1</span> <span class="o">+</span> <span class="n">sum2</span><span class="p">[</span><span class="s">&#39;g&#39;</span><span class="p">])</span> <span class="o">*</span> \
+            <span class="p">(</span><span class="n">sum2</span><span class="p">[</span><span class="s">&#39;trx&#39;</span><span class="p">]</span> <span class="o">+</span> <span class="n">sum2</span><span class="p">[</span><span class="s">&#39;tsky&#39;</span><span class="p">]</span> <span class="o">*</span>
+             <span class="p">((</span><span class="mi">1</span> <span class="o">-</span> <span class="n">pd</span><span class="o">.</span><span class="n">np</span><span class="o">.</span><span class="n">exp</span><span class="p">(</span><span class="o">-</span><span class="mi">1</span> <span class="o">*</span> <span class="n">sum2</span><span class="p">[</span><span class="s">&#39;airmass&#39;</span><span class="p">]</span> <span class="o">*</span> <span class="n">sum2</span><span class="p">[</span><span class="s">&#39;tau&#39;</span><span class="p">]))</span> <span class="o">/</span>
+              <span class="p">(</span><span class="mi">1</span> <span class="o">-</span> <span class="n">pd</span><span class="o">.</span><span class="n">np</span><span class="o">.</span><span class="n">exp</span><span class="p">(</span><span class="o">-</span><span class="mf">1.</span> <span class="o">*</span> <span class="n">sum2</span><span class="p">[</span><span class="s">&#39;tau&#39;</span><span class="p">])))</span> <span class="o">*</span> <span class="mf">0.95</span> <span class="o">+</span> <span class="mf">0.05</span> <span class="o">*</span> <span class="mf">270.</span><span class="p">)</span> <span class="o">/</span> \
+            <span class="p">(</span><span class="mf">0.95</span> <span class="o">*</span> <span class="n">pd</span><span class="o">.</span><span class="n">np</span><span class="o">.</span><span class="n">exp</span><span class="p">(</span><span class="o">-</span><span class="mi">1</span> <span class="o">*</span> <span class="n">sum2</span><span class="p">[</span><span class="s">&#39;tau&#39;</span><span class="p">]</span> <span class="o">*</span> <span class="n">sum2</span><span class="p">[</span><span class="s">&#39;airmass&#39;</span><span class="p">]))</span>
+        <span class="n">sum2</span><span class="p">[</span><span class="s">&#39;tsys_org&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="p">(</span>
+            <span class="mi">1</span> <span class="o">+</span> <span class="n">sum2</span><span class="p">[</span><span class="s">&#39;g&#39;</span><span class="p">])</span> <span class="o">*</span> \
+            <span class="p">(</span><span class="n">sum2</span><span class="p">[</span><span class="s">&#39;trx&#39;</span><span class="p">]</span> <span class="o">+</span> <span class="n">sum2</span><span class="p">[</span><span class="s">&#39;tsky_org&#39;</span><span class="p">]</span> <span class="o">*</span>
+             <span class="p">((</span><span class="mi">1</span> <span class="o">-</span> <span class="n">pd</span><span class="o">.</span><span class="n">np</span><span class="o">.</span><span class="n">exp</span><span class="p">(</span><span class="o">-</span><span class="mi">1</span> <span class="o">*</span> <span class="n">sum2</span><span class="p">[</span><span class="s">&#39;airmass&#39;</span><span class="p">]</span> <span class="o">*</span> <span class="n">sum2</span><span class="p">[</span><span class="s">&#39;tau_org&#39;</span><span class="p">]))</span> <span class="o">/</span>
+              <span class="p">(</span><span class="mi">1</span> <span class="o">-</span> <span class="n">pd</span><span class="o">.</span><span class="n">np</span><span class="o">.</span><span class="n">exp</span><span class="p">(</span><span class="o">-</span><span class="mf">1.</span> <span class="o">*</span> <span class="n">sum2</span><span class="p">[</span><span class="s">&#39;tau_org&#39;</span><span class="p">])))</span> <span class="o">*</span> <span class="mf">0.95</span> <span class="o">+</span> <span class="mf">0.05</span> <span class="o">*</span> <span class="mf">270.</span><span class="p">)</span> <span class="o">/</span> \
+            <span class="p">(</span><span class="mf">0.95</span> <span class="o">*</span> <span class="n">pd</span><span class="o">.</span><span class="n">np</span><span class="o">.</span><span class="n">exp</span><span class="p">(</span><span class="o">-</span><span class="mi">1</span> <span class="o">*</span> <span class="n">sum2</span><span class="p">[</span><span class="s">&#39;tau_org&#39;</span><span class="p">]</span> <span class="o">*</span> <span class="n">sum2</span><span class="p">[</span><span class="s">&#39;airmass&#39;</span><span class="p">]))</span>
+
+        <span class="n">sel1</span> <span class="o">=</span> <span class="n">sum2</span><span class="p">[</span><span class="n">sum2</span><span class="o">.</span><span class="n">transmission</span> <span class="o">&gt;</span> <span class="bp">self</span><span class="o">.</span><span class="n">transmission</span><span class="p">]</span>
+
+        <span class="k">print</span><span class="p">(</span><span class="s">&quot;SBs with a transmission higher than </span><span class="si">%2.1f</span><span class="s">: </span><span class="si">%d</span><span class="s">&quot;</span> <span class="o">%</span>
+              <span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">transmission</span><span class="p">,</span> <span class="nb">len</span><span class="p">(</span><span class="n">sel1</span><span class="p">)))</span>
+
+        <span class="k">if</span> <span class="n">array</span> <span class="o">==</span> <span class="s">&#39;7m&#39;</span><span class="p">:</span>
+            <span class="n">sel2</span> <span class="o">=</span> <span class="n">sel1</span><span class="p">[</span>
+                <span class="p">(</span><span class="n">sel1</span><span class="o">.</span><span class="n">array</span> <span class="o">==</span> <span class="n">array1</span><span class="p">[</span><span class="mi">0</span><span class="p">])</span> <span class="o">|</span>
+                <span class="p">(</span><span class="n">sel1</span><span class="o">.</span><span class="n">array</span> <span class="o">==</span> <span class="n">array1</span><span class="p">[</span><span class="mi">1</span><span class="p">])]</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="n">sel2</span> <span class="o">=</span> <span class="n">sel1</span><span class="p">[</span><span class="n">sel1</span><span class="o">.</span><span class="n">array</span> <span class="o">==</span> <span class="n">array1</span><span class="p">[</span><span class="mi">0</span><span class="p">]]</span>
+
+        <span class="k">print</span><span class="p">(</span><span class="s">&quot;SBs for </span><span class="si">%s</span><span class="s"> array: </span><span class="si">%d</span><span class="s">&quot;</span> <span class="o">%</span> <span class="p">(</span><span class="n">array</span><span class="p">,</span> <span class="nb">len</span><span class="p">(</span><span class="n">sel2</span><span class="p">)))</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">alma</span><span class="o">.</span><span class="n">date</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">date</span>
+        <span class="n">lst</span> <span class="o">=</span> <span class="n">pd</span><span class="o">.</span><span class="n">np</span><span class="o">.</span><span class="n">degrees</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">alma</span><span class="o">.</span><span class="n">sidereal_time</span><span class="p">())</span>
+        <span class="k">print</span> <span class="bp">self</span><span class="o">.</span><span class="n">alma</span><span class="o">.</span><span class="n">date</span><span class="p">,</span> <span class="n">lst</span>
+        <span class="n">ha</span> <span class="o">=</span> <span class="p">(</span><span class="n">lst</span> <span class="o">-</span> <span class="n">sel2</span><span class="o">.</span><span class="n">RA</span><span class="p">)</span> <span class="o">/</span> <span class="mf">15.</span>
+        <span class="n">ha</span><span class="o">.</span><span class="n">loc</span><span class="p">[</span><span class="n">ha</span> <span class="o">&gt;</span> <span class="mi">12</span><span class="p">]</span> <span class="o">=</span> <span class="n">ha</span><span class="o">.</span><span class="n">loc</span><span class="p">[</span><span class="n">ha</span> <span class="o">&gt;</span> <span class="mi">12</span><span class="p">]</span> <span class="o">-</span> <span class="mf">24.</span>
+        <span class="n">ha</span><span class="o">.</span><span class="n">loc</span><span class="p">[</span><span class="n">ha</span> <span class="o">&lt;</span> <span class="o">-</span><span class="mi">12</span><span class="p">]</span> <span class="o">=</span> <span class="mf">24.</span> <span class="o">+</span> <span class="n">ha</span><span class="o">.</span><span class="n">loc</span><span class="p">[</span><span class="n">ha</span> <span class="o">&lt;</span> <span class="o">-</span><span class="mi">12</span><span class="p">]</span>
+        <span class="n">sel2</span><span class="p">[</span><span class="s">&#39;HA&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">ha</span>
+        <span class="n">sel2</span> <span class="o">=</span> <span class="n">sel2</span>
+        <span class="n">sel3</span> <span class="o">=</span> <span class="n">sel2</span><span class="p">[((</span><span class="n">sel2</span><span class="o">.</span><span class="n">HA</span> <span class="o">&gt;</span> <span class="bp">self</span><span class="o">.</span><span class="n">minha</span><span class="p">)</span> <span class="o">&amp;</span> <span class="p">(</span><span class="n">sel2</span><span class="o">.</span><span class="n">HA</span> <span class="o">&lt;</span> <span class="bp">self</span><span class="o">.</span><span class="n">maxha</span><span class="p">))</span> <span class="o">|</span>
+                    <span class="p">(</span><span class="n">sel2</span><span class="o">.</span><span class="n">RA</span> <span class="o">==</span> <span class="mf">0.</span><span class="p">)]</span>
+        <span class="n">sel3</span><span class="p">[</span><span class="s">&#39;tsysfrac&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="p">(</span><span class="n">sel3</span><span class="o">.</span><span class="n">tsys</span> <span class="o">/</span> <span class="n">sel3</span><span class="o">.</span><span class="n">tsys_org</span><span class="p">)</span> <span class="o">**</span> <span class="mf">2.</span>
+        <span class="k">print</span><span class="p">(</span><span class="s">&quot;SBs within current HA limits (or RA=0): </span><span class="si">%d</span><span class="s">&quot;</span> <span class="o">%</span> <span class="nb">len</span><span class="p">(</span><span class="n">sel3</span><span class="p">))</span>
+        <span class="n">sel4</span> <span class="o">=</span> <span class="n">pd</span><span class="o">.</span><span class="n">merge</span><span class="p">(</span><span class="n">sel3</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">obser_prop</span><span class="p">,</span> <span class="n">left_on</span><span class="o">=</span><span class="s">&#39;SB_UID&#39;</span><span class="p">,</span>
+                        <span class="n">right_index</span><span class="o">=</span><span class="bp">True</span><span class="p">)</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">not_horizon</span> <span class="ow">is</span> <span class="bp">False</span><span class="p">:</span>
+            <span class="n">sel4</span> <span class="o">=</span> <span class="n">sel4</span><span class="o">.</span><span class="n">query</span><span class="p">(</span><span class="s">&#39;up == 1 and etime &gt; 1.5&#39;</span><span class="p">)</span>
+            <span class="k">print</span><span class="p">(</span><span class="s">&quot;SBs over </span><span class="si">%d</span><span class="s"> degrees, 1.5 hours: </span><span class="si">%d</span><span class="s">&quot;</span> <span class="o">%</span>
+                  <span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">horizon</span><span class="p">,</span> <span class="nb">len</span><span class="p">(</span><span class="n">sel4</span><span class="p">)))</span>
+        <span class="n">sel4</span> <span class="o">=</span> <span class="n">sel4</span><span class="o">.</span><span class="n">query</span><span class="p">(</span>
+            <span class="s">&#39;SB_state != &quot;Phase2Submitted&quot;&#39;</span>
+            <span class="s">&#39; and SB_state != &quot;FullyObserved&quot;&#39;</span>
+            <span class="s">&#39; and SB_state != &quot;Deleted&quot;&#39;</span>
+            <span class="s">&#39; and PRJ_state != &quot;Phase2Submitted&quot;&#39;</span>
+            <span class="s">&#39; and PRJ_state != &quot;Completed&quot;&#39;</span><span class="p">)</span>
+        <span class="n">sel4</span> <span class="o">=</span> <span class="n">sel4</span><span class="p">[</span><span class="n">sel4</span><span class="o">.</span><span class="n">name</span><span class="o">.</span><span class="n">str</span><span class="o">.</span><span class="n">contains</span><span class="p">(</span><span class="s">&#39;not&#39;</span><span class="p">,</span> <span class="n">case</span><span class="o">=</span><span class="bp">False</span><span class="p">)</span> <span class="o">==</span> <span class="bp">False</span><span class="p">]</span>
+        <span class="k">print</span><span class="p">(</span><span class="s">&quot;SBs with Ok state: </span><span class="si">%d</span><span class="s">&quot;</span> <span class="o">%</span> <span class="nb">len</span><span class="p">(</span><span class="n">sel4</span><span class="p">))</span>
+        <span class="n">sel4</span> <span class="o">=</span> <span class="n">sel4</span><span class="o">.</span><span class="n">query</span><span class="p">(</span><span class="s">&#39;execount &gt; Total&#39;</span><span class="p">)</span>
+        <span class="k">print</span><span class="p">(</span><span class="s">&quot;SBs with missing exec: </span><span class="si">%d</span><span class="s">&quot;</span> <span class="o">%</span> <span class="nb">len</span><span class="p">(</span><span class="n">sel4</span><span class="p">))</span>
+
+        <span class="n">fg</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">fieldsource</span><span class="o">.</span><span class="n">query</span><span class="p">(</span>
+            <span class="s">&#39;isQuery == False and name == &quot;Primary:&quot;&#39;</span>
+        <span class="p">)</span><span class="o">.</span><span class="n">groupby</span><span class="p">(</span><span class="s">&#39;SB_UID&#39;</span><span class="p">)</span>
+        <span class="n">p</span> <span class="o">=</span> <span class="n">pd</span><span class="o">.</span><span class="n">DataFrame</span><span class="p">(</span>
+            <span class="p">[</span><span class="n">fg</span><span class="o">.</span><span class="n">pointings</span><span class="o">.</span><span class="n">mean</span><span class="p">(),</span> <span class="n">fg</span><span class="o">.</span><span class="n">pointings</span><span class="o">.</span><span class="n">count</span><span class="p">()],</span>
+            <span class="n">index</span><span class="o">=</span><span class="p">[</span><span class="s">&#39;mpointings&#39;</span><span class="p">,</span> <span class="s">&#39;sources&#39;</span><span class="p">])</span><span class="o">.</span><span class="n">transpose</span><span class="p">()</span>
+
+        <span class="n">sel4</span> <span class="o">=</span> <span class="n">pd</span><span class="o">.</span><span class="n">merge</span><span class="p">(</span><span class="n">sel4</span><span class="p">,</span> <span class="n">p</span><span class="p">,</span> <span class="n">left_on</span><span class="o">=</span><span class="s">&#39;SB_UID&#39;</span><span class="p">,</span> <span class="n">right_index</span><span class="o">=</span><span class="bp">True</span><span class="p">,</span> <span class="n">how</span><span class="o">=</span><span class="s">&#39;left&#39;</span><span class="p">)</span>
+
+        <span class="k">if</span> <span class="n">array</span> <span class="o">==</span> <span class="s">&#39;12m&#39;</span><span class="p">:</span>
+            <span class="n">sel4</span> <span class="o">=</span> <span class="n">sel4</span><span class="o">.</span><span class="n">query</span><span class="p">(</span>
+                <span class="s">&#39;(arrayMinAR &lt; </span><span class="si">%f</span><span class="s"> and </span><span class="si">%f</span><span class="s"> &lt; arrayMaxAR) &#39;</span> <span class="o">%</span>
+                <span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">array_ar</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">array_ar</span><span class="p">))</span>
+            <span class="k">print</span><span class="p">(</span><span class="s">&quot;SBs for current 12m Array AR: </span><span class="si">%d</span><span class="s">. &quot;</span>
+                  <span class="s">&quot;(AR=</span><span class="si">%.2f</span><span class="s">, #bl=</span><span class="si">%d</span><span class="s">, #ant=</span><span class="si">%d</span><span class="s">)&quot;</span> <span class="o">%</span>
+                  <span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">sel4</span><span class="p">),</span> <span class="bp">self</span><span class="o">.</span><span class="n">array_ar</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">num_bl</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">num_ant</span><span class="p">))</span>
+            <span class="n">sel4</span><span class="p">[</span><span class="s">&#39;blmax&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">sel4</span><span class="o">.</span><span class="n">apply</span><span class="p">(</span>
+                <span class="k">lambda</span> <span class="n">row</span><span class="p">:</span> <span class="n">rUV</span><span class="o">.</span><span class="n">computeBL</span><span class="p">(</span><span class="n">row</span><span class="p">[</span><span class="s">&#39;AR&#39;</span><span class="p">],</span> <span class="n">row</span><span class="p">[</span><span class="s">&#39;repfreq&#39;</span><span class="p">]),</span> <span class="n">axis</span><span class="o">=</span><span class="mi">1</span><span class="p">)</span>
+            <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">array_name</span> <span class="ow">is</span> <span class="ow">not</span> <span class="bp">None</span><span class="p">:</span>
+                <span class="n">sel4</span><span class="p">[</span><span class="s">&#39;blfrac&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">sel4</span><span class="o">.</span><span class="n">apply</span><span class="p">(</span>
+                    <span class="k">lambda</span> <span class="n">row</span><span class="p">:</span> <span class="p">(</span><span class="mf">33.</span> <span class="o">*</span> <span class="mi">17</span><span class="p">)</span> <span class="o">/</span> <span class="p">(</span><span class="mf">1.</span> <span class="o">*</span> <span class="nb">len</span><span class="p">(</span>
+                        <span class="bp">self</span><span class="o">.</span><span class="n">ruv</span><span class="p">[</span><span class="bp">self</span><span class="o">.</span><span class="n">ruv</span> <span class="o">&lt;</span> <span class="n">row</span><span class="p">[</span><span class="s">&#39;blmax&#39;</span><span class="p">]]))</span>
+                    <span class="k">if</span> <span class="p">(</span><span class="n">row</span><span class="p">[</span><span class="s">&#39;LAS&#39;</span><span class="p">]</span> <span class="o">!=</span> <span class="mi">0</span><span class="p">)</span>
+                    <span class="k">else</span> <span class="p">(</span><span class="mf">33.</span> <span class="o">*</span> <span class="mi">17</span><span class="p">)</span> <span class="o">/</span>
+                         <span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">num_ant</span> <span class="o">*</span> <span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">num_ant</span> <span class="o">-</span> <span class="mi">1</span><span class="p">)</span> <span class="o">/</span> <span class="mf">2.</span><span class="p">),</span>
+                    <span class="n">axis</span><span class="o">=</span><span class="mi">1</span><span class="p">)</span>
+            <span class="k">else</span><span class="p">:</span>
+                <span class="n">sel4</span><span class="p">[</span><span class="s">&#39;blfrac&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">sel4</span><span class="o">.</span><span class="n">apply</span><span class="p">(</span>
+                    <span class="k">lambda</span> <span class="n">row</span><span class="p">:</span> <span class="p">(</span><span class="mf">33.</span> <span class="o">*</span> <span class="mi">17</span><span class="p">)</span> <span class="o">/</span> <span class="p">(</span><span class="mf">1.</span> <span class="o">*</span> <span class="nb">len</span><span class="p">(</span>
+                        <span class="bp">self</span><span class="o">.</span><span class="n">ruv</span><span class="p">[</span><span class="bp">self</span><span class="o">.</span><span class="n">ruv</span> <span class="o">&lt;</span> <span class="n">row</span><span class="p">[</span><span class="s">&#39;blmax&#39;</span><span class="p">]]))</span>
+                    <span class="k">if</span> <span class="p">(</span><span class="n">row</span><span class="p">[</span><span class="s">&#39;LAS&#39;</span><span class="p">]</span> <span class="o">!=</span> <span class="mi">0</span><span class="p">)</span>
+                    <span class="k">else</span> <span class="p">(</span><span class="mf">33.</span> <span class="o">*</span> <span class="mi">17</span><span class="p">)</span> <span class="o">/</span>
+                         <span class="p">(</span><span class="mf">34.</span> <span class="o">*</span> <span class="p">(</span><span class="mf">34.</span> <span class="o">-</span> <span class="mi">1</span><span class="p">)</span> <span class="o">/</span> <span class="mf">2.</span><span class="p">),</span>
+                    <span class="n">axis</span><span class="o">=</span><span class="mi">1</span><span class="p">)</span>
+                <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">num_ant</span> <span class="o">!=</span> <span class="mi">34</span><span class="p">:</span>
+                    <span class="n">sel4</span><span class="p">[</span><span class="s">&#39;blfrac&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">sel4</span><span class="o">.</span><span class="n">blfrac</span> <span class="o">*</span> <span class="p">(</span>
+                        <span class="mi">33</span> <span class="o">*</span> <span class="mi">17</span> <span class="o">/</span> <span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">num_ant</span> <span class="o">*</span> <span class="p">(</span>
+                            <span class="bp">self</span><span class="o">.</span><span class="n">num_ant</span> <span class="o">-</span> <span class="mi">1</span><span class="p">)</span> <span class="o">/</span> <span class="mf">2.</span><span class="p">))</span>
+            <span class="n">sel4</span><span class="p">[</span><span class="s">&#39;frac&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">sel4</span><span class="o">.</span><span class="n">tsysfrac</span> <span class="o">*</span> <span class="n">sel4</span><span class="o">.</span><span class="n">blfrac</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">select12m</span> <span class="o">=</span> <span class="n">sel4</span>
+
+        <span class="k">elif</span> <span class="n">array</span> <span class="o">==</span> <span class="s">&#39;7m&#39;</span><span class="p">:</span>
+            <span class="n">sel4</span><span class="p">[</span><span class="s">&#39;blfrac&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">sel4</span><span class="o">.</span><span class="n">RA</span> <span class="o">*</span> <span class="mf">0.</span> <span class="o">+</span> <span class="mf">1.</span>
+            <span class="k">print</span> <span class="bp">self</span><span class="o">.</span><span class="n">num_ant</span>
+            <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">num_ant</span> <span class="o">!=</span> <span class="mi">9</span><span class="p">:</span>
+                <span class="n">sel4</span><span class="p">[</span><span class="s">&#39;blfrac&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">sel4</span><span class="o">.</span><span class="n">blfrac</span> <span class="o">*</span> <span class="p">(</span>
+                    <span class="mi">9</span> <span class="o">*</span> <span class="mi">4</span> <span class="o">/</span> <span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">num_ant</span> <span class="o">*</span> <span class="p">(</span>
+                        <span class="bp">self</span><span class="o">.</span><span class="n">num_ant</span> <span class="o">-</span> <span class="mi">1</span><span class="p">)</span> <span class="o">/</span> <span class="mf">2.</span><span class="p">))</span>
+            <span class="n">sel4</span><span class="p">[</span><span class="s">&#39;frac&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">sel4</span><span class="o">.</span><span class="n">tsysfrac</span> <span class="o">*</span> <span class="n">sel4</span><span class="o">.</span><span class="n">blfrac</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">select7m</span> <span class="o">=</span> <span class="n">sel4</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">selecttp</span> <span class="o">=</span> <span class="n">sel4</span>
+</div>
+<div class="viewcode-block" id="WtoAlgorithm.scorer"><a class="viewcode-back" href="../index.html#wtoAlgorithm.WtoAlgorithm.scorer">[docs]</a>    <span class="k">def</span> <span class="nf">scorer</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">array</span><span class="p">):</span>
+
+        <span class="sd">&quot;&quot;&quot;</span>
+
+<span class="sd">        :param array:</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">if</span> <span class="n">array</span> <span class="o">==</span> <span class="s">&#39;12m&#39;</span><span class="p">:</span>
+            <span class="n">df</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">select12m</span>
+        <span class="k">elif</span> <span class="n">array</span> <span class="o">==</span> <span class="s">&#39;7m&#39;</span><span class="p">:</span>
+            <span class="n">df</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">select7m</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="n">df</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">selecttp</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">max_scirank</span> <span class="o">=</span> <span class="n">df</span><span class="o">.</span><span class="n">scienceRank</span><span class="o">.</span><span class="n">max</span><span class="p">()</span>
+        <span class="n">scores</span> <span class="o">=</span> <span class="n">df</span><span class="o">.</span><span class="n">apply</span><span class="p">(</span>
+            <span class="k">lambda</span> <span class="n">r</span><span class="p">:</span> <span class="bp">self</span><span class="o">.</span><span class="n">calculate_score</span><span class="p">(</span>
+                <span class="n">r</span><span class="p">[</span><span class="s">&#39;execount&#39;</span><span class="p">],</span> <span class="n">r</span><span class="p">[</span><span class="s">&#39;Total&#39;</span><span class="p">],</span> <span class="n">r</span><span class="p">[</span><span class="s">&#39;scienceRank&#39;</span><span class="p">],</span> <span class="n">r</span><span class="p">[</span><span class="s">&#39;AR&#39;</span><span class="p">],</span>
+                <span class="n">r</span><span class="p">[</span><span class="s">&#39;arrayMinAR&#39;</span><span class="p">],</span> <span class="n">r</span><span class="p">[</span><span class="s">&#39;arrayMaxAR&#39;</span><span class="p">],</span> <span class="n">r</span><span class="p">[</span><span class="s">&#39;LAS&#39;</span><span class="p">],</span>
+                <span class="n">r</span><span class="p">[</span><span class="s">&#39;grade&#39;</span><span class="p">],</span> <span class="n">r</span><span class="p">[</span><span class="s">&#39;repfreq&#39;</span><span class="p">],</span> <span class="n">r</span><span class="p">[</span><span class="s">&#39;DEC&#39;</span><span class="p">],</span> <span class="n">r</span><span class="p">[</span><span class="s">&#39;EXEC&#39;</span><span class="p">],</span> <span class="n">array</span><span class="p">,</span>
+                <span class="n">r</span><span class="p">[</span><span class="s">&#39;frac&#39;</span><span class="p">],</span> <span class="n">r</span><span class="p">[</span><span class="s">&#39;maxPWVC&#39;</span><span class="p">],</span> <span class="n">r</span><span class="p">[</span><span class="s">&#39;CODE&#39;</span><span class="p">]),</span>
+            <span class="n">axis</span><span class="o">=</span><span class="mi">1</span><span class="p">)</span>
+        <span class="n">scores</span> <span class="o">=</span> <span class="n">pd</span><span class="o">.</span><span class="n">DataFrame</span><span class="p">(</span><span class="n">scores</span><span class="o">.</span><span class="n">values</span><span class="o">.</span><span class="n">tolist</span><span class="p">(),</span> <span class="n">index</span><span class="o">=</span><span class="n">scores</span><span class="o">.</span><span class="n">index</span><span class="p">)</span>
+        <span class="n">scores</span><span class="o">.</span><span class="n">columns</span> <span class="o">=</span> <span class="n">pd</span><span class="o">.</span><span class="n">Index</span><span class="p">(</span>
+            <span class="p">[</span><span class="s">u&#39;sb_cond_score&#39;</span><span class="p">,</span> <span class="s">u&#39;sb_array_score&#39;</span><span class="p">,</span> <span class="s">u&#39;sb_completion_score&#39;</span><span class="p">,</span>
+             <span class="s">u&#39;sb_exec_score&#39;</span><span class="p">,</span> <span class="s">u&#39;sb_science_score&#39;</span><span class="p">,</span> <span class="s">u&#39;sb_grade_score&#39;</span><span class="p">,</span>
+             <span class="s">u&#39;arcorr&#39;</span><span class="p">,</span> <span class="s">u&#39;score&#39;</span><span class="p">])</span>
+        <span class="k">if</span> <span class="n">array</span> <span class="o">==</span> <span class="s">&#39;12m&#39;</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">score12m</span> <span class="o">=</span> <span class="n">pd</span><span class="o">.</span><span class="n">merge</span><span class="p">(</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">select12m</span><span class="p">,</span> <span class="n">scores</span><span class="p">,</span> <span class="n">left_on</span><span class="o">=</span><span class="s">&#39;SB_UID&#39;</span><span class="p">,</span> <span class="n">right_index</span><span class="o">=</span><span class="bp">True</span><span class="p">)</span>
+        <span class="k">elif</span> <span class="n">array</span> <span class="o">==</span> <span class="s">&#39;7m&#39;</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">score7m</span> <span class="o">=</span> <span class="n">pd</span><span class="o">.</span><span class="n">merge</span><span class="p">(</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">select7m</span><span class="p">,</span> <span class="n">scores</span><span class="p">,</span> <span class="n">left_on</span><span class="o">=</span><span class="s">&#39;SB_UID&#39;</span><span class="p">,</span> <span class="n">right_index</span><span class="o">=</span><span class="bp">True</span><span class="p">)</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">scoretp</span> <span class="o">=</span> <span class="n">pd</span><span class="o">.</span><span class="n">merge</span><span class="p">(</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">selecttp</span><span class="p">,</span> <span class="n">scores</span><span class="p">,</span> <span class="n">left_on</span><span class="o">=</span><span class="s">&#39;SB_UID&#39;</span><span class="p">,</span> <span class="n">right_index</span><span class="o">=</span><span class="bp">True</span><span class="p">)</span>
+</div>
+<div class="viewcode-block" id="WtoAlgorithm.calculate_score"><a class="viewcode-back" href="../index.html#wtoAlgorithm.WtoAlgorithm.calculate_score">[docs]</a>    <span class="k">def</span> <span class="nf">calculate_score</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">ecount</span><span class="p">,</span> <span class="n">tcount</span><span class="p">,</span> <span class="n">srank</span><span class="p">,</span> <span class="n">ar</span><span class="p">,</span> <span class="n">aminar</span><span class="p">,</span> <span class="n">amaxar</span><span class="p">,</span>
+                        <span class="n">las</span><span class="p">,</span> <span class="n">grade</span><span class="p">,</span> <span class="n">repfreq</span><span class="p">,</span> <span class="n">dec</span><span class="p">,</span> <span class="n">execu</span><span class="p">,</span> <span class="n">array</span><span class="p">,</span>
+                        <span class="n">frac</span><span class="p">,</span> <span class="n">maxpwvc</span><span class="p">,</span> <span class="n">code</span><span class="p">):</span>
+
+        <span class="sd">&quot;&quot;&quot;</span>
+
+<span class="sd">        :param ecount:</span>
+<span class="sd">        :param tcount:</span>
+<span class="sd">        :param srank:</span>
+<span class="sd">        :param ar:</span>
+<span class="sd">        :param aminar:</span>
+<span class="sd">        :param amaxar:</span>
+<span class="sd">        :param las:</span>
+<span class="sd">        :param grade:</span>
+<span class="sd">        :param repfreq:</span>
+<span class="sd">        :param dec:</span>
+<span class="sd">        :param execu:</span>
+<span class="sd">        :param array:</span>
+<span class="sd">        :param frac:</span>
+<span class="sd">        :param maxpwvc:</span>
+<span class="sd">        :param code:</span>
+<span class="sd">        :return:</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">sb_completion</span> <span class="o">=</span> <span class="n">tcount</span> <span class="o">/</span> <span class="n">ecount</span>
+        <span class="n">sb_completion_score</span> <span class="o">=</span> <span class="mf">6.</span> <span class="o">*</span> <span class="n">sb_completion</span> <span class="o">+</span> <span class="mf">4.</span>
+
+        <span class="c"># set sb priority score</span>
+
+        <span class="k">if</span> <span class="n">grade</span> <span class="o">==</span> <span class="s">&#39;A&#39;</span><span class="p">:</span>
+            <span class="n">sb_grade_score</span> <span class="o">=</span> <span class="mf">10.</span>
+        <span class="k">elif</span> <span class="nb">str</span><span class="p">(</span><span class="n">code</span><span class="p">)</span><span class="o">.</span><span class="n">startswith</span><span class="p">(</span><span class="s">&#39;2012&#39;</span><span class="p">):</span>
+            <span class="n">sb_grade_score</span> <span class="o">=</span> <span class="mf">7.</span>
+        <span class="k">elif</span> <span class="n">grade</span> <span class="o">==</span> <span class="s">&#39;B&#39;</span><span class="p">:</span>
+            <span class="n">sb_grade_score</span> <span class="o">=</span> <span class="mf">6.</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="n">sb_grade_score</span> <span class="o">=</span> <span class="o">-</span><span class="mf">100.</span>
+
+        <span class="c"># set science score</span>
+        <span class="n">sb_science_score</span> <span class="o">=</span> <span class="mf">10.</span> <span class="o">*</span> <span class="n">srank</span> <span class="o">/</span> <span class="bp">self</span><span class="o">.</span><span class="n">max_scirank</span>
+
+        <span class="c"># set array score</span>
+        <span class="k">if</span> <span class="n">array</span> <span class="o">==</span> <span class="s">&#39;7m&#39;</span> <span class="ow">or</span> <span class="n">array</span> <span class="o">==</span> <span class="s">&#39;tp&#39;</span><span class="p">:</span>
+            <span class="n">sb_array_score</span> <span class="o">=</span> <span class="mf">10.</span>
+            <span class="n">arcorr</span> <span class="o">=</span> <span class="mf">0.</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="n">c_bmax</span> <span class="o">=</span> <span class="mf">0.862</span> <span class="o">/</span> <span class="n">pd</span><span class="o">.</span><span class="n">np</span><span class="o">.</span><span class="n">cos</span><span class="p">(</span><span class="n">pd</span><span class="o">.</span><span class="n">np</span><span class="o">.</span><span class="n">radians</span><span class="p">(</span><span class="o">-</span><span class="mf">23.0262015</span><span class="p">)</span> <span class="o">-</span>
+                                       <span class="n">pd</span><span class="o">.</span><span class="n">np</span><span class="o">.</span><span class="n">radians</span><span class="p">(</span><span class="n">dec</span><span class="p">))</span> <span class="o">+</span> <span class="mf">0.138</span>
+            <span class="n">c_freq</span> <span class="o">=</span> <span class="n">repfreq</span> <span class="o">/</span> <span class="mf">100.</span>
+            <span class="n">corr</span> <span class="o">=</span> <span class="n">c_freq</span> <span class="o">/</span> <span class="n">c_bmax</span>
+            <span class="n">arcorr</span> <span class="o">=</span> <span class="n">ar</span> <span class="o">*</span> <span class="n">corr</span>
+            <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">array_ar</span> <span class="o">&lt;</span> <span class="n">arcorr</span><span class="p">:</span>
+                <span class="n">l</span> <span class="o">=</span> <span class="n">arcorr</span> <span class="o">-</span> <span class="n">aminar</span>
+                <span class="n">s</span> <span class="o">=</span> <span class="mf">10.</span>
+
+                <span class="k">if</span> <span class="n">las</span> <span class="o">==</span> <span class="mi">0</span><span class="p">:</span>
+                    <span class="n">sb_array_score</span> <span class="o">=</span> <span class="p">(</span>
+                        <span class="p">((</span><span class="bp">self</span><span class="o">.</span><span class="n">array_ar</span> <span class="o">-</span> <span class="n">aminar</span><span class="p">)</span> <span class="o">/</span> <span class="n">l</span><span class="p">)</span> <span class="o">**</span> <span class="p">(</span><span class="mi">1</span> <span class="o">/</span> <span class="mf">8.</span><span class="p">))</span> <span class="o">*</span> <span class="mf">8.</span> <span class="o">+</span> <span class="mf">2.</span>
+                <span class="k">else</span><span class="p">:</span>
+                    <span class="n">sb_array_score</span> <span class="o">=</span> <span class="p">(</span>
+                        <span class="p">((</span><span class="bp">self</span><span class="o">.</span><span class="n">array_ar</span> <span class="o">-</span> <span class="n">aminar</span><span class="p">)</span> <span class="o">/</span> <span class="n">l</span><span class="p">)</span> <span class="o">**</span> <span class="p">(</span><span class="mi">1</span> <span class="o">/</span> <span class="mf">3.</span><span class="p">))</span> <span class="o">*</span> <span class="n">s</span>
+            <span class="k">elif</span> <span class="bp">self</span><span class="o">.</span><span class="n">array_ar</span> <span class="o">==</span> <span class="n">arcorr</span><span class="p">:</span>
+                <span class="n">sb_array_score</span> <span class="o">=</span> <span class="mf">10.</span>
+            <span class="k">else</span><span class="p">:</span>
+                <span class="n">l</span> <span class="o">=</span> <span class="n">arcorr</span> <span class="o">-</span> <span class="n">amaxar</span>
+                <span class="n">s</span> <span class="o">=</span> <span class="mf">10.</span> <span class="o">/</span> <span class="n">l</span>
+                <span class="n">sb_array_score</span> <span class="o">=</span> <span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">array_ar</span> <span class="o">-</span> <span class="n">amaxar</span><span class="p">)</span> <span class="o">*</span> <span class="n">s</span>
+        <span class="c"># set exec score:</span>
+        <span class="n">sb_exec_score</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">exec_prio</span><span class="p">[</span><span class="n">execu</span><span class="p">]</span>
+
+        <span class="c"># set condition score:</span>
+        <span class="n">pwv_corr</span> <span class="o">=</span> <span class="mi">1</span> <span class="o">-</span> <span class="p">(</span><span class="nb">abs</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">pwv</span> <span class="o">-</span> <span class="n">maxpwvc</span><span class="p">)</span> <span class="o">/</span> <span class="mf">6.</span><span class="p">)</span>
+        <span class="k">if</span> <span class="n">pwv_corr</span> <span class="o">&gt;</span> <span class="mi">6</span><span class="p">:</span>
+            <span class="n">pwv_corr</span> <span class="o">=</span> <span class="mf">0.</span>
+
+        <span class="k">if</span> <span class="n">frac</span> <span class="o">&lt;</span> <span class="mi">1</span><span class="p">:</span>
+            <span class="n">x</span> <span class="o">=</span> <span class="n">frac</span> <span class="o">-</span> <span class="mf">1.</span>
+            <span class="n">sb_cond_score</span> <span class="o">=</span> <span class="mi">10</span> <span class="o">*</span> <span class="p">(</span><span class="mi">1</span> <span class="o">-</span> <span class="p">(</span><span class="n">x</span> <span class="o">**</span> <span class="mf">2.</span><span class="p">))</span> <span class="o">*</span> <span class="n">pwv_corr</span>
+        <span class="k">elif</span> <span class="n">frac</span> <span class="o">==</span> <span class="mi">1</span><span class="p">:</span>
+            <span class="n">sb_cond_score</span> <span class="o">=</span> <span class="mf">10.</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="n">x</span> <span class="o">=</span> <span class="n">frac</span> <span class="o">-</span> <span class="mi">1</span>
+            <span class="k">if</span> <span class="n">frac</span> <span class="o">&lt;=</span> <span class="mf">1.4</span><span class="p">:</span>
+                <span class="n">sb_cond_score</span> <span class="o">=</span> <span class="p">(</span><span class="mf">1.</span> <span class="o">-</span> <span class="p">(</span><span class="n">x</span> <span class="o">/</span> <span class="mf">0.4</span><span class="p">)</span> <span class="o">**</span> <span class="mf">3.</span><span class="p">)</span> <span class="o">*</span> <span class="mf">10.</span> <span class="o">*</span> <span class="n">pwv_corr</span>
+            <span class="k">else</span><span class="p">:</span>
+                <span class="n">sb_cond_score</span> <span class="o">=</span> <span class="mf">0.</span>
+
+        <span class="n">score</span> <span class="o">=</span> <span class="p">(</span><span class="mf">0.35</span> <span class="o">*</span> <span class="n">sb_cond_score</span> <span class="o">+</span>
+                 <span class="mf">0.20</span> <span class="o">*</span> <span class="n">sb_array_score</span> <span class="o">+</span>
+                 <span class="mf">0.15</span> <span class="o">*</span> <span class="n">sb_completion_score</span> <span class="o">+</span>
+                 <span class="mf">0.10</span> <span class="o">*</span> <span class="n">sb_exec_score</span> <span class="o">+</span>
+                 <span class="mf">0.05</span> <span class="o">*</span> <span class="n">sb_science_score</span> <span class="o">+</span>
+                 <span class="mf">0.15</span> <span class="o">*</span> <span class="n">sb_grade_score</span><span class="p">)</span>
+        <span class="k">return</span> <span class="p">(</span><span class="n">sb_cond_score</span><span class="p">,</span> <span class="n">sb_array_score</span><span class="p">,</span> <span class="n">sb_completion_score</span><span class="p">,</span>
+                <span class="n">sb_exec_score</span><span class="p">,</span> <span class="n">sb_science_score</span><span class="p">,</span> <span class="n">sb_grade_score</span><span class="p">,</span> <span class="n">arcorr</span><span class="p">,</span> <span class="n">score</span><span class="p">)</span>
+</div>
 <div class="viewcode-block" id="WtoAlgorithm.check_observability"><a class="viewcode-back" href="../index.html#wtoAlgorithm.WtoAlgorithm.check_observability">[docs]</a>    <span class="k">def</span> <span class="nf">check_observability</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">array</span><span class="p">):</span>
 
         <span class="sd">&quot;&quot;&quot;</span>
 
-
+<span class="sd">        :param array:</span>
 <span class="sd">        :return:</span>
 <span class="sd">        &quot;&quot;&quot;</span>
         <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">date</span> <span class="o">==</span> <span class="bp">self</span><span class="o">.</span><span class="n">old_date</span><span class="p">:</span>
@@ -232,314 +527,6 @@
                                    <span class="n">left_index</span><span class="o">=</span><span class="bp">True</span><span class="p">,</span> <span class="n">how</span><span class="o">=</span><span class="s">&#39;left&#39;</span><span class="p">)</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">old_date</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">date</span>
         <span class="k">print</span> <span class="bp">self</span><span class="o">.</span><span class="n">old_date</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">date</span>
-
-    <span class="c"># noinspection PyAugmentAssignment</span></div>
-<div class="viewcode-block" id="WtoAlgorithm.selector"><a class="viewcode-back" href="../index.html#wtoAlgorithm.WtoAlgorithm.selector">[docs]</a>    <span class="k">def</span> <span class="nf">selector</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">array</span><span class="p">):</span>
-
-        <span class="sd">&quot;&quot;&quot;</span>
-<span class="sd">        Selects SBs that can be observed given the current weather conditions,</span>
-<span class="sd">        HA range, array type and array configuration (in the case of 12m array</span>
-<span class="sd">        type) and SB/Project Status. To limit the calculation of pyephem, the</span>
-<span class="sd">        selection based on current position in the sky is done afterwards.</span>
-
-<span class="sd">        Selector get stored in either twelvem, sevenm or totalp tables. These</span>
-<span class="sd">        tables contain all the data needed for the calculations to be</span>
-<span class="sd">        done with WtoAlgorith.observable and to assign a score</span>
-
-<span class="sd">        :param array: &#39;12m&#39;, &#39;7m&#39;, &#39;tp&#39;</span>
-<span class="sd">        :type array: str</span>
-<span class="sd">        &quot;&quot;&quot;</span>
-        <span class="c"># TODO: add a 5% padding to fraction selection.</span>
-        <span class="c"># TODO: check with Jorge Garcia the rms fraction against reality.</span>
-
-        <span class="bp">self</span><span class="o">.</span><span class="n">check_observability</span><span class="p">(</span><span class="n">array</span><span class="p">)</span>
-
-        <span class="k">if</span> <span class="n">array</span> <span class="ow">not</span> <span class="ow">in</span> <span class="p">[</span><span class="s">&#39;12m&#39;</span><span class="p">,</span> <span class="s">&#39;7m&#39;</span><span class="p">,</span> <span class="s">&#39;tp&#39;</span><span class="p">]:</span>
-            <span class="k">print</span><span class="p">(</span><span class="s">&quot;Use 12m, 7m or tp for array selection.&quot;</span><span class="p">)</span>
-            <span class="k">return</span> <span class="bp">None</span>
-
-        <span class="k">else</span><span class="p">:</span>
-            <span class="k">if</span> <span class="n">array</span> <span class="o">==</span> <span class="s">&#39;12m&#39;</span><span class="p">:</span>
-                <span class="n">array1</span> <span class="o">=</span> <span class="p">[</span><span class="s">&#39;TWELVE-M&#39;</span><span class="p">]</span>
-            <span class="k">elif</span> <span class="n">array</span> <span class="o">==</span> <span class="s">&#39;7m&#39;</span><span class="p">:</span>
-                <span class="n">array1</span> <span class="o">=</span> <span class="p">[</span><span class="s">&#39;SEVEN-M&#39;</span><span class="p">,</span> <span class="s">&#39;ACA&#39;</span><span class="p">]</span>
-            <span class="k">else</span><span class="p">:</span>
-                <span class="n">array1</span> <span class="o">=</span> <span class="p">[</span><span class="s">&#39;TP-Array&#39;</span><span class="p">]</span>
-
-        <span class="n">fg</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">fieldsource</span><span class="o">.</span><span class="n">query</span><span class="p">(</span>
-            <span class="s">&#39;isQuery == False and name == &quot;Primary:&quot;&#39;</span>
-        <span class="p">)</span><span class="o">.</span><span class="n">groupby</span><span class="p">(</span><span class="s">&#39;SB_UID&#39;</span><span class="p">)</span>
-        <span class="n">p</span> <span class="o">=</span> <span class="n">pd</span><span class="o">.</span><span class="n">DataFrame</span><span class="p">(</span>
-            <span class="p">[</span><span class="n">fg</span><span class="o">.</span><span class="n">pointings</span><span class="o">.</span><span class="n">mean</span><span class="p">(),</span> <span class="n">fg</span><span class="o">.</span><span class="n">pointings</span><span class="o">.</span><span class="n">count</span><span class="p">()],</span>
-            <span class="n">index</span><span class="o">=</span><span class="p">[</span><span class="s">&#39;pointings&#39;</span><span class="p">,</span> <span class="s">&#39;sources&#39;</span><span class="p">])</span><span class="o">.</span><span class="n">transpose</span><span class="p">()</span>
-        <span class="n">pwvcol</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">pwvdata</span><span class="p">[[</span><span class="nb">str</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">pwv</span><span class="p">)]]</span>
-        <span class="n">sum2</span> <span class="o">=</span> <span class="n">pd</span><span class="o">.</span><span class="n">merge</span><span class="p">(</span>
-            <span class="bp">self</span><span class="o">.</span><span class="n">sb_summary</span><span class="p">,</span> <span class="n">pwvcol</span><span class="p">,</span> <span class="n">left_on</span><span class="o">=</span><span class="s">&#39;repfreq&#39;</span><span class="p">,</span> <span class="n">right_index</span><span class="o">=</span><span class="bp">True</span><span class="p">)</span>
-        <span class="n">sum2</span> <span class="o">=</span> <span class="n">sum2</span><span class="o">.</span><span class="n">rename</span><span class="p">(</span>
-            <span class="n">columns</span><span class="o">=</span><span class="p">{</span><span class="nb">str</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">pwv</span><span class="p">):</span> <span class="s">&#39;transmission&#39;</span><span class="p">})</span>
-        <span class="n">ind1</span> <span class="o">=</span> <span class="n">sum2</span><span class="o">.</span><span class="n">repfreq</span>
-        <span class="n">ind2</span> <span class="o">=</span> <span class="n">pd</span><span class="o">.</span><span class="n">np</span><span class="o">.</span><span class="n">around</span><span class="p">(</span><span class="n">sum2</span><span class="o">.</span><span class="n">maxPWVC</span><span class="p">,</span> <span class="n">decimals</span><span class="o">=</span><span class="mi">1</span><span class="p">)</span><span class="o">.</span><span class="n">astype</span><span class="p">(</span><span class="nb">str</span><span class="p">)</span>
-        <span class="n">sum2</span><span class="p">[</span><span class="s">&#39;tau_org&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">tau</span><span class="o">.</span><span class="n">lookup</span><span class="p">(</span><span class="n">ind1</span><span class="p">,</span> <span class="n">ind2</span><span class="p">)</span>
-        <span class="n">sum2</span><span class="p">[</span><span class="s">&#39;tsky_org&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">tsky</span><span class="o">.</span><span class="n">lookup</span><span class="p">(</span><span class="n">ind1</span><span class="p">,</span> <span class="n">ind2</span><span class="p">)</span>
-        <span class="n">sum2</span><span class="p">[</span><span class="s">&#39;airmass&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="mi">1</span><span class="o">/</span><span class="n">pd</span><span class="o">.</span><span class="n">np</span><span class="o">.</span><span class="n">cos</span><span class="p">(</span><span class="n">pd</span><span class="o">.</span><span class="n">np</span><span class="o">.</span><span class="n">radians</span><span class="p">(</span><span class="o">-</span><span class="mf">23.0262015</span> <span class="o">-</span> <span class="n">sum2</span><span class="o">.</span><span class="n">DEC</span><span class="p">))</span>
-        <span class="n">sum2</span> <span class="o">=</span> <span class="n">pd</span><span class="o">.</span><span class="n">merge</span><span class="p">(</span><span class="n">sum2</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">reciever</span><span class="p">,</span> <span class="n">left_on</span><span class="o">=</span><span class="s">&#39;band&#39;</span><span class="p">,</span> <span class="n">right_index</span><span class="o">=</span><span class="bp">True</span><span class="p">,</span>
-                        <span class="n">how</span><span class="o">=</span><span class="s">&#39;left&#39;</span><span class="p">)</span>
-        <span class="n">tskycol</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">tsky</span><span class="p">[[</span><span class="nb">str</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">pwv</span><span class="p">)]]</span>
-        <span class="n">sum2</span> <span class="o">=</span> <span class="n">pd</span><span class="o">.</span><span class="n">merge</span><span class="p">(</span><span class="n">sum2</span><span class="p">,</span> <span class="n">tskycol</span><span class="p">,</span> <span class="n">left_on</span><span class="o">=</span><span class="s">&#39;repfreq&#39;</span><span class="p">,</span> <span class="n">right_index</span><span class="o">=</span><span class="bp">True</span><span class="p">)</span>
-        <span class="n">taucol</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">tau</span><span class="p">[[</span><span class="nb">str</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">pwv</span><span class="p">)]]</span>
-        <span class="n">sum2</span> <span class="o">=</span> <span class="n">sum2</span><span class="o">.</span><span class="n">rename</span><span class="p">(</span>
-            <span class="n">columns</span><span class="o">=</span><span class="p">{</span><span class="nb">str</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">pwv</span><span class="p">):</span> <span class="s">&#39;tsky&#39;</span><span class="p">})</span>
-        <span class="n">sum2</span> <span class="o">=</span> <span class="n">pd</span><span class="o">.</span><span class="n">merge</span><span class="p">(</span><span class="n">sum2</span><span class="p">,</span> <span class="n">taucol</span><span class="p">,</span>  <span class="n">left_on</span><span class="o">=</span><span class="s">&#39;repfreq&#39;</span><span class="p">,</span> <span class="n">right_index</span><span class="o">=</span><span class="bp">True</span><span class="p">)</span>
-        <span class="n">sum2</span> <span class="o">=</span> <span class="n">sum2</span><span class="o">.</span><span class="n">rename</span><span class="p">(</span>
-            <span class="n">columns</span><span class="o">=</span><span class="p">{</span><span class="nb">str</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">pwv</span><span class="p">):</span> <span class="s">&#39;tau&#39;</span><span class="p">})</span>
-        <span class="k">print</span><span class="p">(</span><span class="s">&quot;SBs in sb_summary: </span><span class="si">%d</span><span class="s">. SBs merged with tau/tsky info: </span><span class="si">%d</span><span class="s">.&quot;</span> <span class="o">%</span>
-              <span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">sb_summary</span><span class="p">),</span> <span class="nb">len</span><span class="p">(</span><span class="n">sum2</span><span class="p">)))</span>
-
-        <span class="n">sum2</span><span class="p">[</span><span class="s">&#39;tsys&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="p">(</span>
-            <span class="mi">1</span> <span class="o">+</span> <span class="n">sum2</span><span class="p">[</span><span class="s">&#39;g&#39;</span><span class="p">])</span> <span class="o">*</span> \
-            <span class="p">(</span><span class="n">sum2</span><span class="p">[</span><span class="s">&#39;trx&#39;</span><span class="p">]</span> <span class="o">+</span> <span class="n">sum2</span><span class="p">[</span><span class="s">&#39;tsky&#39;</span><span class="p">]</span> <span class="o">*</span>
-             <span class="p">((</span><span class="mi">1</span> <span class="o">-</span> <span class="n">pd</span><span class="o">.</span><span class="n">np</span><span class="o">.</span><span class="n">exp</span><span class="p">(</span><span class="o">-</span><span class="mi">1</span><span class="o">*</span><span class="n">sum2</span><span class="p">[</span><span class="s">&#39;airmass&#39;</span><span class="p">]</span><span class="o">*</span><span class="n">sum2</span><span class="p">[</span><span class="s">&#39;tau&#39;</span><span class="p">]))</span> <span class="o">/</span>
-              <span class="p">(</span><span class="mi">1</span> <span class="o">-</span> <span class="n">pd</span><span class="o">.</span><span class="n">np</span><span class="o">.</span><span class="n">exp</span><span class="p">(</span><span class="o">-</span><span class="mf">1.</span> <span class="o">*</span> <span class="n">sum2</span><span class="p">[</span><span class="s">&#39;tau&#39;</span><span class="p">])))</span> <span class="o">*</span> <span class="mf">0.95</span> <span class="o">+</span> <span class="mf">0.05</span> <span class="o">*</span> <span class="mf">270.</span><span class="p">)</span> <span class="o">/</span> \
-            <span class="p">(</span><span class="mf">0.95</span> <span class="o">*</span> <span class="n">pd</span><span class="o">.</span><span class="n">np</span><span class="o">.</span><span class="n">exp</span><span class="p">(</span><span class="o">-</span><span class="mi">1</span> <span class="o">*</span> <span class="n">sum2</span><span class="p">[</span><span class="s">&#39;tau&#39;</span><span class="p">]</span> <span class="o">*</span> <span class="n">sum2</span><span class="p">[</span><span class="s">&#39;airmass&#39;</span><span class="p">]))</span>
-        <span class="n">sum2</span><span class="p">[</span><span class="s">&#39;tsys_org&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="p">(</span>
-            <span class="mi">1</span> <span class="o">+</span> <span class="n">sum2</span><span class="p">[</span><span class="s">&#39;g&#39;</span><span class="p">])</span> <span class="o">*</span> \
-            <span class="p">(</span><span class="n">sum2</span><span class="p">[</span><span class="s">&#39;trx&#39;</span><span class="p">]</span> <span class="o">+</span> <span class="n">sum2</span><span class="p">[</span><span class="s">&#39;tsky_org&#39;</span><span class="p">]</span> <span class="o">*</span>
-             <span class="p">((</span><span class="mi">1</span> <span class="o">-</span> <span class="n">pd</span><span class="o">.</span><span class="n">np</span><span class="o">.</span><span class="n">exp</span><span class="p">(</span><span class="o">-</span><span class="mi">1</span><span class="o">*</span><span class="n">sum2</span><span class="p">[</span><span class="s">&#39;airmass&#39;</span><span class="p">]</span><span class="o">*</span><span class="n">sum2</span><span class="p">[</span><span class="s">&#39;tau_org&#39;</span><span class="p">]))</span> <span class="o">/</span>
-              <span class="p">(</span><span class="mi">1</span> <span class="o">-</span> <span class="n">pd</span><span class="o">.</span><span class="n">np</span><span class="o">.</span><span class="n">exp</span><span class="p">(</span><span class="o">-</span><span class="mf">1.</span> <span class="o">*</span> <span class="n">sum2</span><span class="p">[</span><span class="s">&#39;tau_org&#39;</span><span class="p">])))</span> <span class="o">*</span> <span class="mf">0.95</span> <span class="o">+</span> <span class="mf">0.05</span> <span class="o">*</span> <span class="mf">270.</span><span class="p">)</span> <span class="o">/</span> \
-            <span class="p">(</span><span class="mf">0.95</span> <span class="o">*</span> <span class="n">pd</span><span class="o">.</span><span class="n">np</span><span class="o">.</span><span class="n">exp</span><span class="p">(</span><span class="o">-</span><span class="mi">1</span> <span class="o">*</span> <span class="n">sum2</span><span class="p">[</span><span class="s">&#39;tau_org&#39;</span><span class="p">]</span> <span class="o">*</span> <span class="n">sum2</span><span class="p">[</span><span class="s">&#39;airmass&#39;</span><span class="p">]))</span>
-
-        <span class="n">sel1</span> <span class="o">=</span> <span class="n">sum2</span><span class="p">[</span><span class="n">sum2</span><span class="o">.</span><span class="n">transmission</span> <span class="o">&gt;</span> <span class="bp">self</span><span class="o">.</span><span class="n">transmission</span><span class="p">]</span>
-
-        <span class="k">print</span><span class="p">(</span><span class="s">&quot;SBs with a transmission higher than </span><span class="si">%2.1f</span><span class="s">: </span><span class="si">%d</span><span class="s">&quot;</span> <span class="o">%</span>
-              <span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">transmission</span><span class="p">,</span> <span class="nb">len</span><span class="p">(</span><span class="n">sel1</span><span class="p">)))</span>
-
-        <span class="k">if</span> <span class="n">array</span> <span class="o">==</span> <span class="s">&#39;7m&#39;</span><span class="p">:</span>
-            <span class="n">sel2</span> <span class="o">=</span> <span class="n">sel1</span><span class="p">[</span>
-                <span class="p">(</span><span class="n">sel1</span><span class="o">.</span><span class="n">array</span> <span class="o">==</span> <span class="n">array1</span><span class="p">[</span><span class="mi">0</span><span class="p">])</span> <span class="o">|</span>
-                <span class="p">(</span><span class="n">sel1</span><span class="o">.</span><span class="n">array</span> <span class="o">==</span> <span class="n">array1</span><span class="p">[</span><span class="mi">1</span><span class="p">])]</span>
-        <span class="k">else</span><span class="p">:</span>
-            <span class="n">sel2</span> <span class="o">=</span> <span class="n">sel1</span><span class="p">[</span><span class="n">sel1</span><span class="o">.</span><span class="n">array</span> <span class="o">==</span> <span class="n">array1</span><span class="p">[</span><span class="mi">0</span><span class="p">]]</span>
-
-        <span class="k">print</span><span class="p">(</span><span class="s">&quot;SBs for </span><span class="si">%s</span><span class="s"> array: </span><span class="si">%d</span><span class="s">&quot;</span> <span class="o">%</span> <span class="p">(</span><span class="n">array</span><span class="p">,</span> <span class="nb">len</span><span class="p">(</span><span class="n">sel2</span><span class="p">)))</span>
-
-        <span class="bp">self</span><span class="o">.</span><span class="n">alma</span><span class="o">.</span><span class="n">date</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">date</span>
-        <span class="n">lst</span> <span class="o">=</span> <span class="n">pd</span><span class="o">.</span><span class="n">np</span><span class="o">.</span><span class="n">degrees</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">alma</span><span class="o">.</span><span class="n">sidereal_time</span><span class="p">())</span>
-        <span class="k">print</span> <span class="bp">self</span><span class="o">.</span><span class="n">alma</span><span class="o">.</span><span class="n">date</span><span class="p">,</span> <span class="n">lst</span>
-        <span class="n">ha</span> <span class="o">=</span> <span class="p">(</span><span class="n">lst</span> <span class="o">-</span> <span class="n">sel2</span><span class="o">.</span><span class="n">RA</span><span class="p">)</span> <span class="o">/</span> <span class="mf">15.</span>
-        <span class="n">ha</span><span class="o">.</span><span class="n">loc</span><span class="p">[</span><span class="n">ha</span> <span class="o">&gt;</span> <span class="mi">12</span><span class="p">]</span> <span class="o">=</span> <span class="n">ha</span><span class="o">.</span><span class="n">loc</span><span class="p">[</span><span class="n">ha</span> <span class="o">&gt;</span> <span class="mi">12</span><span class="p">]</span> <span class="o">-</span> <span class="mf">24.</span>
-        <span class="n">ha</span><span class="o">.</span><span class="n">loc</span><span class="p">[</span><span class="n">ha</span> <span class="o">&lt;</span> <span class="o">-</span><span class="mi">12</span><span class="p">]</span> <span class="o">=</span> <span class="mf">24.</span> <span class="o">+</span> <span class="n">ha</span><span class="o">.</span><span class="n">loc</span><span class="p">[</span><span class="n">ha</span> <span class="o">&lt;</span> <span class="o">-</span><span class="mi">12</span><span class="p">]</span>
-        <span class="n">sel2</span><span class="p">[</span><span class="s">&#39;HA&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">ha</span>
-        <span class="n">sel2</span> <span class="o">=</span> <span class="n">sel2</span>
-        <span class="n">sel3</span> <span class="o">=</span> <span class="n">sel2</span><span class="p">[((</span><span class="n">sel2</span><span class="o">.</span><span class="n">HA</span> <span class="o">&gt;</span> <span class="bp">self</span><span class="o">.</span><span class="n">minha</span><span class="p">)</span> <span class="o">&amp;</span> <span class="p">(</span><span class="n">sel2</span><span class="o">.</span><span class="n">HA</span> <span class="o">&lt;</span> <span class="bp">self</span><span class="o">.</span><span class="n">maxha</span><span class="p">))</span> <span class="o">|</span>
-                    <span class="p">(</span><span class="n">sel2</span><span class="o">.</span><span class="n">RA</span> <span class="o">==</span> <span class="mf">0.</span><span class="p">)]</span>
-        <span class="n">sel3</span><span class="p">[</span><span class="s">&#39;tsysfrac&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="p">(</span><span class="n">sel3</span><span class="o">.</span><span class="n">tsys</span> <span class="o">/</span> <span class="n">sel3</span><span class="o">.</span><span class="n">tsys_org</span><span class="p">)</span> <span class="o">**</span> <span class="mf">2.</span>
-        <span class="k">print</span><span class="p">(</span><span class="s">&quot;SBs within current HA limits (or RA=0): </span><span class="si">%d</span><span class="s">&quot;</span> <span class="o">%</span> <span class="nb">len</span><span class="p">(</span><span class="n">sel3</span><span class="p">))</span>
-        <span class="n">sel4</span> <span class="o">=</span> <span class="n">pd</span><span class="o">.</span><span class="n">merge</span><span class="p">(</span><span class="n">sel3</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">obser_prop</span><span class="p">,</span> <span class="n">left_on</span><span class="o">=</span><span class="s">&#39;SB_UID&#39;</span><span class="p">,</span>
-                        <span class="n">right_index</span><span class="o">=</span><span class="bp">True</span><span class="p">)</span>
-        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">not_horizon</span> <span class="ow">is</span> <span class="bp">False</span><span class="p">:</span>
-            <span class="n">sel4</span> <span class="o">=</span> <span class="n">sel4</span><span class="o">.</span><span class="n">query</span><span class="p">(</span><span class="s">&#39;up == 1 and etime &gt; 1.5&#39;</span><span class="p">)</span>
-            <span class="k">print</span><span class="p">(</span><span class="s">&quot;SBs over </span><span class="si">%d</span><span class="s"> degrees, 1.5 hours: </span><span class="si">%d</span><span class="s">&quot;</span> <span class="o">%</span>
-                  <span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">horizon</span><span class="p">,</span> <span class="nb">len</span><span class="p">(</span><span class="n">sel4</span><span class="p">)))</span>
-        <span class="n">sel4</span> <span class="o">=</span> <span class="n">sel4</span><span class="o">.</span><span class="n">query</span><span class="p">(</span>
-            <span class="s">&#39;SB_state != &quot;Phase2Submitted&quot;&#39;</span>
-            <span class="s">&#39; and SB_state != &quot;FullyObserved&quot;&#39;</span>
-            <span class="s">&#39; and SB_state != &quot;FullyObserved&quot;&#39;</span>
-            <span class="s">&#39; and PRJ_state != &quot;Phase2Submitted&quot;&#39;</span>
-            <span class="s">&#39; and PRJ_state != &quot;Completed&quot;&#39;</span><span class="p">)</span>
-        <span class="n">sel4</span> <span class="o">=</span> <span class="n">sel4</span><span class="p">[</span><span class="n">sel4</span><span class="o">.</span><span class="n">name</span><span class="o">.</span><span class="n">str</span><span class="o">.</span><span class="n">contains</span><span class="p">(</span><span class="s">&#39;not&#39;</span><span class="p">,</span> <span class="n">case</span><span class="o">=</span><span class="bp">False</span><span class="p">)</span> <span class="o">==</span> <span class="bp">False</span><span class="p">]</span>
-        <span class="k">print</span><span class="p">(</span><span class="s">&quot;SBs with Ok state: </span><span class="si">%d</span><span class="s">&quot;</span> <span class="o">%</span> <span class="nb">len</span><span class="p">(</span><span class="n">sel4</span><span class="p">))</span>
-        <span class="n">sel4</span> <span class="o">=</span> <span class="n">sel4</span><span class="o">.</span><span class="n">query</span><span class="p">(</span><span class="s">&#39;execount &gt; Total&#39;</span><span class="p">)</span>
-        <span class="k">print</span><span class="p">(</span><span class="s">&quot;SBs with missing exec: </span><span class="si">%d</span><span class="s">&quot;</span> <span class="o">%</span> <span class="nb">len</span><span class="p">(</span><span class="n">sel4</span><span class="p">))</span>
-        <span class="n">sel4</span> <span class="o">=</span> <span class="n">pd</span><span class="o">.</span><span class="n">merge</span><span class="p">(</span><span class="n">sel4</span><span class="p">,</span> <span class="n">p</span><span class="p">,</span> <span class="n">left_on</span><span class="o">=</span><span class="s">&#39;SB_UID&#39;</span><span class="p">,</span> <span class="n">right_index</span><span class="o">=</span><span class="bp">True</span><span class="p">,</span> <span class="n">how</span><span class="o">=</span><span class="s">&#39;left&#39;</span><span class="p">)</span>
-
-        <span class="k">if</span> <span class="n">array</span> <span class="o">==</span> <span class="s">&#39;12m&#39;</span><span class="p">:</span>
-            <span class="n">sel4</span> <span class="o">=</span> <span class="n">sel4</span><span class="o">.</span><span class="n">query</span><span class="p">(</span>
-                <span class="s">&#39;(arrayMinAR &lt; </span><span class="si">%f</span><span class="s"> and </span><span class="si">%f</span><span class="s"> &lt; arrayMaxAR) &#39;</span> <span class="o">%</span>
-                <span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">array_ar</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">array_ar</span><span class="p">))</span>
-            <span class="k">print</span><span class="p">(</span><span class="s">&quot;SBs for current 12m Array AR: </span><span class="si">%d</span><span class="s">. &quot;</span>
-                  <span class="s">&quot;(AR=</span><span class="si">%.2f</span><span class="s">, #bl=</span><span class="si">%d</span><span class="s">, #ant=</span><span class="si">%d</span><span class="s">)&quot;</span> <span class="o">%</span>
-                  <span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">sel4</span><span class="p">),</span> <span class="bp">self</span><span class="o">.</span><span class="n">array_ar</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">num_bl</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">num_ant</span><span class="p">))</span>
-            <span class="n">sel4</span><span class="p">[</span><span class="s">&#39;blmax&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">sel4</span><span class="o">.</span><span class="n">apply</span><span class="p">(</span>
-                <span class="k">lambda</span> <span class="n">row</span><span class="p">:</span> <span class="n">rUV</span><span class="o">.</span><span class="n">computeBL</span><span class="p">(</span><span class="n">row</span><span class="p">[</span><span class="s">&#39;AR&#39;</span><span class="p">],</span> <span class="n">row</span><span class="p">[</span><span class="s">&#39;repfreq&#39;</span><span class="p">]),</span> <span class="n">axis</span><span class="o">=</span><span class="mi">1</span><span class="p">)</span>
-            <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">array_name</span> <span class="ow">is</span> <span class="ow">not</span> <span class="bp">None</span><span class="p">:</span>
-                <span class="n">sel4</span><span class="p">[</span><span class="s">&#39;blfrac&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">sel4</span><span class="o">.</span><span class="n">apply</span><span class="p">(</span>
-                    <span class="k">lambda</span> <span class="n">row</span><span class="p">:</span> <span class="p">(</span><span class="mf">33.</span> <span class="o">*</span> <span class="mi">17</span><span class="p">)</span> <span class="o">/</span> <span class="p">(</span><span class="mf">1.</span><span class="o">*</span><span class="nb">len</span><span class="p">(</span>
-                        <span class="bp">self</span><span class="o">.</span><span class="n">ruv</span><span class="p">[</span><span class="bp">self</span><span class="o">.</span><span class="n">ruv</span> <span class="o">&lt;</span> <span class="n">row</span><span class="p">[</span><span class="s">&#39;blmax&#39;</span><span class="p">]]))</span>
-                    <span class="k">if</span> <span class="p">(</span><span class="n">row</span><span class="p">[</span><span class="s">&#39;LAS&#39;</span><span class="p">]</span> <span class="o">!=</span> <span class="mi">0</span><span class="p">)</span>
-                    <span class="k">else</span> <span class="p">(</span><span class="mf">33.</span> <span class="o">*</span> <span class="mi">17</span><span class="p">)</span> <span class="o">/</span>
-                         <span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">num_ant</span><span class="o">*</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">num_ant</span> <span class="o">-</span> <span class="mi">1</span><span class="p">)</span> <span class="o">/</span> <span class="mf">2.</span><span class="p">),</span>
-                    <span class="n">axis</span><span class="o">=</span><span class="mi">1</span><span class="p">)</span>
-            <span class="k">else</span><span class="p">:</span>
-                <span class="n">sel4</span><span class="p">[</span><span class="s">&#39;blfrac&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">sel4</span><span class="o">.</span><span class="n">apply</span><span class="p">(</span>
-                    <span class="k">lambda</span> <span class="n">row</span><span class="p">:</span> <span class="p">(</span><span class="mf">33.</span> <span class="o">*</span> <span class="mi">17</span><span class="p">)</span> <span class="o">/</span> <span class="p">(</span><span class="mf">1.</span><span class="o">*</span><span class="nb">len</span><span class="p">(</span>
-                        <span class="bp">self</span><span class="o">.</span><span class="n">ruv</span><span class="p">[</span><span class="bp">self</span><span class="o">.</span><span class="n">ruv</span> <span class="o">&lt;</span> <span class="n">row</span><span class="p">[</span><span class="s">&#39;blmax&#39;</span><span class="p">]]))</span>
-                    <span class="k">if</span> <span class="p">(</span><span class="n">row</span><span class="p">[</span><span class="s">&#39;LAS&#39;</span><span class="p">]</span> <span class="o">!=</span> <span class="mi">0</span><span class="p">)</span>
-                    <span class="k">else</span> <span class="p">(</span><span class="mf">33.</span> <span class="o">*</span> <span class="mi">17</span><span class="p">)</span> <span class="o">/</span>
-                         <span class="p">(</span><span class="mf">34.</span><span class="o">*</span><span class="p">(</span><span class="mf">34.</span> <span class="o">-</span> <span class="mi">1</span><span class="p">)</span> <span class="o">/</span> <span class="mf">2.</span><span class="p">),</span>
-                    <span class="n">axis</span><span class="o">=</span><span class="mi">1</span><span class="p">)</span>
-                <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">num_ant</span> <span class="o">!=</span> <span class="mi">34</span><span class="p">:</span>
-                    <span class="n">sel4</span><span class="p">[</span><span class="s">&#39;blfrac&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">sel4</span><span class="o">.</span><span class="n">blfrac</span> <span class="o">*</span> <span class="p">(</span>
-                        <span class="mi">33</span> <span class="o">*</span> <span class="mi">17</span> <span class="o">/</span> <span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">num_ant</span><span class="o">*</span><span class="p">(</span>
-                            <span class="bp">self</span><span class="o">.</span><span class="n">num_ant</span> <span class="o">-</span> <span class="mi">1</span><span class="p">)</span> <span class="o">/</span> <span class="mf">2.</span><span class="p">))</span>
-            <span class="n">sel4</span><span class="p">[</span><span class="s">&#39;frac&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">sel4</span><span class="o">.</span><span class="n">tsysfrac</span> <span class="o">*</span> <span class="n">sel4</span><span class="o">.</span><span class="n">blfrac</span>
-            <span class="bp">self</span><span class="o">.</span><span class="n">select12m</span> <span class="o">=</span> <span class="n">sel4</span>
-
-            <span class="c"># special = sel4.query(</span>
-            <span class="c">#     &#39;PRJ_state != &quot;Completed&quot; and SB_state != &quot;FullyObserved&quot;&#39;</span>
-            <span class="c">#     &#39; and SB_state != &quot;Deleted&quot; and isTimeConstrained == False&#39;</span>
-            <span class="c">#     &#39; and frac &lt; 1.3 and PRJ_state != &quot;Phase2Submitted&quot;&#39;)</span>
-            <span class="c"># special = special[</span>
-            <span class="c">#     special.name.str.contains(&#39;not&#39;, case=False) == False]</span>
-            <span class="c"># special = special[special.isPolarization == False]</span>
-            <span class="c"># special[[&#39;SB_UID&#39;, &#39;name&#39;]].to_csv(</span>
-            <span class="c">#     self.path + &#39;special.sbinfo&#39;, header=False, index=False,</span>
-            <span class="c">#     sep=&#39; &#39;)</span>
-        <span class="k">elif</span> <span class="n">array</span> <span class="o">==</span> <span class="s">&#39;7m&#39;</span><span class="p">:</span>
-            <span class="n">sel4</span><span class="p">[</span><span class="s">&#39;blfrac&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">sel4</span><span class="o">.</span><span class="n">RA</span> <span class="o">*</span> <span class="mf">0.</span> <span class="o">+</span> <span class="mf">1.</span>
-            <span class="k">print</span> <span class="bp">self</span><span class="o">.</span><span class="n">num_ant</span>
-            <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">num_ant</span> <span class="o">!=</span> <span class="mi">9</span><span class="p">:</span>
-                <span class="n">sel4</span><span class="p">[</span><span class="s">&#39;blfrac&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">sel4</span><span class="o">.</span><span class="n">blfrac</span> <span class="o">*</span> <span class="p">(</span>
-                    <span class="mi">9</span> <span class="o">*</span> <span class="mi">4</span> <span class="o">/</span> <span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">num_ant</span><span class="o">*</span><span class="p">(</span>
-                        <span class="bp">self</span><span class="o">.</span><span class="n">num_ant</span> <span class="o">-</span> <span class="mi">1</span><span class="p">)</span> <span class="o">/</span> <span class="mf">2.</span><span class="p">))</span>
-            <span class="n">sel4</span><span class="p">[</span><span class="s">&#39;frac&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">sel4</span><span class="o">.</span><span class="n">tsysfrac</span> <span class="o">*</span> <span class="n">sel4</span><span class="o">.</span><span class="n">blfrac</span>
-            <span class="bp">self</span><span class="o">.</span><span class="n">select7m</span> <span class="o">=</span> <span class="n">sel4</span>
-        <span class="k">else</span><span class="p">:</span>
-            <span class="bp">self</span><span class="o">.</span><span class="n">selecttp</span> <span class="o">=</span> <span class="n">sel4</span>
-        <span class="k">pass</span>
-
-        <span class="c"># TODO: merge sb_summary with target left on SB_UID, science, right on</span>
-        <span class="c">#       SB_UID, paramRef (t1)</span>
-        <span class="c"># TODO: merge t1 with fieldsource on fieldRef (and SB_UID) (t2)</span>
-        <span class="c"># TODO: group t2 by SB_UID and calculate mean RA_y and DEC_y</span>
-</div>
-<div class="viewcode-block" id="WtoAlgorithm.scorer"><a class="viewcode-back" href="../index.html#wtoAlgorithm.WtoAlgorithm.scorer">[docs]</a>    <span class="k">def</span> <span class="nf">scorer</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">array</span><span class="p">):</span>
-        <span class="sd">&quot;&quot;&quot;</span>
-
-<span class="sd">        :param array:</span>
-<span class="sd">        &quot;&quot;&quot;</span>
-        <span class="k">if</span> <span class="n">array</span> <span class="o">==</span> <span class="s">&#39;12m&#39;</span><span class="p">:</span>
-            <span class="n">df</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">select12m</span>
-        <span class="k">elif</span> <span class="n">array</span> <span class="o">==</span> <span class="s">&#39;7m&#39;</span><span class="p">:</span>
-            <span class="n">df</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">select7m</span>
-        <span class="k">else</span><span class="p">:</span>
-            <span class="n">df</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">selecttp</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">max_scirank</span> <span class="o">=</span> <span class="n">df</span><span class="o">.</span><span class="n">scienceRank</span><span class="o">.</span><span class="n">max</span><span class="p">()</span>
-        <span class="n">scores</span> <span class="o">=</span> <span class="n">df</span><span class="o">.</span><span class="n">apply</span><span class="p">(</span>
-            <span class="k">lambda</span> <span class="n">r</span><span class="p">:</span> <span class="bp">self</span><span class="o">.</span><span class="n">calculate_score</span><span class="p">(</span>
-                <span class="n">r</span><span class="p">[</span><span class="s">&#39;execount&#39;</span><span class="p">],</span> <span class="n">r</span><span class="p">[</span><span class="s">&#39;Total&#39;</span><span class="p">],</span> <span class="n">r</span><span class="p">[</span><span class="s">&#39;scienceRank&#39;</span><span class="p">],</span> <span class="n">r</span><span class="p">[</span><span class="s">&#39;AR&#39;</span><span class="p">],</span>
-                <span class="n">r</span><span class="p">[</span><span class="s">&#39;arrayMinAR&#39;</span><span class="p">],</span> <span class="n">r</span><span class="p">[</span><span class="s">&#39;arrayMaxAR&#39;</span><span class="p">],</span> <span class="n">r</span><span class="p">[</span><span class="s">&#39;LAS&#39;</span><span class="p">],</span>
-                <span class="n">r</span><span class="p">[</span><span class="s">&#39;grade&#39;</span><span class="p">],</span> <span class="n">r</span><span class="p">[</span><span class="s">&#39;repfreq&#39;</span><span class="p">],</span> <span class="n">r</span><span class="p">[</span><span class="s">&#39;DEC&#39;</span><span class="p">],</span> <span class="n">r</span><span class="p">[</span><span class="s">&#39;EXEC&#39;</span><span class="p">],</span> <span class="n">array</span><span class="p">,</span>
-                <span class="n">r</span><span class="p">[</span><span class="s">&#39;frac&#39;</span><span class="p">],</span> <span class="n">r</span><span class="p">[</span><span class="s">&#39;maxPWVC&#39;</span><span class="p">],</span> <span class="n">r</span><span class="p">[</span><span class="s">&#39;CODE&#39;</span><span class="p">]),</span>
-            <span class="n">axis</span><span class="o">=</span><span class="mi">1</span><span class="p">)</span>
-        <span class="n">scores</span> <span class="o">=</span> <span class="n">pd</span><span class="o">.</span><span class="n">DataFrame</span><span class="p">(</span><span class="n">scores</span><span class="o">.</span><span class="n">values</span><span class="o">.</span><span class="n">tolist</span><span class="p">(),</span> <span class="n">index</span><span class="o">=</span><span class="n">scores</span><span class="o">.</span><span class="n">index</span><span class="p">)</span>
-        <span class="n">scores</span><span class="o">.</span><span class="n">columns</span> <span class="o">=</span> <span class="n">pd</span><span class="o">.</span><span class="n">Index</span><span class="p">(</span>
-            <span class="p">[</span><span class="s">u&#39;sb_cond_score&#39;</span><span class="p">,</span> <span class="s">u&#39;sb_array_score&#39;</span><span class="p">,</span> <span class="s">u&#39;sb_completion_score&#39;</span><span class="p">,</span>
-             <span class="s">u&#39;sb_exec_score&#39;</span><span class="p">,</span> <span class="s">u&#39;sb_science_score&#39;</span><span class="p">,</span> <span class="s">u&#39;sb_grade_score&#39;</span><span class="p">,</span>
-             <span class="s">u&#39;arcorr&#39;</span><span class="p">,</span> <span class="s">u&#39;score&#39;</span><span class="p">])</span>
-        <span class="k">if</span> <span class="n">array</span> <span class="o">==</span> <span class="s">&#39;12m&#39;</span><span class="p">:</span>
-            <span class="bp">self</span><span class="o">.</span><span class="n">score12m</span> <span class="o">=</span> <span class="n">pd</span><span class="o">.</span><span class="n">merge</span><span class="p">(</span>
-                <span class="bp">self</span><span class="o">.</span><span class="n">select12m</span><span class="p">,</span> <span class="n">scores</span><span class="p">,</span> <span class="n">left_on</span><span class="o">=</span><span class="s">&#39;SB_UID&#39;</span><span class="p">,</span> <span class="n">right_index</span><span class="o">=</span><span class="bp">True</span><span class="p">)</span>
-        <span class="k">elif</span> <span class="n">array</span> <span class="o">==</span> <span class="s">&#39;7m&#39;</span><span class="p">:</span>
-            <span class="bp">self</span><span class="o">.</span><span class="n">score7m</span> <span class="o">=</span> <span class="n">pd</span><span class="o">.</span><span class="n">merge</span><span class="p">(</span>
-                <span class="bp">self</span><span class="o">.</span><span class="n">select7m</span><span class="p">,</span> <span class="n">scores</span><span class="p">,</span> <span class="n">left_on</span><span class="o">=</span><span class="s">&#39;SB_UID&#39;</span><span class="p">,</span> <span class="n">right_index</span><span class="o">=</span><span class="bp">True</span><span class="p">)</span>
-        <span class="k">else</span><span class="p">:</span>
-            <span class="bp">self</span><span class="o">.</span><span class="n">scoretp</span> <span class="o">=</span> <span class="n">pd</span><span class="o">.</span><span class="n">merge</span><span class="p">(</span>
-                <span class="bp">self</span><span class="o">.</span><span class="n">selecttp</span><span class="p">,</span> <span class="n">scores</span><span class="p">,</span> <span class="n">left_on</span><span class="o">=</span><span class="s">&#39;SB_UID&#39;</span><span class="p">,</span> <span class="n">right_index</span><span class="o">=</span><span class="bp">True</span><span class="p">)</span>
-</div>
-<div class="viewcode-block" id="WtoAlgorithm.calculate_score"><a class="viewcode-back" href="../index.html#wtoAlgorithm.WtoAlgorithm.calculate_score">[docs]</a>    <span class="k">def</span> <span class="nf">calculate_score</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">ecount</span><span class="p">,</span> <span class="n">tcount</span><span class="p">,</span> <span class="n">srank</span><span class="p">,</span> <span class="n">ar</span><span class="p">,</span> <span class="n">aminar</span><span class="p">,</span> <span class="n">amaxar</span><span class="p">,</span>
-                        <span class="n">las</span><span class="p">,</span> <span class="n">grade</span><span class="p">,</span> <span class="n">repfreq</span><span class="p">,</span> <span class="n">dec</span><span class="p">,</span> <span class="n">execu</span><span class="p">,</span> <span class="n">array</span><span class="p">,</span>
-                        <span class="n">frac</span><span class="p">,</span> <span class="n">maxpwvc</span><span class="p">,</span> <span class="n">code</span><span class="p">):</span>
-
-        <span class="c"># set sb completion score</span>
-        <span class="sd">&quot;&quot;&quot;</span>
-
-<span class="sd">        :param ecount:</span>
-<span class="sd">        :param tcount:</span>
-<span class="sd">        :param srank:</span>
-<span class="sd">        :param ar:</span>
-<span class="sd">        :param aminar:</span>
-<span class="sd">        :param amaxar:</span>
-<span class="sd">        :param tsysfrac:</span>
-<span class="sd">        :param blfrac:</span>
-<span class="sd">        :param grade:</span>
-<span class="sd">        :param repfreq:</span>
-<span class="sd">        :param dec:</span>
-<span class="sd">        :param execu:</span>
-<span class="sd">        :param array:</span>
-<span class="sd">        :param frac:</span>
-<span class="sd">        :return:</span>
-<span class="sd">        &quot;&quot;&quot;</span>
-        <span class="n">sb_completion</span> <span class="o">=</span> <span class="n">tcount</span> <span class="o">/</span> <span class="n">ecount</span>
-        <span class="n">sb_completion_score</span> <span class="o">=</span> <span class="mf">6.</span> <span class="o">*</span> <span class="n">sb_completion</span> <span class="o">+</span> <span class="mf">4.</span>
-
-        <span class="c"># set sb priority score</span>
-
-        <span class="k">if</span> <span class="n">grade</span> <span class="o">==</span> <span class="s">&#39;A&#39;</span><span class="p">:</span>
-            <span class="n">sb_grade_score</span> <span class="o">=</span> <span class="mf">10.</span>
-        <span class="k">elif</span> <span class="nb">str</span><span class="p">(</span><span class="n">code</span><span class="p">)</span><span class="o">.</span><span class="n">startswith</span><span class="p">(</span><span class="s">&#39;2012&#39;</span><span class="p">):</span>
-            <span class="n">sb_grade_score</span> <span class="o">=</span> <span class="mf">7.</span>
-        <span class="k">elif</span> <span class="n">grade</span> <span class="o">==</span> <span class="s">&#39;B&#39;</span><span class="p">:</span>
-            <span class="n">sb_grade_score</span> <span class="o">=</span> <span class="mf">6.</span>
-        <span class="k">else</span><span class="p">:</span>
-            <span class="n">sb_grade_score</span> <span class="o">=</span> <span class="o">-</span><span class="mf">100.</span>
-
-        <span class="c"># set science score</span>
-        <span class="n">sb_science_score</span> <span class="o">=</span> <span class="mf">10.</span> <span class="o">*</span> <span class="n">srank</span> <span class="o">/</span> <span class="bp">self</span><span class="o">.</span><span class="n">max_scirank</span>
-
-        <span class="c"># set array score</span>
-        <span class="k">if</span> <span class="n">array</span> <span class="o">==</span> <span class="s">&#39;7m&#39;</span> <span class="ow">or</span> <span class="n">array</span> <span class="o">==</span> <span class="s">&#39;tp&#39;</span><span class="p">:</span>
-            <span class="n">sb_array_score</span> <span class="o">=</span> <span class="mf">10.</span>
-            <span class="n">arcorr</span> <span class="o">=</span> <span class="mf">0.</span>
-        <span class="k">else</span><span class="p">:</span>
-            <span class="n">c_bmax</span> <span class="o">=</span> <span class="mf">0.862</span> <span class="o">/</span> <span class="n">pd</span><span class="o">.</span><span class="n">np</span><span class="o">.</span><span class="n">cos</span><span class="p">(</span><span class="n">pd</span><span class="o">.</span><span class="n">np</span><span class="o">.</span><span class="n">radians</span><span class="p">(</span><span class="o">-</span><span class="mf">23.0262015</span><span class="p">)</span> <span class="o">-</span>
-                                       <span class="n">pd</span><span class="o">.</span><span class="n">np</span><span class="o">.</span><span class="n">radians</span><span class="p">(</span><span class="n">dec</span><span class="p">))</span> <span class="o">+</span> <span class="mf">0.138</span>
-            <span class="n">c_freq</span> <span class="o">=</span> <span class="n">repfreq</span> <span class="o">/</span> <span class="mf">100.</span>
-            <span class="n">corr</span> <span class="o">=</span> <span class="n">c_freq</span> <span class="o">/</span> <span class="n">c_bmax</span>
-            <span class="n">arcorr</span> <span class="o">=</span> <span class="n">ar</span> <span class="o">*</span> <span class="n">corr</span>
-            <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">array_ar</span> <span class="o">&lt;</span> <span class="n">arcorr</span><span class="p">:</span>
-                <span class="n">l</span> <span class="o">=</span> <span class="n">arcorr</span> <span class="o">-</span> <span class="n">aminar</span>
-                <span class="n">s</span> <span class="o">=</span> <span class="mf">10.</span>
-
-                <span class="k">if</span> <span class="n">las</span> <span class="o">==</span> <span class="mi">0</span><span class="p">:</span>
-                    <span class="n">sb_array_score</span> <span class="o">=</span> <span class="p">(</span>
-                        <span class="p">((</span><span class="bp">self</span><span class="o">.</span><span class="n">array_ar</span> <span class="o">-</span> <span class="n">aminar</span><span class="p">)</span> <span class="o">/</span> <span class="n">l</span><span class="p">)</span><span class="o">**</span><span class="p">(</span><span class="mi">1</span><span class="o">/</span><span class="mf">8.</span><span class="p">))</span> <span class="o">*</span> <span class="mf">8.</span> <span class="o">+</span> <span class="mf">2.</span>
-                <span class="k">else</span><span class="p">:</span>
-                    <span class="n">sb_array_score</span> <span class="o">=</span> <span class="p">(</span>
-                        <span class="p">((</span><span class="bp">self</span><span class="o">.</span><span class="n">array_ar</span> <span class="o">-</span> <span class="n">aminar</span><span class="p">)</span> <span class="o">/</span> <span class="n">l</span><span class="p">)</span><span class="o">**</span><span class="p">(</span><span class="mi">1</span><span class="o">/</span><span class="mf">3.</span><span class="p">))</span> <span class="o">*</span> <span class="n">s</span>
-            <span class="k">elif</span> <span class="bp">self</span><span class="o">.</span><span class="n">array_ar</span> <span class="o">==</span> <span class="n">arcorr</span><span class="p">:</span>
-                <span class="n">sb_array_score</span> <span class="o">=</span> <span class="mf">10.</span>
-            <span class="k">else</span><span class="p">:</span>
-                <span class="n">l</span> <span class="o">=</span> <span class="n">arcorr</span> <span class="o">-</span> <span class="n">amaxar</span>
-                <span class="n">s</span> <span class="o">=</span> <span class="mf">10.</span> <span class="o">/</span> <span class="n">l</span>
-                <span class="n">sb_array_score</span> <span class="o">=</span> <span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">array_ar</span> <span class="o">-</span> <span class="n">amaxar</span><span class="p">)</span> <span class="o">*</span> <span class="n">s</span>
-        <span class="c"># set exec score:</span>
-        <span class="n">sb_exec_score</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">exec_prio</span><span class="p">[</span><span class="n">execu</span><span class="p">]</span>
-
-        <span class="c"># set condition score:</span>
-        <span class="n">pwv_corr</span> <span class="o">=</span> <span class="mi">1</span> <span class="o">-</span> <span class="p">(</span><span class="nb">abs</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">pwv</span> <span class="o">-</span> <span class="n">maxpwvc</span><span class="p">)</span><span class="o">/</span><span class="mf">6.</span><span class="p">)</span>
-        <span class="k">if</span> <span class="n">pwv_corr</span> <span class="o">&gt;</span> <span class="mi">6</span><span class="p">:</span>
-            <span class="n">pwv_corr</span> <span class="o">=</span> <span class="mf">0.</span>
-
-        <span class="k">if</span> <span class="n">frac</span> <span class="o">&lt;</span> <span class="mi">1</span><span class="p">:</span>
-            <span class="n">x</span> <span class="o">=</span> <span class="n">frac</span> <span class="o">-</span> <span class="mf">1.</span>
-            <span class="n">sb_cond_score</span> <span class="o">=</span> <span class="mi">10</span> <span class="o">*</span> <span class="p">(</span><span class="mi">1</span> <span class="o">-</span> <span class="p">(</span><span class="n">x</span> <span class="o">**</span> <span class="mf">2.</span><span class="p">))</span> <span class="o">*</span> <span class="n">pwv_corr</span>
-        <span class="k">elif</span> <span class="n">frac</span> <span class="o">==</span> <span class="mi">1</span><span class="p">:</span>
-            <span class="n">sb_cond_score</span> <span class="o">=</span> <span class="mf">10.</span>
-        <span class="k">else</span><span class="p">:</span>
-            <span class="n">x</span> <span class="o">=</span> <span class="n">frac</span> <span class="o">-</span> <span class="mi">1</span>
-            <span class="k">if</span> <span class="n">frac</span> <span class="o">&lt;=</span> <span class="mf">1.4</span><span class="p">:</span>
-                <span class="n">sb_cond_score</span> <span class="o">=</span> <span class="p">(</span><span class="mf">1.</span> <span class="o">-</span> <span class="p">(</span><span class="n">x</span> <span class="o">/</span> <span class="mf">0.4</span><span class="p">)</span><span class="o">**</span><span class="mf">3.</span><span class="p">)</span> <span class="o">*</span> <span class="mf">10.</span> <span class="o">*</span> <span class="n">pwv_corr</span>
-            <span class="k">else</span><span class="p">:</span>
-                <span class="n">sb_cond_score</span> <span class="o">=</span> <span class="mf">0.</span>
-
-        <span class="n">score</span> <span class="o">=</span> <span class="p">(</span><span class="mf">0.35</span> <span class="o">*</span> <span class="n">sb_cond_score</span> <span class="o">+</span>
-                 <span class="mf">0.20</span> <span class="o">*</span> <span class="n">sb_array_score</span> <span class="o">+</span>
-                 <span class="mf">0.15</span> <span class="o">*</span> <span class="n">sb_completion_score</span> <span class="o">+</span>
-                 <span class="mf">0.10</span> <span class="o">*</span> <span class="n">sb_exec_score</span> <span class="o">+</span>
-                 <span class="mf">0.05</span> <span class="o">*</span> <span class="n">sb_science_score</span> <span class="o">+</span>
-                 <span class="mf">0.15</span> <span class="o">*</span> <span class="n">sb_grade_score</span><span class="p">)</span>
-        <span class="k">return</span> <span class="p">(</span><span class="n">sb_cond_score</span><span class="p">,</span> <span class="n">sb_array_score</span><span class="p">,</span> <span class="n">sb_completion_score</span><span class="p">,</span>
-                <span class="n">sb_exec_score</span><span class="p">,</span> <span class="n">sb_science_score</span><span class="p">,</span> <span class="n">sb_grade_score</span><span class="p">,</span> <span class="n">arcorr</span><span class="p">,</span> <span class="n">score</span><span class="p">)</span>
 </div>
 <div class="viewcode-block" id="WtoAlgorithm.set_trans"><a class="viewcode-back" href="../index.html#wtoAlgorithm.WtoAlgorithm.set_trans">[docs]</a>    <span class="k">def</span> <span class="nf">set_trans</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">transmission</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot;</span>
@@ -653,7 +640,7 @@
             <span class="k">print</span> <span class="s">&quot;No ACA arrays have been created in the last 6 hours.&quot;</span>
 </div>
 <div class="viewcode-block" id="WtoAlgorithm.set_bl_prop"><a class="viewcode-back" href="../index.html#wtoAlgorithm.WtoAlgorithm.set_bl_prop">[docs]</a>    <span class="k">def</span> <span class="nf">set_bl_prop</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">array_name</span><span class="p">):</span>
-        <span class="c"># TODO: check uv coverage to remove baselines that are outliers</span>
+
         <span class="sd">&quot;&quot;&quot;</span>
 
 <span class="sd">        :param array_name:</span>
@@ -694,6 +681,7 @@
             <span class="k">else</span><span class="p">:</span>
                 <span class="n">conf_file</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">wto_path</span> <span class="o">+</span> <span class="s">&#39;conf/</span><span class="si">%s</span><span class="s">.txt.cfg&#39;</span> <span class="o">%</span> <span class="n">array_name</span>
                 <span class="bp">self</span><span class="o">.</span><span class="n">ruv</span> <span class="o">=</span> <span class="n">rUV</span><span class="o">.</span><span class="n">computeRuv</span><span class="p">(</span><span class="n">conf_file</span><span class="p">)</span>
+                <span class="c"># noinspection PyTypeChecker</span>
                 <span class="bp">self</span><span class="o">.</span><span class="n">array_ar</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">arr_ar_def</span><span class="p">[</span><span class="n">array_name</span><span class="p">]</span>
                 <span class="bp">self</span><span class="o">.</span><span class="n">num_ant</span> <span class="o">=</span> <span class="mi">34</span>
 
@@ -702,7 +690,8 @@
                 <span class="bp">self</span><span class="o">.</span><span class="n">num_bl</span> <span class="o">=</span> <span class="nb">len</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">ruv</span><span class="p">)</span>
                 <span class="bp">self</span><span class="o">.</span><span class="n">num_ant</span> <span class="o">=</span> <span class="mi">34</span>
 
-</div></div>
+
+<span class="c"># noinspection PyPep8Naming</span></div></div>
 <div class="viewcode-block" id="observable"><a class="viewcode-back" href="../index.html#wtoAlgorithm.observable">[docs]</a><span class="k">def</span> <span class="nf">observable</span><span class="p">(</span><span class="n">solarSystem</span><span class="p">,</span> <span class="n">sourcename</span><span class="p">,</span> <span class="n">RA</span><span class="p">,</span> <span class="n">DEC</span><span class="p">,</span> <span class="n">horizon</span><span class="p">,</span> <span class="n">isQuery</span><span class="p">,</span> <span class="n">ephemeris</span><span class="p">,</span>
                <span class="n">alma</span><span class="p">):</span>
     <span class="sd">&quot;&quot;&quot;</span>
@@ -830,6 +819,7 @@
     <span class="n">month_ints</span> <span class="o">=</span> <span class="p">{</span>
         <span class="s">&#39;Jan&#39;</span><span class="p">:</span> <span class="mi">1</span><span class="p">,</span> <span class="s">&#39;Feb&#39;</span><span class="p">:</span> <span class="mi">2</span><span class="p">,</span> <span class="s">&#39;Mar&#39;</span><span class="p">:</span> <span class="mi">3</span><span class="p">,</span> <span class="s">&#39;Apr&#39;</span><span class="p">:</span> <span class="mi">4</span><span class="p">,</span> <span class="s">&#39;May&#39;</span><span class="p">:</span> <span class="mi">5</span><span class="p">,</span> <span class="s">&#39;Jun&#39;</span><span class="p">:</span> <span class="mi">6</span><span class="p">,</span>
         <span class="s">&#39;Jul&#39;</span><span class="p">:</span> <span class="mi">7</span><span class="p">,</span> <span class="s">&#39;Aug&#39;</span><span class="p">:</span> <span class="mi">8</span><span class="p">,</span> <span class="s">&#39;Sep&#39;</span><span class="p">:</span> <span class="mi">9</span><span class="p">,</span> <span class="s">&#39;Oct&#39;</span><span class="p">:</span> <span class="mi">10</span><span class="p">,</span> <span class="s">&#39;Nov&#39;</span><span class="p">:</span> <span class="mi">11</span><span class="p">,</span> <span class="s">&#39;Dec&#39;</span><span class="p">:</span> <span class="mi">12</span><span class="p">}</span>
+    <span class="n">found</span> <span class="o">=</span> <span class="bp">False</span>
     <span class="k">for</span> <span class="n">line</span> <span class="ow">in</span> <span class="n">ephemeris</span><span class="o">.</span><span class="n">split</span><span class="p">(</span><span class="s">&#39;</span><span class="se">\n</span><span class="s">&#39;</span><span class="p">):</span>
         <span class="k">if</span> <span class="n">line</span><span class="o">.</span><span class="n">startswith</span><span class="p">(</span><span class="s">&#39;$$SOE&#39;</span><span class="p">):</span>
             <span class="n">in_data</span> <span class="o">=</span> <span class="bp">True</span>
@@ -847,40 +837,22 @@
             <span class="k">if</span> <span class="n">now</span><span class="o">.</span><span class="n">datetime</span><span class="p">()</span> <span class="o">&gt;</span> <span class="n">date</span><span class="p">:</span>
                 <span class="n">data</span> <span class="o">=</span> <span class="n">line</span>
                 <span class="n">found</span> <span class="o">=</span> <span class="bp">False</span>
+                <span class="c"># noinspection PyUnboundLocalVariable</span>
                 <span class="n">c1</span> <span class="o">+=</span> <span class="mi">1</span>
             <span class="k">else</span><span class="p">:</span>
+                <span class="c"># noinspection PyUnboundLocalVariable</span>
                 <span class="k">if</span> <span class="n">c1</span> <span class="o">==</span> <span class="mi">0</span><span class="p">:</span>
-                    <span class="c">#print(&quot;NO EPHEMERIS FOR CURRENT DATE. Setting RA=0,&quot;</span>
-                    <span class="c">#      &quot; DEC=0&quot;)</span>
+
                     <span class="n">ra</span> <span class="o">=</span> <span class="n">ephem</span><span class="o">.</span><span class="n">hours</span><span class="p">(</span><span class="s">&#39;00:00:00&#39;</span><span class="p">)</span>
                     <span class="n">dec</span> <span class="o">=</span> <span class="n">ephem</span><span class="o">.</span><span class="n">degrees</span><span class="p">(</span><span class="s">&#39;00:00:00&#39;</span><span class="p">)</span>
                     <span class="n">ephe</span> <span class="o">=</span> <span class="bp">False</span>
                     <span class="k">return</span> <span class="n">ra</span><span class="p">,</span> <span class="n">dec</span><span class="p">,</span> <span class="n">ephe</span>
+                <span class="c"># noinspection PyUnboundLocalVariable</span>
                 <span class="n">ra</span> <span class="o">=</span> <span class="n">ephem</span><span class="o">.</span><span class="n">hours</span><span class="p">(</span><span class="n">data</span><span class="p">[</span><span class="mi">23</span><span class="p">:</span><span class="mi">36</span><span class="p">]</span><span class="o">.</span><span class="n">strip</span><span class="p">()</span><span class="o">.</span><span class="n">replace</span><span class="p">(</span><span class="s">&#39; &#39;</span><span class="p">,</span> <span class="s">&#39;:&#39;</span><span class="p">))</span>
                 <span class="n">dec</span> <span class="o">=</span> <span class="n">ephem</span><span class="o">.</span><span class="n">degrees</span><span class="p">(</span><span class="n">data</span><span class="p">[</span><span class="mi">37</span><span class="p">:</span><span class="mi">51</span><span class="p">]</span><span class="o">.</span><span class="n">strip</span><span class="p">()</span><span class="o">.</span><span class="n">replace</span><span class="p">(</span><span class="s">&#39; &#39;</span><span class="p">,</span> <span class="s">&#39;:&#39;</span><span class="p">))</span>
                 <span class="n">ephe</span> <span class="o">=</span> <span class="bp">True</span>
                 <span class="k">print</span> <span class="n">ra</span><span class="p">,</span> <span class="n">dec</span><span class="p">,</span> <span class="n">ephe</span>
-                <span class="k">return</span> <span class="n">pd</span><span class="o">.</span><span class="n">np</span><span class="o">.</span><span class="n">degrees</span><span class="p">(</span><span class="n">ra</span><span class="p">),</span> <span class="n">pd</span><span class="o">.</span><span class="n">np</span><span class="o">.</span><span class="n">degrees</span><span class="p">(</span><span class="n">dec</span><span class="p">),</span> <span class="n">ephe</span>
-</div>
-<span class="sd">&quot;&quot;&quot;</span>
-<span class="sd">To fit the ruv distribution</span>
-<span class="sd">from scipy.stats import norm,rayleigh</span>
-
-<span class="sd">samp = rayleigh.rvs(loc=5,scale=2,size=150) # samples generation</span>
-
-<span class="sd">param = rayleigh.fit(samp) # distribution fitting</span>
-
-<span class="sd">x = linspace(5,13,100)</span>
-<span class="sd"># fitted distribution</span>
-<span class="sd">pdf_fitted = rayleigh.pdf(x,loc=param[0],scale=param[1])</span>
-<span class="sd"># original distribution</span>
-<span class="sd">pdf = rayleigh.pdf(x,loc=5,scale=2)</span>
-
-<span class="sd">title(&#39;Rayleigh distribution&#39;)</span>
-<span class="sd">plot(x,pdf_fitted,&#39;r-&#39;,x,pdf,&#39;b-&#39;)</span>
-<span class="sd">hist(samp,normed=1,alpha=.3)</span>
-<span class="sd">show()</span>
-<span class="sd">&quot;&quot;&quot;</span>
+                <span class="k">return</span> <span class="n">pd</span><span class="o">.</span><span class="n">np</span><span class="o">.</span><span class="n">degrees</span><span class="p">(</span><span class="n">ra</span><span class="p">),</span> <span class="n">pd</span><span class="o">.</span><span class="n">np</span><span class="o">.</span><span class="n">degrees</span><span class="p">(</span><span class="n">dec</span><span class="p">),</span> <span class="n">ephe</span></div>
 </pre></div>
 
           </div>

@@ -259,6 +259,9 @@ class WtoAlgorithm(WtoDatabase):
                     sel4['blfrac'] = sel4.blfrac * (
                         33 * 17 / (self.num_ant * (
                             self.num_ant - 1) / 2.))
+            sel4['blfrac'] = sel4.apply(
+                lambda row: self.ret_cycle(row[u'CODE'], row['blfrac']), axis=1
+            )
             sel4['frac'] = sel4.tsysfrac * sel4.blfrac
             self.select12m = sel4
 
@@ -273,6 +276,13 @@ class WtoAlgorithm(WtoDatabase):
             self.select7m = sel4
         else:
             self.selecttp = sel4
+
+    def ret_cycle(self, code, blfrac):
+        if code[:4] == '2012':
+            print code, blfrac, blfrac * (31. * 16.) / (33. * 17)
+            return blfrac * (31. * 16.) / (33. * 17)
+        else:
+            return blfrac * 1.
 
     def scorer(self, array):
 
@@ -365,7 +375,7 @@ class WtoAlgorithm(WtoDatabase):
 
                 if las == 0:
                     sb_array_score = (
-                        ((self.array_ar - aminar) / l) ** (1 / 8.)) * 8. + 2.
+                        ((self.array_ar - aminar) / l) ** (1 / 3.)) * 7. + 3.
                 else:
                     sb_array_score = (
                         ((self.array_ar - aminar) / l) ** (1 / 3.)) * s

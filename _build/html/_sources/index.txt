@@ -4,8 +4,8 @@
    contain the root `toctree` directive.
 
 
-The gWTO2 Documentation
-=======================
+The gWTO2 (What To Observe Cycle 2 GUI) Documentation
+=====================================================
 
 .. contents:: Table of Contents
 
@@ -28,7 +28,7 @@ Using gWTO2
 
 
 
-gWTO is tested and deployed at the osf-red machine, within the aod account.
+gWTO2 is tested and deployed at the osf-red machine, within the aod account.
 A virtual environment of python, based on the Anaconda distribution, must be
 loaded before using it. This is achieved by running:::
 
@@ -58,9 +58,9 @@ for each other. **After playing with gWTO2 using a different path, please**
 Start up
 --------
 
-After starting ``gWTO2 BL`` you will be presented with the gui shown on figure 2.
-If the -c option was used, or the cache have been manually erased it, the time
-until you are presented the gui can take up to 5-7 minutes.
+After starting ``gWTO2 BL`` you will be presented with the gui shown on figure
+2. If the -c option was used, or the cache have been manually erased it,
+the time until the gui is ready can be up to 5-7 minutes.
 
 .. figure:: gWTO2__BL_001.png
    :scale: 50
@@ -212,7 +212,44 @@ Standard (ACA) Tab in BL (ACA) GUI
 Selection and Score algorithms
 ==============================
 
+Selection
+---------
 
+#. Calculate observability using the pyephem libraries
+#. Select SB by array type: 12m, 7m, TP.
+#. Calculate opacity, airmass and sky Temperature for both the
+   OT asumed conditions and current conditions, based on the PWV.
+#. Calculate system Temperatures, again for both cases.
+#. SBs within spectral ranges with transmission higher than 50% are first
+   selected.
+#. Calculate current LST.
+#. Select SBs within given HA limits (-5 to 3 by default).
+#. Select SBs over the given elevation limit (20 deg. default) and that won't
+   set for at least 1 1/2 hours.
+#. Remove SBs with states Phase2Submitted, FullyObserved and Deleted.
+#. Remove SBs that belongs to projects with status Phase2Submitted or Completed.
+#. Remove SBs that have names like "Do not"
+#. Remove SBs where the number of Executions Blocks with QA0 flags "pass" or
+   "unset" is equal or higher than the number of requested executions.
+#. For 12m arrays, select SBs that can be executed with the current array's
+   angular resolution, using the minAR and maxAR corrected limits.
+#. Finally, calculate tsysfrac, blfrac and frac columns, to be use by the
+   scorer algorithm.
+
+TSys time fraction calculation
+------------------------------
+
+The TSys time fraction comes from equation:
+
+.. math::
+   \frac{T_{sys_{wto}}}{T_{sys_{PI}}}^2
+
+
+Score and ranking
+-----------------
+
+Checking observability
+----------------------
 
 Playing with the libraries:
 ===========================
@@ -293,7 +330,8 @@ The WTO Data Frames
 wtoDatabase.obsprojects
 -----------------------
 
-Main obsproject table ingested from queries to the archive.::
+Main obsproject table ingested from queries to the archive.
+::
 
     SELECT PRJ_ARCHIVE_UID,DELETED,PI,PRJ_NAME,
            CODE,PRJ_TIME_OF_CREATION,PRJ_SCIENTIFIC_RANK,PRJ_VERSION,
@@ -491,7 +529,8 @@ QA0STATUS            object
 wtoDatabase.scheduling_proj
 ---------------------------
 
-Queries project data from the SCHEDULING_AOS archive tables.::
+Queries project data from the SCHEDULING_AOS archive tables.
+::
 
     SELECT *
     FROM SCHEDULING_AOS.OBSPROJECT
@@ -510,7 +549,7 @@ SCIENCE_SCORE                 Science Score
 SCIENCE_RANK                  Science Ranking
 SCIENCE_GRADE                 Project letter grade
 STATUS                        Project status in SCHEDULING_AOS
-TOTAL_EXEC_TIME               -----
+TOTAL_EXEC_TIME
 CSV                           Is CSV?
 MANUAL                        Is Manual Mode?
 OBSUNITID                     Obsunit part ID

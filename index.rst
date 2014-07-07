@@ -231,10 +231,24 @@ Selection
 #. Remove SBs that have names like "Do not"
 #. Remove SBs where the number of Executions Blocks with QA0 flags "pass" or
    "unset" is equal or higher than the number of requested executions.
-#. Select SBs that can be executed with the current array's angular resolution,
-   using the minAR and maxAR corrected limits.
+#. For 12m arrays, select SBs that can be executed with the current array's
+   angular resolution, using the minAR and maxAR corrected limits.
+#. Finally, calculate tsysfrac, blfrac and frac columns, to be use by the
+   scorer algorithm.
 
+TSys time fraction calculation
+------------------------------
 
+The TSys time fraction comes from equation:
+
+.. math::
+   \frac{T_{sys_{wto}}}{T_{sys_{PI}}}^2
+
+Where :math:`T_{sys_{wto}}` is the system temperature calculated with the
+current PWV at the representative frequency of the SB corrected by airmass at
+transit, and :math:`T_{sys_{PI}}` is the system temperature calculated using the
+PWV set by the PI/P2G to calculate the integration time in the OT, also at the
+representative frequency and
 Score and ranking
 -----------------
 
@@ -539,7 +553,7 @@ SCIENCE_SCORE                 Science Score
 SCIENCE_RANK                  Science Ranking
 SCIENCE_GRADE                 Project letter grade
 STATUS                        Project status in SCHEDULING_AOS
-TOTAL_EXEC_TIME               -----
+TOTAL_EXEC_TIME
 CSV                           Is CSV?
 MANUAL                        Is Manual Mode?
 OBSUNITID                     Obsunit part ID

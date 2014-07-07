@@ -403,7 +403,7 @@ class BLMainWindow(QMainWindow, Ui_BLMainWindow):
                      'tsysfrac', 'blfrac', 'frac', 'sb_array_score',
                      'sb_cond_score', 'maxPWVC', 'arrayMinAR', 'arcorr',
                      'arrayMaxAR', 'integrationTime',
-                     'PRJ_ARCHIVE_UID', 'grade']]
+                     'PRJ_ARCHIVE_UID', 'grade', 'LAS']]
 
         tc12 = self.datas.score12m.sort(
             'score', ascending=False).query(
@@ -457,7 +457,7 @@ class BLMainWindow(QMainWindow, Ui_BLMainWindow):
              u'Exec. Done', u'TSysFrac', u'BLFrac', u'TotalFrac',
              u'Array Score', u'Cond. Score', u'maxPWVC', u'ArrayMinAR',
              u'ARcorr', u'ArrayMaxAR', u'TimeOnSource',
-             u'PRJ UID', u'Grade'], dtype='object')
+             u'PRJ UID', u'Grade', u'LAS'], dtype='object')
 
         tc12.columns = Wto.pd.Index(
             [u'Score', u'CODE', u'SB UID', u'SB Name', u'SB State', u'Band',

@@ -74,6 +74,7 @@
 <span class="n">sbl</span> <span class="o">=</span> <span class="s">&#39;{Alma/ObsPrep/SchedBlock}&#39;</span>
 
 
+<span class="c"># noinspection PyPep8Naming</span>
 <div class="viewcode-block" id="WtoDatabase"><a class="viewcode-back" href="../index.html#wtoDatabase.WtoDatabase">[docs]</a><span class="k">class</span> <span class="nc">WtoDatabase</span><span class="p">(</span><span class="nb">object</span><span class="p">):</span>
 
     <span class="sd">&quot;&quot;&quot;</span>
@@ -237,6 +238,7 @@
 
 <span class="sd">        :return: None</span>
 <span class="sd">        &quot;&quot;&quot;</span>
+        <span class="c"># noinspection PyUnusedLocal</span>
         <span class="n">states</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">states</span>
 
         <span class="n">sql2</span> <span class="o">=</span> <span class="nb">str</span><span class="p">(</span>
@@ -600,6 +602,7 @@
                         <span class="bp">None</span><span class="p">,</span> <span class="bp">None</span><span class="p">,</span> <span class="bp">None</span><span class="p">,</span> <span class="bp">None</span><span class="p">)</span>
 
                 <span class="k">try</span><span class="p">:</span>
+                    <span class="c"># noinspection PyUnusedLocal</span>
                     <span class="n">ss</span> <span class="o">=</span> <span class="n">sciencegoal</span><span class="o">.</span><span class="n">SpectralSetupParameters</span><span class="o">.</span><span class="n">SpectralScan</span>
                     <span class="n">isspectralscan</span> <span class="o">=</span> <span class="bp">True</span>
                 <span class="k">except</span> <span class="ne">AttributeError</span><span class="p">:</span>
@@ -795,8 +798,8 @@
             <span class="n">ephemeris</span> <span class="o">=</span> <span class="bp">None</span>
         <span class="k">if</span> <span class="n">new</span><span class="p">:</span>
             <span class="bp">self</span><span class="o">.</span><span class="n">fieldsource</span> <span class="o">=</span> <span class="n">pd</span><span class="o">.</span><span class="n">DataFrame</span><span class="p">(</span>
-                <span class="p">[(</span><span class="n">partid</span><span class="p">,</span> <span class="n">sbuid</span><span class="p">,</span> <span class="n">solarsystem</span><span class="p">,</span> <span class="n">sourcename</span><span class="p">,</span> <span class="n">name</span><span class="p">,</span> <span class="n">ra</span><span class="p">,</span> <span class="n">dec</span><span class="p">,</span> <span class="n">isquery</span><span class="p">,</span>
-                  <span class="n">qc_intendeduse</span><span class="p">,</span> <span class="n">qc_ra</span><span class="p">,</span> <span class="n">qc_dec</span><span class="p">,</span> <span class="n">qc_use</span><span class="p">,</span> <span class="n">qc_radius</span><span class="p">,</span>
+                <span class="p">[(</span><span class="n">partid</span><span class="p">,</span> <span class="n">sbuid</span><span class="p">,</span> <span class="n">solarsystem</span><span class="p">,</span> <span class="n">sourcename</span><span class="p">,</span> <span class="n">name</span><span class="p">,</span> <span class="n">ra</span><span class="p">,</span> <span class="n">dec</span><span class="p">,</span>
+                  <span class="n">isquery</span><span class="p">,</span> <span class="n">qc_intendeduse</span><span class="p">,</span> <span class="n">qc_ra</span><span class="p">,</span> <span class="n">qc_dec</span><span class="p">,</span> <span class="n">qc_use</span><span class="p">,</span> <span class="n">qc_radius</span><span class="p">,</span>
                   <span class="n">qc_radius_unit</span><span class="p">,</span> <span class="n">ephemeris</span><span class="p">,</span> <span class="n">pointings</span><span class="p">,</span> <span class="n">ismosaic</span><span class="p">,</span> <span class="n">array</span><span class="p">)],</span>
                 <span class="n">columns</span><span class="o">=</span><span class="p">[</span><span class="s">&#39;fieldRef&#39;</span><span class="p">,</span> <span class="s">&#39;SB_UID&#39;</span><span class="p">,</span> <span class="s">&#39;solarSystem&#39;</span><span class="p">,</span> <span class="s">&#39;sourcename&#39;</span><span class="p">,</span>
                          <span class="s">&#39;name&#39;</span><span class="p">,</span> <span class="s">&#39;RA&#39;</span><span class="p">,</span>
@@ -886,7 +889,8 @@
                 <span class="n">index</span><span class="o">=</span><span class="p">[</span><span class="n">sb_uid</span><span class="p">])</span>
         <span class="k">else</span><span class="p">:</span>
             <span class="bp">self</span><span class="o">.</span><span class="n">schedblocks</span><span class="o">.</span><span class="n">ix</span><span class="p">[</span><span class="n">sb_uid</span><span class="p">]</span> <span class="o">=</span> <span class="p">(</span><span class="n">sb_uid</span><span class="p">,</span> <span class="n">partid</span><span class="p">,</span> <span class="n">data</span><span class="p">[</span><span class="mi">0</span><span class="p">][</span><span class="mi">0</span><span class="p">],</span> <span class="n">xml</span><span class="p">)</span>
-</div>
+
+    <span class="c"># noinspection PyUnboundLocalVariable</span></div>
 <div class="viewcode-block" id="WtoDatabase.row_newar"><a class="viewcode-back" href="../index.html#wtoDatabase.WtoDatabase.row_newar">[docs]</a>    <span class="k">def</span> <span class="nf">row_newar</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">sbuid</span><span class="p">,</span> <span class="n">new</span><span class="o">=</span><span class="bp">False</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot;</span>
 
@@ -953,7 +957,7 @@
         <span class="k">else</span><span class="p">:</span>
             <span class="k">if</span> <span class="n">sbnum</span> <span class="o">==</span> <span class="mi">1</span><span class="p">:</span>
                 <span class="bp">self</span><span class="o">.</span><span class="n">newar</span><span class="o">.</span><span class="n">ix</span><span class="p">[</span><span class="n">sbuidE</span><span class="p">]</span> <span class="o">=</span> <span class="p">(</span><span class="n">minarE</span><span class="p">,</span> <span class="n">maxarE</span><span class="p">,</span> <span class="n">minarE</span> <span class="o">*</span> <span class="n">corr</span><span class="p">,</span>
-                                        <span class="n">maxarE</span> <span class="o">*</span> <span class="n">corr</span><span class="p">)</span>
+                                         <span class="n">maxarE</span> <span class="o">*</span> <span class="n">corr</span><span class="p">)</span>
             <span class="k">if</span> <span class="n">sbnum</span> <span class="o">==</span> <span class="mi">2</span><span class="p">:</span>
                 <span class="bp">self</span><span class="o">.</span><span class="n">newar</span><span class="o">.</span><span class="n">ix</span><span class="p">[</span><span class="n">sbuidE</span><span class="p">]</span> <span class="o">=</span> <span class="p">(</span><span class="n">minarE</span><span class="p">,</span> <span class="n">maxarE</span><span class="p">,</span> <span class="n">minarE</span> <span class="o">*</span> <span class="n">corr</span><span class="p">,</span>
                                          <span class="n">maxarE</span> <span class="o">*</span> <span class="n">corr</span><span class="p">)</span>
@@ -974,7 +978,7 @@
         <span class="n">check_c1</span> <span class="o">=</span> <span class="n">pd</span><span class="o">.</span><span class="n">merge</span><span class="p">(</span>
             <span class="bp">self</span><span class="o">.</span><span class="n">obsproject</span><span class="p">[</span><span class="bp">self</span><span class="o">.</span><span class="n">obsproject</span><span class="o">.</span><span class="n">CODE</span><span class="o">.</span><span class="n">str</span><span class="o">.</span><span class="n">startswith</span><span class="p">(</span><span class="s">&#39;2012&#39;</span><span class="p">)],</span>
             <span class="n">toc2</span><span class="p">,</span> <span class="n">on</span><span class="o">=</span><span class="s">&#39;CODE&#39;</span><span class="p">,</span> <span class="n">how</span><span class="o">=</span><span class="s">&#39;right&#39;</span><span class="p">)</span><span class="o">.</span><span class="n">set_index</span><span class="p">(</span>
-            <span class="s">&#39;CODE&#39;</span><span class="p">,</span> <span class="n">drop</span><span class="o">=</span><span class="bp">False</span><span class="p">)[[</span><span class="s">&#39;CODE&#39;</span><span class="p">]]</span>
+                <span class="s">&#39;CODE&#39;</span><span class="p">,</span> <span class="n">drop</span><span class="o">=</span><span class="bp">False</span><span class="p">)[[</span><span class="s">&#39;CODE&#39;</span><span class="p">]]</span>
         <span class="n">check_c2</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">obsproject</span><span class="p">[</span>
             <span class="bp">self</span><span class="o">.</span><span class="n">obsproject</span><span class="o">.</span><span class="n">CODE</span><span class="o">.</span><span class="n">str</span><span class="o">.</span><span class="n">startswith</span><span class="p">(</span><span class="s">&#39;2013&#39;</span><span class="p">)][[</span><span class="s">&#39;CODE&#39;</span><span class="p">]]</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">checked</span> <span class="o">=</span> <span class="n">pd</span><span class="o">.</span><span class="n">concat</span><span class="p">([</span><span class="n">check_c1</span><span class="p">,</span> <span class="n">check_c2</span><span class="p">])</span>
