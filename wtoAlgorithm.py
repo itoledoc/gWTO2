@@ -347,10 +347,10 @@ class WtoAlgorithm(WtoDatabase):
 
         # set sb priority score
 
-        if grade == 'A':
+        if grade == 'A' and str(code).startswith('2013'):
             sb_grade_score = 10.
         elif str(code).startswith('2012'):
-            sb_grade_score = 7.
+            sb_grade_score = 8.
         elif grade == 'B':
             sb_grade_score = 6.
         else:
