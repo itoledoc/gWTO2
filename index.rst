@@ -218,7 +218,7 @@ Selection
 #. Calculate observability using the pyephem libraries
 #. Select SB by array type: 12m, 7m, TP.
 #. Calculate opacity, airmass and sky Temperature for both the
-   OT asumed conditions and current conditions, based on the PWV.
+   OT asumed conditions and current, actual, conditions, based on the PWV.
 #. Calculate system Temperatures, again for both cases.
 #. SBs within spectral ranges with transmission higher than 50% are first
    selected.
@@ -248,7 +248,9 @@ Where :math:`T_{sys_{wto}}` is the system temperature calculated with the
 current PWV at the representative frequency of the SB corrected by airmass at
 transit, and :math:`T_{sys_{PI}}` is the system temperature calculated using the
 PWV set by the PI/P2G to calculate the integration time in the OT, also at the
-representative frequency and
+representative frequency and at transit.
+
+
 Score and ranking
 -----------------
 

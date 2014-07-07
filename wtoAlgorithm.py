@@ -308,7 +308,7 @@ class WtoAlgorithm(WtoDatabase):
         scores.columns = pd.Index(
             [u'sb_cond_score', u'sb_array_score', u'sb_completion_score',
              u'sb_exec_score', u'sb_science_score', u'sb_grade_score',
-             u'arcorr', u'score'])
+             u'arcorr', u'score', u'lascorr'])
         if array == '12m':
             self.score12m = pd.merge(
                 self.select12m, scores, left_on='SB_UID', right_index=True)
@@ -363,28 +363,27 @@ class WtoAlgorithm(WtoDatabase):
         if array == '7m' or array == 'tp':
             sb_array_score = 10.
             arcorr = 0.
+            lascorr = 0.
         else:
             c_bmax = 0.862 / pd.np.cos(pd.np.radians(-23.0262015) -
                                        pd.np.radians(dec)) + 0.138
             c_freq = repfreq / 100.
             corr = c_freq / c_bmax
             arcorr = ar * corr
-            if self.array_ar < arcorr:
-                l = arcorr - aminar
-                s = 10.
+            lascorr = las * corr
+            if 0.9 * arcorr <= self.array_ar <= 1.1 * arcorr:
+                sb_array_score = 10
 
-                if las == 0:
-                    sb_array_score = (
-                        ((self.array_ar - aminar) / l) ** (1 / 3.)) * 7. + 3.
-                else:
-                    sb_array_score = (
-                        ((self.array_ar - aminar) / l) ** (1 / 3.)) * s
-            elif self.array_ar == arcorr:
-                sb_array_score = 10.
-            else:
-                l = arcorr - amaxar
+            elif self.array_ar < 0.9 * arcorr:
+                l = 0.9 * arcorr - aminar
+                sb_array_score = ((self.array_ar - aminar) / l) * 10.
+            elif self.array_ar > 1.1 * arcorr:
+                l = arcorr * 1.1 - amaxar
                 s = 10. / l
                 sb_array_score = (self.array_ar - amaxar) * s
+            else:
+                print "What happened with?"
+                sb_array_score = -1.
         # set exec score:
         sb_exec_score = self.exec_prio[execu]
 
@@ -412,7 +411,8 @@ class WtoAlgorithm(WtoDatabase):
                  0.05 * sb_science_score +
                  0.15 * sb_grade_score)
         return (sb_cond_score, sb_array_score, sb_completion_score,
-                sb_exec_score, sb_science_score, sb_grade_score, arcorr, score)
+                sb_exec_score, sb_science_score, sb_grade_score, arcorr, score,
+                lascorr)
 
     def check_observability(self, array):
 

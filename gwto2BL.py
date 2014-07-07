@@ -177,7 +177,7 @@ class BLMainWindow(QMainWindow, Ui_BLMainWindow):
         """
         # TODO: not implemented yet
         self.datas.num_ant = p0
-        print self.datas.array_name, self.datas.array_ar, self.datas.num_ant
+        print(self.datas.array_name, self.datas.array_ar, self.datas.num_ant)
     
     @pyqtSignature("")
     def on_array_ar_spin_editingFinished(self):
@@ -296,7 +296,7 @@ class BLMainWindow(QMainWindow, Ui_BLMainWindow):
         self.antennas_spin.setValue(self.datas.num_ant)
         self.pop = ArrayCheck2(ruv=self.datas.ruv, num_ant=self.datas.num_ant)
         self.pop.show()
-        print self.datas.array_name, self.datas.array_ar, self.datas.num_ant
+        print(self.datas.array_name, self.datas.array_ar, self.datas.num_ant)
 
     @pyqtSignature("QString")
     def on_blarrays_combo_activated(self):
@@ -319,7 +319,7 @@ class BLMainWindow(QMainWindow, Ui_BLMainWindow):
             self.datas.array_name = None
             self.stdarrays_combo.setCurrentIndex(1)
             self.on_stdarrays_combo_activated()
-        print self.datas.array_name, self.datas.array_ar, self.datas.num_ant
+        print(self.datas.array_name, self.datas.array_ar, self.datas.num_ant)
 
     @pyqtSignature("bool")
     def on_now_button_clicked(self):
@@ -370,7 +370,7 @@ class BLMainWindow(QMainWindow, Ui_BLMainWindow):
             self.stdarrays_combo.setCurrentIndex(1)
             self.blarrays_combo.setCurrentIndex(0)
             self.on_stdarrays_combo_activated()
-        print self.datas.array_name, self.datas.array_ar, self.datas.num_ant
+        print(self.datas.array_name, self.datas.array_ar, self.datas.num_ant)
 
     # noinspection PyArgumentList
     @pyqtSignature("")
@@ -403,7 +403,7 @@ class BLMainWindow(QMainWindow, Ui_BLMainWindow):
                      'tsysfrac', 'blfrac', 'frac', 'sb_array_score',
                      'sb_cond_score', 'maxPWVC', 'arrayMinAR', 'arcorr',
                      'arrayMaxAR', 'integrationTime',
-                     'PRJ_ARCHIVE_UID', 'grade', 'LAS']]
+                     'PRJ_ARCHIVE_UID', 'grade', 'lascorr', 'AR', 'LAS']]
 
         tc12 = self.datas.score12m.sort(
             'score', ascending=False).query(
@@ -457,7 +457,7 @@ class BLMainWindow(QMainWindow, Ui_BLMainWindow):
              u'Exec. Done', u'TSysFrac', u'BLFrac', u'TotalFrac',
              u'Array Score', u'Cond. Score', u'maxPWVC', u'ArrayMinAR',
              u'ARcorr', u'ArrayMaxAR', u'TimeOnSource',
-             u'PRJ UID', u'Grade', u'LAS'], dtype='object')
+             u'PRJ UID', u'Grade', u'LAScorr', u'AR', u'LAS'], dtype='object')
 
         tc12.columns = Wto.pd.Index(
             [u'Score', u'CODE', u'SB UID', u'SB Name', u'SB State', u'Band',
@@ -465,7 +465,7 @@ class BLMainWindow(QMainWindow, Ui_BLMainWindow):
              u'Exec. Done', u'TSysFrac', u'BLFrac', u'TotalFrac',
              u'Array Score', u'Cond. Score', u'maxPWVC', u'ArrayMinAR',
              u'ARcorr', u'ArrayMaxAR', u'ToS',
-             u'PRJ UID', u'Grade',  u'StartTime', u'EndTime', u'AllowedMargin',
+             u'PRJ UID', u'Grade', u'StartTime', u'EndTime', u'AllowedMargin',
              u'AllowedUnits', u'repeats', u'isavoid'], dtype='object')
 
         pol12.columns = Wto.pd.Index(
@@ -476,7 +476,7 @@ class BLMainWindow(QMainWindow, Ui_BLMainWindow):
              u'ARcorr', u'ArrayMaxAR', u'Int. Time', u'isPolarization',
              u'PRJ UID', u'Grade'], dtype='object')
 
-        print std12.head(10)
+        print(std12.head(10))
         std12n = std12.to_records(index=False)
         header = std12n.dtype.names
         self.tmstd12 = MyStdTableModel(std12n, header, self)
@@ -558,13 +558,13 @@ class MyStdTableModel(QAbstractTableModel):
         try:
             return len(self.arraydata[0])
         except IndexError:
-            print "Table Std is empty"
+            print("Table Std is empty")
             return 0
 
     # noinspection PyTypeChecker
     def data(self, index, role):
         if not index.isValid():
-            print "whaat?"
+            print("whaat?")
             return QVariant()
         sb = self.arraydata[index.row()]
         col = index.column()
@@ -648,13 +648,13 @@ class MyTcTableModel(QAbstractTableModel):
         try:
             return len(self.arraydata[0])
         except IndexError:
-            print "Table TC is empty"
+            print("Table TC is empty")
             return 0
 
     # noinspection PyTypeChecker
     def data(self, index, role):
         if not index.isValid():
-            print "whaat?"
+            print("whaat?")
             return QVariant()
         sb = self.arraydata[index.row()]
         col = index.column()
@@ -710,6 +710,7 @@ class MyTcTableModel(QAbstractTableModel):
             return QVariant(self.headerdata[col])
         return QVariant()
 
+
 # noinspection PyMethodOverriding
 class MyPolTableModel(QAbstractTableModel):
     def __init__(self, datain, headerdata, parent=None):
@@ -727,13 +728,13 @@ class MyPolTableModel(QAbstractTableModel):
         try:
             return len(self.arraydata[0])
         except IndexError:
-            print "Table Pol is empty"
+            print("Table Pol is empty")
             return 0
 
     # noinspection PyTypeChecker
     def data(self, index, role):
         if not index.isValid():
-            print "whaat?"
+            print("whaat?")
             return QVariant()
         sb = self.arraydata[index.row()]
         col = index.column()
