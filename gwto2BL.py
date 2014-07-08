@@ -490,7 +490,7 @@ class BLMainWindow(QMainWindow, Ui_BLMainWindow):
         self.bl_sheet.sortByColumn(0, Qt.DescendingOrder)
         self.bl_sheet.resizeRowsToContents()
         for column in range(25):
-            if column in [1, 2, 3, 4, 5, 6, 7, 22]:
+            if column in [1, 2, 3, 4, 5, 6, 7, 22, 25, 26, 27]:
                 self.bl_sheet.resizeColumnToContents(column)
             elif column in [11, 12, 16, 17, 19, 21]:
                 self.bl_sheet.setColumnWidth(column, 80)
@@ -590,7 +590,7 @@ class MyStdTableModel(QAbstractTableModel):
                 return QVariant(str(d)[:-2])
             elif col in [0, 13, 14, 15, 18, 19, 20, 21]:
                 return QVariant(QString("%1").arg(sb[col], 0, 'f', 2))
-            elif col in [9, 16, 17, 22]:
+            elif col in [9, 16, 17, 22, 25]:
                 return QVariant(QString("%1").arg(sb[col], 0, 'f', 1))
             elif col in [11, 12]:
                 return QVariant(QString("%1").arg(sb[col], 0, 'i', 0))
@@ -598,7 +598,7 @@ class MyStdTableModel(QAbstractTableModel):
             return QVariant(str(self.arraydata[index.row()][index.column()]))
         elif role == Qt.TextAlignmentRole:
             if col in [0, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19,
-                       20, 21, 22]:
+                       20, 21, 22, 25, 26, 27]:
                 return QVariant(int(Qt.AlignRight | Qt.AlignVCenter))
             return QVariant(int(Qt.AlignLeft | Qt.AlignVCenter))
         elif role == Qt.BackgroundColorRole:

@@ -401,7 +401,7 @@
         <span class="k">elif</span> <span class="nb">str</span><span class="p">(</span><span class="n">code</span><span class="p">)</span><span class="o">.</span><span class="n">startswith</span><span class="p">(</span><span class="s">&#39;2012&#39;</span><span class="p">):</span>
             <span class="n">sb_grade_score</span> <span class="o">=</span> <span class="mf">8.</span>
         <span class="k">elif</span> <span class="n">grade</span> <span class="o">==</span> <span class="s">&#39;B&#39;</span><span class="p">:</span>
-            <span class="n">sb_grade_score</span> <span class="o">=</span> <span class="mf">6.</span>
+            <span class="n">sb_grade_score</span> <span class="o">=</span> <span class="mf">4.</span>
         <span class="k">else</span><span class="p">:</span>
             <span class="n">sb_grade_score</span> <span class="o">=</span> <span class="o">-</span><span class="mf">100.</span>
 
@@ -834,7 +834,7 @@
         <span class="k">if</span> <span class="n">line</span><span class="o">.</span><span class="n">startswith</span><span class="p">(</span><span class="s">&#39;$$SOE&#39;</span><span class="p">):</span>
             <span class="n">in_data</span> <span class="o">=</span> <span class="bp">True</span>
             <span class="n">c1</span> <span class="o">=</span> <span class="mi">0</span>
-        <span class="k">elif</span> <span class="n">line</span><span class="o">.</span><span class="n">startswith</span><span class="p">(</span><span class="s">&#39;$$EOE&#39;</span><span class="p">):</span>
+        <span class="k">elif</span> <span class="n">line</span><span class="o">.</span><span class="n">startswith</span><span class="p">(</span><span class="s">&#39;$$EOE&#39;</span><span class="p">)</span> <span class="ow">or</span> <span class="n">line</span><span class="o">.</span><span class="n">startswith</span><span class="p">(</span><span class="s">&#39; $$EOE&#39;</span><span class="p">):</span>
             <span class="k">if</span> <span class="ow">not</span> <span class="n">found</span><span class="p">:</span>
                 <span class="c"># print &quot;NO EPHEMERIS FOR CURRENT DATE. Setting RA=0, DEC=0&quot;</span>
                 <span class="n">ra</span> <span class="o">=</span> <span class="n">ephem</span><span class="o">.</span><span class="n">hours</span><span class="p">(</span><span class="s">&#39;00:00:00&#39;</span><span class="p">)</span>
