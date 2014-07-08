@@ -352,7 +352,7 @@ class WtoAlgorithm(WtoDatabase):
         elif str(code).startswith('2012'):
             sb_grade_score = 8.
         elif grade == 'B':
-            sb_grade_score = 6.
+            sb_grade_score = 4.
         else:
             sb_grade_score = -100.
 
@@ -785,7 +785,7 @@ def read_ephemeris(ephemeris, date):
         if line.startswith('$$SOE'):
             in_data = True
             c1 = 0
-        elif line.startswith('$$EOE'):
+        elif line.startswith('$$EOE') or line.startswith(' $$EOE'):
             if not found:
                 # print "NO EPHEMERIS FOR CURRENT DATE. Setting RA=0, DEC=0"
                 ra = ephem.hours('00:00:00')
