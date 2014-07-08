@@ -194,7 +194,7 @@ class WtoAlgorithm(WtoDatabase):
 
         self.alma.date = self.date
         lst = pd.np.degrees(self.alma.sidereal_time())
-        print self.alma.date, lst
+        print(self.alma.date, lst)
         ha = (lst - sel2.RA) / 15.
         ha.loc[ha > 12] = ha.loc[ha > 12] - 24.
         ha.loc[ha < -12] = 24. + ha.loc[ha < -12]
@@ -267,7 +267,7 @@ class WtoAlgorithm(WtoDatabase):
 
         elif array == '7m':
             sel4['blfrac'] = sel4.RA * 0. + 1.
-            print self.num_ant
+            print(self.num_ant)
             if self.num_ant != 9:
                 sel4['blfrac'] = sel4.blfrac * (
                     9 * 4 / (self.num_ant * (
@@ -279,7 +279,7 @@ class WtoAlgorithm(WtoDatabase):
 
     def ret_cycle(self, code, blfrac):
         if code[:4] == '2012':
-            print code, blfrac, blfrac * (31. * 16.) / (33. * 17)
+            print(code, blfrac, blfrac * (31. * 16.) / (33. * 17))
             return blfrac * (31. * 16.) / (33. * 17)
         else:
             return blfrac * 1.
@@ -382,7 +382,7 @@ class WtoAlgorithm(WtoDatabase):
                 s = 10. / l
                 sb_array_score = (self.array_ar - amaxar) * s
             else:
-                print "What happened with?"
+                print("What happened with?")
                 sb_array_score = -1.
         # set exec score:
         sb_exec_score = self.exec_prio[execu]
@@ -424,7 +424,7 @@ class WtoAlgorithm(WtoDatabase):
         if self.date == self.old_date:
             return None
         alma1.date = self.date
-        print alma1.date
+        print(alma1.date)
         if array == '12m':
             fs_arr = self.fieldsource.query('arraySB == "TWELVE-M"')
         elif array == '7m':
@@ -487,7 +487,7 @@ class WtoAlgorithm(WtoDatabase):
         self.obser_prop = pd.merge(fs_5, lsts, right_index=True,
                                    left_index=True, how='left')
         self.old_date = self.date
-        print self.old_date, self.date
+        print(self.old_date, self.date)
 
     def set_trans(self, transmission):
         """
@@ -570,7 +570,7 @@ class WtoAlgorithm(WtoDatabase):
             self.bl_arrays = pd.DataFrame(
                 columns=pd.Index(
                     [u'TS1', u'AV1', u'SE1', u'AV2'], dtype='object'))
-            print "No BL arrays have been created in the last 6 hours."
+            print("No BL arrays have been created in the last 6 hours.")
         b = str(
             "WITH t1 AS ( "
             "select se.SE_TIMESTAMP ts1, sa.SLOG_ATTR_VALUE av1, se.SE_ID se1 "
@@ -598,7 +598,7 @@ class WtoAlgorithm(WtoDatabase):
             self.aca_arrays = pd.DataFrame(
                 columns=pd.Index(
                     [u'TS1', u'AV1', u'SE1', u'AV2'], dtype='object'))
-            print "No ACA arrays have been created in the last 6 hours."
+            print("No ACA arrays have been created in the last 6 hours.")
 
     def set_bl_prop(self, array_name):
 
@@ -812,5 +812,5 @@ def read_ephemeris(ephemeris, date):
                 ra = ephem.hours(data[23:36].strip().replace(' ', ':'))
                 dec = ephem.degrees(data[37:51].strip().replace(' ', ':'))
                 ephe = True
-                print ra, dec, ephe
+                print(ra, dec, ephe)
                 return pd.np.degrees(ra), pd.np.degrees(dec), ephe

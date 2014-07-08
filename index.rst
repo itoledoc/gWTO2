@@ -215,15 +215,63 @@ Selection and Score algorithms
 Selection
 ---------
 
-#. Calculate observability using the pyephem libraries
-#. Select SB by array type: 12m, 7m, TP.
-#. Calculate opacity, airmass and sky Temperature for both the
-   OT asumed conditions and current, actual, conditions, based on the PWV.
-#. Calculate system Temperatures, again for both cases.
-#. SBs within spectral ranges with transmission higher than 50% are first
-   selected.
-#. Calculate current LST.
-#. Select SBs within given HA limits (-5 to 3 by default).
+#. **Calculate observability using the pyephem libraries.**
+
+   For all the science field sources of an SB and fixed calibration sources,
+   we calculate the current elevation, rise LST and set LST.
+   If a field source is a Solar System object, or an ephemeris
+   source, we calculate first the current RA and DEC, and then the other
+   parameters. The current elevation for the SB comes from the source with the
+   minimun elevation; the rise LST for the SB is the LST of the source that
+   would rise last; and the set LST for the SB is the LST of the source that
+   would set first. The rise and set LST are calculated using the elevation
+   limit (`horizon`) gave as an input for gWTO.
+
+   * SchedBlock.FieldSource['solarSystemObject']
+   * SchedBlock.FieldSource.sourceCoordinates.longitude
+   * SchedBlock.FieldSource.sourceCoordinates.latitude
+   * SchedBlock.FieldSource.isQuery
+   * SchedBlock.FieldSource.sourceEphemeris
+   * Date, horizon limit.
+
+#. **Select SB by array type: 12m, 7m, TP.**
+
+   * SchedBlock.ObsUnitControl['arrayRequested']
+   * Array Type.
+
+#. **Calculate opacity, airmass and sky Temperature.**
+
+   For both the OT asumed conditions and current, actual, conditions,
+   based on the current PWV.
+
+   * SchedBlock.Preconditions.WeatherConstraints.maxPWVC
+   * SchedBlock.SchedulingConstraints.representativeCoordinates.latitude
+   * SchedBlock.SchedulingConstraints.representativeFrequency
+   * Date, current PWV
+   * Tsky and Tau tables.
+
+#. **Calculate system Temperatures.**
+
+   Again for both cases.
+
+   * Tsky_wto, Tau_wto, Tsky_original, Tau_original, airmass.
+
+#. **SBs within spectral ranges with transmission higher than 50% are first**
+   **selected.**
+
+   .. math::
+      e^{-\tau_{sb,pwv}\cdot airmass_{sb,time}} > 0.5
+
+#. **Calculate current LST.**
+
+   * Date, ephem.observer(ALMA)
+
+#. **Select SBs within given HA limits.**
+
+   .. math::
+      minHA < HA_{sb,time} < maxHA
+
+   (mihHA = -5 and maxHA =  3 by default).
 #. Select SBs over the given elevation limit (20 deg. default) and that won't
    set for at least 1 1/2 hours.
 #. Remove SBs with states Phase2Submitted, FullyObserved and Deleted.

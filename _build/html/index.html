@@ -274,27 +274,82 @@ sources.</li>
 <h1><a class="toc-backref" href="#id8">Selection and Score algorithms</a><a class="headerlink" href="#selection-and-score-algorithms" title="Permalink to this headline">¶</a></h1>
 <div class="section" id="selection">
 <h2><a class="toc-backref" href="#id9">Selection</a><a class="headerlink" href="#selection" title="Permalink to this headline">¶</a></h2>
-<ol class="arabic simple">
-<li>Calculate observability using the pyephem libraries</li>
-<li>Select SB by array type: 12m, 7m, TP.</li>
-<li>Calculate opacity, airmass and sky Temperature for both the
-OT asumed conditions and current conditions, based on the PWV.</li>
-<li>Calculate system Temperatures, again for both cases.</li>
-<li>SBs within spectral ranges with transmission higher than 50% are first
-selected.</li>
-<li>Calculate current LST.</li>
-<li>Select SBs within given HA limits (-5 to 3 by default).</li>
-<li>Select SBs over the given elevation limit (20 deg. default) and that won&#8217;t
-set for at least 1 1/2 hours.</li>
-<li>Remove SBs with states Phase2Submitted, FullyObserved and Deleted.</li>
-<li>Remove SBs that belongs to projects with status Phase2Submitted or Completed.</li>
-<li>Remove SBs that have names like &#8220;Do not&#8221;</li>
-<li>Remove SBs where the number of Executions Blocks with QA0 flags &#8220;pass&#8221; or
-&#8220;unset&#8221; is equal or higher than the number of requested executions.</li>
-<li>For 12m arrays, select SBs that can be executed with the current array&#8217;s
-angular resolution, using the minAR and maxAR corrected limits.</li>
-<li>Finally, calculate tsysfrac, blfrac and frac columns, to be use by the
-scorer algorithm.</li>
+<ol class="arabic">
+<li><p class="first"><strong>Calculate observability using the pyephem libraries.</strong></p>
+<p>For all the science field sources of an SB and fixed calibration sources,
+we calculate the current elevation, rise LST and set LST.
+If a field source is a Solar System object, or an ephemeris
+source, we calculate first the current RA and DEC, and then the other
+parameters. The current elevation for the SB comes from the source with the
+minimun elevation; the rise LST for the SB is the LST of the source that
+would rise last; and the set LST for the SB is the LST of the source that
+would set first. The rise and set LST are calculated using the elevation
+limit (<cite>horizon</cite>) gave as an input for gWTO.</p>
+<ul class="simple">
+<li>SchedBlock.FieldSource[&#8216;solarSystemObject&#8217;]</li>
+<li>SchedBlock.FieldSource.sourceCoordinates.longitude</li>
+<li>SchedBlock.FieldSource.sourceCoordinates.latitude</li>
+<li>SchedBlock.FieldSource.isQuery</li>
+<li>SchedBlock.FieldSource.sourceEphemeris</li>
+<li>Date, horizon limit.</li>
+</ul>
+</li>
+<li><p class="first"><strong>Select SB by array type: 12m, 7m, TP.</strong></p>
+<ul class="simple">
+<li>SchedBlock.ObsUnitControl[&#8216;arrayRequested&#8217;]</li>
+<li>Array Type.</li>
+</ul>
+</li>
+<li><p class="first"><strong>Calculate opacity, airmass and sky Temperature.</strong></p>
+<p>For both the OT asumed conditions and current, actual, conditions,
+based on the current PWV.</p>
+<ul class="simple">
+<li>SchedBlock.Preconditions.WeatherConstraints.maxPWVC</li>
+<li>SchedBlock.SchedulingConstraints.representativeCoordinates.latitude</li>
+<li>SchedBlock.SchedulingConstraints.representativeFrequency</li>
+<li>Date, current PWV</li>
+<li>Tsky and Tau tables.</li>
+</ul>
+</li>
+<li><p class="first"><strong>Calculate system Temperatures.</strong></p>
+<p>Again for both cases.</p>
+<ul class="simple">
+<li>Tsky_wto, Tau_wto, Tsky_original, Tau_original, airmass.</li>
+</ul>
+</li>
+<li><p class="first"><strong>SBs within spectral ranges with transmission higher than 50% are first</strong>
+<strong>selected.</strong></p>
+<div class="math">
+<p><img src="_images/math/46580186a5a005326cfde8bd0f833339da4d8e15.png" alt="e^{-\tau_{sb,pwv}\cdot airmass_{sb,time}} &gt; 0.5"/></p>
+</div></li>
+<li><p class="first"><strong>Calculate current LST.</strong></p>
+<ul class="simple">
+<li>Date, ephem.observer(ALMA)</li>
+</ul>
+</li>
+<li><p class="first"><strong>Select SBs within given HA limits.</strong></p>
+<div class="math">
+<p><img src="_images/math/72673641df0b41530849230c8451599d3df51721.png" alt="minHA &lt; HA_{sb,time} &lt; maxHA"/></p>
+</div><p>(mihHA = -5 and maxHA =  3 by default).</p>
+</li>
+<li><p class="first">Select SBs over the given elevation limit (20 deg. default) and that won&#8217;t
+set for at least 1 1/2 hours.</p>
+</li>
+<li><p class="first">Remove SBs with states Phase2Submitted, FullyObserved and Deleted.</p>
+</li>
+<li><p class="first">Remove SBs that belongs to projects with status Phase2Submitted or Completed.</p>
+</li>
+<li><p class="first">Remove SBs that have names like &#8220;Do not&#8221;</p>
+</li>
+<li><p class="first">Remove SBs where the number of Executions Blocks with QA0 flags &#8220;pass&#8221; or
+&#8220;unset&#8221; is equal or higher than the number of requested executions.</p>
+</li>
+<li><p class="first">For 12m arrays, select SBs that can be executed with the current array&#8217;s
+angular resolution, using the minAR and maxAR corrected limits.</p>
+</li>
+<li><p class="first">Finally, calculate tsysfrac, blfrac and frac columns, to be use by the
+scorer algorithm.</p>
+</li>
 </ol>
 </div>
 <div class="section" id="tsys-time-fraction-calculation">
@@ -302,7 +357,12 @@ scorer algorithm.</li>
 <p>The TSys time fraction comes from equation:</p>
 <div class="math">
 <p><img src="_images/math/9a61d10685328c93c516e3f27d34a2d248b3385b.png" alt="\frac{T_{sys_{wto}}}{T_{sys_{PI}}}^2"/></p>
-</div></div>
+</div><p>Where <img class="math" src="_images/math/bf0ea3db0ec51d387c8d4c1abcea8f09662da8bc.png" alt="T_{sys_{wto}}"/> is the system temperature calculated with the
+current PWV at the representative frequency of the SB corrected by airmass at
+transit, and <img class="math" src="_images/math/87116e2e4299705c7233ebd30b56f96fb1a54e36.png" alt="T_{sys_{PI}}"/> is the system temperature calculated using the
+PWV set by the PI/P2G to calculate the integration time in the OT, also at the
+representative frequency and at transit.</p>
+</div>
 <div class="section" id="score-and-ranking">
 <h2><a class="toc-backref" href="#id11">Score and ranking</a><a class="headerlink" href="#score-and-ranking" title="Permalink to this headline">¶</a></h2>
 </div>
