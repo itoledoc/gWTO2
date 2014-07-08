@@ -402,8 +402,8 @@ class BLMainWindow(QMainWindow, Ui_BLMainWindow):
                      'RA', 'DEC', 'HA', 'elev', 'etime', 'execount', 'Total',
                      'tsysfrac', 'blfrac', 'frac', 'sb_array_score',
                      'sb_cond_score', 'maxPWVC', 'arrayMinAR', 'arcorr',
-                     'arrayMaxAR', 'integrationTime',
-                     'PRJ_ARCHIVE_UID', 'grade', 'lascorr']]
+                     'arrayMaxAR', 'integrationTime', 'lascorr',
+                     'PRJ_ARCHIVE_UID', 'grade']]
 
         tc12 = self.datas.score12m.sort(
             'score', ascending=False).query(
@@ -456,8 +456,8 @@ class BLMainWindow(QMainWindow, Ui_BLMainWindow):
              u'RA', u'DEC', u'HA', u'Elev.', u'Sets in', u'Exec. Req.',
              u'Exec. Done', u'TSysFrac', u'BLFrac', u'TotalFrac',
              u'Array Score', u'Cond. Score', u'maxPWVC', u'ArrayMinAR',
-             u'ARcorr', u'ArrayMaxAR', u'TimeOnSource',
-             u'PRJ UID', u'Grade', u'LAScorr'], dtype='object')
+             u'ARcorr', u'ArrayMaxAR', u'TimeOnSource', u'LAScorr',
+             u'PRJ UID', u'Grade'], dtype='object')
 
         tc12.columns = Wto.pd.Index(
             [u'Score', u'CODE', u'SB UID', u'SB Name', u'SB State', u'Band',
@@ -490,7 +490,7 @@ class BLMainWindow(QMainWindow, Ui_BLMainWindow):
         self.bl_sheet.sortByColumn(0, Qt.DescendingOrder)
         self.bl_sheet.resizeRowsToContents()
         for column in range(25):
-            if column in [1, 2, 3, 4, 5, 6, 7, 22, 25]:
+            if column in [1, 2, 3, 4, 5, 6, 7, 22, 23]:
                 self.bl_sheet.resizeColumnToContents(column)
             elif column in [11, 12, 16, 17, 19, 21]:
                 self.bl_sheet.setColumnWidth(column, 80)
@@ -590,7 +590,7 @@ class MyStdTableModel(QAbstractTableModel):
                 return QVariant(str(d)[:-2])
             elif col in [0, 13, 14, 15, 18, 19, 20, 21]:
                 return QVariant(QString("%1").arg(sb[col], 0, 'f', 2))
-            elif col in [9, 16, 17, 22, 25]:
+            elif col in [9, 16, 17, 22, 23]:
                 return QVariant(QString("%1").arg(sb[col], 0, 'f', 1))
             elif col in [11, 12]:
                 return QVariant(QString("%1").arg(sb[col], 0, 'i', 0))
@@ -598,7 +598,7 @@ class MyStdTableModel(QAbstractTableModel):
             return QVariant(str(self.arraydata[index.row()][index.column()]))
         elif role == Qt.TextAlignmentRole:
             if col in [0, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19,
-                       20, 21, 22, 25]:
+                       20, 21, 22, 23]:
                 return QVariant(int(Qt.AlignRight | Qt.AlignVCenter))
             return QVariant(int(Qt.AlignLeft | Qt.AlignVCenter))
         elif role == Qt.BackgroundColorRole:
