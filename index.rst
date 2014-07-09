@@ -376,6 +376,11 @@ The WTO API
 .. automodule:: wtoAlgorithm
    :members:
 
+.. figure:: diagram.png
+   :scale: 65
+
+   Figure 4, UML diagram of wtoAlgorithm.py
+
 The WTO Data Frames
 ===================
 

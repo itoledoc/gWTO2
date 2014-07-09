@@ -82,11 +82,11 @@
     <AntennaOnPad antenna="CM03" pad="J503" start="2012-10-01T13:45:47.477-04:00">
         <MetrologyCoefficients AN0="0.0" AW0="0.0" version="0"/>
     </AntennaOnPad>
-    <AntennaOnPad antenna="DA42" pad="A081" start="2014-03-30T11:07:13.569-04:00">
-        <MetrologyCoefficients AN0="-6.18" AW0="-15.77" version="1"/>
-    </AntennaOnPad>
     <AntennaOnPad antenna="DA62" pad="A016" start="2013-12-08T13:23:02.643-03:00">
         <MetrologyCoefficients AN0="-0.988" AW0="-3.974" version="1"/>
+    </AntennaOnPad>
+    <AntennaOnPad antenna="DA42" pad="A081" start="2014-03-30T11:07:13.569-04:00">
+        <MetrologyCoefficients AN0="-6.18" AW0="-15.77" version="1"/>
     </AntennaOnPad>
     <AntennaOnPad antenna="DA52" pad="A035" start="2012-10-25T19:04:52.759-03:00">
         <MetrologyCoefficients AN0="11.55" AW0="-4.0843" version="2"/>

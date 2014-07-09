@@ -212,7 +212,7 @@
         <span class="c"># Create main dataframes</span>
         <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">new</span><span class="p">:</span>
             <span class="n">call</span><span class="p">([</span><span class="s">&#39;rm&#39;</span><span class="p">,</span> <span class="s">&#39;-rf&#39;</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">path</span><span class="p">])</span>
-            <span class="k">print</span> <span class="bp">self</span><span class="o">.</span><span class="n">path</span> <span class="o">+</span> <span class="s">&quot;: creating preferences dir&quot;</span>
+            <span class="k">print</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">path</span> <span class="o">+</span> <span class="s">&quot;: creating preferences dir&quot;</span><span class="p">)</span>
             <span class="n">os</span><span class="o">.</span><span class="n">mkdir</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">path</span><span class="p">)</span>
             <span class="n">os</span><span class="o">.</span><span class="n">mkdir</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">sbxml</span><span class="p">)</span>
             <span class="n">os</span><span class="o">.</span><span class="n">mkdir</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">obsxml</span><span class="p">)</span>
@@ -529,7 +529,7 @@
 
 <span class="sd">        :param code:</span>
 <span class="sd">        &quot;&quot;&quot;</span>
-        <span class="k">print</span> <span class="s">&quot;Downloading Project </span><span class="si">%s</span><span class="s"> obsproject.xml&quot;</span> <span class="o">%</span> <span class="n">code</span>
+        <span class="k">print</span><span class="p">(</span><span class="s">&quot;Downloading Project </span><span class="si">%s</span><span class="s"> obsproject.xml&quot;</span> <span class="o">%</span> <span class="n">code</span><span class="p">)</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">cursor</span><span class="o">.</span><span class="n">execute</span><span class="p">(</span>
             <span class="s">&quot;SELECT TIMESTAMP, XMLTYPE.getClobVal(xml) &quot;</span>
             <span class="s">&quot;FROM ALMA.XML_OBSPROJECT_ENTITIES &quot;</span>
@@ -560,7 +560,10 @@
             <span class="k">for</span> <span class="n">sg</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">obsproj</span><span class="o">.</span><span class="n">ObsProgram</span><span class="o">.</span><span class="n">ScienceGoal</span><span class="p">)):</span>
                 <span class="n">code</span> <span class="o">=</span> <span class="n">code</span>
                 <span class="n">sciencegoal</span> <span class="o">=</span> <span class="n">obsproj</span><span class="o">.</span><span class="n">ObsProgram</span><span class="o">.</span><span class="n">ScienceGoal</span><span class="p">[</span><span class="n">sg</span><span class="p">]</span>
-                <span class="n">partid</span> <span class="o">=</span> <span class="n">sciencegoal</span><span class="o">.</span><span class="n">ObsUnitSetRef</span><span class="o">.</span><span class="n">attrib</span><span class="p">[</span><span class="s">&#39;partId&#39;</span><span class="p">]</span>
+                <span class="k">try</span><span class="p">:</span>
+                    <span class="n">partid</span> <span class="o">=</span> <span class="n">sciencegoal</span><span class="o">.</span><span class="n">ObsUnitSetRef</span><span class="o">.</span><span class="n">attrib</span><span class="p">[</span><span class="s">&#39;partId&#39;</span><span class="p">]</span>
+                <span class="k">except</span> <span class="ne">AttributeError</span><span class="p">:</span>
+                    <span class="k">continue</span>
                 <span class="n">perfparam</span> <span class="o">=</span> <span class="n">sciencegoal</span><span class="o">.</span><span class="n">PerformanceParameters</span>
                 <span class="n">ar</span> <span class="o">=</span> <span class="n">perfparam</span><span class="o">.</span><span class="n">desiredAngularResolution</span><span class="o">.</span><span class="n">pyval</span>
                 <span class="n">arunit</span> <span class="o">=</span> <span class="n">perfparam</span><span class="o">.</span><span class="n">desiredAngularResolution</span><span class="o">.</span><span class="n">attrib</span><span class="p">[</span><span class="s">&#39;unit&#39;</span><span class="p">]</span>
