@@ -634,11 +634,14 @@ class WtoAlgorithm(WtoDatabase):
                 conf_file = self.wto_path + 'conf/default.txt'
                 io_file = open(
                     self.wto_path + 'conf/arrayConfigurationResults.txt')
-                self.array_ar = float(io_file.readlines()[13].split(':')[1])
+                lines = io_file.readlines()
+                self.array_ar = float(lines[13].split(':')[1])
+                self.num_ant = int(lines[3].split(':')[1])
                 io_file.close()
                 ac = rUV.ac.ArrayConfigurationCasaFile()
                 ac.createCasaConfig(conf_file)
                 self.ruv = rUV.computeRuv(conf_file + ".cfg")
+
             else:
                 conf_file = self.wto_path + 'conf/%s.txt.cfg' % array_name
                 self.ruv = rUV.computeRuv(conf_file)
