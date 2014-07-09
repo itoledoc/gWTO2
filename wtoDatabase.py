@@ -163,7 +163,7 @@ class WtoDatabase(object):
         # Create main dataframes
         if self.new:
             call(['rm', '-rf', self.path])
-            print self.path + ": creating preferences dir"
+            print(self.path + ": creating preferences dir")
             os.mkdir(self.path)
             os.mkdir(self.sbxml)
             os.mkdir(self.obsxml)
@@ -480,7 +480,7 @@ class WtoDatabase(object):
 
         :param code:
         """
-        print "Downloading Project %s obsproject.xml" % code
+        print("Downloading Project %s obsproject.xml" % code)
         self.cursor.execute(
             "SELECT TIMESTAMP, XMLTYPE.getClobVal(xml) "
             "FROM ALMA.XML_OBSPROJECT_ENTITIES "
@@ -511,7 +511,10 @@ class WtoDatabase(object):
             for sg in range(len(obsproj.ObsProgram.ScienceGoal)):
                 code = code
                 sciencegoal = obsproj.ObsProgram.ScienceGoal[sg]
-                partid = sciencegoal.ObsUnitSetRef.attrib['partId']
+                try:
+                    partid = sciencegoal.ObsUnitSetRef.attrib['partId']
+                except AttributeError:
+                    continue
                 perfparam = sciencegoal.PerformanceParameters
                 ar = perfparam.desiredAngularResolution.pyval
                 arunit = perfparam.desiredAngularResolution.attrib['unit']

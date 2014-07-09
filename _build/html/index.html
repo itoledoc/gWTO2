@@ -98,11 +98,9 @@
 </div>
 <div class="section" id="using-gwto2">
 <h1><a class="toc-backref" href="#id2">Using gWTO2</a><a class="headerlink" href="#using-gwto2" title="Permalink to this headline">¶</a></h1>
-<p><strong>NOTICE 1: Updated Standard Columns description (2014-07-04)</strong></p>
-<p><strong>NOTICE 2: gWTO2, BL version now makes use of &#8220;Time Const.&#8221; and &#8220;Pol&#8221; Tabs.</strong>
-<strong>Tab &#8220;Sessions&#8221; is still on development (2014-07-02)</strong></p>
+<p><strong>Latest update: |today|</strong></p>
 <div class="figure">
-<a class="reference internal image-reference" href="_images/Selection_003.png"><img alt="_images/Selection_003.png" src="_images/Selection_003.png" style="width: 678.5px; height: 458.0px;" /></a>
+<img alt="_images/Selection_003.png" src="_images/Selection_003.png" />
 <p class="caption">Screenshot of gWTO2 RC</p>
 </div>
 <p>gWTO2 is tested and deployed at the osf-red machine, within the aod account.
@@ -135,7 +133,7 @@ for each other. <strong>After playing with gWTO2 using a different path, please<
 2. If the -c option was used, or the cache have been manually erased it,
 the time until the gui is ready can be up to 5-7 minutes.</p>
 <div class="figure">
-<a class="reference internal image-reference" href="_images/gWTO2__BL_001.png"><img alt="_images/gWTO2__BL_001.png" src="_images/gWTO2__BL_001.png" style="width: 546.0px; height: 438.0px;" /></a>
+<img alt="_images/gWTO2__BL_001.png" src="_images/gWTO2__BL_001.png" />
 <p class="caption">Figure 2</p>
 </div>
 <p>The gui for ACA (<tt class="docutils literal"><span class="pre">gWTO2</span> <span class="pre">ACA</span></tt>) is almost the same, except for the lack of
@@ -147,23 +145,26 @@ the time until the gui is ready can be up to 5-7 minutes.</p>
 1.2 mm., the horizon limit is 20 degrees, minimum hour angle is -5 and maximum
 hour angle is 3. The LST field is not editable, and it shows the LST for the
 date time set in the Date field.</p>
-<p><strong>For BL GUI only.</strong> The box with the array variables will have the
-<em>Std. Conf.:</em> field set to
+<dl class="docutils">
+<dt><strong>(For BL GUI only.)</strong> The box with the array variables will have the</dt>
+<dd><em>Std. Conf.:</em> field set to
 &#8220;Current Conf.&#8221;. This &#8220;Current Conf&#8221; comes from the output of the CASA script
 <tt class="docutils literal"><span class="pre">arrayConfigurationTools.py</span></tt>, which can be found at
 AIV/science/ArrayConfiguration/Tools/arrayConfigurationTools.py. It is made
 with the antennas that in principle can be used for the current ES Block. <strong>It</strong>
-<strong>is the AoD lead duty to create the relevant files from time to time to</strong>
-<strong>account for the antenna movements or being added</strong>.</p>
-<p><strong>For BL GUI only.**The values given at *Array AR* are set according to the
-*current array&#8217;s* angular resolution and number of antennas offered officially
-for cycle 2. **The only field you can modify at this stage in the &#8216;Antenna&#8217;</strong>
+<strong>is the AoD&#8217;s Lead duty to create the relevant files from time to time to</strong>
+<strong>account for the antenna movements or being added</strong>.</dd>
+<dt><strong>(For BL GUI only.)</strong> The values given at <em>Array AR:</em>  and <em>Antennas:</em></dt>
+<dd>are set according to the <em>current array&#8217;s</em> angular resolution and
+number of antennas offered officially for cycle 2.
+<strong>The only field you can modify at this stage in the &#8216;Antenna&#8217;</strong>
 <strong>field, which is the number of antennas</strong>. The idea is that the user will use
 this information to have an idea of the current configuration characteristics,
 and to run gWTO2 to plan observations ahead of time, or when Baseline arrays
-have not been created in the last 6 to 12 hours.</p>
-<p><strong>For BL GUI only. When observing</strong> the user should press the button <em>Now</em>,
-and a pop up window similar to the one shown in figure 3 will appear.</p>
+have not been created in the last 6 to 12 hours.</dd>
+<dt><strong>(For BL GUI only, when observing.)</strong> The user should press the button <em>Now</em>,</dt>
+<dd>and a pop up window similar to the one shown in figure 3 will appear.</dd>
+</dl>
 <div class="figure">
 <img alt="_images/gWTO2__BL_002.png" src="_images/gWTO2__BL_002.png" />
 <p class="caption">Figure 3</p>
@@ -180,8 +181,10 @@ longer be able to change the number of antennas unless you go back to
 &#8220;Current Conf.&#8221;</p>
 <p>The &#8220;BL Arrays:&#8221; Combo menu is populated also with the list of the baselines
 arrays created in the last 6 to 12 hours.</p>
-<p><strong>For ACA GUI only</strong> The number of antennas is 9 by default. Change the number
-according to the number of antennas that are available.</p>
+<dl class="docutils">
+<dt><strong>For ACA GUI only</strong> The number of antennas is 9 by default. Change the number</dt>
+<dd>according to the number of antennas that are available.</dd>
+</dl>
 </div>
 <div class="section" id="running-and-setting-scores">
 <h2><a class="toc-backref" href="#id5">Running and setting scores</a><a class="headerlink" href="#running-and-setting-scores" title="Permalink to this headline">¶</a></h2>
@@ -262,6 +265,8 @@ zenith.</li>
 equivalent resolution at 100GHz and source with DEC -23.</li>
 <li><strong>ArrayMinAR:</strong> The maximum array&#8217;s resolution that the current SB will
 accept.</li>
+<li><strong>LASCorr:</strong> The largest angular scale required by the SB, corrected to
+the equivalent scale at 100GHz and source with DEC -23.</li>
 <li><strong>TimeOnSource:</strong> Integration time, in seconds, for the science target(s).
 In the case of multisources, this time should be multiplied by the number of
 sources.</li>

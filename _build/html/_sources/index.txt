@@ -16,13 +16,9 @@ The gWTO2 (What To Observe Cycle 2 GUI) Documentation
 Using gWTO2
 ===========
 
-**NOTICE 1: Updated Standard Columns description (2014-07-04)**
-
-**NOTICE 2: gWTO2, BL version now makes use of "Time Const." and "Pol" Tabs.**
-**Tab "Sessions" is still on development (2014-07-02)**
+**Latest update: |today|**
 
 .. figure:: Selection_003.png
-   :scale: 50
 
    Screenshot of gWTO2 RC
 
@@ -63,7 +59,6 @@ After starting ``gWTO2 BL`` you will be presented with the gui shown on figure
 the time until the gui is ready can be up to 5-7 minutes.
 
 .. figure:: gWTO2__BL_001.png
-   :scale: 50
 
    Figure 2
 
@@ -78,25 +73,26 @@ After opening, the date will be by default the current UTC time, pwv is set to
 hour angle is 3. The LST field is not editable, and it shows the LST for the
 date time set in the Date field.
 
-**For BL GUI only.** The box with the array variables will have the
-*Std. Conf.:* field set to
-"Current Conf.". This "Current Conf" comes from the output of the CASA script
-``arrayConfigurationTools.py``, which can be found at
-AIV/science/ArrayConfiguration/Tools/arrayConfigurationTools.py. It is made
-with the antennas that in principle can be used for the current ES Block. **It**
-**is the AoD lead duty to create the relevant files from time to time to**
-**account for the antenna movements or being added**.
+**(For BL GUI only.)** The box with the array variables will have the
+   *Std. Conf.:* field set to
+   "Current Conf.". This "Current Conf" comes from the output of the CASA script
+   ``arrayConfigurationTools.py``, which can be found at
+   AIV/science/ArrayConfiguration/Tools/arrayConfigurationTools.py. It is made
+   with the antennas that in principle can be used for the current ES Block. **It**
+   **is the AoD's Lead duty to create the relevant files from time to time to**
+   **account for the antenna movements or being added**.
 
-**For BL GUI only.**The values given at *Array AR* are set according to the
-*current array's* angular resolution and number of antennas offered officially
-for cycle 2. **The only field you can modify at this stage in the 'Antenna'**
-**field, which is the number of antennas**. The idea is that the user will use
-this information to have an idea of the current configuration characteristics,
-and to run gWTO2 to plan observations ahead of time, or when Baseline arrays
-have not been created in the last 6 to 12 hours.
+**(For BL GUI only.)** The values given at *Array AR:*  and *Antennas:*
+   are set according to the *current array's* angular resolution and
+   number of antennas offered officially for cycle 2.
+   **The only field you can modify at this stage in the 'Antenna'**
+   **field, which is the number of antennas**. The idea is that the user will use
+   this information to have an idea of the current configuration characteristics,
+   and to run gWTO2 to plan observations ahead of time, or when Baseline arrays
+   have not been created in the last 6 to 12 hours.
 
-**For BL GUI only. When observing** the user should press the button *Now*,
-and a pop up window similar to the one shown in figure 3 will appear.
+**(For BL GUI only, when observing.)** The user should press the button *Now*,
+   and a pop up window similar to the one shown in figure 3 will appear.
 
 .. figure:: gWTO2__BL_002.png
 
@@ -117,7 +113,7 @@ The "BL Arrays:" Combo menu is populated also with the list of the baselines
 arrays created in the last 6 to 12 hours.
 
 **For ACA GUI only** The number of antennas is 9 by default. Change the number
-according to the number of antennas that are available.
+   according to the number of antennas that are available.
 
 Running and setting scores
 --------------------------
@@ -202,6 +198,8 @@ Standard (ACA) Tab in BL (ACA) GUI
    equivalent resolution at 100GHz and source with DEC -23.
 #. **ArrayMinAR:** The maximum array's resolution that the current SB will
    accept.
+#. **LASCorr:** The largest angular scale required by the SB, corrected to
+   the equivalent scale at 100GHz and source with DEC -23.
 #. **TimeOnSource:** Integration time, in seconds, for the science target(s).
    In the case of multisources, this time should be multiplied by the number of
    sources.
