@@ -414,8 +414,8 @@ Once in ipython:::
     datas = wto.Algorithm(path='./wto_testing/')
 
 And the run the following script. You can copy the code, and then paste into
-python with :command:`%paste`, or copy it into a file, and then execute it inside the
-ipython session::
+python with :command:`%paste`, or :download:`donwload the file <runwto.py>`,
+and then load the function with :command:`execfile('runwto.py')`::
 
     def runwto(pwv, array_name=None, d=None, num_ant=34):
         datas.query_arrays()
