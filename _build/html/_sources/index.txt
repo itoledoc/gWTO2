@@ -228,8 +228,8 @@ Selection and Score algorithms
 
 .. _selection:
 
-Selection and Data preparation
-------------------------------
+Selection and Data preparation (:py:func:`wtoAlgorithm.WtoAlgorithm.selector`)
+------------------------------------------------------------------------------
 
 #. **Calculate observability using the pyephem libraries.**
 
@@ -349,8 +349,8 @@ Selection and Data preparation
    * :math:`\rm{HA}_{sb,time}`
    * :keyword:`LST`
 
-#. Select SBs over the given elevation limit (20 deg. default) and that won't
-   set for at least 1 1/2 hours.
+#. **Select SBs over the given elevation limit (20 deg. default) and that won't**
+   **set for at least 1 1/2 hours.**
 
    .. math::
       \left( \rm{elev} > \rm{horizon} \right) \rm{\ AND\ } \left(
@@ -362,15 +362,74 @@ Selection and Data preparation
    * :keyword:`Horizon Limit`
    * :keyword:`SB set time`
 
-#. Remove SBs with states Phase2Submitted, FullyObserved and Deleted.
-#. Remove SBs that belongs to projects with status Phase2Submitted or Completed.
-#. Remove SBs that have names like "Do not"
-#. Remove SBs where the number of Executions Blocks with QA0 flags "pass" or
-   "unset" is equal or higher than the number of requested executions.
-#. For 12m arrays, select SBs that can be executed with the current array's
-   angular resolution, using the minAR and maxAR corrected limits.
-#. Finally, calculate tsysfrac, blfrac and frac columns, to be use by the
-   scorer algorithm.
+#. **Remove SBs with states Phase2Submitted, FullyObserved and Deleted.**
+
+   Relavant XML child/tag or gWTO2 variables:
+
+   * This information comes from the ALMA.SCHED_BLOCK_STATUS.
+
+#. **Remove SBs that belongs to projects with status Phase2Submitted or Completed.**
+
+   Relavant XML child/tag or gWTO2 variables:
+
+   * This information comes from the ALMA.OBS_PROJECT_STATUS, and is crosschecked
+     against ALMA.BMMV_OBSPROJECT
+
+#. **Remove SBs that have names like "Do not".**
+
+   Currently the OT is not able to handle the SB status "Deleted", so SBs
+   that are supposed to be deleted are set to status "Suspended", and the
+   name changed to a varation of "DO NOT OBSERVE", "Do_not_observe", "DO not
+   observe descoped", etc., depending on the mood of the P2G. The only thing
+   in common is the presence of a "do not". Any SB with those words in the name
+   is removed.
+
+   Relavant XML child/tag or gWTO2 variables:
+
+   * SchedBlock.name
+
+#. **Remove SBs where the number of requested executions has been achieved**
+
+   Given the requested number of executions of a SB (executionCount), check
+   if any EB are associated to this SB, and add up the ones with QA0 flags
+   *Unset* and *Pass*. If this last number is equal or higher than
+   executionCount we don't select the SB.
+
+   When a QAO *Unset* flag is set to *Fail* or *Semipass*, the number of
+   assoc. EB will go down, and then an SB can be back on the list. This method
+   avoids over-observing of an SB.
+
+   Relavant XML child/tag or gWTO2 variables:
+
+   * SchedBlock.SchedBlockControl.executionCount
+   * QA0STATUS column FROM ALMA.AQUA_EXECBLOCK
+
+#. **Select SBs that can be executed with the current array's**
+   **angular resolution**
+
+   Using the minAR and maxAR limits, corrrected by Stéphane's script and transformed
+   to the equivalent AR at 100GHz, we select SBs that would accept current array's
+   configuration as set in :guilabel:`Array AR:`:
+
+   .. math::
+      \rm{minAR}_{\rm{SB}} < \rm{AR}_{\rm{array}} < \rm{maxAR}_{\rm{SB}}
+
+   Relavant XML child/tag or gWTO2 variables:
+
+   * SchedBlock.SchedulingConstraints.minAcceptableAngResolution
+   * SchedBlock.SchedulingConstraints.maxAcceptableAngResolution
+   * :keyword:`minAR`, :keyword:`maxAR`, Stéphane's script
+   * :guilabel:`Array AR:`
+
+#. **Calculate tsysfrac, blfrac and frac columns**
+
+   .. math::
+
+      \rm{tsysfrac} = \left(\frac{\rm{Tsys}}{\rm{Tsys\_org}}\right)^{2}
+
+      \rm{blfrac} = \frac{offered\_baselines}{\rm{available\_baselines}}
+
+      \rm{frac} = \rm{tsysfrac} \times \rm{blfrac}
 
 .. _score:
 
@@ -745,6 +804,7 @@ wtoDatabase.sbstate
 
 Assessment of Current Array's Angular Resolution
 ================================================
+
 
 Indices and tables
 ==================

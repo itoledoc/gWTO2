@@ -678,6 +678,7 @@ class WtoAlgorithm(WtoDatabase):
                 lines = io_file.readlines()
                 self.array_ar = float(lines[13].split(':')[1])
                 self.num_ant = int(lines[3].split(':')[1])
+                self.num_bl = self.num_ant * (self.num_ant - 1.) / 2.
                 io_file.close()
                 ac = rUV.ac.ArrayConfigurationCasaFile()
                 ac.createCasaConfig(conf_file)
@@ -688,6 +689,7 @@ class WtoAlgorithm(WtoDatabase):
                 self.ruv = rUV.computeRuv(conf_file)
                 # noinspection PyTypeChecker
                 self.array_ar = self.arr_ar_def[array_name]
+                self.num_bl = self.num_ant * (self.num_ant - 1.) / 2.
                 self.num_ant = 34
 
             if len(self.ruv) > 33. * 17.:

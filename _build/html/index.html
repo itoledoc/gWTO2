@@ -247,8 +247,8 @@ sources.</li>
 </div>
 <div class="section" id="selection-and-score-algorithms">
 <h1>Selection and Score algorithms<a class="headerlink" href="#selection-and-score-algorithms" title="Permalink to this headline">¶</a></h1>
-<div class="section" id="selection-and-data-preparation">
-<span id="selection"></span><h2>Selection and Data preparation<a class="headerlink" href="#selection-and-data-preparation" title="Permalink to this headline">¶</a></h2>
+<div class="section" id="selection-and-data-preparation-wtoalgorithm-wtoalgorithm-selector">
+<span id="selection"></span><h2>Selection and Data preparation (<a class="reference internal" href="#wtoAlgorithm.WtoAlgorithm.selector" title="wtoAlgorithm.WtoAlgorithm.selector"><tt class="xref py py-func docutils literal"><span class="pre">wtoAlgorithm.WtoAlgorithm.selector()</span></tt></a>)<a class="headerlink" href="#selection-and-data-preparation-wtoalgorithm-wtoalgorithm-selector" title="Permalink to this headline">¶</a></h2>
 <ol class="arabic">
 <li><p class="first"><strong>Calculate observability using the pyephem libraries.</strong></p>
 <p>For all the science field sources of an SB and fixed calibration sources,
@@ -362,8 +362,8 @@ of <em>sb</em> at transit.</p>
 <li><tt class="xref std std-keyword docutils literal"><span class="pre">LST</span></tt></li>
 </ul>
 </li>
-<li><p class="first">Select SBs over the given elevation limit (20 deg. default) and that won&#8217;t
-set for at least 1 1/2 hours.</p>
+<li><p class="first"><strong>Select SBs over the given elevation limit (20 deg. default) and that won&#8217;t</strong>
+<strong>set for at least 1 1/2 hours.</strong></p>
 <div class="math">
 <p><img src="_images/math/e3a9811f66c41fc75ffb813f00a9bbdfb41e740d.png" alt="\left( \rm{elev} &gt; \rm{horizon} \right) \rm{\ AND\ } \left(
 \rm{SB}_{\rm{set\ time}} &gt; 1.5\rm{hours\ from\ now} \right)"/></p>
@@ -374,21 +374,68 @@ set for at least 1 1/2 hours.</p>
 <li><tt class="xref std std-keyword docutils literal"><span class="pre">SB</span> <span class="pre">set</span> <span class="pre">time</span></tt></li>
 </ul>
 </li>
-<li><p class="first">Remove SBs with states Phase2Submitted, FullyObserved and Deleted.</p>
+<li><p class="first"><strong>Remove SBs with states Phase2Submitted, FullyObserved and Deleted.</strong></p>
+<p>Relavant XML child/tag or gWTO2 variables:</p>
+<ul class="simple">
+<li>This information comes from the ALMA.SCHED_BLOCK_STATUS.</li>
+</ul>
 </li>
-<li><p class="first">Remove SBs that belongs to projects with status Phase2Submitted or Completed.</p>
+<li><p class="first"><strong>Remove SBs that belongs to projects with status Phase2Submitted or Completed.</strong></p>
+<p>Relavant XML child/tag or gWTO2 variables:</p>
+<ul class="simple">
+<li>This information comes from the ALMA.OBS_PROJECT_STATUS, and is crosschecked
+against ALMA.BMMV_OBSPROJECT</li>
+</ul>
 </li>
-<li><p class="first">Remove SBs that have names like &#8220;Do not&#8221;</p>
+<li><p class="first"><strong>Remove SBs that have names like &#8220;Do not&#8221;.</strong></p>
+<p>Currently the OT is not able to handle the SB status &#8220;Deleted&#8221;, so SBs
+that are supposed to be deleted are set to status &#8220;Suspended&#8221;, and the
+name changed to a varation of &#8220;DO NOT OBSERVE&#8221;, &#8220;Do_not_observe&#8221;, &#8220;DO not
+observe descoped&#8221;, etc., depending on the mood of the P2G. The only thing
+in common is the presence of a &#8220;do not&#8221;. Any SB with those words in the name
+is removed.</p>
+<p>Relavant XML child/tag or gWTO2 variables:</p>
+<ul class="simple">
+<li>SchedBlock.name</li>
+</ul>
 </li>
-<li><p class="first">Remove SBs where the number of Executions Blocks with QA0 flags &#8220;pass&#8221; or
-&#8220;unset&#8221; is equal or higher than the number of requested executions.</p>
+<li><p class="first"><strong>Remove SBs where the number of requested executions has been achieved</strong></p>
+<p>Given the requested number of executions of a SB (executionCount), check
+if any EB are associated to this SB, and add up the ones with QA0 flags
+<em>Unset</em> and <em>Pass</em>. If this last number is equal or higher than
+executionCount we don&#8217;t select the SB.</p>
+<p>When a QAO <em>Unset</em> flag is set to <em>Fail</em> or <em>Semipass</em>, the number of
+assoc. EB will go down, and then an SB can be back on the list. This method
+avoids over-observing of an SB.</p>
+<p>Relavant XML child/tag or gWTO2 variables:</p>
+<ul class="simple">
+<li>SchedBlock.SchedBlockControl.executionCount</li>
+<li>QA0STATUS column FROM ALMA.AQUA_EXECBLOCK</li>
+</ul>
 </li>
-<li><p class="first">For 12m arrays, select SBs that can be executed with the current array&#8217;s
-angular resolution, using the minAR and maxAR corrected limits.</p>
+<li><p class="first"><strong>Select SBs that can be executed with the current array&#8217;s</strong>
+<strong>angular resolution</strong></p>
+<p>Using the minAR and maxAR limits, corrrected by Stéphane&#8217;s script and transformed
+to the equivalent AR at 100GHz, we select SBs that would accept current array&#8217;s
+configuration as set in <em class="guilabel">Array AR:</em>:</p>
+<div class="math">
+<p><img src="_images/math/47a561cdeb129d549fb2bd0508cd39367229a135.png" alt="\rm{minAR}_{\rm{SB}} &lt; \rm{AR}_{\rm{array}} &lt; \rm{maxAR}_{\rm{SB}}"/></p>
+</div><p>Relavant XML child/tag or gWTO2 variables:</p>
+<ul class="simple">
+<li>SchedBlock.SchedulingConstraints.minAcceptableAngResolution</li>
+<li>SchedBlock.SchedulingConstraints.maxAcceptableAngResolution</li>
+<li><tt class="xref std std-keyword docutils literal"><span class="pre">minAR</span></tt>, <tt class="xref std std-keyword docutils literal"><span class="pre">maxAR</span></tt>, Stéphane&#8217;s script</li>
+<li><em class="guilabel">Array AR:</em></li>
+</ul>
 </li>
-<li><p class="first">Finally, calculate tsysfrac, blfrac and frac columns, to be use by the
-scorer algorithm.</p>
-</li>
+<li><p class="first"><strong>Calculate tsysfrac, blfrac and frac columns</strong></p>
+<div class="math">
+<p><img src="_images/math/60123999a4b294d894cf0a2e5d5c5c5bbb4626b7.png" alt="\rm{tsysfrac} = \left(\frac{\rm{Tsys}}{\rm{Tsys\_org}}\right)^{2}
+
+\rm{blfrac} = \frac{offered\_baselines}{\rm{available\_baselines}}
+
+\rm{frac} = \rm{tsysfrac} \times \rm{blfrac}"/></p>
+</div></li>
 </ol>
 </div>
 <div class="section" id="score-and-ranking">
@@ -1841,7 +1888,7 @@ WHERE sb.SCHEDBLOCKID = ou.OBSUNITID AND sb.CSV = 0
 </ul>
 </li>
 <li><a class="reference internal" href="#selection-and-score-algorithms">Selection and Score algorithms</a><ul>
-<li><a class="reference internal" href="#selection-and-data-preparation">Selection and Data preparation</a></li>
+<li><a class="reference internal" href="#selection-and-data-preparation-wtoalgorithm-wtoalgorithm-selector">Selection and Data preparation (<tt class="docutils literal"><span class="pre">wtoAlgorithm.WtoAlgorithm.selector()</span></tt>)</a></li>
 <li><a class="reference internal" href="#score-and-ranking">Score and ranking</a></li>
 <li><a class="reference internal" href="#checking-observability">Checking observability</a></li>
 <li><a class="reference internal" href="#tsys-time-fraction-calculation">TSys time fraction calculation</a></li>
