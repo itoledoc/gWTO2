@@ -4,10 +4,8 @@
    contain the root `toctree` directive.
 
 
-The gWTO2 (What To Observe Cycle 2 GUI) Documentation
-=====================================================
-
-.. contents:: Table of Contents
+The gWTO2 (gui for What To Observe Cycle 2) Documentation
+=========================================================
 
 .. toctree::
    :maxdepth: 2
@@ -16,24 +14,26 @@ The gWTO2 (What To Observe Cycle 2 GUI) Documentation
 Using gWTO2
 ===========
 
-**Latest update: |today|**
+**Latest update:** |today|
 
 .. figure:: Selection_003.png
 
    Screenshot of gWTO2 RC
 
-
+Starting the GUI
+----------------
 
 gWTO2 is tested and deployed at the osf-red machine, within the aod account.
-A virtual environment of python, based on the Anaconda distribution, must be
-loaded before using it. This is achieved by running:::
+A virtual environment of python, based on the
+`Anaconda distribution <http://docs.continuum.io/anaconda/index.html>`_,
+must be loaded before using it. This is achieved by running::
 
     . activateC2Test
 
 The Anaconda distribution is based on python 2.7.6 and includes numpy, pandas,
 pyephem and other libraries need by gWTO.
 
-The gui is run executing the gWTO2.py comand:::
+The gui is run executing the gWTO2.py comand::
 
     Usage: gWTO2.py arg1 [options]
         arg1 must be BL or ACA
@@ -43,46 +43,55 @@ The gui is run executing the gWTO2.py comand:::
       -c, --clean           Force clean up of gWTO2 cache
       -p PATH, --path=PATH  Path for cache
 
-So, to run gWTO2 for baseline correlator use ``BL``, and ``ACA`` for Total Power
-and ACA. The ``-c`` option should only be used once per day.
+So, to run gWTO2 for baseline correlator use argument :option:`BL`, and
+:option:`ACA` for Total Power and ACA. The :option:`-c` option should only be
+used once per day.
 
-I would also recommend to set the option ``-p`` to something like
+I would also recommend to set the option :option:`-p` to something like
 ``'/.wto_myname/'`` so different users running gWTO won't mess up the cache
 for each other. **After playing with gWTO2 using a different path, please**
 **delete the directory created with the name .wto_myname**
 
-Start up
---------
+The gWTO2 window
+----------------
 
-After starting ``gWTO2 BL`` you will be presented with the gui shown on figure
-2. If the -c option was used, or the cache have been manually erased it,
+After starting :command:`gWTO2 BL` you will be presented with the gui shown on
+:ref:`Figure 2 <fig2>`.
+If the :option:`-c` option was used, or the cache have been manually erased it,
 the time until the gui is ready can be up to 5-7 minutes.
+
+.. _fig2:
 
 .. figure:: gWTO2__BL_001.png
 
    Figure 2
 
-The gui for ACA (``gWTO2 ACA``) is almost the same, except for the lack of
-"Array Options", and a tab "TP" that will be used for handling Total Power SBs
+The gui for ACA (:command:`gWTO2 ACA`) is almost the same, except for the lack
+of :guilabel:`Array Options`, and the presence of a tab :guilabel:`TP` that
+will be used for handling Total Power SBs.
 
 Setting up variables
 --------------------
 
-After opening, the date will be by default the current UTC time, pwv is set to
-1.2 mm., the horizon limit is 20 degrees, minimum hour angle is -5 and maximum
-hour angle is 3. The LST field is not editable, and it shows the LST for the
-date time set in the Date field.
+After opening, the :guilabel:`Date` will be by default the current UTC time,
+:guilabel:`PWV` is set to 1.2 mm., the :guilabel:`Horizon` limit is 20 degrees,
+:guilabel:`minHA`, minimum hour angle, is -5 and :guilabel:`maxHA`, maximum
+hour angle, is 3. The :guilabel:`LST` field is not editable, and it shows the
+LST for the date/time set in the :guilabel:`Date` field.
 
-**(For BL GUI only.)** The box with the array variables will have the
-   *Std. Conf.:* field set to
-   "Current Conf.". This "Current Conf" comes from the output of the CASA script
-   ``arrayConfigurationTools.py``, which can be found at
-   AIV/science/ArrayConfiguration/Tools/arrayConfigurationTools.py. It is made
-   with the antennas that in principle can be used for the current ES Block. **It**
-   **is the AoD's Lead duty to create the relevant files from time to time to**
-   **account for the antenna movements or being added**.
+**(For BL GUI only.)**
+   The box with the array variables will have the
+   :guilabel:`Std. Conf.:` field set to :keyword:`Current Conf.`
+   This :keyword:`Current Conf.` comes from the output of the CASA script
+   :command:`arrayConfigurationTools.py`, which can be found at
+   :file:`~/AIV/science/ArrayConfiguration/Tools/arrayConfigurationTools.py`.
+   It is made with the antennas that in principle can be used for the current
+   ES Block. **It is the AoD Lead's duty to create the relevant files from**
+   **time to time to account for antenna movements or new antennas added**.
+   :ref:`(Instructions) <current-conf>`
 
-**(For BL GUI only.)** The values given at *Array AR:*  and *Antennas:*
+**(For BL GUI only.)**
+   The values given at :guilabel:`Array AR:`  and :guilabel:`Antennas:`
    are set according to the *current array's* angular resolution and
    number of antennas offered officially for cycle 2.
    **The only field you can modify at this stage in the 'Antenna'**
@@ -91,8 +100,11 @@ date time set in the Date field.
    and to run gWTO2 to plan observations ahead of time, or when Baseline arrays
    have not been created in the last 6 to 12 hours.
 
-**(For BL GUI only, when observing.)** The user should press the button *Now*,
-   and a pop up window similar to the one shown in figure 3 will appear.
+**(For BL GUI only, when observing.)**
+   The user should press the button :guilabel:`Now`, and a pop up window
+   similar to the one shown in :ref:`Figure 3 <fig3>` will appear.
+
+.. _fig3:
 
 .. figure:: gWTO2__BL_002.png
 
@@ -103,39 +115,43 @@ this distribution, taking the data from latest Baseline Array created.
 From this distribution the array's resolution is estimated, and the number of
 antennas is also show. **The user should check that the array resolution is**
 **close the the "Current Conf." value, and that no outliers are fitted**. If
-happy press the OK button, and this will set the Array AR and Antennas fields
-in the main window. If Cancel is pressed instead, the main window will go back
-to "Current Conf.". Also, when accepting the new array estimates you will not
-longer be able to change the number of antennas unless you go back to
-"Current Conf."
+happy press the :guilabel:`OK` button, and this will set the
+:guilabel:`Array AR:` and :guilabel:`Antennas:` fields
+in the main window. If :guilabel:`Cancel` is pressed instead, the main window
+will go back to :keyword:`Current Conf.`. Also, when accepting the new array
+estimates you will not longer be able to change the number of antennas unless
+you go back to :keyword"`Current Conf.`
 
-The "BL Arrays:" Combo menu is populated also with the list of the baselines
-arrays created in the last 6 to 12 hours.
+The :guilabel:`BL Arrays:` Combo menu is also populated with the list of the
+baselines arrays created in the last 6 to 12 hours.
 
-**For ACA GUI only** The number of antennas is 9 by default. Change the number
-   according to the number of antennas that are available.
+**For ACA GUI only**
+   The number of antennas is 9 by default. Change the number according to the
+   number of antennas that are available.
 
-Running and setting scores
---------------------------
+Running
+-------
 
-When you are happy with the date, pwv and array variables (and also the horizon,
-minHA and maxHA values) you can run the selector and scoring algorithms pressing
-the button "Now".
+When you are happy with the :guilabel:`Date`, :guilabel:`PWV` and
+array variables (also the :guilabel:`Horizon`, :guilabel:`minHA` and
+:guilabel:`maxHA` values) you can run the selector and scoring algorithms
+pressing the button :guilabel:`Run`.
 
 After an interval of a few seconds (5 to 15 seconds) you will be presented
-with something similar to Figure 4.
+with something similar to :ref:`Figure 4 <fig4>`.
+
+.. _fig4:
 
 .. figure:: gWTO2__BL_003.png
-   :scale: 50
 
    Figure 4
 
 
 Reading the output Scores
-=========================
+-------------------------
 
 Standard (ACA) Tab in BL (ACA) GUI
-----------------------------------
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
 #. **Score:** The score is the weighted mean of different scores calculated
    for each observable SB. The score is a value between 0 and 10,
@@ -210,8 +226,10 @@ Standard (ACA) Tab in BL (ACA) GUI
 Selection and Score algorithms
 ==============================
 
-Selection
----------
+.. _selection:
+
+Selection and Data preparation
+------------------------------
 
 #. **Calculate observability using the pyephem libraries.**
 
@@ -225,6 +243,8 @@ Selection
    would set first. The rise and set LST are calculated using the elevation
    limit (`horizon`) gave as an input for gWTO.
 
+   Relavant XML child/tag or gWTO2 variables:
+
    * SchedBlock.FieldSource['solarSystemObject']
    * SchedBlock.FieldSource.sourceCoordinates.longitude
    * SchedBlock.FieldSource.sourceCoordinates.latitude
@@ -234,6 +254,8 @@ Selection
 
 #. **Select SB by array type: 12m, 7m, TP.**
 
+   Relavant XML child/tag or gWTO2 variables:
+
    * SchedBlock.ObsUnitControl['arrayRequested']
    * Array Type.
 
@@ -241,6 +263,28 @@ Selection
 
    For both the OT asumed conditions and current, actual, conditions,
    based on the current PWV.
+
+   The implementation has several steps:
+
+    #. First, a table with values of Tau as fuction of PWV and representative
+       frequencies was created. The file with this tables, in csv format, is
+       called **tau.csv**. The frequencies are between 84.0 and 720.0 GHz, with
+       steps of 100 MHz; pwv values are between 0.0 and 20.0 mm, in steps of
+       0.05. The values were calculated using the atmosphere model algorithms from
+       CASA 4.2.1, using as input variables :math:`P=580.0`, :math:`H=20.0`,
+       :math:`T=270.0`, :math:`altitude=5059` and :math:`chansep=0.1`.
+    #. A table with Tsky values as function of PWV and representative
+       frequencies was also create. The file with this table, in csv format,
+       is called **tskyR.csv**. Description of columns, rows, and values is the
+       same as the table tau.csv, the only addition, is that the Tsky in the
+       tables assumes the airmass of a source at Zenith.
+    #. Internaly, four columns are created for all SBs: *tau_org* and *tsky_org*,
+       storing the value of tau and tsky for the conditions assumed by the OT,
+       i.e., pwv from maxPWVC; *tau* and *tsky*, storing
+       the values of tau and tsky for the current conditions, i.e.,
+       pwv from the gui's PWV variable.
+
+   Relavant XML child/tag or gWTO2 variables:
 
    * SchedBlock.Preconditions.WeatherConstraints.maxPWVC
    * SchedBlock.SchedulingConstraints.representativeCoordinates.latitude
@@ -250,28 +294,74 @@ Selection
 
 #. **Calculate system Temperatures.**
 
-   Again for both cases.
+   Two columns are genrated for each SB: *tsys_org* and *tsys*, one for the
+   OT's assumed conditions and the other for the current conditions.
+   Tsys, for both cases, is calculated using:
 
-   * Tsky_wto, Tau_wto, Tsky_original, Tau_original, airmass.
+       .. math::
+          T_{sys} = \frac{1 + g}{\eta_{eff} e^{-\tau \cdot \sec Z}}
+          \left(T_{rx} + T_{sky,Z=0} \left(\frac{1-e^{-\tau \cdot \sec Z}}{e^{-\tau}}\right)
+          \eta_{eff} + (1-\eta_{eff}) T_{amb}\right)
+
+   Where :math:`g` is the sideband gain ratio (:math:`g=0` for SSB and 2SB
+   receivers, :math:`g=1` for DSB); :math:`\eta_{eff}` is the forward efficiency,
+   which is set to a value of 0.95; :math:`T_{rx}` is the receiver characteristic
+   temperature; :math:`\tau` is the oppacity for a source at zenithal distance
+   :math:`Z=0`; :math:`Z` is the zenithal distance of the representative source
+   at transit: :math:`T_{sky}` is the sky temperature at :math:`Z=0`; and
+   :math:`T_{amb}` is the ambient temperature, set to a fixed value of
+   :math:`270K`.
+
+   Relavant XML child/tag or gWTO2 variables:
+
+   * SchedBlock.SchedulingConstraints.requiredReceiverBands
 
 #. **SBs within spectral ranges with transmission higher than 50% are first**
    **selected.**
 
+   For gWTO1, we use to have a limit of 70%, which change to 50% when the pwv
+   was under 0.6 mm. For gWTO2 we set the limit to 50%, and a more accurate
+   selection is applied later using :math:`T_{sys}`
+   The transmission is calculated from the previously found :math:`tau` for
+   the current conditions:
+
    .. math::
-      e^{-\tau_{sb,pwv}\cdot airmass_{sb,time}} > 0.5
+      e^{-\tau_{\rm{sb,pwv}}\cdot \sec Z_{\rm{sb,HA}=0}} > 0.5
 
-#. **Calculate current LST.**
+   where :math:`\tau_{\rm{sb,pwv}}` is the oppacity for the representative source
+   of a scheduling block *sb* and with the current PWV :math:`pwv`; and
+   :math:`Z_{sb,\rm{HA}=0}` is the zenithal distance for the representative source
+   of *sb* at transit.
 
-   * Date, ephem.observer(ALMA)
+   Relavant XML child/tag or gWTO2 variables:
+
+   * :math:`\tau_{\rm{sb,pwv}}`
 
 #. **Select SBs within given HA limits.**
 
    .. math::
-      minHA < HA_{sb,time} < maxHA
+      \rm{minHA} < \rm{HA}_{sb,time} < \rm{maxHA}
 
    (mihHA = -5 and maxHA =  3 by default).
+
+   Relavant XML child/tag or gWTO2 variables:
+
+   * :math:`\rm{HA}_{sb,time}`
+   * :keyword:`LST`
+
 #. Select SBs over the given elevation limit (20 deg. default) and that won't
    set for at least 1 1/2 hours.
+
+   .. math::
+      \left( \rm{elev} > \rm{horizon} \right) \rm{\ AND\ } \left(
+      \rm{SB}_{\rm{set\ time}} > 1.5\rm{hours\ from\ now} \right)
+
+   Relavant XML child/tag or gWTO2 variables:
+
+   * :keyword:`LST`
+   * :keyword:`Horizon Limit`
+   * :keyword:`SB set time`
+
 #. Remove SBs with states Phase2Submitted, FullyObserved and Deleted.
 #. Remove SBs that belongs to projects with status Phase2Submitted or Completed.
 #. Remove SBs that have names like "Do not"
@@ -281,6 +371,18 @@ Selection
    angular resolution, using the minAR and maxAR corrected limits.
 #. Finally, calculate tsysfrac, blfrac and frac columns, to be use by the
    scorer algorithm.
+
+.. _score:
+
+Score and ranking
+-----------------
+
+.. _check-obs:
+
+Checking observability
+----------------------
+
+.. _tsys-calc:
 
 TSys time fraction calculation
 ------------------------------
@@ -295,13 +397,6 @@ current PWV at the representative frequency of the SB corrected by airmass at
 transit, and :math:`T_{sys_{PI}}` is the system temperature calculated using the
 PWV set by the PI/P2G to calculate the integration time in the OT, also at the
 representative frequency and at transit.
-
-
-Score and ranking
------------------
-
-Checking observability
-----------------------
 
 Playing with the libraries:
 ===========================
@@ -319,7 +414,7 @@ Once in ipython:::
     datas = wto.Algorithm(path='./wto_testing/')
 
 And the run the following script. You can copy the code, and then paste into
-python with ``%paste``, or copy it into a file, and then execute it inside the
+python with :command:`%paste`, or copy it into a file, and then execute it inside the
 ipython session::
 
     def runwto(pwv, array_name=None, d=None, num_ant=34):
@@ -379,7 +474,7 @@ The WTO API
 .. figure:: diagram.png
    :scale: 65
 
-   Figure 4, UML diagram or wtoAlgorithm.py
+   Figure 4, UML diagram of wtoAlgorithm.py
 
 The WTO Data Frames
 ===================
@@ -646,6 +741,10 @@ OBSUNIT_PROJECT_UID            object
 wtoDatabase.sbstate
 -------------------
 
+.. _current-conf:
+
+Assessment of Current Array's Angular Resolution
+================================================
 
 Indices and tables
 ==================

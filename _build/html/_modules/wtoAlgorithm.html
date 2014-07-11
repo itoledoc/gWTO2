@@ -92,20 +92,18 @@
 
 <div class="viewcode-block" id="WtoAlgorithm"><a class="viewcode-back" href="../index.html#wtoAlgorithm.WtoAlgorithm">[docs]</a><span class="k">class</span> <span class="nc">WtoAlgorithm</span><span class="p">(</span><span class="n">WtoDatabase</span><span class="p">):</span>
     <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Inherits from WtoDatabase, adds the methods for selection and scoring.</span>
+<span class="sd">    It also sets the default parameters for these methods: pwv=1.2, date=now,</span>
+<span class="sd">    array angular resolution, transmission=0.5, minha=-5, maxha=3, etc.</span>
 
-<span class="sd">    :param path:</span>
-<span class="sd">    :param source:</span>
-<span class="sd">    :param forcenew:</span>
-<span class="sd">    :return:</span>
+<span class="sd">    :param path: A path, relative to $HOME, where the cache is stored.</span>
+<span class="sd">    :type path: (default=&#39;/.wto/&#39;) String.</span>
+<span class="sd">    :param source: See WtoDatabase definitions.</span>
+<span class="sd">    :param forcenew: See WtoDatabase definitions.</span>
+<span class="sd">    :return: A WtoAlgorithm instance.</span>
 <span class="sd">    &quot;&quot;&quot;</span>
     <span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">path</span><span class="o">=</span><span class="s">&#39;/.wto/&#39;</span><span class="p">,</span> <span class="n">source</span><span class="o">=</span><span class="bp">None</span><span class="p">,</span> <span class="n">forcenew</span><span class="o">=</span><span class="bp">False</span><span class="p">):</span>
-        <span class="sd">&quot;&quot;&quot;</span>
 
-<span class="sd">        :param path:</span>
-<span class="sd">        :param source:</span>
-<span class="sd">        :param forcenew:</span>
-<span class="sd">        :return:</span>
-<span class="sd">        &quot;&quot;&quot;</span>
         <span class="nb">super</span><span class="p">(</span><span class="n">WtoAlgorithm</span><span class="p">,</span> <span class="bp">self</span><span class="p">)</span><span class="o">.</span><span class="n">__init__</span><span class="p">(</span><span class="n">path</span><span class="p">,</span> <span class="n">source</span><span class="p">,</span> <span class="n">forcenew</span><span class="p">)</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">pwv</span> <span class="o">=</span> <span class="mf">1.2</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">date</span> <span class="o">=</span> <span class="n">ephem</span><span class="o">.</span><span class="n">now</span><span class="p">()</span>
@@ -164,15 +162,13 @@
         <span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Selects SBs that can be observed given the current weather conditions,</span>
 <span class="sd">        HA range, array type and array configuration (in the case of 12m array</span>
-<span class="sd">        type) and SB/Project Status. To limit the calculation of pyephem, the</span>
-<span class="sd">        selection based on current position in the sky is done afterwards.</span>
-
-<span class="sd">        Selector get stored in either twelvem, sevenm or totalp tables. These</span>
-<span class="sd">        tables contain all the data needed for the calculations to be</span>
-<span class="sd">        done with WtoAlgorith.observable and to assign a score</span>
+<span class="sd">        type) and SB/Project Status. See</span>
+<span class="sd">        :ref:`Selection and Data preparation &lt;selection&gt;`</span>
 
 <span class="sd">        :param array: &#39;12m&#39;, &#39;7m&#39;, &#39;tp&#39;</span>
-<span class="sd">        :type array: str</span>
+<span class="sd">        :type array: String.</span>
+<span class="sd">        :return: Depending on the array type, creates tables select12m, select7m</span>
+<span class="sd">           or selecttp.</span>
 <span class="sd">        &quot;&quot;&quot;</span>
         <span class="c"># TODO: add a 5% padding to fraction selection.</span>
         <span class="c"># TODO: check with Jorge Garcia the rms fraction against reality.</span>
@@ -297,6 +293,7 @@
                          <span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">num_ant</span> <span class="o">*</span> <span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">num_ant</span> <span class="o">-</span> <span class="mi">1</span><span class="p">)</span> <span class="o">/</span> <span class="mf">2.</span><span class="p">),</span>
                     <span class="n">axis</span><span class="o">=</span><span class="mi">1</span><span class="p">)</span>
             <span class="k">else</span><span class="p">:</span>
+                <span class="c"># TODO: check &#39;isPointSource&#39; instead of LAS</span>
                 <span class="n">sel4</span><span class="p">[</span><span class="s">&#39;blfrac&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">sel4</span><span class="o">.</span><span class="n">apply</span><span class="p">(</span>
                     <span class="k">lambda</span> <span class="n">row</span><span class="p">:</span> <span class="p">(</span><span class="mf">33.</span> <span class="o">*</span> <span class="mi">17</span><span class="p">)</span> <span class="o">/</span> <span class="p">(</span><span class="mf">1.</span> <span class="o">*</span> <span class="nb">len</span><span class="p">(</span>
                         <span class="bp">self</span><span class="o">.</span><span class="n">ruv</span><span class="p">[</span><span class="bp">self</span><span class="o">.</span><span class="n">ruv</span> <span class="o">&lt;</span> <span class="n">row</span><span class="p">[</span><span class="s">&#39;blmax&#39;</span><span class="p">]]))</span>
@@ -336,15 +333,38 @@
 <div class="viewcode-block" id="WtoAlgorithm.scorer"><a class="viewcode-back" href="../index.html#wtoAlgorithm.WtoAlgorithm.scorer">[docs]</a>    <span class="k">def</span> <span class="nf">scorer</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">array</span><span class="p">):</span>
 
         <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Method that handles the score calculation for each array type. It</span>
+<span class="sd">        applies ``self.calculate_score()`` to the previously selected SBs using</span>
+<span class="sd">        ``self.selector()``</span>
 
-<span class="sd">        :param array:</span>
+<span class="sd">        :param array: &#39;12m&#39;, &#39;7m&#39;, &#39;tp&#39;</span>
+<span class="sd">        :type array: String.</span>
+<span class="sd">        :return: Creates a score table for the instance, which will be named as</span>
+<span class="sd">           ``score12m``, ``score7m`` or ``scoretp``.</span>
 <span class="sd">        &quot;&quot;&quot;</span>
+
         <span class="k">if</span> <span class="n">array</span> <span class="o">==</span> <span class="s">&#39;12m&#39;</span><span class="p">:</span>
-            <span class="n">df</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">select12m</span>
+            <span class="k">try</span><span class="p">:</span>
+                <span class="n">df</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">select12m</span>
+            <span class="k">except</span> <span class="ne">AttributeError</span><span class="p">:</span>
+                <span class="k">print</span><span class="p">(</span><span class="s">&quot;Please execute method self.selector(&#39;12m&#39;) first.&quot;</span><span class="p">)</span>
+                <span class="k">return</span> <span class="bp">None</span>
         <span class="k">elif</span> <span class="n">array</span> <span class="o">==</span> <span class="s">&#39;7m&#39;</span><span class="p">:</span>
-            <span class="n">df</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">select7m</span>
+            <span class="k">try</span><span class="p">:</span>
+                <span class="n">df</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">select7m</span>
+            <span class="k">except</span> <span class="ne">AttributeError</span><span class="p">:</span>
+                <span class="k">print</span><span class="p">(</span><span class="s">&quot;Please execute method self.selector(&#39;7m&#39;) first.&quot;</span><span class="p">)</span>
+                <span class="k">return</span> <span class="bp">None</span>
+        <span class="k">elif</span> <span class="n">array</span> <span class="o">==</span> <span class="s">&#39;tp&#39;</span><span class="p">:</span>
+            <span class="k">try</span><span class="p">:</span>
+                <span class="n">df</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">selecttp</span>
+            <span class="k">except</span> <span class="ne">AttributeError</span><span class="p">:</span>
+                <span class="k">print</span><span class="p">(</span><span class="s">&quot;Please execute method self.selector(&#39;tp&#39;) first.&quot;</span><span class="p">)</span>
+                <span class="k">return</span> <span class="bp">None</span>
         <span class="k">else</span><span class="p">:</span>
-            <span class="n">df</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">selecttp</span>
+            <span class="k">print</span><span class="p">(</span><span class="s">&quot;array must be either 12m, 7m or tp.&quot;</span><span class="p">)</span>
+            <span class="k">return</span> <span class="bp">None</span>
+
         <span class="bp">self</span><span class="o">.</span><span class="n">max_scirank</span> <span class="o">=</span> <span class="n">df</span><span class="o">.</span><span class="n">scienceRank</span><span class="o">.</span><span class="n">max</span><span class="p">()</span>
         <span class="n">scores</span> <span class="o">=</span> <span class="n">df</span><span class="o">.</span><span class="n">apply</span><span class="p">(</span>
             <span class="k">lambda</span> <span class="n">r</span><span class="p">:</span> <span class="bp">self</span><span class="o">.</span><span class="n">calculate_score</span><span class="p">(</span>
@@ -373,23 +393,44 @@
                         <span class="n">frac</span><span class="p">,</span> <span class="n">maxpwvc</span><span class="p">,</span> <span class="n">code</span><span class="p">):</span>
 
         <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Please go to the :ref:`Score and ranking &lt;score&gt;` section for an</span>
+<span class="sd">        algorithm&#39;s description.</span>
 
-<span class="sd">        :param ecount:</span>
-<span class="sd">        :param tcount:</span>
-<span class="sd">        :param srank:</span>
-<span class="sd">        :param ar:</span>
-<span class="sd">        :param aminar:</span>
-<span class="sd">        :param amaxar:</span>
-<span class="sd">        :param las:</span>
-<span class="sd">        :param grade:</span>
-<span class="sd">        :param repfreq:</span>
-<span class="sd">        :param dec:</span>
-<span class="sd">        :param execu:</span>
-<span class="sd">        :param array:</span>
-<span class="sd">        :param frac:</span>
-<span class="sd">        :param maxpwvc:</span>
-<span class="sd">        :param code:</span>
-<span class="sd">        :return:</span>
+<span class="sd">        :param ecount: Executions requested by the SB</span>
+<span class="sd">        :type ecount: Integer.</span>
+<span class="sd">        :param tcount: Total executions with QA0 Pass or Unset for the SB.</span>
+<span class="sd">        :type tcount: Integer.</span>
+<span class="sd">        :param srank: SB Science ranking.</span>
+<span class="sd">        :type srank: Intenger</span>
+<span class="sd">        :param ar: SB requested Angular Resolution, from the Science Goal.</span>
+<span class="sd">        :type ar: Float.</span>
+<span class="sd">        :param aminar: The minum angular resolution the SB can accept to be</span>
+<span class="sd">           observed.</span>
+<span class="sd">        :type aminar: Float. In arcsec.</span>
+<span class="sd">        :param amaxar: The maximum angular resolution the SB can accept to be</span>
+<span class="sd">           observed.</span>
+<span class="sd">        :type amaxar: Float. In arcsec.</span>
+<span class="sd">        :param las: SB requested Largest Angular Scale, from the Science Goal.</span>
+<span class="sd">        :type las: Float. In arcsec.</span>
+<span class="sd">        :param grade: SB&#39;s Project letter grade.</span>
+<span class="sd">        :type grade: String, can be A, B or C.</span>
+<span class="sd">        :param repfreq: SB&#39;s representative frequency.</span>
+<span class="sd">        :type repfreq: Float, in GHz.</span>
+<span class="sd">        :param dec: SB&#39;s representative declination coordinates, as determined</span>
+<span class="sd">           by self.check_observability().</span>
+<span class="sd">        :type dec: Float, in degrees.</span>
+<span class="sd">        :param execu: SB&#39;s Project Executive.</span>
+<span class="sd">        :type execu: String, can be NA, EU, EA, CL or OTHER.</span>
+<span class="sd">        :param array: Array type.</span>
+<span class="sd">        :type array: String, can be 12m, 7m or tp.</span>
+<span class="sd">        :param frac: Total time fraction calculated by self.selector() for the</span>
+<span class="sd">           SB to reach the required sensitivity.</span>
+<span class="sd">        :type frac: Float.</span>
+<span class="sd">        :param maxpwvc: SB&#39;s maxPWVC variable.</span>
+<span class="sd">        :type maxpwvc: Float, a value between 0 and 20.</span>
+<span class="sd">        :param code: SB&#39;s project code.</span>
+<span class="sd">        :type code: String.</span>
+<span class="sd">        :return: Tuple with ...</span>
 <span class="sd">        &quot;&quot;&quot;</span>
         <span class="n">sb_completion</span> <span class="o">=</span> <span class="n">tcount</span> <span class="o">/</span> <span class="n">ecount</span>
         <span class="n">sb_completion_score</span> <span class="o">=</span> <span class="mf">6.</span> <span class="o">*</span> <span class="n">sb_completion</span> <span class="o">+</span> <span class="mf">4.</span>
@@ -448,8 +489,8 @@
             <span class="n">sb_cond_score</span> <span class="o">=</span> <span class="mf">10.</span>
         <span class="k">else</span><span class="p">:</span>
             <span class="n">x</span> <span class="o">=</span> <span class="n">frac</span> <span class="o">-</span> <span class="mi">1</span>
-            <span class="k">if</span> <span class="n">frac</span> <span class="o">&lt;=</span> <span class="mf">1.4</span><span class="p">:</span>
-                <span class="n">sb_cond_score</span> <span class="o">=</span> <span class="p">(</span><span class="mf">1.</span> <span class="o">-</span> <span class="p">(</span><span class="n">x</span> <span class="o">/</span> <span class="mf">0.4</span><span class="p">)</span> <span class="o">**</span> <span class="mf">3.</span><span class="p">)</span> <span class="o">*</span> <span class="mf">10.</span> <span class="o">*</span> <span class="n">pwv_corr</span>
+            <span class="k">if</span> <span class="n">frac</span> <span class="o">&lt;=</span> <span class="mf">1.3</span><span class="p">:</span>
+                <span class="n">sb_cond_score</span> <span class="o">=</span> <span class="p">(</span><span class="mf">1.</span> <span class="o">-</span> <span class="p">(</span><span class="n">x</span> <span class="o">/</span> <span class="mf">0.3</span><span class="p">)</span> <span class="o">**</span> <span class="mf">3.</span><span class="p">)</span> <span class="o">*</span> <span class="mf">10.</span> <span class="o">*</span> <span class="n">pwv_corr</span>
             <span class="k">else</span><span class="p">:</span>
                 <span class="n">sb_cond_score</span> <span class="o">=</span> <span class="mf">0.</span>
 
@@ -683,11 +724,14 @@
                 <span class="n">conf_file</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">wto_path</span> <span class="o">+</span> <span class="s">&#39;conf/default.txt&#39;</span>
                 <span class="n">io_file</span> <span class="o">=</span> <span class="nb">open</span><span class="p">(</span>
                     <span class="bp">self</span><span class="o">.</span><span class="n">wto_path</span> <span class="o">+</span> <span class="s">&#39;conf/arrayConfigurationResults.txt&#39;</span><span class="p">)</span>
-                <span class="bp">self</span><span class="o">.</span><span class="n">array_ar</span> <span class="o">=</span> <span class="nb">float</span><span class="p">(</span><span class="n">io_file</span><span class="o">.</span><span class="n">readlines</span><span class="p">()[</span><span class="mi">13</span><span class="p">]</span><span class="o">.</span><span class="n">split</span><span class="p">(</span><span class="s">&#39;:&#39;</span><span class="p">)[</span><span class="mi">1</span><span class="p">])</span>
+                <span class="n">lines</span> <span class="o">=</span> <span class="n">io_file</span><span class="o">.</span><span class="n">readlines</span><span class="p">()</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">array_ar</span> <span class="o">=</span> <span class="nb">float</span><span class="p">(</span><span class="n">lines</span><span class="p">[</span><span class="mi">13</span><span class="p">]</span><span class="o">.</span><span class="n">split</span><span class="p">(</span><span class="s">&#39;:&#39;</span><span class="p">)[</span><span class="mi">1</span><span class="p">])</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">num_ant</span> <span class="o">=</span> <span class="nb">int</span><span class="p">(</span><span class="n">lines</span><span class="p">[</span><span class="mi">3</span><span class="p">]</span><span class="o">.</span><span class="n">split</span><span class="p">(</span><span class="s">&#39;:&#39;</span><span class="p">)[</span><span class="mi">1</span><span class="p">])</span>
                 <span class="n">io_file</span><span class="o">.</span><span class="n">close</span><span class="p">()</span>
                 <span class="n">ac</span> <span class="o">=</span> <span class="n">rUV</span><span class="o">.</span><span class="n">ac</span><span class="o">.</span><span class="n">ArrayConfigurationCasaFile</span><span class="p">()</span>
                 <span class="n">ac</span><span class="o">.</span><span class="n">createCasaConfig</span><span class="p">(</span><span class="n">conf_file</span><span class="p">)</span>
                 <span class="bp">self</span><span class="o">.</span><span class="n">ruv</span> <span class="o">=</span> <span class="n">rUV</span><span class="o">.</span><span class="n">computeRuv</span><span class="p">(</span><span class="n">conf_file</span> <span class="o">+</span> <span class="s">&quot;.cfg&quot;</span><span class="p">)</span>
+
             <span class="k">else</span><span class="p">:</span>
                 <span class="n">conf_file</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">wto_path</span> <span class="o">+</span> <span class="s">&#39;conf/</span><span class="si">%s</span><span class="s">.txt.cfg&#39;</span> <span class="o">%</span> <span class="n">array_name</span>
                 <span class="bp">self</span><span class="o">.</span><span class="n">ruv</span> <span class="o">=</span> <span class="n">rUV</span><span class="o">.</span><span class="n">computeRuv</span><span class="p">(</span><span class="n">conf_file</span><span class="p">)</span>

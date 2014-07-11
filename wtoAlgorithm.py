@@ -43,20 +43,18 @@ c_mks = 2.99792458e8
 
 class WtoAlgorithm(WtoDatabase):
     """
+    Inherits from WtoDatabase, adds the methods for selection and scoring.
+    It also sets the default parameters for these methods: pwv=1.2, date=now,
+    array angular resolution, transmission=0.5, minha=-5, maxha=3, etc.
 
-    :param path:
-    :param source:
-    :param forcenew:
-    :return:
+    :param path: A path, relative to $HOME, where the cache is stored.
+    :type path: (default='/.wto/') String.
+    :param source: See WtoDatabase definitions.
+    :param forcenew: See WtoDatabase definitions.
+    :return: A WtoAlgorithm instance.
     """
     def __init__(self, path='/.wto/', source=None, forcenew=False):
-        """
 
-        :param path:
-        :param source:
-        :param forcenew:
-        :return:
-        """
         super(WtoAlgorithm, self).__init__(path, source, forcenew)
         self.pwv = 1.2
         self.date = ephem.now()
@@ -115,15 +113,13 @@ class WtoAlgorithm(WtoDatabase):
         """
         Selects SBs that can be observed given the current weather conditions,
         HA range, array type and array configuration (in the case of 12m array
-        type) and SB/Project Status. To limit the calculation of pyephem, the
-        selection based on current position in the sky is done afterwards.
-
-        Selector get stored in either twelvem, sevenm or totalp tables. These
-        tables contain all the data needed for the calculations to be
-        done with WtoAlgorith.observable and to assign a score
+        type) and SB/Project Status. See
+        :ref:`Selection and Data preparation <selection>`
 
         :param array: '12m', '7m', 'tp'
-        :type array: str
+        :type array: String.
+        :return: Depending on the array type, creates tables select12m, select7m
+           or selecttp.
         """
         # TODO: add a 5% padding to fraction selection.
         # TODO: check with Jorge Garcia the rms fraction against reality.
@@ -248,6 +244,7 @@ class WtoAlgorithm(WtoDatabase):
                          (self.num_ant * (self.num_ant - 1) / 2.),
                     axis=1)
             else:
+                # TODO: check 'isPointSource' instead of LAS
                 sel4['blfrac'] = sel4.apply(
                     lambda row: (33. * 17) / (1. * len(
                         self.ruv[self.ruv < row['blmax']]))
@@ -287,15 +284,38 @@ class WtoAlgorithm(WtoDatabase):
     def scorer(self, array):
 
         """
+        Method that handles the score calculation for each array type. It
+        applies ``self.calculate_score()`` to the previously selected SBs using
+        ``self.selector()``
 
-        :param array:
+        :param array: '12m', '7m', 'tp'
+        :type array: String.
+        :return: Creates a score table for the instance, which will be named as
+           ``score12m``, ``score7m`` or ``scoretp``.
         """
+
         if array == '12m':
-            df = self.select12m
+            try:
+                df = self.select12m
+            except AttributeError:
+                print("Please execute method self.selector('12m') first.")
+                return None
         elif array == '7m':
-            df = self.select7m
+            try:
+                df = self.select7m
+            except AttributeError:
+                print("Please execute method self.selector('7m') first.")
+                return None
+        elif array == 'tp':
+            try:
+                df = self.selecttp
+            except AttributeError:
+                print("Please execute method self.selector('tp') first.")
+                return None
         else:
-            df = self.selecttp
+            print("array must be either 12m, 7m or tp.")
+            return None
+
         self.max_scirank = df.scienceRank.max()
         scores = df.apply(
             lambda r: self.calculate_score(
@@ -324,23 +344,44 @@ class WtoAlgorithm(WtoDatabase):
                         frac, maxpwvc, code):
 
         """
+        Please go to the :ref:`Score and ranking <score>` section for an
+        algorithm's description.
 
-        :param ecount:
-        :param tcount:
-        :param srank:
-        :param ar:
-        :param aminar:
-        :param amaxar:
-        :param las:
-        :param grade:
-        :param repfreq:
-        :param dec:
-        :param execu:
-        :param array:
-        :param frac:
-        :param maxpwvc:
-        :param code:
-        :return:
+        :param ecount: Executions requested by the SB
+        :type ecount: Integer.
+        :param tcount: Total executions with QA0 Pass or Unset for the SB.
+        :type tcount: Integer.
+        :param srank: SB Science ranking.
+        :type srank: Intenger
+        :param ar: SB requested Angular Resolution, from the Science Goal.
+        :type ar: Float.
+        :param aminar: The minum angular resolution the SB can accept to be
+           observed.
+        :type aminar: Float. In arcsec.
+        :param amaxar: The maximum angular resolution the SB can accept to be
+           observed.
+        :type amaxar: Float. In arcsec.
+        :param las: SB requested Largest Angular Scale, from the Science Goal.
+        :type las: Float. In arcsec.
+        :param grade: SB's Project letter grade.
+        :type grade: String, can be A, B or C.
+        :param repfreq: SB's representative frequency.
+        :type repfreq: Float, in GHz.
+        :param dec: SB's representative declination coordinates, as determined
+           by self.check_observability().
+        :type dec: Float, in degrees.
+        :param execu: SB's Project Executive.
+        :type execu: String, can be NA, EU, EA, CL or OTHER.
+        :param array: Array type.
+        :type array: String, can be 12m, 7m or tp.
+        :param frac: Total time fraction calculated by self.selector() for the
+           SB to reach the required sensitivity.
+        :type frac: Float.
+        :param maxpwvc: SB's maxPWVC variable.
+        :type maxpwvc: Float, a value between 0 and 20.
+        :param code: SB's project code.
+        :type code: String.
+        :return: Tuple with ...
         """
         sb_completion = tcount / ecount
         sb_completion_score = 6. * sb_completion + 4.
@@ -399,8 +440,8 @@ class WtoAlgorithm(WtoDatabase):
             sb_cond_score = 10.
         else:
             x = frac - 1
-            if frac <= 1.4:
-                sb_cond_score = (1. - (x / 0.4) ** 3.) * 10. * pwv_corr
+            if frac <= 1.3:
+                sb_cond_score = (1. - (x / 0.3) ** 3.) * 10. * pwv_corr
             else:
                 sb_cond_score = 0.
 

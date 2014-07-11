@@ -6,7 +6,7 @@
   <head>
     <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
     
-    <title>The gWTO2 (What To Observe Cycle 2 GUI) Documentation &mdash; gWTO 2.0RC documentation</title>
+    <title>The gWTO2 (gui for What To Observe Cycle 2) Documentation &mdash; gWTO 2.0RC documentation</title>
     
     <link rel="stylesheet" href="_static/default.css" type="text/css" />
     <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
@@ -44,74 +44,32 @@
         <div class="bodywrapper">
           <div class="body">
             
-  <div class="section" id="the-gwto2-what-to-observe-cycle-2-gui-documentation">
-<h1><a class="toc-backref" href="#id1">The gWTO2 (What To Observe Cycle 2 GUI) Documentation</a><a class="headerlink" href="#the-gwto2-what-to-observe-cycle-2-gui-documentation" title="Permalink to this headline">¶</a></h1>
-<div class="contents topic" id="table-of-contents">
-<p class="topic-title first">Table of Contents</p>
-<ul class="simple">
-<li><a class="reference internal" href="#the-gwto2-what-to-observe-cycle-2-gui-documentation" id="id1">The gWTO2 (What To Observe Cycle 2 GUI) Documentation</a></li>
-<li><a class="reference internal" href="#using-gwto2" id="id2">Using gWTO2</a><ul>
-<li><a class="reference internal" href="#start-up" id="id3">Start up</a></li>
-<li><a class="reference internal" href="#setting-up-variables" id="id4">Setting up variables</a></li>
-<li><a class="reference internal" href="#running-and-setting-scores" id="id5">Running and setting scores</a></li>
-</ul>
-</li>
-<li><a class="reference internal" href="#reading-the-output-scores" id="id6">Reading the output Scores</a><ul>
-<li><a class="reference internal" href="#standard-aca-tab-in-bl-aca-gui" id="id7">Standard (ACA) Tab in BL (ACA) GUI</a></li>
-</ul>
-</li>
-<li><a class="reference internal" href="#selection-and-score-algorithms" id="id8">Selection and Score algorithms</a><ul>
-<li><a class="reference internal" href="#selection" id="id9">Selection</a></li>
-<li><a class="reference internal" href="#tsys-time-fraction-calculation" id="id10">TSys time fraction calculation</a></li>
-<li><a class="reference internal" href="#score-and-ranking" id="id11">Score and ranking</a></li>
-<li><a class="reference internal" href="#checking-observability" id="id12">Checking observability</a></li>
-</ul>
-</li>
-<li><a class="reference internal" href="#playing-with-the-libraries" id="id13">Playing with the libraries:</a></li>
-<li><a class="reference internal" href="#module-wtoDatabase" id="id14">The WTO API</a><ul>
-<li><a class="reference internal" href="#wtodatabase-py-the-gwto-database-library" id="id15">wtoDatabase.py: the gWTO database library.</a></li>
-<li><a class="reference internal" href="#wtoalgorithm-py-the-gwto-selector-and-scorer-library" id="id16">wtoAlgorithm.py: the gWTO selector and scorer library.</a></li>
-</ul>
-</li>
-<li><a class="reference internal" href="#the-wto-data-frames" id="id17">The WTO Data Frames</a><ul>
-<li><a class="reference internal" href="#wtodatabase-obsprojects" id="id18">wtoDatabase.obsprojects</a></li>
-<li><a class="reference internal" href="#wtodatabase-sciencegoals" id="id19">wtoDatabase.sciencegoals</a></li>
-<li><a class="reference internal" href="#wtodatabase-schedblocks" id="id20">wtoDatabase.schedblocks</a></li>
-<li><a class="reference internal" href="#wtodatabase-schedblock-info" id="id21">wtoDatabase.schedblock_info</a></li>
-<li><a class="reference internal" href="#wtodatabase-target" id="id22">wtoDatabase.target</a></li>
-<li><a class="reference internal" href="#wtodatabase-fieldsource" id="id23">wtoDatabase.fieldsource</a></li>
-<li><a class="reference internal" href="#wtodatabase-spectralconf" id="id24">wtoDatabase.spectralconf</a></li>
-<li><a class="reference internal" href="#wtodatabase-sb-summary-view" id="id25">wtoDatabase.sb_summary (<em>&#8220;view&#8221;</em>)</a></li>
-<li><a class="reference internal" href="#wtodatabase-qa0" id="id26">wtoDatabase.qa0</a></li>
-<li><a class="reference internal" href="#wtodatabase-scheduling-proj" id="id27">wtoDatabase.scheduling_proj</a></li>
-<li><a class="reference internal" href="#wtodatabase-scheduling-sb" id="id28">wtoDatabase.scheduling_sb</a></li>
-<li><a class="reference internal" href="#wtodatabase-sbstate" id="id29">wtoDatabase.sbstate</a></li>
-</ul>
-</li>
-<li><a class="reference internal" href="#indices-and-tables" id="id30">Indices and tables</a></li>
-</ul>
-</div>
+  <div class="section" id="the-gwto2-gui-for-what-to-observe-cycle-2-documentation">
+<h1>The gWTO2 (gui for What To Observe Cycle 2) Documentation<a class="headerlink" href="#the-gwto2-gui-for-what-to-observe-cycle-2-documentation" title="Permalink to this headline">¶</a></h1>
 <div class="toctree-wrapper compound">
 <ul class="simple">
 </ul>
 </div>
 </div>
 <div class="section" id="using-gwto2">
-<h1><a class="toc-backref" href="#id2">Using gWTO2</a><a class="headerlink" href="#using-gwto2" title="Permalink to this headline">¶</a></h1>
-<p><strong>Latest update: |today|</strong></p>
+<h1>Using gWTO2<a class="headerlink" href="#using-gwto2" title="Permalink to this headline">¶</a></h1>
+<p><strong>Latest update:</strong> July 10, 2014</p>
 <div class="figure">
 <img alt="_images/Selection_003.png" src="_images/Selection_003.png" />
 <p class="caption">Screenshot of gWTO2 RC</p>
 </div>
+<div class="section" id="starting-the-gui">
+<h2>Starting the GUI<a class="headerlink" href="#starting-the-gui" title="Permalink to this headline">¶</a></h2>
 <p>gWTO2 is tested and deployed at the osf-red machine, within the aod account.
-A virtual environment of python, based on the Anaconda distribution, must be
-loaded before using it. This is achieved by running::</p>
+A virtual environment of python, based on the
+<a class="reference external" href="http://docs.continuum.io/anaconda/index.html">Anaconda distribution</a>,
+must be loaded before using it. This is achieved by running:</p>
 <div class="highlight-python"><div class="highlight"><pre>. activateC2Test
 </pre></div>
 </div>
 <p>The Anaconda distribution is based on python 2.7.6 and includes numpy, pandas,
 pyephem and other libraries need by gWTO.</p>
-<p>The gui is run executing the gWTO2.py comand::</p>
+<p>The gui is run executing the gWTO2.py comand:</p>
 <div class="highlight-python"><div class="highlight"><pre>Usage: gWTO2.py arg1 [options]
     arg1 must be BL or ACA
 
@@ -121,51 +79,60 @@ Options:
   -p PATH, --path=PATH  Path for cache
 </pre></div>
 </div>
-<p>So, to run gWTO2 for baseline correlator use <tt class="docutils literal"><span class="pre">BL</span></tt>, and <tt class="docutils literal"><span class="pre">ACA</span></tt> for Total Power
-and ACA. The <tt class="docutils literal"><span class="pre">-c</span></tt> option should only be used once per day.</p>
-<p>I would also recommend to set the option <tt class="docutils literal"><span class="pre">-p</span></tt> to something like
+<p>So, to run gWTO2 for baseline correlator use argument <em class="xref std std-option">BL</em>, and
+<em class="xref std std-option">ACA</em> for Total Power and ACA. The <em class="xref std std-option">-c</em> option should only be
+used once per day.</p>
+<p>I would also recommend to set the option <em class="xref std std-option">-p</em> to something like
 <tt class="docutils literal"><span class="pre">'/.wto_myname/'</span></tt> so different users running gWTO won&#8217;t mess up the cache
 for each other. <strong>After playing with gWTO2 using a different path, please</strong>
 <strong>delete the directory created with the name .wto_myname</strong></p>
-<div class="section" id="start-up">
-<h2><a class="toc-backref" href="#id3">Start up</a><a class="headerlink" href="#start-up" title="Permalink to this headline">¶</a></h2>
-<p>After starting <tt class="docutils literal"><span class="pre">gWTO2</span> <span class="pre">BL</span></tt> you will be presented with the gui shown on figure
-2. If the -c option was used, or the cache have been manually erased it,
+</div>
+<div class="section" id="the-gwto2-window">
+<h2>The gWTO2 window<a class="headerlink" href="#the-gwto2-window" title="Permalink to this headline">¶</a></h2>
+<p>After starting <strong class="command">gWTO2 BL</strong> you will be presented with the gui shown on
+<a class="reference internal" href="#fig2"><em>Figure 2</em></a>.
+If the <em class="xref std std-option">-c</em> option was used, or the cache have been manually erased it,
 the time until the gui is ready can be up to 5-7 minutes.</p>
-<div class="figure">
+<div class="figure" id="fig2">
 <img alt="_images/gWTO2__BL_001.png" src="_images/gWTO2__BL_001.png" />
 <p class="caption">Figure 2</p>
 </div>
-<p>The gui for ACA (<tt class="docutils literal"><span class="pre">gWTO2</span> <span class="pre">ACA</span></tt>) is almost the same, except for the lack of
-&#8220;Array Options&#8221;, and a tab &#8220;TP&#8221; that will be used for handling Total Power SBs</p>
+<p>The gui for ACA (<strong class="command">gWTO2 ACA</strong>) is almost the same, except for the lack
+of <em class="guilabel">Array Options</em>, and the presence of a tab <em class="guilabel">TP</em> that
+will be used for handling Total Power SBs.</p>
 </div>
 <div class="section" id="setting-up-variables">
-<h2><a class="toc-backref" href="#id4">Setting up variables</a><a class="headerlink" href="#setting-up-variables" title="Permalink to this headline">¶</a></h2>
-<p>After opening, the date will be by default the current UTC time, pwv is set to
-1.2 mm., the horizon limit is 20 degrees, minimum hour angle is -5 and maximum
-hour angle is 3. The LST field is not editable, and it shows the LST for the
-date time set in the Date field.</p>
+<h2>Setting up variables<a class="headerlink" href="#setting-up-variables" title="Permalink to this headline">¶</a></h2>
+<p>After opening, the <em class="guilabel">Date</em> will be by default the current UTC time,
+<em class="guilabel">PWV</em> is set to 1.2 mm., the <em class="guilabel">Horizon</em> limit is 20 degrees,
+<em class="guilabel">minHA</em>, minimum hour angle, is -5 and <em class="guilabel">maxHA</em>, maximum
+hour angle, is 3. The <em class="guilabel">LST</em> field is not editable, and it shows the
+LST for the date/time set in the <em class="guilabel">Date</em> field.</p>
 <dl class="docutils">
-<dt><strong>(For BL GUI only.)</strong> The box with the array variables will have the</dt>
-<dd><em>Std. Conf.:</em> field set to
-&#8220;Current Conf.&#8221;. This &#8220;Current Conf&#8221; comes from the output of the CASA script
-<tt class="docutils literal"><span class="pre">arrayConfigurationTools.py</span></tt>, which can be found at
-AIV/science/ArrayConfiguration/Tools/arrayConfigurationTools.py. It is made
-with the antennas that in principle can be used for the current ES Block. <strong>It</strong>
-<strong>is the AoD&#8217;s Lead duty to create the relevant files from time to time to</strong>
-<strong>account for the antenna movements or being added</strong>.</dd>
-<dt><strong>(For BL GUI only.)</strong> The values given at <em>Array AR:</em>  and <em>Antennas:</em></dt>
-<dd>are set according to the <em>current array&#8217;s</em> angular resolution and
+<dt><strong>(For BL GUI only.)</strong></dt>
+<dd>The box with the array variables will have the
+<em class="guilabel">Std. Conf.:</em> field set to <tt class="xref std std-keyword docutils literal"><span class="pre">Current</span> <span class="pre">Conf.</span></tt>
+This <tt class="xref std std-keyword docutils literal"><span class="pre">Current</span> <span class="pre">Conf.</span></tt> comes from the output of the CASA script
+<strong class="command">arrayConfigurationTools.py</strong>, which can be found at
+<tt class="file docutils literal"><span class="pre">~/AIV/science/ArrayConfiguration/Tools/arrayConfigurationTools.py</span></tt>.
+It is made with the antennas that in principle can be used for the current
+ES Block. <strong>It is the AoD Lead&#8217;s duty to create the relevant files from</strong>
+<strong>time to time to account for antenna movements or new antennas added</strong>.
+<a class="reference internal" href="#current-conf"><em>(Instructions)</em></a></dd>
+<dt><strong>(For BL GUI only.)</strong></dt>
+<dd>The values given at <em class="guilabel">Array AR:</em>  and <em class="guilabel">Antennas:</em>
+are set according to the <em>current array&#8217;s</em> angular resolution and
 number of antennas offered officially for cycle 2.
 <strong>The only field you can modify at this stage in the &#8216;Antenna&#8217;</strong>
 <strong>field, which is the number of antennas</strong>. The idea is that the user will use
 this information to have an idea of the current configuration characteristics,
 and to run gWTO2 to plan observations ahead of time, or when Baseline arrays
 have not been created in the last 6 to 12 hours.</dd>
-<dt><strong>(For BL GUI only, when observing.)</strong> The user should press the button <em>Now</em>,</dt>
-<dd>and a pop up window similar to the one shown in figure 3 will appear.</dd>
+<dt><strong>(For BL GUI only, when observing.)</strong></dt>
+<dd>The user should press the button <em class="guilabel">Now</em>, and a pop up window
+similar to the one shown in <a class="reference internal" href="#fig3"><em>Figure 3</em></a> will appear.</dd>
 </dl>
-<div class="figure">
+<div class="figure" id="fig3">
 <img alt="_images/gWTO2__BL_002.png" src="_images/gWTO2__BL_002.png" />
 <p class="caption">Figure 3</p>
 </div>
@@ -174,35 +141,37 @@ this distribution, taking the data from latest Baseline Array created.
 From this distribution the array&#8217;s resolution is estimated, and the number of
 antennas is also show. <strong>The user should check that the array resolution is</strong>
 <strong>close the the &#8220;Current Conf.&#8221; value, and that no outliers are fitted</strong>. If
-happy press the OK button, and this will set the Array AR and Antennas fields
-in the main window. If Cancel is pressed instead, the main window will go back
-to &#8220;Current Conf.&#8221;. Also, when accepting the new array estimates you will not
-longer be able to change the number of antennas unless you go back to
-&#8220;Current Conf.&#8221;</p>
-<p>The &#8220;BL Arrays:&#8221; Combo menu is populated also with the list of the baselines
-arrays created in the last 6 to 12 hours.</p>
+happy press the <em class="guilabel">OK</em> button, and this will set the
+<em class="guilabel">Array AR:</em> and <em class="guilabel">Antennas:</em> fields
+in the main window. If <em class="guilabel">Cancel</em> is pressed instead, the main window
+will go back to <tt class="xref std std-keyword docutils literal"><span class="pre">Current</span> <span class="pre">Conf.</span></tt>. Also, when accepting the new array
+estimates you will not longer be able to change the number of antennas unless
+you go back to :keyword&#8221;<cite>Current Conf.</cite></p>
+<p>The <em class="guilabel">BL Arrays:</em> Combo menu is also populated with the list of the
+baselines arrays created in the last 6 to 12 hours.</p>
 <dl class="docutils">
-<dt><strong>For ACA GUI only</strong> The number of antennas is 9 by default. Change the number</dt>
-<dd>according to the number of antennas that are available.</dd>
+<dt><strong>For ACA GUI only</strong></dt>
+<dd>The number of antennas is 9 by default. Change the number according to the
+number of antennas that are available.</dd>
 </dl>
 </div>
-<div class="section" id="running-and-setting-scores">
-<h2><a class="toc-backref" href="#id5">Running and setting scores</a><a class="headerlink" href="#running-and-setting-scores" title="Permalink to this headline">¶</a></h2>
-<p>When you are happy with the date, pwv and array variables (and also the horizon,
-minHA and maxHA values) you can run the selector and scoring algorithms pressing
-the button &#8220;Now&#8221;.</p>
+<div class="section" id="running">
+<h2>Running<a class="headerlink" href="#running" title="Permalink to this headline">¶</a></h2>
+<p>When you are happy with the <em class="guilabel">Date</em>, <em class="guilabel">PWV</em> and
+array variables (also the <em class="guilabel">Horizon</em>, <em class="guilabel">minHA</em> and
+<em class="guilabel">maxHA</em> values) you can run the selector and scoring algorithms
+pressing the button <em class="guilabel">Run</em>.</p>
 <p>After an interval of a few seconds (5 to 15 seconds) you will be presented
-with something similar to Figure 4.</p>
-<div class="figure">
-<a class="reference internal image-reference" href="_images/gWTO2__BL_003.png"><img alt="_images/gWTO2__BL_003.png" src="_images/gWTO2__BL_003.png" style="width: 943.0px; height: 456.0px;" /></a>
+with something similar to <a class="reference internal" href="#fig4"><em>Figure 4</em></a>.</p>
+<div class="figure" id="fig4">
+<img alt="_images/gWTO2__BL_003.png" src="_images/gWTO2__BL_003.png" />
 <p class="caption">Figure 4</p>
 </div>
 </div>
-</div>
 <div class="section" id="reading-the-output-scores">
-<h1><a class="toc-backref" href="#id6">Reading the output Scores</a><a class="headerlink" href="#reading-the-output-scores" title="Permalink to this headline">¶</a></h1>
+<h2>Reading the output Scores<a class="headerlink" href="#reading-the-output-scores" title="Permalink to this headline">¶</a></h2>
 <div class="section" id="standard-aca-tab-in-bl-aca-gui">
-<h2><a class="toc-backref" href="#id7">Standard (ACA) Tab in BL (ACA) GUI</a><a class="headerlink" href="#standard-aca-tab-in-bl-aca-gui" title="Permalink to this headline">¶</a></h2>
+<h3>Standard (ACA) Tab in BL (ACA) GUI<a class="headerlink" href="#standard-aca-tab-in-bl-aca-gui" title="Permalink to this headline">¶</a></h3>
 <ol class="arabic simple">
 <li><strong>Score:</strong> The score is the weighted mean of different scores calculated
 for each observable SB. The score is a value between 0 and 10,
@@ -275,10 +244,11 @@ sources.</li>
 </ol>
 </div>
 </div>
+</div>
 <div class="section" id="selection-and-score-algorithms">
-<h1><a class="toc-backref" href="#id8">Selection and Score algorithms</a><a class="headerlink" href="#selection-and-score-algorithms" title="Permalink to this headline">¶</a></h1>
-<div class="section" id="selection">
-<h2><a class="toc-backref" href="#id9">Selection</a><a class="headerlink" href="#selection" title="Permalink to this headline">¶</a></h2>
+<h1>Selection and Score algorithms<a class="headerlink" href="#selection-and-score-algorithms" title="Permalink to this headline">¶</a></h1>
+<div class="section" id="selection-and-data-preparation">
+<span id="selection"></span><h2>Selection and Data preparation<a class="headerlink" href="#selection-and-data-preparation" title="Permalink to this headline">¶</a></h2>
 <ol class="arabic">
 <li><p class="first"><strong>Calculate observability using the pyephem libraries.</strong></p>
 <p>For all the science field sources of an SB and fixed calibration sources,
@@ -290,6 +260,7 @@ minimun elevation; the rise LST for the SB is the LST of the source that
 would rise last; and the set LST for the SB is the LST of the source that
 would set first. The rise and set LST are calculated using the elevation
 limit (<cite>horizon</cite>) gave as an input for gWTO.</p>
+<p>Relavant XML child/tag or gWTO2 variables:</p>
 <ul class="simple">
 <li>SchedBlock.FieldSource[&#8216;solarSystemObject&#8217;]</li>
 <li>SchedBlock.FieldSource.sourceCoordinates.longitude</li>
@@ -300,6 +271,7 @@ limit (<cite>horizon</cite>) gave as an input for gWTO.</p>
 </ul>
 </li>
 <li><p class="first"><strong>Select SB by array type: 12m, 7m, TP.</strong></p>
+<p>Relavant XML child/tag or gWTO2 variables:</p>
 <ul class="simple">
 <li>SchedBlock.ObsUnitControl[&#8216;arrayRequested&#8217;]</li>
 <li>Array Type.</li>
@@ -308,6 +280,29 @@ limit (<cite>horizon</cite>) gave as an input for gWTO.</p>
 <li><p class="first"><strong>Calculate opacity, airmass and sky Temperature.</strong></p>
 <p>For both the OT asumed conditions and current, actual, conditions,
 based on the current PWV.</p>
+<p>The implementation has several steps:</p>
+<blockquote>
+<div><ol class="arabic simple">
+<li>First, a table with values of Tau as fuction of PWV and representative
+frequencies was created. The file with this tables, in csv format, is
+called <strong>tau.csv</strong>. The frequencies are between 84.0 and 720.0 GHz, with
+steps of 100 MHz; pwv values are between 0.0 and 20.0 mm, in steps of
+0.05. The values were calculated using the atmosphere model algorithms from
+CASA 4.2.1, using as input variables <img class="math" src="_images/math/6c1266441124f971fda425574c0e1e4945b12d23.png" alt="P=580.0"/>, <img class="math" src="_images/math/cf7382c6205f63343eeb2df28f7b56c2d7c18fae.png" alt="H=20.0"/>,
+<img class="math" src="_images/math/3518c52f4a673ccad243bd354fe8c1e5ba49bd43.png" alt="T=270.0"/>, <img class="math" src="_images/math/b7b96959123ced6d57864bf850779e45a9ed7306.png" alt="altitude=5059"/> and <img class="math" src="_images/math/29ffd03b199c9087d1a5225aa9be4375b91cc6c9.png" alt="chansep=0.1"/>.</li>
+<li>A table with Tsky values as function of PWV and representative
+frequencies was also create. The file with this table, in csv format,
+is called <strong>tskyR.csv</strong>. Description of columns, rows, and values is the
+same as the table tau.csv, the only addition, is that the Tsky in the
+tables assumes the airmass of a source at Zenith.</li>
+<li>Internaly, four columns are created for all SBs: <em>tau_org</em> and <em>tsky_org</em>,
+storing the value of tau and tsky for the conditions assumed by the OT,
+i.e., pwv from maxPWVC; <em>tau</em> and <em>tsky</em>, storing
+the values of tau and tsky for the current conditions, i.e.,
+pwv from the gui&#8217;s PWV variable.</li>
+</ol>
+</div></blockquote>
+<p>Relavant XML child/tag or gWTO2 variables:</p>
 <ul class="simple">
 <li>SchedBlock.Preconditions.WeatherConstraints.maxPWVC</li>
 <li>SchedBlock.SchedulingConstraints.representativeCoordinates.latitude</li>
@@ -317,28 +312,67 @@ based on the current PWV.</p>
 </ul>
 </li>
 <li><p class="first"><strong>Calculate system Temperatures.</strong></p>
-<p>Again for both cases.</p>
+<p>Two columns are genrated for each SB: <em>tsys_org</em> and <em>tsys</em>, one for the
+OT&#8217;s assumed conditions and the other for the current conditions.
+Tsys, for both cases, is calculated using:</p>
+<blockquote>
+<div><div class="math">
+<p><img src="_images/math/6746e74267f4b9289e0689f3698da26a38fa37ec.png" alt="T_{sys} = \frac{1 + g}{\eta_{eff} e^{-\tau \cdot \sec Z}}
+\left(T_{rx} + T_{sky,Z=0} \left(\frac{1-e^{-\tau \cdot \sec Z}}{e^{-\tau}}\right)
+\eta_{eff} + (1-\eta_{eff}) T_{amb}\right)"/></p>
+</div></div></blockquote>
+<p>Where <img class="math" src="_images/math/67f4714f065d485540ad40829e0717bf75e9dd85.png" alt="g"/> is the sideband gain ratio (<img class="math" src="_images/math/41b9bdb3b433e8ee75764e968aedc6d74a7146f5.png" alt="g=0"/> for SSB and 2SB
+receivers, <img class="math" src="_images/math/9e745ea037f9036698cf5f5d4f182a36210dd4af.png" alt="g=1"/> for DSB); <img class="math" src="_images/math/98b64d0c163d9572e3130e710082e82e7a74e39b.png" alt="\eta_{eff}"/> is the forward efficiency,
+which is set to a value of 0.95; <img class="math" src="_images/math/3e9cf902d39aa125def8f7cae01c92c47a17f20c.png" alt="T_{rx}"/> is the receiver characteristic
+temperature; <img class="math" src="_images/math/d9e99c35d3632bb156b7aca0e93cd78a148a10e8.png" alt="\tau"/> is the oppacity for a source at zenithal distance
+<img class="math" src="_images/math/645e8e061e21bbdf122e8c910559eb1fa24221d1.png" alt="Z=0"/>; <img class="math" src="_images/math/c4563e7ecec2336a3934447a6c10ef8519b0b452.png" alt="Z"/> is the zenithal distance of the representative source
+at transit: <img class="math" src="_images/math/b0f79094f9e0259773ff687fdc98746c8b893fd6.png" alt="T_{sky}"/> is the sky temperature at <img class="math" src="_images/math/645e8e061e21bbdf122e8c910559eb1fa24221d1.png" alt="Z=0"/>; and
+<img class="math" src="_images/math/639d7eed325e7eff458e62f98af610da3ea3624d.png" alt="T_{amb}"/> is the ambient temperature, set to a fixed value of
+<img class="math" src="_images/math/a297b8a2f1a61ac4a12daf834c2d838b8bf3e96a.png" alt="270K"/>.</p>
+<p>Relavant XML child/tag or gWTO2 variables:</p>
 <ul class="simple">
-<li>Tsky_wto, Tau_wto, Tsky_original, Tau_original, airmass.</li>
+<li>SchedBlock.SchedulingConstraints.requiredReceiverBands</li>
 </ul>
 </li>
 <li><p class="first"><strong>SBs within spectral ranges with transmission higher than 50% are first</strong>
 <strong>selected.</strong></p>
+<p>For gWTO1, we use to have a limit of 70%, which change to 50% when the pwv
+was under 0.6 mm. For gWTO2 we set the limit to 50%, and a more accurate
+selection is applied later using <img class="math" src="_images/math/efb94025a55aa1eb99667c7b98dfcce242e89e28.png" alt="T_{sys}"/>
+The transmission is calculated from the previously found <img class="math" src="_images/math/8606c09f4e0d78a0a7576c353c5e6f33f92cecfa.png" alt="tau"/> for
+the current conditions:</p>
 <div class="math">
-<p><img src="_images/math/46580186a5a005326cfde8bd0f833339da4d8e15.png" alt="e^{-\tau_{sb,pwv}\cdot airmass_{sb,time}} &gt; 0.5"/></p>
-</div></li>
-<li><p class="first"><strong>Calculate current LST.</strong></p>
+<p><img src="_images/math/989475255a312fa4ba22b4ef2a2ce0d7de4f3368.png" alt="e^{-\tau_{\rm{sb,pwv}}\cdot \sec Z_{\rm{sb,HA}=0}} &gt; 0.5"/></p>
+</div><p>where <img class="math" src="_images/math/1fcc670ccf41a576017478b8e5ea5e818c7460b6.png" alt="\tau_{\rm{sb,pwv}}"/> is the oppacity for the representative source
+of a scheduling block <em>sb</em> and with the current PWV <img class="math" src="_images/math/bb4bda725d29d553d9e19a757be80d24fc01fc23.png" alt="pwv"/>; and
+<img class="math" src="_images/math/cd4ba9532f7554da09a9b91e20677964d77624a7.png" alt="Z_{sb,\rm{HA}=0}"/> is the zenithal distance for the representative source
+of <em>sb</em> at transit.</p>
+<p>Relavant XML child/tag or gWTO2 variables:</p>
 <ul class="simple">
-<li>Date, ephem.observer(ALMA)</li>
+<li><img class="math" src="_images/math/1fcc670ccf41a576017478b8e5ea5e818c7460b6.png" alt="\tau_{\rm{sb,pwv}}"/></li>
 </ul>
 </li>
 <li><p class="first"><strong>Select SBs within given HA limits.</strong></p>
 <div class="math">
-<p><img src="_images/math/72673641df0b41530849230c8451599d3df51721.png" alt="minHA &lt; HA_{sb,time} &lt; maxHA"/></p>
+<p><img src="_images/math/2ca30b993d613efbf998ce553ac14f1bdfe9a003.png" alt="\rm{minHA} &lt; \rm{HA}_{sb,time} &lt; \rm{maxHA}"/></p>
 </div><p>(mihHA = -5 and maxHA =  3 by default).</p>
+<p>Relavant XML child/tag or gWTO2 variables:</p>
+<ul class="simple">
+<li><img class="math" src="_images/math/13d8f5735b26f6bdb137a079399cd30dfc70b3bd.png" alt="\rm{HA}_{sb,time}"/></li>
+<li><tt class="xref std std-keyword docutils literal"><span class="pre">LST</span></tt></li>
+</ul>
 </li>
 <li><p class="first">Select SBs over the given elevation limit (20 deg. default) and that won&#8217;t
 set for at least 1 1/2 hours.</p>
+<div class="math">
+<p><img src="_images/math/e3a9811f66c41fc75ffb813f00a9bbdfb41e740d.png" alt="\left( \rm{elev} &gt; \rm{horizon} \right) \rm{\ AND\ } \left(
+\rm{SB}_{\rm{set\ time}} &gt; 1.5\rm{hours\ from\ now} \right)"/></p>
+</div><p>Relavant XML child/tag or gWTO2 variables:</p>
+<ul class="simple">
+<li><tt class="xref std std-keyword docutils literal"><span class="pre">LST</span></tt></li>
+<li><tt class="xref std std-keyword docutils literal"><span class="pre">Horizon</span> <span class="pre">Limit</span></tt></li>
+<li><tt class="xref std std-keyword docutils literal"><span class="pre">SB</span> <span class="pre">set</span> <span class="pre">time</span></tt></li>
+</ul>
 </li>
 <li><p class="first">Remove SBs with states Phase2Submitted, FullyObserved and Deleted.</p>
 </li>
@@ -357,8 +391,14 @@ scorer algorithm.</p>
 </li>
 </ol>
 </div>
+<div class="section" id="score-and-ranking">
+<span id="score"></span><h2>Score and ranking<a class="headerlink" href="#score-and-ranking" title="Permalink to this headline">¶</a></h2>
+</div>
+<div class="section" id="checking-observability">
+<span id="check-obs"></span><h2>Checking observability<a class="headerlink" href="#checking-observability" title="Permalink to this headline">¶</a></h2>
+</div>
 <div class="section" id="tsys-time-fraction-calculation">
-<h2><a class="toc-backref" href="#id10">TSys time fraction calculation</a><a class="headerlink" href="#tsys-time-fraction-calculation" title="Permalink to this headline">¶</a></h2>
+<span id="tsys-calc"></span><h2>TSys time fraction calculation<a class="headerlink" href="#tsys-time-fraction-calculation" title="Permalink to this headline">¶</a></h2>
 <p>The TSys time fraction comes from equation:</p>
 <div class="math">
 <p><img src="_images/math/9a61d10685328c93c516e3f27d34a2d248b3385b.png" alt="\frac{T_{sys_{wto}}}{T_{sys_{PI}}}^2"/></p>
@@ -368,15 +408,9 @@ transit, and <img class="math" src="_images/math/87116e2e4299705c7233ebd30b56f96
 PWV set by the PI/P2G to calculate the integration time in the OT, also at the
 representative frequency and at transit.</p>
 </div>
-<div class="section" id="score-and-ranking">
-<h2><a class="toc-backref" href="#id11">Score and ranking</a><a class="headerlink" href="#score-and-ranking" title="Permalink to this headline">¶</a></h2>
-</div>
-<div class="section" id="checking-observability">
-<h2><a class="toc-backref" href="#id12">Checking observability</a><a class="headerlink" href="#checking-observability" title="Permalink to this headline">¶</a></h2>
-</div>
 </div>
 <div class="section" id="playing-with-the-libraries">
-<h1><a class="toc-backref" href="#id13">Playing with the libraries:</a><a class="headerlink" href="#playing-with-the-libraries" title="Permalink to this headline">¶</a></h1>
+<h1>Playing with the libraries:<a class="headerlink" href="#playing-with-the-libraries" title="Permalink to this headline">¶</a></h1>
 <div class="highlight-python"><div class="highlight"><pre>. activateC2Test
 ipython
 </pre></div>
@@ -389,7 +423,7 @@ ipython
 </pre></div>
 </div>
 <p>And the run the following script. You can copy the code, and then paste into
-python with <tt class="docutils literal"><span class="pre">%paste</span></tt>, or copy it into a file, and then execute it inside the
+python with <strong class="command">%paste</strong>, or copy it into a file, and then execute it inside the
 ipython session:</p>
 <div class="highlight-python"><div class="highlight"><pre><span class="k">def</span> <span class="nf">runwto</span><span class="p">(</span><span class="n">pwv</span><span class="p">,</span> <span class="n">array_name</span><span class="o">=</span><span class="bp">None</span><span class="p">,</span> <span class="n">d</span><span class="o">=</span><span class="bp">None</span><span class="p">,</span> <span class="n">num_ant</span><span class="o">=</span><span class="mi">34</span><span class="p">):</span>
     <span class="n">datas</span><span class="o">.</span><span class="n">query_arrays</span><span class="p">()</span>
@@ -437,9 +471,9 @@ output in an excel table run::</p>
 score.xls excel spreadsheet.</p>
 </div>
 <div class="section" id="module-wtoDatabase">
-<span id="the-wto-api"></span><h1><a class="toc-backref" href="#id14">The WTO API</a><a class="headerlink" href="#module-wtoDatabase" title="Permalink to this headline">¶</a></h1>
+<span id="the-wto-api"></span><h1>The WTO API<a class="headerlink" href="#module-wtoDatabase" title="Permalink to this headline">¶</a></h1>
 <div class="section" id="wtodatabase-py-the-gwto-database-library">
-<h2><a class="toc-backref" href="#id15">wtoDatabase.py: the gWTO database library.</a><a class="headerlink" href="#wtodatabase-py-the-gwto-database-library" title="Permalink to this headline">¶</a></h2>
+<h2>wtoDatabase.py: the gWTO database library.<a class="headerlink" href="#wtodatabase-py-the-gwto-database-library" title="Permalink to this headline">¶</a></h2>
 <p>This library contains the classes and functions required to query, parse and
 organize the Projects and SchedBlock information stored at the OSF archive in
 different tables.</p>
@@ -849,24 +883,27 @@ ALMA.XML_OBSPROJECT_ENTITIES.</p>
 
 </div>
 <span class="target" id="module-wtoAlgorithm"></span><div class="section" id="wtoalgorithm-py-the-gwto-selector-and-scorer-library">
-<h2><a class="toc-backref" href="#id16">wtoAlgorithm.py: the gWTO selector and scorer library.</a><a class="headerlink" href="#wtoalgorithm-py-the-gwto-selector-and-scorer-library" title="Permalink to this headline">¶</a></h2>
+<h2>wtoAlgorithm.py: the gWTO selector and scorer library.<a class="headerlink" href="#wtoalgorithm-py-the-gwto-selector-and-scorer-library" title="Permalink to this headline">¶</a></h2>
 <p>This library contains the classes and functions required to select and rank
 SBs from the information that is stored in a WtoDatabse object.</p>
 <dl class="class">
 <dt id="wtoAlgorithm.WtoAlgorithm">
 <em class="property">class </em><tt class="descclassname">wtoAlgorithm.</tt><tt class="descname">WtoAlgorithm</tt><big>(</big><em>path='/.wto/'</em>, <em>source=None</em>, <em>forcenew=False</em><big>)</big><a class="reference internal" href="_modules/wtoAlgorithm.html#WtoAlgorithm"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#wtoAlgorithm.WtoAlgorithm" title="Permalink to this definition">¶</a></dt>
-<dd><table class="docutils field-list" frame="void" rules="none">
+<dd><p>Inherits from WtoDatabase, adds the methods for selection and scoring.
+It also sets the default parameters for these methods: pwv=1.2, date=now,
+array angular resolution, transmission=0.5, minha=-5, maxha=3, etc.</p>
+<table class="docutils field-list" frame="void" rules="none">
 <col class="field-name" />
 <col class="field-body" />
 <tbody valign="top">
 <tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first simple">
-<li><strong>path</strong> &#8211; </li>
-<li><strong>source</strong> &#8211; </li>
-<li><strong>forcenew</strong> &#8211; </li>
+<li><strong>path</strong> (<em>(default=&#8217;/.wto/&#8217;) String.</em>) &#8211; A path, relative to $HOME, where the cache is stored.</li>
+<li><strong>source</strong> &#8211; See WtoDatabase definitions.</li>
+<li><strong>forcenew</strong> &#8211; See WtoDatabase definitions.</li>
 </ul>
 </td>
 </tr>
-<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><p class="first last"></p>
+<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><p class="first last">A WtoAlgorithm instance.</p>
 </td>
 </tr>
 </tbody>
@@ -874,30 +911,36 @@ SBs from the information that is stored in a WtoDatabse object.</p>
 <dl class="method">
 <dt id="wtoAlgorithm.WtoAlgorithm.calculate_score">
 <tt class="descname">calculate_score</tt><big>(</big><em>ecount</em>, <em>tcount</em>, <em>srank</em>, <em>ar</em>, <em>aminar</em>, <em>amaxar</em>, <em>las</em>, <em>grade</em>, <em>repfreq</em>, <em>dec</em>, <em>execu</em>, <em>array</em>, <em>frac</em>, <em>maxpwvc</em>, <em>code</em><big>)</big><a class="reference internal" href="_modules/wtoAlgorithm.html#WtoAlgorithm.calculate_score"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#wtoAlgorithm.WtoAlgorithm.calculate_score" title="Permalink to this definition">¶</a></dt>
-<dd><table class="docutils field-list" frame="void" rules="none">
+<dd><p>Please go to the <a class="reference internal" href="#score"><em>Score and ranking</em></a> section for an
+algorithm&#8217;s description.</p>
+<table class="docutils field-list" frame="void" rules="none">
 <col class="field-name" />
 <col class="field-body" />
 <tbody valign="top">
 <tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first simple">
-<li><strong>ecount</strong> &#8211; </li>
-<li><strong>tcount</strong> &#8211; </li>
-<li><strong>srank</strong> &#8211; </li>
-<li><strong>ar</strong> &#8211; </li>
-<li><strong>aminar</strong> &#8211; </li>
-<li><strong>amaxar</strong> &#8211; </li>
-<li><strong>las</strong> &#8211; </li>
-<li><strong>grade</strong> &#8211; </li>
-<li><strong>repfreq</strong> &#8211; </li>
-<li><strong>dec</strong> &#8211; </li>
-<li><strong>execu</strong> &#8211; </li>
-<li><strong>array</strong> &#8211; </li>
-<li><strong>frac</strong> &#8211; </li>
-<li><strong>maxpwvc</strong> &#8211; </li>
-<li><strong>code</strong> &#8211; </li>
+<li><strong>ecount</strong> (<em>Integer.</em>) &#8211; Executions requested by the SB</li>
+<li><strong>tcount</strong> (<em>Integer.</em>) &#8211; Total executions with QA0 Pass or Unset for the SB.</li>
+<li><strong>srank</strong> (<em>Intenger</em>) &#8211; SB Science ranking.</li>
+<li><strong>ar</strong> (<em>Float.</em>) &#8211; SB requested Angular Resolution, from the Science Goal.</li>
+<li><strong>aminar</strong> (<em>Float. In arcsec.</em>) &#8211; The minum angular resolution the SB can accept to be
+observed.</li>
+<li><strong>amaxar</strong> (<em>Float. In arcsec.</em>) &#8211; The maximum angular resolution the SB can accept to be
+observed.</li>
+<li><strong>las</strong> (<em>Float. In arcsec.</em>) &#8211; SB requested Largest Angular Scale, from the Science Goal.</li>
+<li><strong>grade</strong> (<em>String, can be A, B or C.</em>) &#8211; SB&#8217;s Project letter grade.</li>
+<li><strong>repfreq</strong> (<em>Float, in GHz.</em>) &#8211; SB&#8217;s representative frequency.</li>
+<li><strong>dec</strong> (<em>Float, in degrees.</em>) &#8211; SB&#8217;s representative declination coordinates, as determined
+by self.check_observability().</li>
+<li><strong>execu</strong> (<em>String, can be NA, EU, EA, CL or OTHER.</em>) &#8211; SB&#8217;s Project Executive.</li>
+<li><strong>array</strong> (<em>String, can be 12m, 7m or tp.</em>) &#8211; Array type.</li>
+<li><strong>frac</strong> (<em>Float.</em>) &#8211; Total time fraction calculated by self.selector() for the
+SB to reach the required sensitivity.</li>
+<li><strong>maxpwvc</strong> (<em>Float, a value between 0 and 20.</em>) &#8211; SB&#8217;s maxPWVC variable.</li>
+<li><strong>code</strong> (<em>String.</em>) &#8211; SB&#8217;s project code.</li>
 </ul>
 </td>
 </tr>
-<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><p class="first last"></p>
+<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><p class="first last">Tuple with ...</p>
 </td>
 </tr>
 </tbody>
@@ -927,11 +970,17 @@ SBs from the information that is stored in a WtoDatabse object.</p>
 <dl class="method">
 <dt id="wtoAlgorithm.WtoAlgorithm.scorer">
 <tt class="descname">scorer</tt><big>(</big><em>array</em><big>)</big><a class="reference internal" href="_modules/wtoAlgorithm.html#WtoAlgorithm.scorer"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#wtoAlgorithm.WtoAlgorithm.scorer" title="Permalink to this definition">¶</a></dt>
-<dd><table class="docutils field-list" frame="void" rules="none">
+<dd><p>Method that handles the score calculation for each array type. It
+applies <tt class="docutils literal"><span class="pre">self.calculate_score()</span></tt> to the previously selected SBs using
+<tt class="docutils literal"><span class="pre">self.selector()</span></tt></p>
+<table class="docutils field-list" frame="void" rules="none">
 <col class="field-name" />
 <col class="field-body" />
 <tbody valign="top">
-<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><strong>array</strong> &#8211; </td>
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><strong>array</strong> (<em>String.</em>) &#8211; &#8216;12m&#8217;, &#8216;7m&#8217;, &#8216;tp&#8217;</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body">Creates a score table for the instance, which will be named as
+<tt class="docutils literal"><span class="pre">score12m</span></tt>, <tt class="docutils literal"><span class="pre">score7m</span></tt> or <tt class="docutils literal"><span class="pre">scoretp</span></tt>.</td>
 </tr>
 </tbody>
 </table>
@@ -942,16 +991,16 @@ SBs from the information that is stored in a WtoDatabse object.</p>
 <tt class="descname">selector</tt><big>(</big><em>array</em><big>)</big><a class="reference internal" href="_modules/wtoAlgorithm.html#WtoAlgorithm.selector"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#wtoAlgorithm.WtoAlgorithm.selector" title="Permalink to this definition">¶</a></dt>
 <dd><p>Selects SBs that can be observed given the current weather conditions,
 HA range, array type and array configuration (in the case of 12m array
-type) and SB/Project Status. To limit the calculation of pyephem, the
-selection based on current position in the sky is done afterwards.</p>
-<p>Selector get stored in either twelvem, sevenm or totalp tables. These
-tables contain all the data needed for the calculations to be
-done with WtoAlgorith.observable and to assign a score</p>
+type) and SB/Project Status. See
+<a class="reference internal" href="#selection"><em>Selection and Data preparation</em></a></p>
 <table class="docutils field-list" frame="void" rules="none">
 <col class="field-name" />
 <col class="field-body" />
 <tbody valign="top">
-<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><strong>array</strong> (<em>str</em>) &#8211; &#8216;12m&#8217;, &#8216;7m&#8217;, &#8216;tp&#8217;</td>
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><strong>array</strong> (<em>String.</em>) &#8211; &#8216;12m&#8217;, &#8216;7m&#8217;, &#8216;tp&#8217;</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body">Depending on the array type, creates tables select12m, select7m
+or selecttp.</td>
 </tr>
 </tbody>
 </table>
@@ -1112,13 +1161,13 @@ done with WtoAlgorith.observable and to assign a score</p>
 </div>
 <div class="figure">
 <a class="reference internal image-reference" href="_images/diagram.png"><img alt="_images/diagram.png" src="_images/diagram.png" style="width: 1436.5px; height: 2026.05px;" /></a>
-<p class="caption">Figure 4, UML diagram or wtoAlgorithm.py</p>
+<p class="caption">Figure 4, UML diagram of wtoAlgorithm.py</p>
 </div>
 </div>
 <div class="section" id="the-wto-data-frames">
-<h1><a class="toc-backref" href="#id17">The WTO Data Frames</a><a class="headerlink" href="#the-wto-data-frames" title="Permalink to this headline">¶</a></h1>
+<h1>The WTO Data Frames<a class="headerlink" href="#the-wto-data-frames" title="Permalink to this headline">¶</a></h1>
 <div class="section" id="wtodatabase-obsprojects">
-<h2><a class="toc-backref" href="#id18">wtoDatabase.obsprojects</a><a class="headerlink" href="#wtodatabase-obsprojects" title="Permalink to this headline">¶</a></h2>
+<h2>wtoDatabase.obsprojects<a class="headerlink" href="#wtodatabase-obsprojects" title="Permalink to this headline">¶</a></h2>
 <p>Main obsproject table ingested from queries to the archive.</p>
 <div class="highlight-python"><div class="highlight"><pre>SELECT PRJ_ARCHIVE_UID,DELETED,PI,PRJ_NAME,
        CODE,PRJ_TIME_OF_CREATION,PRJ_SCIENTIFIC_RANK,PRJ_VERSION,
@@ -1191,7 +1240,7 @@ WHERE regexp_like (CODE, &#39;^201[23].*\.[AST]&#39;)
 </table>
 </div>
 <div class="section" id="wtodatabase-sciencegoals">
-<h2><a class="toc-backref" href="#id19">wtoDatabase.sciencegoals</a><a class="headerlink" href="#wtodatabase-sciencegoals" title="Permalink to this headline">¶</a></h2>
+<h2>wtoDatabase.sciencegoals<a class="headerlink" href="#wtodatabase-sciencegoals" title="Permalink to this headline">¶</a></h2>
 <table border="1" class="docutils">
 <colgroup>
 <col width="27%" />
@@ -1258,7 +1307,7 @@ WHERE regexp_like (CODE, &#39;^201[23].*\.[AST]&#39;)
 </table>
 </div>
 <div class="section" id="wtodatabase-schedblocks">
-<h2><a class="toc-backref" href="#id20">wtoDatabase.schedblocks</a><a class="headerlink" href="#wtodatabase-schedblocks" title="Permalink to this headline">¶</a></h2>
+<h2>wtoDatabase.schedblocks<a class="headerlink" href="#wtodatabase-schedblocks" title="Permalink to this headline">¶</a></h2>
 <table border="1" class="docutils">
 <colgroup>
 <col width="27%" />
@@ -1286,7 +1335,7 @@ WHERE regexp_like (CODE, &#39;^201[23].*\.[AST]&#39;)
 </table>
 </div>
 <div class="section" id="wtodatabase-schedblock-info">
-<h2><a class="toc-backref" href="#id21">wtoDatabase.schedblock_info</a><a class="headerlink" href="#wtodatabase-schedblock-info" title="Permalink to this headline">¶</a></h2>
+<h2>wtoDatabase.schedblock_info<a class="headerlink" href="#wtodatabase-schedblock-info" title="Permalink to this headline">¶</a></h2>
 <table border="1" class="docutils">
 <colgroup>
 <col width="27%" />
@@ -1368,7 +1417,7 @@ WHERE regexp_like (CODE, &#39;^201[23].*\.[AST]&#39;)
 </table>
 </div>
 <div class="section" id="wtodatabase-target">
-<h2><a class="toc-backref" href="#id22">wtoDatabase.target</a><a class="headerlink" href="#wtodatabase-target" title="Permalink to this headline">¶</a></h2>
+<h2>wtoDatabase.target<a class="headerlink" href="#wtodatabase-target" title="Permalink to this headline">¶</a></h2>
 <table border="1" class="docutils">
 <colgroup>
 <col width="27%" />
@@ -1396,7 +1445,7 @@ WHERE regexp_like (CODE, &#39;^201[23].*\.[AST]&#39;)
 </table>
 </div>
 <div class="section" id="wtodatabase-fieldsource">
-<h2><a class="toc-backref" href="#id23">wtoDatabase.fieldsource</a><a class="headerlink" href="#wtodatabase-fieldsource" title="Permalink to this headline">¶</a></h2>
+<h2>wtoDatabase.fieldsource<a class="headerlink" href="#wtodatabase-fieldsource" title="Permalink to this headline">¶</a></h2>
 <table border="1" class="docutils">
 <colgroup>
 <col width="27%" />
@@ -1463,7 +1512,7 @@ WHERE regexp_like (CODE, &#39;^201[23].*\.[AST]&#39;)
 </table>
 </div>
 <div class="section" id="wtodatabase-spectralconf">
-<h2><a class="toc-backref" href="#id24">wtoDatabase.spectralconf</a><a class="headerlink" href="#wtodatabase-spectralconf" title="Permalink to this headline">¶</a></h2>
+<h2>wtoDatabase.spectralconf<a class="headerlink" href="#wtodatabase-spectralconf" title="Permalink to this headline">¶</a></h2>
 <table border="1" class="docutils">
 <colgroup>
 <col width="27%" />
@@ -1491,7 +1540,7 @@ WHERE regexp_like (CODE, &#39;^201[23].*\.[AST]&#39;)
 </table>
 </div>
 <div class="section" id="wtodatabase-sb-summary-view">
-<h2><a class="toc-backref" href="#id25">wtoDatabase.sb_summary (<em>&#8220;view&#8221;</em>)</a><a class="headerlink" href="#wtodatabase-sb-summary-view" title="Permalink to this headline">¶</a></h2>
+<h2>wtoDatabase.sb_summary (<em>&#8220;view&#8221;</em>)<a class="headerlink" href="#wtodatabase-sb-summary-view" title="Permalink to this headline">¶</a></h2>
 <table border="1" class="docutils">
 <colgroup>
 <col width="69%" />
@@ -1603,7 +1652,7 @@ WHERE regexp_like (CODE, &#39;^201[23].*\.[AST]&#39;)
 </table>
 </div>
 <div class="section" id="wtodatabase-qa0">
-<h2><a class="toc-backref" href="#id26">wtoDatabase.qa0</a><a class="headerlink" href="#wtodatabase-qa0" title="Permalink to this headline">¶</a></h2>
+<h2>wtoDatabase.qa0<a class="headerlink" href="#wtodatabase-qa0" title="Permalink to this headline">¶</a></h2>
 <table border="1" class="docutils">
 <colgroup>
 <col width="42%" />
@@ -1625,7 +1674,7 @@ WHERE regexp_like (CODE, &#39;^201[23].*\.[AST]&#39;)
 </table>
 </div>
 <div class="section" id="wtodatabase-scheduling-proj">
-<h2><a class="toc-backref" href="#id27">wtoDatabase.scheduling_proj</a><a class="headerlink" href="#wtodatabase-scheduling-proj" title="Permalink to this headline">¶</a></h2>
+<h2>wtoDatabase.scheduling_proj<a class="headerlink" href="#wtodatabase-scheduling-proj" title="Permalink to this headline">¶</a></h2>
 <p>Queries project data from the SCHEDULING_AOS archive tables.</p>
 <div class="highlight-python"><div class="highlight"><pre>SELECT *
 FROM SCHEDULING_AOS.OBSPROJECT
@@ -1707,7 +1756,7 @@ WHERE regexp_like (CODE, &#39;^201[23].*\.[AST]&#39;)
 </table>
 </div>
 <div class="section" id="wtodatabase-scheduling-sb">
-<h2><a class="toc-backref" href="#id28">wtoDatabase.scheduling_sb</a><a class="headerlink" href="#wtodatabase-scheduling-sb" title="Permalink to this headline">¶</a></h2>
+<h2>wtoDatabase.scheduling_sb<a class="headerlink" href="#wtodatabase-scheduling-sb" title="Permalink to this headline">¶</a></h2>
 <p>Queries scheduling block data from SCHEDULING_AOS tables.:</p>
 <div class="highlight-python"><div class="highlight"><pre>SELECT ou.OBSUNIT_UID,sb.NAME,sb.REPR_BAND,
        sb.SCHEDBLOCK_CTRL_EXEC_COUNT,sb.SCHEDBLOCK_CTRL_STATE,
@@ -1756,11 +1805,14 @@ WHERE sb.SCHEDBLOCKID = ou.OBSUNITID AND sb.CSV = 0
 </table>
 </div>
 <div class="section" id="wtodatabase-sbstate">
-<h2><a class="toc-backref" href="#id29">wtoDatabase.sbstate</a><a class="headerlink" href="#wtodatabase-sbstate" title="Permalink to this headline">¶</a></h2>
+<h2>wtoDatabase.sbstate<a class="headerlink" href="#wtodatabase-sbstate" title="Permalink to this headline">¶</a></h2>
 </div>
+</div>
+<div class="section" id="assessment-of-current-array-s-angular-resolution">
+<span id="current-conf"></span><h1>Assessment of Current Array&#8217;s Angular Resolution<a class="headerlink" href="#assessment-of-current-array-s-angular-resolution" title="Permalink to this headline">¶</a></h1>
 </div>
 <div class="section" id="indices-and-tables">
-<h1><a class="toc-backref" href="#id30">Indices and tables</a><a class="headerlink" href="#indices-and-tables" title="Permalink to this headline">¶</a></h1>
+<h1>Indices and tables<a class="headerlink" href="#indices-and-tables" title="Permalink to this headline">¶</a></h1>
 <ul class="simple">
 <li><a class="reference internal" href="genindex.html"><em>Index</em></a></li>
 <li><a class="reference internal" href="py-modindex.html"><em>Module Index</em></a></li>
@@ -1776,22 +1828,23 @@ WHERE sb.SCHEDBLOCKID = ou.OBSUNITID AND sb.CSV = 0
         <div class="sphinxsidebarwrapper">
   <h3><a href="#">Table Of Contents</a></h3>
   <ul>
-<li><a class="reference internal" href="#">The gWTO2 (What To Observe Cycle 2 GUI) Documentation</a></li>
+<li><a class="reference internal" href="#">The gWTO2 (gui for What To Observe Cycle 2) Documentation</a></li>
 <li><a class="reference internal" href="#using-gwto2">Using gWTO2</a><ul>
-<li><a class="reference internal" href="#start-up">Start up</a></li>
+<li><a class="reference internal" href="#starting-the-gui">Starting the GUI</a></li>
+<li><a class="reference internal" href="#the-gwto2-window">The gWTO2 window</a></li>
 <li><a class="reference internal" href="#setting-up-variables">Setting up variables</a></li>
-<li><a class="reference internal" href="#running-and-setting-scores">Running and setting scores</a></li>
-</ul>
-</li>
+<li><a class="reference internal" href="#running">Running</a></li>
 <li><a class="reference internal" href="#reading-the-output-scores">Reading the output Scores</a><ul>
 <li><a class="reference internal" href="#standard-aca-tab-in-bl-aca-gui">Standard (ACA) Tab in BL (ACA) GUI</a></li>
 </ul>
 </li>
+</ul>
+</li>
 <li><a class="reference internal" href="#selection-and-score-algorithms">Selection and Score algorithms</a><ul>
-<li><a class="reference internal" href="#selection">Selection</a></li>
-<li><a class="reference internal" href="#tsys-time-fraction-calculation">TSys time fraction calculation</a></li>
+<li><a class="reference internal" href="#selection-and-data-preparation">Selection and Data preparation</a></li>
 <li><a class="reference internal" href="#score-and-ranking">Score and ranking</a></li>
 <li><a class="reference internal" href="#checking-observability">Checking observability</a></li>
+<li><a class="reference internal" href="#tsys-time-fraction-calculation">TSys time fraction calculation</a></li>
 </ul>
 </li>
 <li><a class="reference internal" href="#playing-with-the-libraries">Playing with the libraries:</a></li>
@@ -1815,6 +1868,7 @@ WHERE sb.SCHEDBLOCKID = ou.OBSUNITID AND sb.CSV = 0
 <li><a class="reference internal" href="#wtodatabase-sbstate">wtoDatabase.sbstate</a></li>
 </ul>
 </li>
+<li><a class="reference internal" href="#assessment-of-current-array-s-angular-resolution">Assessment of Current Array&#8217;s Angular Resolution</a></li>
 <li><a class="reference internal" href="#indices-and-tables">Indices and tables</a></li>
 </ul>
 
