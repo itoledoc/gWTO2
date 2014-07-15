@@ -104,7 +104,7 @@ class ACAMainWindow(QMainWindow, Ui_ACAMainWindow):
         Slot documentation goes here.
         """
         # TODO: not implemented yet
-        raise NotImplementedError\
+        raise NotImplementedError
 
     @pyqtSignature("int")
     def on_maxha_spin_valueChanged(self, p0):
