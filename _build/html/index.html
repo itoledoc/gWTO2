@@ -50,16 +50,15 @@
 <ul class="simple">
 </ul>
 </div>
-</div>
 <div class="section" id="using-gwto2">
-<h1>Using gWTO2<a class="headerlink" href="#using-gwto2" title="Permalink to this headline">¶</a></h1>
-<p><strong>Latest update:</strong> July 11, 2014</p>
+<h2>Using gWTO2<a class="headerlink" href="#using-gwto2" title="Permalink to this headline">¶</a></h2>
+<p><strong>Latest update:</strong> July 15, 2014</p>
 <div class="figure">
 <img alt="_images/Selection_003.png" src="_images/Selection_003.png" />
 <p class="caption">Screenshot of gWTO2 RC</p>
 </div>
 <div class="section" id="starting-the-gui">
-<h2>Starting the GUI<a class="headerlink" href="#starting-the-gui" title="Permalink to this headline">¶</a></h2>
+<h3>Starting the GUI<a class="headerlink" href="#starting-the-gui" title="Permalink to this headline">¶</a></h3>
 <p>gWTO2 is tested and deployed at the osf-red machine, within the aod account.
 A virtual environment of python, based on the
 <a class="reference external" href="http://docs.continuum.io/anaconda/index.html">Anaconda distribution</a>,
@@ -88,7 +87,7 @@ for each other. <strong>After playing with gWTO2 using a different path, please<
 <strong>delete the directory created with the name .wto_myname</strong></p>
 </div>
 <div class="section" id="the-gwto2-window">
-<h2>The gWTO2 window<a class="headerlink" href="#the-gwto2-window" title="Permalink to this headline">¶</a></h2>
+<h3>The gWTO2 window<a class="headerlink" href="#the-gwto2-window" title="Permalink to this headline">¶</a></h3>
 <p>After starting <strong class="command">gWTO2 BL</strong> you will be presented with the gui shown on
 <a class="reference internal" href="#fig2"><em>Figure 2</em></a>.
 If the <em class="xref std std-option">-c</em> option was used, or the cache have been manually erased it,
@@ -102,7 +101,7 @@ of <em class="guilabel">Array Options</em>, and the presence of a tab <em class=
 will be used for handling Total Power SBs.</p>
 </div>
 <div class="section" id="setting-up-variables">
-<h2>Setting up variables<a class="headerlink" href="#setting-up-variables" title="Permalink to this headline">¶</a></h2>
+<h3>Setting up variables<a class="headerlink" href="#setting-up-variables" title="Permalink to this headline">¶</a></h3>
 <p>After opening, the <em class="guilabel">Date</em> will be by default the current UTC time,
 <em class="guilabel">PWV</em> is set to 1.2 mm., the <em class="guilabel">Horizon</em> limit is 20 degrees,
 <em class="guilabel">minHA</em>, minimum hour angle, is -5 and <em class="guilabel">maxHA</em>, maximum
@@ -156,7 +155,7 @@ number of antennas that are available.</dd>
 </dl>
 </div>
 <div class="section" id="running">
-<h2>Running<a class="headerlink" href="#running" title="Permalink to this headline">¶</a></h2>
+<h3>Running<a class="headerlink" href="#running" title="Permalink to this headline">¶</a></h3>
 <p>When you are happy with the <em class="guilabel">Date</em>, <em class="guilabel">PWV</em> and
 array variables (also the <em class="guilabel">Horizon</em>, <em class="guilabel">minHA</em> and
 <em class="guilabel">maxHA</em> values) you can run the selector and scoring algorithms
@@ -169,9 +168,21 @@ with something similar to <a class="reference internal" href="#fig4"><em>Figure 
 </div>
 </div>
 <div class="section" id="reading-the-output-scores">
-<h2>Reading the output Scores<a class="headerlink" href="#reading-the-output-scores" title="Permalink to this headline">¶</a></h2>
+<h3>Reading the output Scores<a class="headerlink" href="#reading-the-output-scores" title="Permalink to this headline">¶</a></h3>
+<div class="section" id="meaning-of-the-background-colors">
+<h4>Meaning of the background colors<a class="headerlink" href="#meaning-of-the-background-colors" title="Permalink to this headline">¶</a></h4>
+<ul class="simple">
+<li><strong>Red</strong>: Means that the integration time for the science target needs to be
+increased by over a factor of 1.3 to reach the PI requested sensitivity.
+<strong>Do not change the integration time unless a clear policy has been set.</strong>
+<strong>(AoD leader should know.)</strong></li>
+<li><strong>Yellow</strong>: The SB, even when it can be run with the current Array&#8217;s angular
+resolution, does require, or prefers, another configuration. If there is
+nothing else to observe, the AoD could execute it.</li>
+</ul>
+</div>
 <div class="section" id="standard-aca-tab-in-bl-aca-gui">
-<h3>Standard (ACA) Tab in BL (ACA) GUI<a class="headerlink" href="#standard-aca-tab-in-bl-aca-gui" title="Permalink to this headline">¶</a></h3>
+<h4>Standard (ACA) Tab in BL (ACA) GUI<a class="headerlink" href="#standard-aca-tab-in-bl-aca-gui" title="Permalink to this headline">¶</a></h4>
 <ol class="arabic simple">
 <li><strong>Score:</strong> The score is the weighted mean of different scores calculated
 for each observable SB. The score is a value between 0 and 10,
@@ -241,14 +252,15 @@ In the case of multisources, this time should be multiplied by the number of
 sources.</li>
 <li><strong>PRJ UID:</strong> The SB&#8217;s project UID.</li>
 <li><strong>Grade:</strong> Grade letter for the SB&#8217;s project.</li>
+<li><strong>Exceutive:</strong> SB&#8217;s project executive.</li>
 </ol>
 </div>
 </div>
 </div>
 <div class="section" id="selection-and-score-algorithms">
-<h1>Selection and Score algorithms<a class="headerlink" href="#selection-and-score-algorithms" title="Permalink to this headline">¶</a></h1>
+<h2>Selection and Score algorithms<a class="headerlink" href="#selection-and-score-algorithms" title="Permalink to this headline">¶</a></h2>
 <div class="section" id="selection-and-data-preparation-wtoalgorithm-wtoalgorithm-selector">
-<span id="selection"></span><h2>Selection and Data preparation (<a class="reference internal" href="#wtoAlgorithm.WtoAlgorithm.selector" title="wtoAlgorithm.WtoAlgorithm.selector"><tt class="xref py py-func docutils literal"><span class="pre">wtoAlgorithm.WtoAlgorithm.selector()</span></tt></a>)<a class="headerlink" href="#selection-and-data-preparation-wtoalgorithm-wtoalgorithm-selector" title="Permalink to this headline">¶</a></h2>
+<span id="selection"></span><h3>Selection and Data preparation (<a class="reference internal" href="#wtoAlgorithm.WtoAlgorithm.selector" title="wtoAlgorithm.WtoAlgorithm.selector"><tt class="xref py py-func docutils literal"><span class="pre">wtoAlgorithm.WtoAlgorithm.selector()</span></tt></a>)<a class="headerlink" href="#selection-and-data-preparation-wtoalgorithm-wtoalgorithm-selector" title="Permalink to this headline">¶</a></h3>
 <ol class="arabic">
 <li><p class="first"><strong>Calculate observability using the pyephem libraries.</strong></p>
 <p>For all the science field sources of an SB and fixed calibration sources,
@@ -439,13 +451,13 @@ configuration as set in <em class="guilabel">Array AR:</em>:</p>
 </ol>
 </div>
 <div class="section" id="score-and-ranking">
-<span id="score"></span><h2>Score and ranking<a class="headerlink" href="#score-and-ranking" title="Permalink to this headline">¶</a></h2>
+<span id="score"></span><h3>Score and ranking<a class="headerlink" href="#score-and-ranking" title="Permalink to this headline">¶</a></h3>
 </div>
 <div class="section" id="checking-observability">
-<span id="check-obs"></span><h2>Checking observability<a class="headerlink" href="#checking-observability" title="Permalink to this headline">¶</a></h2>
+<span id="check-obs"></span><h3>Checking observability<a class="headerlink" href="#checking-observability" title="Permalink to this headline">¶</a></h3>
 </div>
 <div class="section" id="tsys-time-fraction-calculation">
-<span id="tsys-calc"></span><h2>TSys time fraction calculation<a class="headerlink" href="#tsys-time-fraction-calculation" title="Permalink to this headline">¶</a></h2>
+<span id="tsys-calc"></span><h3>TSys time fraction calculation<a class="headerlink" href="#tsys-time-fraction-calculation" title="Permalink to this headline">¶</a></h3>
 <p>The TSys time fraction comes from equation:</p>
 <div class="math">
 <p><img src="_images/math/9a61d10685328c93c516e3f27d34a2d248b3385b.png" alt="\frac{T_{sys_{wto}}}{T_{sys_{PI}}}^2"/></p>
@@ -457,7 +469,7 @@ representative frequency and at transit.</p>
 </div>
 </div>
 <div class="section" id="playing-with-the-libraries">
-<h1>Playing with the libraries:<a class="headerlink" href="#playing-with-the-libraries" title="Permalink to this headline">¶</a></h1>
+<h2>Playing with the libraries:<a class="headerlink" href="#playing-with-the-libraries" title="Permalink to this headline">¶</a></h2>
 <div class="highlight-python"><div class="highlight"><pre>. activateC2Test
 ipython
 </pre></div>
@@ -518,9 +530,9 @@ output in an excel table run::</p>
 score.xls excel spreadsheet.</p>
 </div>
 <div class="section" id="module-wtoDatabase">
-<span id="the-wto-api"></span><h1>The WTO API<a class="headerlink" href="#module-wtoDatabase" title="Permalink to this headline">¶</a></h1>
+<span id="the-wto-api"></span><h2>The WTO API<a class="headerlink" href="#module-wtoDatabase" title="Permalink to this headline">¶</a></h2>
 <div class="section" id="wtodatabase-py-the-gwto-database-library">
-<h2>wtoDatabase.py: the gWTO database library.<a class="headerlink" href="#wtodatabase-py-the-gwto-database-library" title="Permalink to this headline">¶</a></h2>
+<h3>wtoDatabase.py: the gWTO database library.<a class="headerlink" href="#wtodatabase-py-the-gwto-database-library" title="Permalink to this headline">¶</a></h3>
 <p>This library contains the classes and functions required to query, parse and
 organize the Projects and SchedBlock information stored at the OSF archive in
 different tables.</p>
@@ -930,7 +942,7 @@ ALMA.XML_OBSPROJECT_ENTITIES.</p>
 
 </div>
 <span class="target" id="module-wtoAlgorithm"></span><div class="section" id="wtoalgorithm-py-the-gwto-selector-and-scorer-library">
-<h2>wtoAlgorithm.py: the gWTO selector and scorer library.<a class="headerlink" href="#wtoalgorithm-py-the-gwto-selector-and-scorer-library" title="Permalink to this headline">¶</a></h2>
+<h3>wtoAlgorithm.py: the gWTO selector and scorer library.<a class="headerlink" href="#wtoalgorithm-py-the-gwto-selector-and-scorer-library" title="Permalink to this headline">¶</a></h3>
 <p>This library contains the classes and functions required to select and rank
 SBs from the information that is stored in a WtoDatabse object.</p>
 <dl class="class">
@@ -1212,9 +1224,11 @@ or selecttp.</td>
 </div>
 </div>
 <div class="section" id="the-wto-data-frames">
-<h1>The WTO Data Frames<a class="headerlink" href="#the-wto-data-frames" title="Permalink to this headline">¶</a></h1>
+<h2>The WTO Data Frames<a class="headerlink" href="#the-wto-data-frames" title="Permalink to this headline">¶</a></h2>
+<div class="section" id="description">
+<h3>Description<a class="headerlink" href="#description" title="Permalink to this headline">¶</a></h3>
 <div class="section" id="wtodatabase-obsprojects">
-<h2>wtoDatabase.obsprojects<a class="headerlink" href="#wtodatabase-obsprojects" title="Permalink to this headline">¶</a></h2>
+<h4>wtoDatabase.obsprojects<a class="headerlink" href="#wtodatabase-obsprojects" title="Permalink to this headline">¶</a></h4>
 <p>Main obsproject table ingested from queries to the archive.</p>
 <div class="highlight-python"><div class="highlight"><pre>SELECT PRJ_ARCHIVE_UID,DELETED,PI,PRJ_NAME,
        CODE,PRJ_TIME_OF_CREATION,PRJ_SCIENTIFIC_RANK,PRJ_VERSION,
@@ -1287,7 +1301,7 @@ WHERE regexp_like (CODE, &#39;^201[23].*\.[AST]&#39;)
 </table>
 </div>
 <div class="section" id="wtodatabase-sciencegoals">
-<h2>wtoDatabase.sciencegoals<a class="headerlink" href="#wtodatabase-sciencegoals" title="Permalink to this headline">¶</a></h2>
+<h4>wtoDatabase.sciencegoals<a class="headerlink" href="#wtodatabase-sciencegoals" title="Permalink to this headline">¶</a></h4>
 <table border="1" class="docutils">
 <colgroup>
 <col width="27%" />
@@ -1354,7 +1368,7 @@ WHERE regexp_like (CODE, &#39;^201[23].*\.[AST]&#39;)
 </table>
 </div>
 <div class="section" id="wtodatabase-schedblocks">
-<h2>wtoDatabase.schedblocks<a class="headerlink" href="#wtodatabase-schedblocks" title="Permalink to this headline">¶</a></h2>
+<h4>wtoDatabase.schedblocks<a class="headerlink" href="#wtodatabase-schedblocks" title="Permalink to this headline">¶</a></h4>
 <table border="1" class="docutils">
 <colgroup>
 <col width="27%" />
@@ -1382,7 +1396,7 @@ WHERE regexp_like (CODE, &#39;^201[23].*\.[AST]&#39;)
 </table>
 </div>
 <div class="section" id="wtodatabase-schedblock-info">
-<h2>wtoDatabase.schedblock_info<a class="headerlink" href="#wtodatabase-schedblock-info" title="Permalink to this headline">¶</a></h2>
+<h4>wtoDatabase.schedblock_info<a class="headerlink" href="#wtodatabase-schedblock-info" title="Permalink to this headline">¶</a></h4>
 <table border="1" class="docutils">
 <colgroup>
 <col width="27%" />
@@ -1464,7 +1478,7 @@ WHERE regexp_like (CODE, &#39;^201[23].*\.[AST]&#39;)
 </table>
 </div>
 <div class="section" id="wtodatabase-target">
-<h2>wtoDatabase.target<a class="headerlink" href="#wtodatabase-target" title="Permalink to this headline">¶</a></h2>
+<h4>wtoDatabase.target<a class="headerlink" href="#wtodatabase-target" title="Permalink to this headline">¶</a></h4>
 <table border="1" class="docutils">
 <colgroup>
 <col width="27%" />
@@ -1492,7 +1506,7 @@ WHERE regexp_like (CODE, &#39;^201[23].*\.[AST]&#39;)
 </table>
 </div>
 <div class="section" id="wtodatabase-fieldsource">
-<h2>wtoDatabase.fieldsource<a class="headerlink" href="#wtodatabase-fieldsource" title="Permalink to this headline">¶</a></h2>
+<h4>wtoDatabase.fieldsource<a class="headerlink" href="#wtodatabase-fieldsource" title="Permalink to this headline">¶</a></h4>
 <table border="1" class="docutils">
 <colgroup>
 <col width="27%" />
@@ -1559,7 +1573,7 @@ WHERE regexp_like (CODE, &#39;^201[23].*\.[AST]&#39;)
 </table>
 </div>
 <div class="section" id="wtodatabase-spectralconf">
-<h2>wtoDatabase.spectralconf<a class="headerlink" href="#wtodatabase-spectralconf" title="Permalink to this headline">¶</a></h2>
+<h4>wtoDatabase.spectralconf<a class="headerlink" href="#wtodatabase-spectralconf" title="Permalink to this headline">¶</a></h4>
 <table border="1" class="docutils">
 <colgroup>
 <col width="27%" />
@@ -1587,7 +1601,7 @@ WHERE regexp_like (CODE, &#39;^201[23].*\.[AST]&#39;)
 </table>
 </div>
 <div class="section" id="wtodatabase-sb-summary-view">
-<h2>wtoDatabase.sb_summary (<em>&#8220;view&#8221;</em>)<a class="headerlink" href="#wtodatabase-sb-summary-view" title="Permalink to this headline">¶</a></h2>
+<h4>wtoDatabase.sb_summary (<em>&#8220;view&#8221;</em>)<a class="headerlink" href="#wtodatabase-sb-summary-view" title="Permalink to this headline">¶</a></h4>
 <table border="1" class="docutils">
 <colgroup>
 <col width="69%" />
@@ -1699,7 +1713,7 @@ WHERE regexp_like (CODE, &#39;^201[23].*\.[AST]&#39;)
 </table>
 </div>
 <div class="section" id="wtodatabase-qa0">
-<h2>wtoDatabase.qa0<a class="headerlink" href="#wtodatabase-qa0" title="Permalink to this headline">¶</a></h2>
+<h4>wtoDatabase.qa0<a class="headerlink" href="#wtodatabase-qa0" title="Permalink to this headline">¶</a></h4>
 <table border="1" class="docutils">
 <colgroup>
 <col width="42%" />
@@ -1721,7 +1735,7 @@ WHERE regexp_like (CODE, &#39;^201[23].*\.[AST]&#39;)
 </table>
 </div>
 <div class="section" id="wtodatabase-scheduling-proj">
-<h2>wtoDatabase.scheduling_proj<a class="headerlink" href="#wtodatabase-scheduling-proj" title="Permalink to this headline">¶</a></h2>
+<h4>wtoDatabase.scheduling_proj<a class="headerlink" href="#wtodatabase-scheduling-proj" title="Permalink to this headline">¶</a></h4>
 <p>Queries project data from the SCHEDULING_AOS archive tables.</p>
 <div class="highlight-python"><div class="highlight"><pre>SELECT *
 FROM SCHEDULING_AOS.OBSPROJECT
@@ -1803,7 +1817,7 @@ WHERE regexp_like (CODE, &#39;^201[23].*\.[AST]&#39;)
 </table>
 </div>
 <div class="section" id="wtodatabase-scheduling-sb">
-<h2>wtoDatabase.scheduling_sb<a class="headerlink" href="#wtodatabase-scheduling-sb" title="Permalink to this headline">¶</a></h2>
+<h4>wtoDatabase.scheduling_sb<a class="headerlink" href="#wtodatabase-scheduling-sb" title="Permalink to this headline">¶</a></h4>
 <p>Queries scheduling block data from SCHEDULING_AOS tables.:</p>
 <div class="highlight-python"><div class="highlight"><pre>SELECT ou.OBSUNIT_UID,sb.NAME,sb.REPR_BAND,
        sb.SCHEDBLOCK_CTRL_EXEC_COUNT,sb.SCHEDBLOCK_CTRL_STATE,
@@ -1852,19 +1866,24 @@ WHERE sb.SCHEDBLOCKID = ou.OBSUNITID AND sb.CSV = 0
 </table>
 </div>
 <div class="section" id="wtodatabase-sbstate">
-<h2>wtoDatabase.sbstate<a class="headerlink" href="#wtodatabase-sbstate" title="Permalink to this headline">¶</a></h2>
+<h4>wtoDatabase.sbstate<a class="headerlink" href="#wtodatabase-sbstate" title="Permalink to this headline">¶</a></h4>
 </div>
 </div>
+</div>
+<div class="section" id="apendix">
+<h2>Apendix<a class="headerlink" href="#apendix" title="Permalink to this headline">¶</a></h2>
 <div class="section" id="assessment-of-current-array-s-angular-resolution">
-<span id="current-conf"></span><h1>Assessment of Current Array&#8217;s Angular Resolution<a class="headerlink" href="#assessment-of-current-array-s-angular-resolution" title="Permalink to this headline">¶</a></h1>
+<span id="current-conf"></span><h3>Assessment of Current Array&#8217;s Angular Resolution<a class="headerlink" href="#assessment-of-current-array-s-angular-resolution" title="Permalink to this headline">¶</a></h3>
+</div>
 </div>
 <div class="section" id="indices-and-tables">
-<h1>Indices and tables<a class="headerlink" href="#indices-and-tables" title="Permalink to this headline">¶</a></h1>
+<h2>Indices and tables<a class="headerlink" href="#indices-and-tables" title="Permalink to this headline">¶</a></h2>
 <ul class="simple">
 <li><a class="reference internal" href="genindex.html"><em>Index</em></a></li>
 <li><a class="reference internal" href="py-modindex.html"><em>Module Index</em></a></li>
 <li><a class="reference internal" href="search.html"><em>Search Page</em></a></li>
 </ul>
+</div>
 </div>
 
 
@@ -1875,13 +1894,14 @@ WHERE sb.SCHEDBLOCKID = ou.OBSUNITID AND sb.CSV = 0
         <div class="sphinxsidebarwrapper">
   <h3><a href="#">Table Of Contents</a></h3>
   <ul>
-<li><a class="reference internal" href="#">The gWTO2 (gui for What To Observe Cycle 2) Documentation</a></li>
+<li><a class="reference internal" href="#">The gWTO2 (gui for What To Observe Cycle 2) Documentation</a><ul>
 <li><a class="reference internal" href="#using-gwto2">Using gWTO2</a><ul>
 <li><a class="reference internal" href="#starting-the-gui">Starting the GUI</a></li>
 <li><a class="reference internal" href="#the-gwto2-window">The gWTO2 window</a></li>
 <li><a class="reference internal" href="#setting-up-variables">Setting up variables</a></li>
 <li><a class="reference internal" href="#running">Running</a></li>
 <li><a class="reference internal" href="#reading-the-output-scores">Reading the output Scores</a><ul>
+<li><a class="reference internal" href="#meaning-of-the-background-colors">Meaning of the background colors</a></li>
 <li><a class="reference internal" href="#standard-aca-tab-in-bl-aca-gui">Standard (ACA) Tab in BL (ACA) GUI</a></li>
 </ul>
 </li>
@@ -1901,6 +1921,7 @@ WHERE sb.SCHEDBLOCKID = ou.OBSUNITID AND sb.CSV = 0
 </ul>
 </li>
 <li><a class="reference internal" href="#the-wto-data-frames">The WTO Data Frames</a><ul>
+<li><a class="reference internal" href="#description">Description</a><ul>
 <li><a class="reference internal" href="#wtodatabase-obsprojects">wtoDatabase.obsprojects</a></li>
 <li><a class="reference internal" href="#wtodatabase-sciencegoals">wtoDatabase.sciencegoals</a></li>
 <li><a class="reference internal" href="#wtodatabase-schedblocks">wtoDatabase.schedblocks</a></li>
@@ -1915,8 +1936,15 @@ WHERE sb.SCHEDBLOCKID = ou.OBSUNITID AND sb.CSV = 0
 <li><a class="reference internal" href="#wtodatabase-sbstate">wtoDatabase.sbstate</a></li>
 </ul>
 </li>
+</ul>
+</li>
+<li><a class="reference internal" href="#apendix">Apendix</a><ul>
 <li><a class="reference internal" href="#assessment-of-current-array-s-angular-resolution">Assessment of Current Array&#8217;s Angular Resolution</a></li>
+</ul>
+</li>
 <li><a class="reference internal" href="#indices-and-tables">Indices and tables</a></li>
+</ul>
+</li>
 </ul>
 
   <h3>This Page</h3>

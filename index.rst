@@ -3,16 +3,16 @@
    You can adapt this file completely to your liking, but it should at least
    contain the root `toctree` directive.
 
-
+#########################################################
 The gWTO2 (gui for What To Observe Cycle 2) Documentation
-=========================================================
+#########################################################
 
 .. toctree::
    :maxdepth: 2
 
-
+***********
 Using gWTO2
-===========
+***********
 
 **Latest update:** |today|
 
@@ -21,7 +21,7 @@ Using gWTO2
    Screenshot of gWTO2 RC
 
 Starting the GUI
-----------------
+================
 
 gWTO2 is tested and deployed at the osf-red machine, within the aod account.
 A virtual environment of python, based on the
@@ -53,7 +53,7 @@ for each other. **After playing with gWTO2 using a different path, please**
 **delete the directory created with the name .wto_myname**
 
 The gWTO2 window
-----------------
+================
 
 After starting :command:`gWTO2 BL` you will be presented with the gui shown on
 :ref:`Figure 2 <fig2>`.
@@ -71,7 +71,7 @@ of :guilabel:`Array Options`, and the presence of a tab :guilabel:`TP` that
 will be used for handling Total Power SBs.
 
 Setting up variables
---------------------
+====================
 
 After opening, the :guilabel:`Date` will be by default the current UTC time,
 :guilabel:`PWV` is set to 1.2 mm., the :guilabel:`Horizon` limit is 20 degrees,
@@ -130,7 +130,7 @@ baselines arrays created in the last 6 to 12 hours.
    number of antennas that are available.
 
 Running
--------
+=======
 
 When you are happy with the :guilabel:`Date`, :guilabel:`PWV` and
 array variables (also the :guilabel:`Horizon`, :guilabel:`minHA` and
@@ -148,10 +148,22 @@ with something similar to :ref:`Figure 4 <fig4>`.
 
 
 Reading the output Scores
--------------------------
+=========================
+
+Meaning of the background colors
+--------------------------------
+
+* **Red**: Means that the integration time for the science target needs to be
+  increased by over a factor of 1.3 to reach the PI requested sensitivity.
+  **Do not change the integration time unless a clear policy has been set.**
+  **(AoD leader should know.)**
+
+* **Yellow**: The SB, even when it can be run with the current Array's angular
+  resolution, does require, or prefers, another configuration. If there is
+  nothing else to observe, the AoD could execute it.
 
 Standard (ACA) Tab in BL (ACA) GUI
-^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+----------------------------------
 
 #. **Score:** The score is the weighted mean of different scores calculated
    for each observable SB. The score is a value between 0 and 10,
@@ -221,15 +233,16 @@ Standard (ACA) Tab in BL (ACA) GUI
    sources.
 #. **PRJ UID:** The SB's project UID.
 #. **Grade:** Grade letter for the SB's project.
+#. **Exceutive:** SB's project executive.
 
-
+******************************
 Selection and Score algorithms
-==============================
+******************************
 
 .. _selection:
 
 Selection and Data preparation (:py:func:`wtoAlgorithm.WtoAlgorithm.selector`)
-------------------------------------------------------------------------------
+==============================================================================
 
 #. **Calculate observability using the pyephem libraries.**
 
@@ -434,17 +447,17 @@ Selection and Data preparation (:py:func:`wtoAlgorithm.WtoAlgorithm.selector`)
 .. _score:
 
 Score and ranking
------------------
+=================
 
 .. _check-obs:
 
 Checking observability
-----------------------
+======================
 
 .. _tsys-calc:
 
 TSys time fraction calculation
-------------------------------
+==============================
 
 The TSys time fraction comes from equation:
 
@@ -457,8 +470,9 @@ transit, and :math:`T_{sys_{PI}}` is the system temperature calculated using the
 PWV set by the PI/P2G to calculate the integration time in the OT, also at the
 representative frequency and at transit.
 
+***************************
 Playing with the libraries:
-===========================
+***************************
 
 ::
 
@@ -521,8 +535,9 @@ output in an excel table run:::
 Where output_path is the full path to the directory where you want to save the
 score.xls excel spreadsheet.
 
+***********
 The WTO API
-===========
+***********
 
 .. automodule:: wtoDatabase
    :members:
@@ -535,8 +550,12 @@ The WTO API
 
    Figure 4, UML diagram of wtoAlgorithm.py
 
+*******************
 The WTO Data Frames
-===================
+*******************
+
+Description
+===========
 
 wtoDatabase.obsprojects
 -----------------------
@@ -800,14 +819,18 @@ OBSUNIT_PROJECT_UID            object
 wtoDatabase.sbstate
 -------------------
 
+*******
+Apendix
+*******
+
 .. _current-conf:
 
 Assessment of Current Array's Angular Resolution
 ================================================
 
-
+******************
 Indices and tables
-==================
+******************
 
 * :ref:`genindex`
 * :ref:`modindex`

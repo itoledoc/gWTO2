@@ -403,7 +403,7 @@ class BLMainWindow(QMainWindow, Ui_BLMainWindow):
                      'tsysfrac', 'blfrac', 'frac', 'sb_array_score',
                      'sb_cond_score', 'maxPWVC', 'arrayMinAR', 'arcorr',
                      'arrayMaxAR', 'integrationTime', 'lascorr',
-                     'PRJ_ARCHIVE_UID', 'grade']]
+                     'PRJ_ARCHIVE_UID', 'grade', 'EXEC']]
 
         tc12 = self.datas.score12m.sort(
             'score', ascending=False).query(
@@ -424,7 +424,7 @@ class BLMainWindow(QMainWindow, Ui_BLMainWindow):
                      'tsysfrac', 'blfrac', 'frac', 'sb_array_score',
                      'sb_cond_score', 'maxPWVC', 'arrayMinAR', 'arcorr',
                      'arrayMaxAR', 'integrationTime', 'isPolarization',
-                     'PRJ_ARCHIVE_UID', 'grade']]
+                     'PRJ_ARCHIVE_UID', 'grade', 'EXEC']]
 
         if not self.B03_b.isChecked():
             std12 = std12.query('band != "ALMA_RB_03"')
@@ -457,7 +457,7 @@ class BLMainWindow(QMainWindow, Ui_BLMainWindow):
              u'Exec. Done', u'TSysFrac', u'BLFrac', u'TotalFrac',
              u'Array Score', u'Cond. Score', u'maxPWVC', u'ArrayMinAR',
              u'ARcorr', u'ArrayMaxAR', u'TimeOnSource', u'LAScorr',
-             u'PRJ UID', u'Grade'], dtype='object')
+             u'PRJ UID', u'Grade', u'Executive'], dtype='object')
 
         tc12.columns = Wto.pd.Index(
             [u'Score', u'CODE', u'SB UID', u'SB Name', u'SB State', u'Band',
@@ -474,7 +474,7 @@ class BLMainWindow(QMainWindow, Ui_BLMainWindow):
              u'Exec. Done', u'TSysFrac', u'BLFrac', u'TotalFrac',
              u'Array Score', u'Cond. Score', u'maxPWVC', u'ArrayMinAR',
              u'ARcorr', u'ArrayMaxAR', u'Int. Time', u'isPolarization',
-             u'PRJ UID', u'Grade'], dtype='object')
+             u'PRJ UID', u'Grade', u'Executive'], dtype='object')
 
         print(std12.head(10))
         std12n = std12.to_records(index=False)
@@ -606,6 +606,8 @@ class MyStdTableModel(QAbstractTableModel):
                 c = QVariant(QColor(235, 245, 255))
             else:
                 c = QVariant(QColor(250, 250, 250))
+            if sb[16] < 8.5:
+                c = QVariant(QColor(255, 255, 0))
             if sb[17] == 0:
                 c = QVariant(QColor(255, 110, 110))
             return c
@@ -696,8 +698,11 @@ class MyTcTableModel(QAbstractTableModel):
                 c = QVariant(QColor(235, 245, 255))
             else:
                 c = QVariant(QColor(250, 250, 250))
+            if sb[16] < 9:
+                c = QVariant(QColor(255, 255, 0))
             if sb[17] == 0:
                 c = QVariant(QColor(255, 110, 110))
+
             return c
         elif role == Qt.FontRole:
             if col in [0, 15, 17]:
@@ -776,6 +781,8 @@ class MyPolTableModel(QAbstractTableModel):
                 c = QVariant(QColor(235, 245, 255))
             else:
                 c = QVariant(QColor(250, 250, 250))
+            if sb[16] < 9:
+                c = QVariant(QColor(255, 255, 0))
             if sb[17] == 0:
                 c = QVariant(QColor(255, 110, 110))
             return c

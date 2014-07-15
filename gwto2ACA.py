@@ -409,7 +409,7 @@ class ACAMainWindow(QMainWindow, Ui_ACAMainWindow):
                      'RA', 'DEC', 'HA', 'elev', 'etime', 'execount', 'Total',
                      'tsysfrac', 'blfrac', 'frac', 'sb_array_score',
                      'sb_cond_score', 'maxPWVC', 'integrationTime',
-                     'PRJ_ARCHIVE_UID', 'grade']]
+                     'PRJ_ARCHIVE_UID', 'grade', 'EXEC']]
 
         if not self.band3_b.isChecked():
             std7 = std7.query('band != "ALMA_RB_03"')
@@ -429,7 +429,7 @@ class ACAMainWindow(QMainWindow, Ui_ACAMainWindow):
              u'RA', u'DEC', u'HA', u'Elev.', u'Sets in', u'Exec. Req.',
              u'Exec. Done', u'TSysFrac', u'BLFrac', u'TotalFrac',
              u'Array Score', u'Cond. Score', u'maxPWVC', u'TimeOnSource',
-             u'PRJ UID', u'Grade'], dtype='object')
+             u'PRJ UID', u'Grade', u'Executive'], dtype='object')
 
         print std7.head(10)
         std7n = std7.to_records(index=False)
@@ -515,6 +515,8 @@ class MyStdTableModel(QAbstractTableModel):
                 c = QVariant(QColor(235, 245, 255))
             else:
                 c = QVariant(QColor(250, 250, 250))
+            if sb[16] < 9:
+                c = QVariant(QColor(255, 255, 0))
             if sb[17] == 0:
                 c = QVariant(QColor(255, 110, 110))
             return c
