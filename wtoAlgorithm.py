@@ -239,16 +239,15 @@ class WtoAlgorithm(WtoDatabase):
                 sel4['blfrac'] = sel4.apply(
                     lambda row: (33. * 17) / (1. * len(
                         self.ruv[self.ruv < row['blmax']]))
-                    if (row['LAS'] != 0)
+                    if (row['isPointSource'] == False)
                     else (33. * 17) /
                          (self.num_ant * (self.num_ant - 1) / 2.),
                     axis=1)
             else:
-                # TODO: check 'isPointSource' instead of LAS
                 sel4['blfrac'] = sel4.apply(
                     lambda row: (33. * 17) / (1. * len(
                         self.ruv[self.ruv < row['blmax']]))
-                    if (row['LAS'] != 0)
+                    if (row['isPointSource'] == False)
                     else (33. * 17) /
                          (34. * (34. - 1) / 2.),
                     axis=1)
@@ -256,8 +255,9 @@ class WtoAlgorithm(WtoDatabase):
                     sel4['blfrac'] = sel4.blfrac * (
                         33 * 17 / (self.num_ant * (
                             self.num_ant - 1) / 2.))
-            sel4['blfrac'] = sel4.apply(
-                lambda row: self.ret_cycle(row[u'CODE'], row['blfrac']), axis=1
+
+            sel4.loc[:, 'blfrac'] = sel4.apply(
+                lambda row: ret_cycle(row[u'CODE'], row['blfrac']), axis=1
             )
             sel4['frac'] = sel4.tsysfrac * sel4.blfrac
             self.select12m = sel4
@@ -273,13 +273,6 @@ class WtoAlgorithm(WtoDatabase):
             self.select7m = sel4
         else:
             self.selecttp = sel4
-
-    def ret_cycle(self, code, blfrac):
-        if code[:4] == '2012':
-            print(code, blfrac, blfrac * (31. * 16.) / (33. * 17))
-            return blfrac * (31. * 16.) / (33. * 17)
-        else:
-            return blfrac * 1.
 
     def scorer(self, array):
 
@@ -415,9 +408,11 @@ class WtoAlgorithm(WtoDatabase):
             if 0.9 * arcorr <= self.array_ar <= 1.1 * arcorr:
                 sb_array_score = 10
 
-            elif self.array_ar < 0.9 * arcorr:
-                l = 0.9 * arcorr - aminar
-                sb_array_score = ((self.array_ar - aminar) / l) * 10.
+            elif 0.9 * arcorr > self.array_ar >= 0.7 * arcorr:
+                sb_array_score = 9.0
+            elif self.array_ar < 0.7 * arcorr:
+                l = 0.7 * arcorr - aminar
+                sb_array_score = ((self.array_ar - aminar) / l) * 8.5
             elif self.array_ar > 1.1 * arcorr:
                 l = arcorr * 1.1 - amaxar
                 s = 10. / l
@@ -860,3 +855,10 @@ def read_ephemeris(ephemeris, date):
                 ephe = True
                 print(ra, dec, ephe)
                 return pd.np.degrees(ra), pd.np.degrees(dec), ephe
+
+
+def ret_cycle(code, blfrac):
+    if code[:4] == '2012':
+        return blfrac * (31. * 16.) / (33. * 17)
+    else:
+        return blfrac * 1.

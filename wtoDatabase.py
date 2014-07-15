@@ -563,16 +563,17 @@ class WtoDatabase(object):
                     isspectralscan = False
                 useaca = sciencegoal.PerformanceParameters.useACA.pyval
                 usetp = sciencegoal.PerformanceParameters.useTP.pyval
+                ps = sciencegoal.PerformanceParameters.isPointSource.pyval
 
                 if new:
                     self.sciencegoals = pd.DataFrame(
                         [(code, partid, ar, las, bands, isspectralscan,
-                          istimeconst, useaca, usetp, assoc_sbs[partid],
+                          istimeconst, useaca, usetp, ps, assoc_sbs[partid],
                           starttime, endtime, allowedmarg,
                           allowedmarg_unit, repeats, note, isavoid)],
                         columns=['CODE', 'partId', 'AR', 'LAS', 'bands',
                                  'isSpectralScan', 'isTimeConstrained',
-                                 'useACA', 'useTP', 'SBS', 'startTime',
+                                 'useACA', 'useTP', 'ps', 'SBS', 'startTime',
                                  'endTime', 'allowedMargin', 'allowedUnits',
                                  'repeats', 'note', 'isavoid'],
                         index=[partid])
@@ -580,7 +581,7 @@ class WtoDatabase(object):
                 else:
                     self.sciencegoals.ix[partid] = (
                         code, partid, ar, las, bands, isspectralscan,
-                        istimeconst, useaca, usetp, assoc_sbs[partid],
+                        istimeconst, useaca, usetp, ps, assoc_sbs[partid],
                         starttime, endtime, allowedmarg,
                         allowedmarg_unit, repeats, note, isavoid)
 
@@ -959,7 +960,8 @@ class WtoDatabase(object):
             df2, self.sciencegoals[
                 ['CODE', 'isSpectralScan', 'isTimeConstrained', 'startTime',
                  'endTime', 'allowedMargin', 'allowedUnits', 'repeats',
-                 'isavoid', 'AR', 'LAS']], left_on='partId', right_index=True)
+                 'isavoid', 'AR', 'LAS', 'ps']], left_on='partId',
+            right_index=True)
 
         qa0group = self.qa0.groupby(['SCHEDBLOCKUID', 'QA0STATUS'])
         qa0count = qa0group.QA0STATUS.count().unstack()
@@ -989,8 +991,8 @@ class WtoDatabase(object):
              u'SB_state', u'minAR', u'maxAR', u'arrayMinAR', u'arrayMaxAR',
              u'CODE', u'isSpectralScan', u'isTimeConstrained', u'startTime',
              u'endTime', u'allowedMargin', u'allowedUnits', u'repeats',
-             u'isavoid', u'AR', u'LAS', u'Pass', u'Unset', u'Total',
-             u'PRJ_ARCHIVE_UID', u'EXEC', u'PRJ_state', u'grade',
+             u'isavoid', u'AR', u'LAS', u'isPointSource', u'Pass', u'Unset',
+             u'Total', u'PRJ_ARCHIVE_UID', u'EXEC', u'PRJ_state', u'grade',
              u'scienceRank'], dtype='object')
         self.sb_summary.repfreq = pd.np.around(
             self.sb_summary.repfreq, decimals=1)

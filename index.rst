@@ -233,7 +233,7 @@ Standard (ACA) Tab in BL (ACA) GUI
    sources.
 #. **PRJ UID:** The SB's project UID.
 #. **Grade:** Grade letter for the SB's project.
-#. **Exceutive:** SB's project executive.
+#. **Executive:** SB's project executive.
 
 ******************************
 Selection and Score algorithms
