@@ -3,7 +3,7 @@
   <component name="SqlDialectMappings">
     <file url="file://$PROJECT_DIR$/wtoAlgorithm.py" dialect="Oracle" />
     <file url="file://$PROJECT_DIR$/wtoDatabase.py" dialect="Oracle" />
-    <file url="file://$PROJECT_DIR$/wtoPlanning.py" dialect="Oracle" />
+    <file url="file://$PROJECT_DIR$/wtoProposals.py" dialect="Oracle" />
   </component>
 </project>
 

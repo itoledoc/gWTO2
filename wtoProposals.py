@@ -17,7 +17,6 @@ prj = '{Alma/ObsPrep/ObsProject}'
 val = '{Alma/ValueTypes}'
 sbl = '{Alma/ObsPrep/SchedBlock}'
 
-
 pd.options.display.width = 200
 pd.options.display.max_columns = 55
 
@@ -36,7 +35,7 @@ c = 2.99792458e10
 c_mks = 2.99792458e8
 
 
-class WtoPlanning(object):
+class WtoProposals(object):
 
     def __init__(self, path='/.wto_plan/', forcenew=False):
 
@@ -64,9 +63,9 @@ class WtoPlanning(object):
                    'newar_table', 'fieldsource_table', 'target_table',
                    'spectralconf_table'])
 
-        self.states = ["Approved", "Phase1Submitted", "Broken",
+        self.states = ["Approved", "Phase1Submitted",
                        "Canceled", "Rejected"]
-        self.states2 = ["Broken", "Canceled", "Rejected"]
+        self.states2 = ["Canceled", "Rejected"]
         # Global SQL search expressions
 
         self.sql1 = str(
@@ -97,15 +96,15 @@ class WtoPlanning(object):
             "WHERE sb.SCHEDBLOCKID = ou.OBSUNITID AND sb.CSV = 0")
 
         # Global Oracle Connection
-        self.connection = cx_Oracle.connect(conx_string)
+        self.connection = cx_Oracle.connect(conx_string_sco)
         self.cursor = self.connection.cursor()
 
         # Populate different dataframes related to projects and SBs statuses
-        self.cursor.execute(self.sqlsched_proj)
-        self.scheduling_proj = pd.DataFrame(
-            self.cursor.fetchall(),
-            columns=[rec[0] for rec in self.cursor.description]
-        ).set_index('CODE', drop=False)
+        #  self.cursor.execute(self.sqlsched_proj)
+        #  self.scheduling_proj = pd.DataFrame(
+        #     self.cursor.fetchall(),
+        #     columns=[rec[0] for rec in self.cursor.description]
+        #  ).set_index('CODE', drop=False)
 
         self.cursor.execute(self.sqlstates)
         self.sbstates = pd.DataFrame(
@@ -113,25 +112,25 @@ class WtoPlanning(object):
             columns=[rec[0] for rec in self.cursor.description]
         ).set_index('DOMAIN_ENTITY_ID')
 
-        self.cursor.execute(self.sqlqa0)
-        self.qa0 = pd.DataFrame(
-            self.cursor.fetchall(),
-            columns=[rec[0] for rec in self.cursor.description]
-        ).set_index('SCHEDBLOCKUID', drop=False)
-
-        self.cursor.execute(self.sqlsched_sb)
-        self.scheduling_sb = pd.DataFrame(
-            self.cursor.fetchall(),
-            columns=[rec[0] for rec in self.cursor.description]
-        ).set_index('OBSUNIT_UID', drop=False)
+        # self.cursor.execute(self.sqlqa0)
+        # self.qa0 = pd.DataFrame(
+        #     self.cursor.fetchall(),
+        #     columns=[rec[0] for rec in self.cursor.description]
+        # ).set_index('SCHEDBLOCKUID', drop=False)
+        #
+        # self.cursor.execute(self.sqlsched_sb)
+        # self.scheduling_sb = pd.DataFrame(
+        #     self.cursor.fetchall(),
+        #     columns=[rec[0] for rec in self.cursor.description]
+        # ).set_index('OBSUNIT_UID', drop=False)
 
         # Initialize with saved data and update, Default behavior.
         if not self.new:
             try:
                 self.obsproject = pd.read_pickle(
                     self.path + self.preferences.obsproject_table)
-                self.sciencegoals = pd.read_pickle(
-                    self.path + self.preferences.sciencegoals_table)
+                # self.sciencegoals = pd.read_pickle(
+                #     self.path + self.preferences.sciencegoals_table)
                 self.filter_c1()
             except IOError, e:
                 print e
@@ -395,10 +394,9 @@ class WtoPlanning(object):
                 usetp = sciencegoal.PerformanceParameters.useTP.pyval
                 ps = sciencegoal.PerformanceParameters.isPointSource.pyval
                 specset = sciencegoal.SpectralSetupParameters
-                polar = sciencegoal.SpectralSetupParameters.attrib[
-                    'polarisation']
+                polar = specset.attrib['polarisation']
                 repfreq = specset.representativeFrequency.pyval
-                target = specset.TargetParameters
+                target = sciencegoal.TargetParameters
                 try:
                     ssystem = target.attrib['solarSystemObject']
                 except KeyError:
@@ -407,7 +405,10 @@ class WtoPlanning(object):
                 coord = target.sourceCoordinates
                 RA = coord.findall(val + 'longitude')[0].pyval
                 DEC = coord.findall(val + 'latitude')[0].pyval
-                mosaic = target.isMosaic.pyval
+                try:
+                    mosaic = target.isMosaic.pyval
+                except AttributeError:
+                    mosaic = None
                 arcorr = ar * corr_res(DEC, repfreq)
                 lascorr = las * corr_res(DEC, repfreq)
 
@@ -426,10 +427,10 @@ class WtoPlanning(object):
                                  'repeats', 'note', 'isavoid', 'polarization',
                                  'RA', 'DEC', 'repFreq', 'solarSystem', 'mosaic',
                                  'obs_type', 'AR_100', 'LAS_100'],
-                        index=[partid])
+                        index=[str(partid)])
                     new = False
                 else:
-                    self.sciencegoals.ix[partid] = (
+                    self.sciencegoals.ix[str(partid)] = (
                         code, partid, ar, las, bands, isspectralscan,
                         istimeconst, useaca, usetp, ps, asbs,
                         starttime, endtime, allowedmarg,

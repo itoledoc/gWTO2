@@ -37,8 +37,8 @@
     <AntennaOnPad antenna="DV22" pad="A011" start="2012-10-13T07:48:02.115-04:00">
         <MetrologyCoefficients AN0="-13.04" AW0="-13.19" version="1"/>
     </AntennaOnPad>
-    <AntennaOnPad antenna="DV12" pad="A010" start="2013-12-08T13:22:02.539-03:00">
-        <MetrologyCoefficients AN0="2.3625" AW0="8.1125" version="1"/>
+    <AntennaOnPad antenna="DV12" pad="A094" start="2014-07-15T10:20:45.937-04:00">
+        <MetrologyCoefficients AN0="11.5" AW0="-16.4" version="1"/>
     </AntennaOnPad>
     <AntennaOnPad antenna="DA58" pad="A001" start="2014-06-12T08:56:08.121-04:00">
         <MetrologyCoefficients AN0="0.0" AW0="0.0" version="0"/>

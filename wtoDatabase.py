@@ -1,6 +1,6 @@
 """
 wtoDatabase.py: the gWTO database library.
-------------------------------------------
+==========================================
 This library contains the classes and functions required to query, parse and
 organize the Projects and SchedBlock information stored at the OSF archive in
 different tables.

@@ -1,6 +1,6 @@
 """
 wtoAlgorithm.py: the gWTO selector and scorer library.
-------------------------------------------------------
+======================================================
 This library contains the classes and functions required to select and rank
 SBs from the information that is stored in a WtoDatabse object.
 """
