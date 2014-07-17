@@ -130,6 +130,8 @@ class WtoPlanning(object):
             try:
                 self.obsproject = pd.read_pickle(
                     self.path + self.preferences.obsproject_table)
+                self.sciencegoals = pd.read_pickle(
+                    self.path + self.preferences.sciencegoals_table)
                 self.filter_c1()
             except IOError, e:
                 print e
@@ -223,7 +225,7 @@ class WtoPlanning(object):
         df2 = df1[
             ((df1.CODE.str.startswith('2013')) &
              (~df1.DOMAIN_ENTITY_STATE.isin(states2)) &
-             (df1.PRJ_LETTER_GRADE.isin(['A', 'B']))) |
+             (df1.PRJ_LETTER_GRADE.isin(['A', 'B', 'C']))) |
             ((df1.CODE.str.startswith('2012')) &
              (~df1.DOMAIN_ENTITY_STATE.isin(states)) &
              (df1.PRJ_LETTER_GRADE.isin(['A', 'B'])))]
@@ -406,7 +408,8 @@ class WtoPlanning(object):
                 RA = coord.findall(val + 'longitude')[0].pyval
                 DEC = coord.findall(val + 'latitude')[0].pyval
                 mosaic = target.isMosaic.pyval
-
+                arcorr = ar * corr_res(DEC, repfreq)
+                lascorr = las * corr_res(DEC, repfreq)
 
                 if new:
                     self.sciencegoals = pd.DataFrame(
@@ -414,14 +417,15 @@ class WtoPlanning(object):
                           istimeconst, useaca, usetp, ps, asbs,
                           starttime, endtime, allowedmarg,
                           allowedmarg_unit, repeats, note, isavoid, polar,
-                          RA, DEC, repfreq, ssystem, mosaic, typet)],
+                          RA, DEC, repfreq, ssystem, mosaic, typet, arcorr,
+                          lascorr)],
                         columns=['CODE', 'partId', 'AR', 'LAS', 'bands',
                                  'isSpectralScan', 'isTimeConstrained',
                                  'useACA', 'useTP', 'ps', 'SBS', 'startTime',
                                  'endTime', 'allowedMargin', 'allowedUnits',
                                  'repeats', 'note', 'isavoid', 'polarization',
                                  'RA', 'DEC', 'repFreq', 'solarSystem', 'mosaic',
-                                 'obs_type'],
+                                 'obs_type', 'AR_100', 'LAS_100'],
                         index=[partid])
                     new = False
                 else:
@@ -430,7 +434,8 @@ class WtoPlanning(object):
                         istimeconst, useaca, usetp, ps, asbs,
                         starttime, endtime, allowedmarg,
                         allowedmarg_unit, repeats, note, isavoid, polar,
-                        RA, DEC, repfreq, ssystem, mosaic, typet)
+                        RA, DEC, repfreq, ssystem, mosaic, typet, arcorr,
+                        lascorr)
 
         except AttributeError, e:
             print "Project %s has no ObsUnitSets (%s)" % (code, e)
@@ -530,6 +535,7 @@ class ObsProject(object):
     def import_sched_blocks(self):
         pass
 
+
 def convert_sec(angle, unit):
     """
 
@@ -553,3 +559,10 @@ def convert_sec(angle, unit):
     else:
         return None
     return value
+
+
+def corr_res(dec, repfreq):
+    c_bmax = 0.862 / pd.np.cos(pd.np.radians(-23.0262015) -
+                               pd.np.radians(dec)) + 0.138
+    c_freq = repfreq / 100.
+    return c_freq / c_bmax
