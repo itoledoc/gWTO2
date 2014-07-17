@@ -58,6 +58,7 @@ class BLMainWindow(QMainWindow, Ui_BLMainWindow):
         self.datas.set_maxha(self.maxha_spin.value())
         self.datas.horizon = self.horizon_spin.value()
         self.datas.date = self.date_datetime.dateTime().toPyDateTime()
+        self.changed_date = True
         self.datas.num_ant = self.antennas_spin.value()
         self.datas.set_bl_prop(array_name=None)
         self.array_ar_spin.setValue(self.datas.array_ar)
@@ -88,6 +89,7 @@ class BLMainWindow(QMainWindow, Ui_BLMainWindow):
         lst_time = Wto.datetime.strptime(str(lst), '%H:%M:%S.%f').time()
         self.lst_spin.setTime(QTime(
             lst_time.hour, lst_time.minute, lst_time.second))
+        self.changed_date = True
     
     @pyqtSignature("int")
     def on_horizon_spin_valueChanged(self, p0):
@@ -327,6 +329,7 @@ class BLMainWindow(QMainWindow, Ui_BLMainWindow):
         Slot documentation goes here.
         """
         date = Wto.datetime.utcnow()
+        self.changed_date = True
         self.date_datetime.setDateTime(
             QDateTime(
                 QDate(date.date().year, date.date().month, date.date().day),
@@ -384,8 +387,9 @@ class BLMainWindow(QMainWindow, Ui_BLMainWindow):
         progress.show()
         progress.setAutoClose(True)
         QCoreApplication.processEvents()
-
-        self.datas.update()
+        if self.changed_date:
+            self.datas.update()
+            self.changed_date = False
         QCoreApplication.processEvents()
         print(
             self.datas.date, self.datas.pwv, self.datas.minha, self.datas.maxha,
