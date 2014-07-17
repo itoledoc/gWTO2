@@ -13,13 +13,14 @@
     <inspection_tool class="PyUnresolvedReferencesInspection" enabled="true" level="WARNING" enabled_by_default="true">
       <option name="ignoredIdentifiers">
         <value>
-          <list size="6">
+          <list size="7">
             <item index="0" class="java.lang.String" itemvalue="cx_Oracle.connect" />
             <item index="1" class="java.lang.String" itemvalue="wtoDatabase.ObsProject.*" />
             <item index="2" class="java.lang.String" itemvalue="numpy.radians" />
             <item index="3" class="java.lang.String" itemvalue="numpy.degrees" />
             <item index="4" class="java.lang.String" itemvalue="float.loc" />
             <item index="5" class="java.lang.String" itemvalue="numpy.deg2rad" />
+            <item index="6" class="java.lang.String" itemvalue="cx_Oracle" />
           </list>
         </value>
       </option>

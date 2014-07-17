@@ -130,20 +130,6 @@ class WtoPlanning(object):
             try:
                 self.obsproject = pd.read_pickle(
                     self.path + self.preferences.obsproject_table)
-                self.sciencegoals = pd.read_pickle(
-                    self.path + self.preferences.sciencegoals_table)
-                self.schedblocks = pd.read_pickle(
-                    self.path + self.preferences.sbxml_table)
-                self.schedblock_info = pd.read_pickle(
-                    self.path + self.preferences.sbinfo_table)
-                self.newar = pd.read_pickle(
-                    self.path + self.preferences.newar_table)
-                self.fieldsource = pd.read_pickle(
-                    self.path + self.preferences.fieldsource_table)
-                self.target = pd.read_pickle(
-                    self.path + self.preferences.target_table)
-                self.spectralconf = pd.read_pickle(
-                    self.path + self.preferences.spectralconf_table)
                 self.filter_c1()
             except IOError, e:
                 print e
@@ -335,7 +321,7 @@ class WtoPlanning(object):
         :return:
         """
         proj = self.obsproject[self.obsproject.CODE == code].ix[0]
-        obsproj = ObsProject(proj.obsproj, self.obsxml)
+        obsproj = ObsProject(proj.obsproj, code, self.obsxml)
         p2 = proj.p2
         assoc_sbs = obsproj.assoc_sched_blocks()
         try:
@@ -406,15 +392,21 @@ class WtoPlanning(object):
                 useaca = sciencegoal.PerformanceParameters.useACA.pyval
                 usetp = sciencegoal.PerformanceParameters.useTP.pyval
                 ps = sciencegoal.PerformanceParameters.isPointSource.pyval
+                specset = sciencegoal.SpectralSetupParameters
                 polar = sciencegoal.SpectralSetupParameters.attrib[
                     'polarisation']
-                target = sciencegoal.TargetParameters
-                ssystem = target.attrib['solarSystemObject']
-                type = target.attrib['type']
+                repfreq = specset.representativeFrequency.pyval
+                target = specset.TargetParameters
+                try:
+                    ssystem = target.attrib['solarSystemObject']
+                except KeyError:
+                    ssystem = None
+                typet = target.attrib['type']
                 coord = target.sourceCoordinates
                 RA = coord.findall(val + 'longitude')[0].pyval
                 DEC = coord.findall(val + 'latitude')[0].pyval
                 mosaic = target.isMosaic.pyval
+
 
                 if new:
                     self.sciencegoals = pd.DataFrame(
@@ -422,12 +414,14 @@ class WtoPlanning(object):
                           istimeconst, useaca, usetp, ps, asbs,
                           starttime, endtime, allowedmarg,
                           allowedmarg_unit, repeats, note, isavoid, polar,
-                          RA, DEC, repFreq, ssystem, mosaic, )],
+                          RA, DEC, repfreq, ssystem, mosaic, typet)],
                         columns=['CODE', 'partId', 'AR', 'LAS', 'bands',
                                  'isSpectralScan', 'isTimeConstrained',
                                  'useACA', 'useTP', 'ps', 'SBS', 'startTime',
                                  'endTime', 'allowedMargin', 'allowedUnits',
-                                 'repeats', 'note', 'isavoid'],
+                                 'repeats', 'note', 'isavoid', 'polarization',
+                                 'RA', 'DEC', 'repFreq', 'solarSystem', 'mosaic',
+                                 'obs_type'],
                         index=[partid])
                     new = False
                 else:
@@ -435,7 +429,8 @@ class WtoPlanning(object):
                         code, partid, ar, las, bands, isspectralscan,
                         istimeconst, useaca, usetp, ps, asbs,
                         starttime, endtime, allowedmarg,
-                        allowedmarg_unit, repeats, note, isavoid)
+                        allowedmarg_unit, repeats, note, isavoid, polar,
+                        RA, DEC, repfreq, ssystem, mosaic, typet)
 
         except AttributeError, e:
             print "Project %s has no ObsUnitSets (%s)" % (code, e)
@@ -473,7 +468,7 @@ class ObsProject(object):
     :param path:
     """
 
-    def __init__(self, xml_file, path='./'):
+    def __init__(self, xml_file, code, path='./'):
         """
 
         :param xml_file:
@@ -483,11 +478,12 @@ class ObsProject(object):
         tree = objectify.parse(io_file)
         io_file.close()
         data = tree.getroot()
+        self.code1 = code
         self.data = data
         try:
             self.status = data.attrib['status']
         except KeyError:
-            self.status = "NA"
+            self.status = None
         for key in data.__dict__:
             self.__setattr__(key, data.__dict__[key])
 
@@ -524,11 +520,11 @@ class ObsProject(object):
                                 continue
                     except AttributeError:
                         print('Project %s has no member OUS in at least one '
-                              'SG_OUS' % self.code)
+                              'SG_OUS' % self.code1)
                         continue
                 result[sgid] = sched_uid
         except AttributeError:
-            print "Project %s has no Science Goal OUS" % self.code
+            print "Project %s has no Science Goal OUS" % self.code1
         return result
 
     def import_sched_blocks(self):
