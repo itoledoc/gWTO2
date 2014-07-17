@@ -261,7 +261,7 @@ class WtoAlgorithm(WtoDatabase):
             )
             sel4['frac'] = sel4.tsysfrac * sel4.blfrac
             self.select12m = sel4.query('frac < 2.1')
-            print("SBs with 'frac' < 2.1: %d", len(self.select12m))
+            print("SBs with 'frac' < 2.1: %d" % len(self.select12m))
 
         elif array == '7m':
             sel4['blfrac'] = sel4.RA * 0. + 1.
@@ -272,10 +272,10 @@ class WtoAlgorithm(WtoDatabase):
                         self.num_ant - 1) / 2.))
             sel4['frac'] = sel4.tsysfrac * sel4.blfrac
             self.select7m = sel4.query('frac < 2.1')
-            print("SBs with 'frac' < 2.1: %d", len(self.select7m))
+            print("SBs with 'frac' < 2.1: %d" % len(self.select7m))
         else:
             self.selecttp = sel4.query('frac < 2.1')
-            print("SBs with 'frac' < 2.1: %d", len(self.selecttp))
+            print("SBs with 'frac' < 2.1: %d" % len(self.selecttp))
 
     def scorer(self, array):
 
