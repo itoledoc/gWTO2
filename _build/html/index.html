@@ -259,8 +259,9 @@ sources.</li>
 </div>
 <div class="section" id="selection-and-score-algorithms">
 <h2>Selection and Score algorithms<a class="headerlink" href="#selection-and-score-algorithms" title="Permalink to this headline">¶</a></h2>
-<div class="section" id="selection-and-data-preparation-wtoalgorithm-wtoalgorithm-selector">
-<span id="selection"></span><h3>Selection and Data preparation (<a class="reference internal" href="#wtoAlgorithm.WtoAlgorithm.selector" title="wtoAlgorithm.WtoAlgorithm.selector"><tt class="xref py py-func docutils literal"><span class="pre">wtoAlgorithm.WtoAlgorithm.selector()</span></tt></a>)<a class="headerlink" href="#selection-and-data-preparation-wtoalgorithm-wtoalgorithm-selector" title="Permalink to this headline">¶</a></h3>
+<div class="section" id="selection-and-data-preparation">
+<span id="selection"></span><h3>Selection and Data preparation<a class="headerlink" href="#selection-and-data-preparation" title="Permalink to this headline">¶</a></h3>
+<p>(<a class="reference internal" href="#wtoAlgorithm.WtoAlgorithm.selector" title="wtoAlgorithm.WtoAlgorithm.selector"><tt class="xref py py-func docutils literal"><span class="pre">wtoAlgorithm.WtoAlgorithm.selector()</span></tt></a>)</p>
 <ol class="arabic">
 <li><p class="first"><strong>Calculate observability using the pyephem libraries.</strong></p>
 <p>For all the science field sources of an SB and fixed calibration sources,
@@ -441,12 +442,24 @@ configuration as set in <em class="guilabel">Array AR:</em>:</p>
 </ul>
 </li>
 <li><p class="first"><strong>Calculate tsysfrac, blfrac and frac columns</strong></p>
+<p>Three new variables are calculated for each SB, that will help to do a final
+selection and assign scores. <tt class="xref std std-keyword docutils literal"><span class="pre">tsysfrac</span></tt> is the multiplicative factor
+the science target integration time should be corrected by, so given the
+current weather conditions (<img class="math" src="_images/math/739c004ce0a5b9e2a0ac6a5a1140c8aceeeef917.png" alt="\rm{T}_{\rm{sys}}"/>, <img class="math" src="_images/math/d9e99c35d3632bb156b7aca0e93cd78a148a10e8.png" alt="\tau"/>)
+the execution would achieve the requested sensitivity:</p>
 <div class="math">
-<p><img src="_images/math/60123999a4b294d894cf0a2e5d5c5c5bbb4626b7.png" alt="\rm{tsysfrac} = \left(\frac{\rm{Tsys}}{\rm{Tsys\_org}}\right)^{2}
-
-\rm{blfrac} = \frac{offered\_baselines}{\rm{available\_baselines}}
-
-\rm{frac} = \rm{tsysfrac} \times \rm{blfrac}"/></p>
+<p><img src="_images/math/b81536a7296a2edfe7cee338b7e9d22f2703ae81.png" alt="\rm{tsysfrac} = \left(\frac{\rm{Tsys}}{\rm{Tsys\_org}}\right)^{2}"/></p>
+</div><p><tt class="xref std std-keyword docutils literal"><span class="pre">blfrac</span></tt> is the multiplicative factor the science target integration
+time should be corrected by to account for differences between current array&#8217;s
+characteristics (<img class="math" src="_images/math/1e1f404893fdb03a04e1566ca66cd110b9f14334.png" alt="AR"/>, <img class="math" src="_images/math/855aa451e9dd98ba35bb0d6ddde23bacd1986855.png" alt="\rm{Number_of_Baselines}"/>) and requested
+array:</p>
+<div class="math">
+<p><img src="_images/math/90b38c5afa57badc0fe67378e42907c1ef1d01d1.png" alt="\rm{blfrac} = \frac{offered\_baselines}{\rm{available\_baselines}}"/></p>
+</div><p>The offered_baselines will depend on Cycle (32 for cycle 1, 34 for cycle 2).</p>
+<p>Finally, <tt class="xref std std-keyword docutils literal"><span class="pre">frac</span></tt> is the total multiplicative factor accounting for
+both previous factors:</p>
+<div class="math">
+<p><img src="_images/math/fdf905418dab0ce6f914f82c063a025e0dd05bb3.png" alt="\rm{frac} = \rm{tsysfrac} \times\rm{blfrac}"/></p>
 </div></li>
 </ol>
 </div>
@@ -456,20 +469,10 @@ configuration as set in <em class="guilabel">Array AR:</em>:</p>
 <div class="section" id="checking-observability">
 <span id="check-obs"></span><h3>Checking observability<a class="headerlink" href="#checking-observability" title="Permalink to this headline">¶</a></h3>
 </div>
-<div class="section" id="tsys-time-fraction-calculation">
-<span id="tsys-calc"></span><h3>TSys time fraction calculation<a class="headerlink" href="#tsys-time-fraction-calculation" title="Permalink to this headline">¶</a></h3>
-<p>The TSys time fraction comes from equation:</p>
-<div class="math">
-<p><img src="_images/math/9a61d10685328c93c516e3f27d34a2d248b3385b.png" alt="\frac{T_{sys_{wto}}}{T_{sys_{PI}}}^2"/></p>
-</div><p>Where <img class="math" src="_images/math/bf0ea3db0ec51d387c8d4c1abcea8f09662da8bc.png" alt="T_{sys_{wto}}"/> is the system temperature calculated with the
-current PWV at the representative frequency of the SB corrected by airmass at
-transit, and <img class="math" src="_images/math/87116e2e4299705c7233ebd30b56f96fb1a54e36.png" alt="T_{sys_{PI}}"/> is the system temperature calculated using the
-PWV set by the PI/P2G to calculate the integration time in the OT, also at the
-representative frequency and at transit.</p>
-</div>
 </div>
 <div class="section" id="playing-with-the-libraries">
-<h2>Playing with the libraries:<a class="headerlink" href="#playing-with-the-libraries" title="Permalink to this headline">¶</a></h2>
+<h2>Playing with the libraries<a class="headerlink" href="#playing-with-the-libraries" title="Permalink to this headline">¶</a></h2>
+<p>Load the environment and start ipython:</p>
 <div class="highlight-python"><div class="highlight"><pre>. activateC2Test
 ipython
 </pre></div>
@@ -1600,8 +1603,8 @@ WHERE regexp_like (CODE, &#39;^201[23].*\.[AST]&#39;)
 </tbody>
 </table>
 </div>
-<div class="section" id="wtodatabase-sb-summary-view">
-<h4>wtoDatabase.sb_summary (<em>&#8220;view&#8221;</em>)<a class="headerlink" href="#wtodatabase-sb-summary-view" title="Permalink to this headline">¶</a></h4>
+<div class="section" id="wtodatabase-sb-summary">
+<h4>wtoDatabase.sb_summary<a class="headerlink" href="#wtodatabase-sb-summary" title="Permalink to this headline">¶</a></h4>
 <table border="1" class="docutils">
 <colgroup>
 <col width="69%" />
@@ -1908,13 +1911,12 @@ WHERE sb.SCHEDBLOCKID = ou.OBSUNITID AND sb.CSV = 0
 </ul>
 </li>
 <li><a class="reference internal" href="#selection-and-score-algorithms">Selection and Score algorithms</a><ul>
-<li><a class="reference internal" href="#selection-and-data-preparation-wtoalgorithm-wtoalgorithm-selector">Selection and Data preparation (<tt class="docutils literal"><span class="pre">wtoAlgorithm.WtoAlgorithm.selector()</span></tt>)</a></li>
+<li><a class="reference internal" href="#selection-and-data-preparation">Selection and Data preparation</a></li>
 <li><a class="reference internal" href="#score-and-ranking">Score and ranking</a></li>
 <li><a class="reference internal" href="#checking-observability">Checking observability</a></li>
-<li><a class="reference internal" href="#tsys-time-fraction-calculation">TSys time fraction calculation</a></li>
 </ul>
 </li>
-<li><a class="reference internal" href="#playing-with-the-libraries">Playing with the libraries:</a></li>
+<li><a class="reference internal" href="#playing-with-the-libraries">Playing with the libraries</a></li>
 <li><a class="reference internal" href="#module-wtoDatabase">The WTO API</a><ul>
 <li><a class="reference internal" href="#wtodatabase-py-the-gwto-database-library">wtoDatabase.py: the gWTO database library.</a></li>
 <li><a class="reference internal" href="#wtoalgorithm-py-the-gwto-selector-and-scorer-library">wtoAlgorithm.py: the gWTO selector and scorer library.</a></li>
@@ -1929,7 +1931,7 @@ WHERE sb.SCHEDBLOCKID = ou.OBSUNITID AND sb.CSV = 0
 <li><a class="reference internal" href="#wtodatabase-target">wtoDatabase.target</a></li>
 <li><a class="reference internal" href="#wtodatabase-fieldsource">wtoDatabase.fieldsource</a></li>
 <li><a class="reference internal" href="#wtodatabase-spectralconf">wtoDatabase.spectralconf</a></li>
-<li><a class="reference internal" href="#wtodatabase-sb-summary-view">wtoDatabase.sb_summary (<em>&#8220;view&#8221;</em>)</a></li>
+<li><a class="reference internal" href="#wtodatabase-sb-summary">wtoDatabase.sb_summary</a></li>
 <li><a class="reference internal" href="#wtodatabase-qa0">wtoDatabase.qa0</a></li>
 <li><a class="reference internal" href="#wtodatabase-scheduling-proj">wtoDatabase.scheduling_proj</a></li>
 <li><a class="reference internal" href="#wtodatabase-scheduling-sb">wtoDatabase.scheduling_sb</a></li>

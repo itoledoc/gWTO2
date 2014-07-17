@@ -241,8 +241,10 @@ Selection and Score algorithms
 
 .. _selection:
 
-Selection and Data preparation (:py:func:`wtoAlgorithm.WtoAlgorithm.selector`)
-==============================================================================
+Selection and Data preparation
+==============================
+
+(:py:func:`wtoAlgorithm.WtoAlgorithm.selector`)
 
 #. **Calculate observability using the pyephem libraries.**
 
@@ -436,13 +438,32 @@ Selection and Data preparation (:py:func:`wtoAlgorithm.WtoAlgorithm.selector`)
 
 #. **Calculate tsysfrac, blfrac and frac columns**
 
+   Three new variables are calculated for each SB, that will help to do a final
+   selection and assign scores. :keyword:`tsysfrac` is the multiplicative factor
+   the science target integration time should be corrected by, so given the
+   current weather conditions (:math:`\rm{T}_{\rm{sys}}`, :math:`\tau`)
+   the execution would achieve the requested sensitivity:
+
    .. math::
 
       \rm{tsysfrac} = \left(\frac{\rm{Tsys}}{\rm{Tsys\_org}}\right)^{2}
 
+   :keyword:`blfrac` is the multiplicative factor the science target integration
+   time should be corrected by to account for differences between current array's
+   characteristics (:math:`AR`, :math:`\rm{Number_of_Baselines}`) and requested
+   array:
+
+   .. math::
+
       \rm{blfrac} = \frac{offered\_baselines}{\rm{available\_baselines}}
 
-      \rm{frac} = \rm{tsysfrac} \times \rm{blfrac}
+   The offered_baselines will depend on Cycle (32 for cycle 1, 34 for cycle 2).
+
+   Finally, :keyword:`frac` is the total multiplicative factor accounting for
+   both previous factors:
+
+   .. math::
+      \rm{frac} = \rm{tsysfrac} \times\rm{blfrac}
 
 .. _score:
 
@@ -454,27 +475,13 @@ Score and ranking
 Checking observability
 ======================
 
-.. _tsys-calc:
 
-TSys time fraction calculation
-==============================
 
-The TSys time fraction comes from equation:
+**************************
+Playing with the libraries
+**************************
 
-.. math::
-   \frac{T_{sys_{wto}}}{T_{sys_{PI}}}^2
-
-Where :math:`T_{sys_{wto}}` is the system temperature calculated with the
-current PWV at the representative frequency of the SB corrected by airmass at
-transit, and :math:`T_{sys_{PI}}` is the system temperature calculated using the
-PWV set by the PI/P2G to calculate the integration time in the OT, also at the
-representative frequency and at transit.
-
-***************************
-Playing with the libraries:
-***************************
-
-::
+Load the environment and start ipython::
 
     . activateC2Test
     ipython
@@ -708,8 +715,8 @@ BaseBands            float64
 SPWs                 float64
 ==================   ================================================
 
-wtoDatabase.sb_summary (*"view"*)
----------------------------------
+wtoDatabase.sb_summary
+----------------------
 ===========================   ============
 COLUMN                        VALUE
 ===========================   ============
