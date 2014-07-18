@@ -417,7 +417,7 @@ class WtoDatabase(object):
         i = ori != new
         if len(new[i.values]) > 0:
             print("Detected PRJ state changes: ")
-            print(new)
+            print(new[i.values])
         self.create_summary()
 
     def populate_sciencegoals_sbxml(self):
