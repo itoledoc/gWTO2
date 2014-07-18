@@ -6,7 +6,7 @@
   <head>
     <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
     
-    <title>The gWTO2 (gui for What To Observe Cycle 2) Documentation &mdash; gWTO 2.0RC documentation</title>
+    <title>The gWTO2 (gui for What To Observe Cycle 2) Documentation &mdash; gWTO2 2.0RC documentation</title>
     
     <link rel="stylesheet" href="_static/default.css" type="text/css" />
     <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
@@ -23,7 +23,7 @@
     <script type="text/javascript" src="_static/jquery.js"></script>
     <script type="text/javascript" src="_static/underscore.js"></script>
     <script type="text/javascript" src="_static/doctools.js"></script>
-    <link rel="top" title="gWTO 2.0RC documentation" href="#" /> 
+    <link rel="top" title="gWTO2 2.0RC documentation" href="#" /> 
   </head>
   <body>
     <div class="related">
@@ -35,7 +35,7 @@
         <li class="right" >
           <a href="py-modindex.html" title="Python Module Index"
              >modules</a> |</li>
-        <li><a href="#">gWTO 2.0RC documentation</a> &raquo;</li> 
+        <li><a href="#">gWTO2 2.0RC documentation</a> &raquo;</li> 
       </ul>
     </div>  
 
@@ -52,7 +52,18 @@
 </div>
 <div class="section" id="using-gwto2">
 <h2>Using gWTO2<a class="headerlink" href="#using-gwto2" title="Permalink to this headline">¶</a></h2>
-<p><strong>Latest update:</strong> July 15, 2014</p>
+<div class="admonition note">
+<p class="first admonition-title">Note</p>
+<p><strong>Latest update:</strong> July 18, 2014</p>
+<p><strong>Latest changes in the code:</strong></p>
+<ol class="last arabic simple">
+<li>Added yellow background to SBs that could be executed, but that would prefer
+another angular resolution</li>
+<li>gWTO2 will now detect Project States changes without need to restart, as well
+as SB states changes</li>
+<li>Executive, Grade and Rank columns added/rearrenged.</li>
+</ol>
+</div>
 <div class="figure">
 <img alt="_images/Selection_003.png" src="_images/Selection_003.png" />
 <p class="caption">Screenshot of gWTO2 RC</p>
@@ -212,6 +223,8 @@ tracker</li>
 <li><strong>Sets in:</strong> Time left until the first of the field sources (science targets)
 goes down the horizon limit. <em>This calculated by checking the field sources</em>
 <em>coordinates of the SB, and not by the representative coordinates.</em></li>
+<li><strong>Grade:</strong> Grade letter for the SB&#8217;s project.</li>
+<li><strong>Executive:</strong> SB&#8217;s project executive.</li>
 <li><strong>Exec. Req.:</strong> Number of executions requested for this SB.</li>
 <li><strong>Exec. Done.:</strong> Number of execution blocks for this SB, that have the QA0
 status set to PASS, or in Unset state.</li>
@@ -251,8 +264,6 @@ the equivalent scale at 100GHz and source with DEC -23.</li>
 In the case of multisources, this time should be multiplied by the number of
 sources.</li>
 <li><strong>PRJ UID:</strong> The SB&#8217;s project UID.</li>
-<li><strong>Grade:</strong> Grade letter for the SB&#8217;s project.</li>
-<li><strong>Executive:</strong> SB&#8217;s project executive.</li>
 </ol>
 </div>
 </div>
@@ -1980,11 +1991,11 @@ WHERE sb.SCHEDBLOCKID = ou.OBSUNITID AND sb.CSV = 0
         <li class="right" >
           <a href="py-modindex.html" title="Python Module Index"
              >modules</a> |</li>
-        <li><a href="#">gWTO 2.0RC documentation</a> &raquo;</li> 
+        <li><a href="#">gWTO2 2.0RC documentation</a> &raquo;</li> 
       </ul>
     </div>
     <div class="footer">
-        &copy; Copyright 2014, I. Toledo.
+        &copy; Copyright 2014, ALMA/I. Toledo.
       Created using <a href="http://sphinx-doc.org/">Sphinx</a> 1.2.2.
     </div>
   </body>

@@ -14,7 +14,16 @@ The gWTO2 (gui for What To Observe Cycle 2) Documentation
 Using gWTO2
 ***********
 
-**Latest update:** |today|
+.. note::
+   **Latest update:** |today|
+
+   **Latest changes in the code:**
+
+   #. Added yellow background to SBs that could be executed, but that would prefer
+      another angular resolution
+   #. gWTO2 will now detect Project States changes without need to restart, as well
+      as SB states changes
+   #. Executive, Grade and Rank columns added/rearrenged.
 
 .. figure:: Selection_003.png
 
@@ -193,6 +202,8 @@ Standard (ACA) Tab in BL (ACA) GUI
 #. **Sets in:** Time left until the first of the field sources (science targets)
    goes down the horizon limit. *This calculated by checking the field sources*
    *coordinates of the SB, and not by the representative coordinates.*
+#. **Grade:** Grade letter for the SB's project.
+#. **Executive:** SB's project executive.
 #. **Exec. Req.:** Number of executions requested for this SB.
 #. **Exec. Done.:** Number of execution blocks for this SB, that have the QA0
    status set to PASS, or in Unset state.
@@ -232,8 +243,7 @@ Standard (ACA) Tab in BL (ACA) GUI
    In the case of multisources, this time should be multiplied by the number of
    sources.
 #. **PRJ UID:** The SB's project UID.
-#. **Grade:** Grade letter for the SB's project.
-#. **Executive:** SB's project executive.
+
 
 ******************************
 Selection and Score algorithms

@@ -51,8 +51,8 @@ source_suffix = '.rst'
 master_doc = 'index'
 
 # General information about the project.
-project = u'gWTO'
-copyright = u'2014, I. Toledo'
+project = u'gWTO2'
+copyright = u'2014, ALMA/I. Toledo'
 
 # The version info for the project you're documenting, acts as replacement for
 # |version| and |release|, also used in various other places throughout the

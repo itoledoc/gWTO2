@@ -14,7 +14,16 @@ The gWTO2 (gui for What To Observe Cycle 2) Documentation
 Using gWTO2
 ***********
 
-**Latest update:** |today|
+.. note::
+   **Latest update:** |today|
+
+   **Latest changes in the code:**
+
+   #. Added yellow background to SBs that could be executed, but that would prefer
+      another angular resolution
+   #. gWTO2 will now detect Project States changes without need to restart, as well
+      as SB states changes
+   #. Executive, Grade and Rank columns added/rearrenged.
 
 .. figure:: Selection_003.png
 

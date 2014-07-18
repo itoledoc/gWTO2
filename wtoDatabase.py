@@ -1026,7 +1026,7 @@ class WtoDatabase(object):
         """
         if path is None:
             path = self.path
-        allsb = self.sb_summary[
+        allsb = self.sb_summary.copy()[
             ['CODE', 'PRJ_ARCHIVE_UID', 'name', 'SB_UID', 'band', 'repfreq',
              'array', 'EXEC', 'RA', 'DEC']]
         allsb['conf'] = pd.Series(pd.np.zeros(len(allsb)), index=allsb.index)

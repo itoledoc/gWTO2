@@ -252,11 +252,13 @@ class WtoAlgorithm(WtoDatabase):
                          (34. * (34. - 1) / 2.),
                     axis=1)
                 if self.num_ant != 34:
-                    sel4['blfrac'] = sel4.blfrac * (
+                    sel5 = sel4.copy()
+                    sel5.loc[:, 'blfrac'] = sel5.blfrac * (
                         33 * 17 / (self.num_ant * (
                             self.num_ant - 1) / 2.))
-
-            sel4.loc[:, 'blfrac'] = sel4.apply(
+                    sel4 = sel5.copy()
+            sel5 = sel4.copy()
+            sel5.loc[:, 'blfrac'] = sel5.apply(
                 lambda row: ret_cycle(row[u'CODE'], row['blfrac']), axis=1
             )
             sel4['frac'] = sel4.tsysfrac * sel4.blfrac
@@ -265,9 +267,8 @@ class WtoAlgorithm(WtoDatabase):
 
         elif array == '7m':
             sel4['blfrac'] = sel4.RA * 0. + 1.
-            print(self.num_ant)
             if self.num_ant != 9:
-                sel4['blfrac'] = sel4.blfrac * (
+                sel4.loc[:, 'blfrac'] = sel4.blfrac * (
                     9 * 4 / (self.num_ant * (
                         self.num_ant - 1) / 2.))
             sel4['frac'] = sel4.tsysfrac * sel4.blfrac

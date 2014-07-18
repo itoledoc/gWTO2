@@ -6,7 +6,7 @@
   <head>
     <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
     
-    <title>wtoDatabase &mdash; gWTO 2.0RC documentation</title>
+    <title>wtoDatabase &mdash; gWTO2 2.0RC documentation</title>
     
     <link rel="stylesheet" href="../_static/default.css" type="text/css" />
     <link rel="stylesheet" href="../_static/pygments.css" type="text/css" />
@@ -23,7 +23,7 @@
     <script type="text/javascript" src="../_static/jquery.js"></script>
     <script type="text/javascript" src="../_static/underscore.js"></script>
     <script type="text/javascript" src="../_static/doctools.js"></script>
-    <link rel="top" title="gWTO 2.0RC documentation" href="../index.html" />
+    <link rel="top" title="gWTO2 2.0RC documentation" href="../index.html" />
     <link rel="up" title="Module code" href="index.html" /> 
   </head>
   <body>
@@ -36,7 +36,7 @@
         <li class="right" >
           <a href="../py-modindex.html" title="Python Module Index"
              >modules</a> |</li>
-        <li><a href="../index.html">gWTO 2.0RC documentation</a> &raquo;</li>
+        <li><a href="../index.html">gWTO2 2.0RC documentation</a> &raquo;</li>
           <li><a href="index.html" accesskey="U">Module code</a> &raquo;</li> 
       </ul>
     </div>  
@@ -49,7 +49,7 @@
   <h1>Source code for wtoDatabase</h1><div class="highlight"><pre>
 <span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">wtoDatabase.py: the gWTO database library.</span>
-<span class="sd">------------------------------------------</span>
+<span class="sd">==========================================</span>
 <span class="sd">This library contains the classes and functions required to query, parse and</span>
 <span class="sd">organize the Projects and SchedBlock information stored at the OSF archive in</span>
 <span class="sd">different tables.</span>
@@ -405,8 +405,6 @@
                 <span class="bp">self</span><span class="o">.</span><span class="n">path</span> <span class="o">+</span> <span class="bp">self</span><span class="o">.</span><span class="n">preferences</span><span class="o">.</span><span class="n">sbxml_table</span><span class="p">)</span>
             <span class="bp">self</span><span class="o">.</span><span class="n">sciencegoals</span><span class="o">.</span><span class="n">to_pickle</span><span class="p">(</span>
                 <span class="bp">self</span><span class="o">.</span><span class="n">path</span> <span class="o">+</span> <span class="bp">self</span><span class="o">.</span><span class="n">preferences</span><span class="o">.</span><span class="n">sciencegoals_table</span><span class="p">)</span>
-            <span class="bp">self</span><span class="o">.</span><span class="n">obsproject</span><span class="o">.</span><span class="n">to_pickle</span><span class="p">(</span>
-                <span class="bp">self</span><span class="o">.</span><span class="n">path</span> <span class="o">+</span> <span class="bp">self</span><span class="o">.</span><span class="n">preferences</span><span class="o">.</span><span class="n">obsproject_table</span><span class="p">)</span>
             <span class="bp">self</span><span class="o">.</span><span class="n">schedblock_info</span><span class="o">.</span><span class="n">to_pickle</span><span class="p">(</span>
                 <span class="bp">self</span><span class="o">.</span><span class="n">path</span> <span class="o">+</span> <span class="bp">self</span><span class="o">.</span><span class="n">preferences</span><span class="o">.</span><span class="n">sbinfo_table</span><span class="p">)</span>
             <span class="bp">self</span><span class="o">.</span><span class="n">newar</span><span class="o">.</span><span class="n">to_pickle</span><span class="p">(</span>
@@ -451,6 +449,26 @@
                 <span class="bp">self</span><span class="o">.</span><span class="n">path</span> <span class="o">+</span> <span class="bp">self</span><span class="o">.</span><span class="n">preferences</span><span class="o">.</span><span class="n">target_table</span><span class="p">)</span>
             <span class="bp">self</span><span class="o">.</span><span class="n">spectralconf</span><span class="o">.</span><span class="n">to_pickle</span><span class="p">(</span>
                 <span class="bp">self</span><span class="o">.</span><span class="n">path</span> <span class="o">+</span> <span class="bp">self</span><span class="o">.</span><span class="n">preferences</span><span class="o">.</span><span class="n">spectralconf_table</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">cursor</span><span class="o">.</span><span class="n">execute</span><span class="p">(</span><span class="s">&quot;SELECT OBS_PROJECT_ID, DOMAIN_ENTITY_STATE &quot;</span>
+                            <span class="s">&quot;FROM ALMA.OBS_PROJECT_STATUS&quot;</span><span class="p">)</span>
+        <span class="n">newprstate</span> <span class="o">=</span> <span class="n">pd</span><span class="o">.</span><span class="n">DataFrame</span><span class="p">(</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">cursor</span><span class="o">.</span><span class="n">fetchall</span><span class="p">(),</span>
+            <span class="n">columns</span><span class="o">=</span><span class="p">[</span><span class="n">rec</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="k">for</span> <span class="n">rec</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">cursor</span><span class="o">.</span><span class="n">description</span><span class="p">]</span>
+        <span class="p">)</span><span class="o">.</span><span class="n">set_index</span><span class="p">(</span><span class="s">&#39;OBS_PROJECT_ID&#39;</span><span class="p">,</span> <span class="n">drop</span><span class="o">=</span><span class="bp">False</span><span class="p">)</span>
+        <span class="n">ori</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">obsproject</span><span class="p">[[</span><span class="s">&#39;DOMAIN_ENTITY_STATE&#39;</span><span class="p">]]</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">obsproject</span><span class="o">.</span><span class="n">loc</span><span class="p">[:,</span> <span class="s">&#39;DOMAIN_ENTITY_STATE&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">obsproject</span><span class="o">.</span><span class="n">apply</span><span class="p">(</span>
+            <span class="k">lambda</span> <span class="n">r</span><span class="p">:</span> <span class="n">newprstate</span><span class="o">.</span><span class="n">loc</span><span class="p">[</span><span class="n">r</span><span class="p">[</span><span class="s">&#39;PRJ_ARCHIVE_UID&#39;</span><span class="p">],</span>
+                                     <span class="s">&#39;DOMAIN_ENTITY_STATE&#39;</span><span class="p">],</span>
+            <span class="n">axis</span><span class="o">=</span><span class="mi">1</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">obsproject</span><span class="o">.</span><span class="n">to_pickle</span><span class="p">(</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">path</span> <span class="o">+</span> <span class="bp">self</span><span class="o">.</span><span class="n">preferences</span><span class="o">.</span><span class="n">obsproject_table</span><span class="p">)</span>
+        <span class="n">new</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">obsproject</span><span class="p">[[</span><span class="s">&#39;DOMAIN_ENTITY_STATE&#39;</span><span class="p">]]</span>
+        <span class="n">i</span> <span class="o">=</span> <span class="n">ori</span> <span class="o">!=</span> <span class="n">new</span>
+        <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">new</span><span class="p">[</span><span class="n">i</span><span class="o">.</span><span class="n">values</span><span class="p">])</span> <span class="o">&gt;</span> <span class="mi">0</span><span class="p">:</span>
+            <span class="k">print</span><span class="p">(</span><span class="s">&quot;Detected PRJ state changes: &quot;</span><span class="p">)</span>
+            <span class="k">print</span><span class="p">(</span><span class="n">new</span><span class="p">[</span><span class="n">i</span><span class="o">.</span><span class="n">values</span><span class="p">])</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="k">print</span><span class="p">(</span><span class="s">&quot;No PRJ states changes.&quot;</span><span class="p">)</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">create_summary</span><span class="p">()</span>
 </div>
 <div class="viewcode-block" id="WtoDatabase.populate_sciencegoals_sbxml"><a class="viewcode-back" href="../index.html#wtoDatabase.WtoDatabase.populate_sciencegoals_sbxml">[docs]</a>    <span class="k">def</span> <span class="nf">populate_sciencegoals_sbxml</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
@@ -478,9 +496,13 @@
 <span class="sd">        &quot;&quot;&quot;</span>
         <span class="n">new</span> <span class="o">=</span> <span class="bp">True</span>
         <span class="n">sb_uid_list</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">schedblocks</span><span class="o">.</span><span class="n">SB_UID</span><span class="o">.</span><span class="n">tolist</span><span class="p">()</span>
+        <span class="n">numsb</span> <span class="o">=</span> <span class="nb">len</span><span class="p">(</span><span class="n">sb_uid_list</span><span class="p">)</span>
+        <span class="n">cou</span> <span class="o">=</span> <span class="mi">1</span>
         <span class="k">for</span> <span class="n">s</span> <span class="ow">in</span> <span class="n">sb_uid_list</span><span class="p">:</span>
             <span class="bp">self</span><span class="o">.</span><span class="n">row_schedblock_info</span><span class="p">(</span><span class="n">s</span><span class="p">,</span> <span class="n">new</span><span class="o">=</span><span class="n">new</span><span class="p">)</span>
+            <span class="k">print</span><span class="p">(</span><span class="s">&quot;SB </span><span class="si">%s</span><span class="s"> processed (</span><span class="si">%d</span><span class="s">/</span><span class="si">%d</span><span class="s">)&quot;</span> <span class="o">%</span> <span class="p">(</span><span class="n">s</span><span class="p">,</span> <span class="n">cou</span><span class="p">,</span> <span class="n">numsb</span><span class="p">))</span>
             <span class="n">new</span> <span class="o">=</span> <span class="bp">False</span>
+            <span class="n">cou</span> <span class="o">+=</span> <span class="mi">1</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">schedblock_info</span><span class="o">.</span><span class="n">to_pickle</span><span class="p">(</span>
             <span class="bp">self</span><span class="o">.</span><span class="n">path</span> <span class="o">+</span> <span class="bp">self</span><span class="o">.</span><span class="n">preferences</span><span class="o">.</span><span class="n">sbinfo_table</span><span class="p">)</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">fieldsource</span><span class="o">.</span><span class="n">to_pickle</span><span class="p">(</span>
@@ -647,7 +669,6 @@
 <span class="sd">        :param sb_uid:</span>
 <span class="sd">        :param new:</span>
 <span class="sd">        &quot;&quot;&quot;</span>
-        <span class="k">print</span> <span class="s">&quot; Processing SB </span><span class="si">%s</span><span class="s">&quot;</span> <span class="o">%</span> <span class="n">sb_uid</span>
         <span class="n">sb</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">schedblocks</span><span class="o">.</span><span class="n">ix</span><span class="p">[</span><span class="n">sb_uid</span><span class="p">]</span>
         <span class="n">pid</span> <span class="o">=</span> <span class="n">sb</span><span class="o">.</span><span class="n">partId</span>
         <span class="n">xml</span> <span class="o">=</span> <span class="n">SchedBlocK</span><span class="p">(</span><span class="n">sb</span><span class="o">.</span><span class="n">sb_xml</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">sbxml</span><span class="p">)</span>
@@ -1319,12 +1340,12 @@
         <li class="right" >
           <a href="../py-modindex.html" title="Python Module Index"
              >modules</a> |</li>
-        <li><a href="../index.html">gWTO 2.0RC documentation</a> &raquo;</li>
+        <li><a href="../index.html">gWTO2 2.0RC documentation</a> &raquo;</li>
           <li><a href="index.html" >Module code</a> &raquo;</li> 
       </ul>
     </div>
     <div class="footer">
-        &copy; Copyright 2014, I. Toledo.
+        &copy; Copyright 2014, ALMA/I. Toledo.
       Created using <a href="http://sphinx-doc.org/">Sphinx</a> 1.2.2.
     </div>
   </body>
