@@ -429,9 +429,13 @@ class WtoDatabase(object):
         """
         new = True
         sb_uid_list = self.schedblocks.SB_UID.tolist()
+        numsb = len(sb_uid_list)
+        cou = 1
         for s in sb_uid_list:
             self.row_schedblock_info(s, new=new)
+            print("SB %s processed (%d/%d)" % (s, cou, numsb))
             new = False
+            cou += 1
         self.schedblock_info.to_pickle(
             self.path + self.preferences.sbinfo_table)
         self.fieldsource.to_pickle(
@@ -598,7 +602,6 @@ class WtoDatabase(object):
         :param sb_uid:
         :param new:
         """
-        print " Processing SB %s" % sb_uid
         sb = self.schedblocks.ix[sb_uid]
         pid = sb.partId
         xml = SchedBlocK(sb.sb_xml, self.sbxml)

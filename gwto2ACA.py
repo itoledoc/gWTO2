@@ -504,7 +504,7 @@ class MyStdTableModel(QAbstractTableModel):
             elif col in [9, 19, 20, 22]:
                 return QVariant(QString("%1").arg(sb[col], 0, 'f', 1))
             elif col in [13, 14, 15]:
-                return QVariant(QString("%1").arg(sb[col], 0, 'i', 0))
+                return QVariant(QString("%1").arg(int(sb[col]), 0, 'i', 0))
 
             return QVariant(str(self.arraydata[index.row()][index.column()]))
         elif role == Qt.TextAlignmentRole:
