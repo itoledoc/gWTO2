@@ -403,32 +403,35 @@ class BLMainWindow(QMainWindow, Ui_BLMainWindow):
             'score', ascending=False).query(
                 'isPolarization == False and isTimeConstrained == False')[
                     ['score', 'CODE', 'SB_UID', 'name', 'SB_state', 'band',
-                     'RA', 'DEC', 'HA', 'elev', 'etime', 'execount', 'Total',
+                     'RA', 'DEC', 'HA', 'elev', 'etime', 'grade', 'EXEC',
+                     'scienceRank', 'execount', 'Total',
                      'tsysfrac', 'blfrac', 'frac', 'sb_array_score',
                      'sb_cond_score', 'maxPWVC', 'arrayMinAR', 'arcorr',
                      'arrayMaxAR', 'integrationTime', 'lascorr',
-                     'PRJ_ARCHIVE_UID', 'grade', 'EXEC']]
+                     'PRJ_ARCHIVE_UID']]
 
         tc12 = self.datas.score12m.sort(
             'score', ascending=False).query(
                 'isPolarization == False and isTimeConstrained == True')[
                     ['score', 'CODE', 'SB_UID', 'name', 'SB_state', 'band',
-                     'RA', 'DEC', 'HA', 'elev', 'etime', 'execount', 'Total',
+                     'RA', 'DEC', 'HA', 'elev', 'etime', 'grade', 'EXEC',
+                     'scienceRank', 'execount', 'Total',
                      'tsysfrac', 'blfrac', 'frac', 'sb_array_score',
                      'sb_cond_score', 'maxPWVC', 'arrayMinAR', 'arcorr',
                      'arrayMaxAR', 'integrationTime',
-                     'PRJ_ARCHIVE_UID', 'grade', 'startTime', 'endTime',
+                     'PRJ_ARCHIVE_UID', 'startTime', 'endTime',
                      'allowedMargin', 'allowedUnits', 'repeats', 'isavoid']]
 
         pol12 = self.datas.score12m.sort(
             'score', ascending=False).query(
                 'isPolarization == True')[
                     ['score', 'CODE', 'SB_UID', 'name', 'SB_state', 'band',
-                     'RA', 'DEC', 'HA', 'elev', 'etime', 'execount', 'Total',
+                     'RA', 'DEC', 'HA', 'elev', 'etime', 'grade', 'EXEC',
+                     'scienceRank', 'execount', 'Total',
                      'tsysfrac', 'blfrac', 'frac', 'sb_array_score',
                      'sb_cond_score', 'maxPWVC', 'arrayMinAR', 'arcorr',
                      'arrayMaxAR', 'integrationTime', 'isPolarization',
-                     'PRJ_ARCHIVE_UID', 'grade', 'EXEC']]
+                     'PRJ_ARCHIVE_UID']]
 
         if not self.B03_b.isChecked():
             std12 = std12.query('band != "ALMA_RB_03"')
@@ -457,28 +460,31 @@ class BLMainWindow(QMainWindow, Ui_BLMainWindow):
 
         std12.columns = Wto.pd.Index(
             [u'Score', u'CODE', u'SB UID', u'SB Name', u'SB State', u'Band',
-             u'RA', u'DEC', u'HA', u'Elev.', u'Sets in', u'Exec. Req.',
+             u'RA', u'DEC', u'HA', u'Elev.', u'Sets in', u'Grade', u'Executive',
+             u'Rank', u'Exec. Req.',
              u'Exec. Done', u'TSysFrac', u'BLFrac', u'TotalFrac',
              u'Array Score', u'Cond. Score', u'maxPWVC', u'ArrayMinAR',
              u'ARcorr', u'ArrayMaxAR', u'TimeOnSource', u'LAScorr',
-             u'PRJ UID', u'Grade', u'Executive'], dtype='object')
+             u'PRJ UID'], dtype='object')
 
         tc12.columns = Wto.pd.Index(
             [u'Score', u'CODE', u'SB UID', u'SB Name', u'SB State', u'Band',
-             u'RA', u'DEC', u'HA', u'Elev.', u'Sets in', u'Exec. Req.',
+             u'RA', u'DEC', u'HA', u'Elev.', u'Sets in', u'Grade', u'Executive',
+             u'Rank', u'Exec. Req.',
              u'Exec. Done', u'TSysFrac', u'BLFrac', u'TotalFrac',
              u'Array Score', u'Cond. Score', u'maxPWVC', u'ArrayMinAR',
              u'ARcorr', u'ArrayMaxAR', u'ToS',
-             u'PRJ UID', u'Grade', u'StartTime', u'EndTime', u'AllowedMargin',
+             u'PRJ UID', u'StartTime', u'EndTime', u'AllowedMargin',
              u'AllowedUnits', u'repeats', u'isavoid'], dtype='object')
 
         pol12.columns = Wto.pd.Index(
             [u'Score', u'CODE', u'SB UID', u'SB Name', u'SB State', u'Band',
-             u'RA', u'DEC', u'HA', u'Elev.', u'Sets in', u'Exec. Req.',
+             u'RA', u'DEC', u'HA', u'Elev.', u'Sets in', u'Grade', u'Executive',
+             u'Rank', u'Exec. Req.',
              u'Exec. Done', u'TSysFrac', u'BLFrac', u'TotalFrac',
              u'Array Score', u'Cond. Score', u'maxPWVC', u'ArrayMinAR',
              u'ARcorr', u'ArrayMaxAR', u'Int. Time', u'isPolarization',
-             u'PRJ UID', u'Grade', u'Executive'], dtype='object')
+             u'PRJ UID'], dtype='object')
 
         print(std12.head(10))
         std12n = std12.to_records(index=False)
@@ -493,10 +499,10 @@ class BLMainWindow(QMainWindow, Ui_BLMainWindow):
         self.bl_sheet.setSortingEnabled(True)
         self.bl_sheet.sortByColumn(0, Qt.DescendingOrder)
         self.bl_sheet.resizeRowsToContents()
-        for column in range(25):
-            if column in [1, 2, 3, 4, 5, 6, 7, 22, 23]:
+        for column in range(26):
+            if column in [1, 2, 3, 4, 5, 6, 7, 25, 26]:
                 self.bl_sheet.resizeColumnToContents(column)
-            elif column in [11, 12, 16, 17, 19, 21]:
+            elif column in [14, 15, 19, 20, 22, 24]:
                 self.bl_sheet.setColumnWidth(column, 80)
             else:
                 self.bl_sheet.setColumnWidth(column, 66)
@@ -515,9 +521,9 @@ class BLMainWindow(QMainWindow, Ui_BLMainWindow):
         self.tc_sheet.sortByColumn(0, Qt.DescendingOrder)
         self.tc_sheet.resizeRowsToContents()
         for column in range(25):
-            if column in [1, 2, 3, 4, 5, 6, 7, 22]:
+            if column in [1, 2, 3, 4, 5, 6, 7, 25]:
                 self.tc_sheet.resizeColumnToContents(column)
-            elif column in [11, 12, 16, 17, 19, 21]:
+            elif column in [14, 15, 19, 20, 22, 24]:
                 self.tc_sheet.setColumnWidth(column, 80)
             else:
                 self.tc_sheet.setColumnWidth(column, 66)
@@ -536,9 +542,9 @@ class BLMainWindow(QMainWindow, Ui_BLMainWindow):
         self.pol_sheet.sortByColumn(0, Qt.DescendingOrder)
         self.pol_sheet.resizeRowsToContents()
         for column in range(25):
-            if column in [1, 2, 3, 4, 5, 6, 7, 22]:
+            if column in [1, 2, 3, 4, 5, 6, 7, 25]:
                 self.pol_sheet.resizeColumnToContents(column)
-            elif column in [11, 12, 16, 17, 19, 21]:
+            elif column in [14, 15, 19, 20, 22, 24]:
                 self.pol_sheet.setColumnWidth(column, 80)
             else:
                 self.pol_sheet.setColumnWidth(column, 66)
@@ -592,31 +598,33 @@ class MyStdTableModel(QAbstractTableModel):
             elif col == 7:
                 d = ephem.degrees(str(sb[col]))
                 return QVariant(str(d)[:-2])
-            elif col in [0, 13, 14, 15, 18, 19, 20, 21]:
+            elif col in [0, 16, 17, 18, 21, 22, 23, 24]:
                 return QVariant(QString("%1").arg(sb[col], 0, 'f', 2))
-            elif col in [9, 16, 17, 22, 23]:
+            elif col in [9, 19, 20, 25, 26]:
                 return QVariant(QString("%1").arg(sb[col], 0, 'f', 1))
-            elif col in [11, 12]:
+            elif col in [13, 14, 15]:
                 return QVariant(QString("%1").arg(sb[col], 0, 'i', 0))
 
             return QVariant(str(self.arraydata[index.row()][index.column()]))
         elif role == Qt.TextAlignmentRole:
-            if col in [0, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19,
-                       20, 21, 22, 23]:
+            if col in [0, 6, 7, 8, 9, 10, 14, 15, 16, 17, 18, 19, 20, 21, 22,
+                       22, 24, 25, 26]:
                 return QVariant(int(Qt.AlignRight | Qt.AlignVCenter))
+            if col in [11, 12, 13]:
+                return QVariant(int(Qt.AlignCenter | Qt.AlignVCenter))
             return QVariant(int(Qt.AlignLeft | Qt.AlignVCenter))
         elif role == Qt.BackgroundColorRole:
             if 0 == index.row() % 2:
                 c = QVariant(QColor(235, 245, 255))
             else:
                 c = QVariant(QColor(250, 250, 250))
-            if sb[16] < 8.5:
+            if sb[19] < 8.5:
                 c = QVariant(QColor(255, 255, 0))
-            if sb[17] == 0:
+            if sb[20] == 0:
                 c = QVariant(QColor(255, 110, 110))
             return c
         elif role == Qt.FontRole:
-            if col in [0, 15, 17]:
+            if col in [0, 18, 20]:
                 return QVariant(QFont("Cantarel", 10, QFont.Bold))
 
         return QVariant()
@@ -684,32 +692,34 @@ class MyTcTableModel(QAbstractTableModel):
             elif col == 7:
                 d = ephem.degrees(str(sb[col]))
                 return QVariant(str(d)[:-2])
-            elif col in [0, 13, 14, 15, 18, 19, 20, 21]:
+            elif col in [0, 16, 17, 18, 21, 22, 23, 24]:
                 return QVariant(QString("%1").arg(sb[col], 0, 'f', 2))
-            elif col in [9, 16, 17, 22]:
+            elif col in [9, 19, 20, 25]:
                 return QVariant(QString("%1").arg(sb[col], 0, 'f', 1))
-            elif col in [11, 12]:
+            elif col in [13, 14, 15]:
                 return QVariant(QString("%1").arg(sb[col], 0, 'i', 0))
 
             return QVariant(str(self.arraydata[index.row()][index.column()]))
         elif role == Qt.TextAlignmentRole:
-            if col in [0, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19,
-                       20, 21, 22]:
+            if col in [0, 6, 7, 8, 9, 10, 14, 15, 16, 17, 18, 19, 20, 21, 22,
+                       23, 24, 25]:
                 return QVariant(int(Qt.AlignRight | Qt.AlignVCenter))
+            if col in [11, 12, 13]:
+                return QVariant(int(Qt.AlignCenter | Qt.AlignVCenter))
             return QVariant(int(Qt.AlignLeft | Qt.AlignVCenter))
         elif role == Qt.BackgroundColorRole:
             if 0 == index.row() % 2:
                 c = QVariant(QColor(235, 245, 255))
             else:
                 c = QVariant(QColor(250, 250, 250))
-            if sb[16] < 9:
+            if sb[19] < 9:
                 c = QVariant(QColor(255, 255, 0))
-            if sb[17] == 0:
+            if sb[20] == 0:
                 c = QVariant(QColor(255, 110, 110))
 
             return c
         elif role == Qt.FontRole:
-            if col in [0, 15, 17]:
+            if col in [0, 18, 20]:
                 return QVariant(QFont("Cantarel", 10, QFont.Bold))
 
         return QVariant()
@@ -767,31 +777,33 @@ class MyPolTableModel(QAbstractTableModel):
             elif col == 7:
                 d = ephem.degrees(str(sb[col]))
                 return QVariant(str(d)[:-2])
-            elif col in [0, 13, 14, 15, 18, 19, 20, 21]:
+            elif col in [0, 16, 17, 18, 21, 22, 23, 24]:
                 return QVariant(QString("%1").arg(sb[col], 0, 'f', 2))
-            elif col in [9, 16, 17, 22]:
+            elif col in [9, 19, 20, 25]:
                 return QVariant(QString("%1").arg(sb[col], 0, 'f', 1))
-            elif col in [11, 12]:
+            elif col in [13, 14, 15]:
                 return QVariant(QString("%1").arg(sb[col], 0, 'i', 0))
 
             return QVariant(str(self.arraydata[index.row()][index.column()]))
         elif role == Qt.TextAlignmentRole:
-            if col in [0, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19,
-                       20, 21, 22]:
+            if col in [0, 6, 7, 8, 9, 10, 14, 15, 16, 17, 18, 19, 20, 21, 22,
+                       23, 23, 24]:
                 return QVariant(int(Qt.AlignRight | Qt.AlignVCenter))
+            if col in [11, 12, 13]:
+                return QVariant(int(Qt.AlignCenter | Qt.AlignVCenter))
             return QVariant(int(Qt.AlignLeft | Qt.AlignVCenter))
         elif role == Qt.BackgroundColorRole:
             if 0 == index.row() % 2:
                 c = QVariant(QColor(235, 245, 255))
             else:
                 c = QVariant(QColor(250, 250, 250))
-            if sb[16] < 9:
+            if sb[19] < 9:
                 c = QVariant(QColor(255, 255, 0))
-            if sb[17] == 0:
+            if sb[20] == 0:
                 c = QVariant(QColor(255, 110, 110))
             return c
         elif role == Qt.FontRole:
-            if col in [0, 15, 17]:
+            if col in [0, 18, 20]:
                 return QVariant(QFont("Cantarel", 10, QFont.Bold))
 
         return QVariant()
