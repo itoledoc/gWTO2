@@ -356,8 +356,6 @@ class WtoDatabase(object):
                 self.path + self.preferences.sbxml_table)
             self.sciencegoals.to_pickle(
                 self.path + self.preferences.sciencegoals_table)
-            self.obsproject.to_pickle(
-                self.path + self.preferences.obsproject_table)
             self.schedblock_info.to_pickle(
                 self.path + self.preferences.sbinfo_table)
             self.newar.to_pickle(
@@ -402,6 +400,24 @@ class WtoDatabase(object):
                 self.path + self.preferences.target_table)
             self.spectralconf.to_pickle(
                 self.path + self.preferences.spectralconf_table)
+        self.cursor.execute("SELECT OBS_PROJECT_ID, DOMAIN_ENTITY_STATE "
+                            "FROM ALMA.OBS_PROJECT_STATUS")
+        newprstate = pd.DataFrame(
+            self.cursor.fetchall(),
+            columns=[rec[0] for rec in self.cursor.description]
+        ).set_index('OBS_PROJECT_ID', drop=False)
+        ori = self.obsproject[['DOMAIN_ENTITY_STATE']]
+        self.obsproject.loc[:, 'DOMAIN_ENTITY_STATE'] = self.obsproject.apply(
+            lambda r: newprstate.loc[r['PRJ_ARCHIVE_UID'],
+                                     'DOMAIN_ENTITY_STATE'],
+            axis=1)
+        self.obsproject.to_pickle(
+            self.path + self.preferences.obsproject_table)
+        new = self.obsproject[['DOMAIN_ENTITY_STATE']]
+        i = ori != new
+        if len(new[i.values]) > 0:
+            print("Detected PRJ state changes: ")
+            print(new)
         self.create_summary()
 
     def populate_sciencegoals_sbxml(self):
