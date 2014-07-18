@@ -696,7 +696,7 @@ class MyTcTableModel(QAbstractTableModel):
                 return QVariant(QString("%1").arg(sb[col], 0, 'f', 2))
             elif col in [9, 19, 20, 25]:
                 return QVariant(QString("%1").arg(sb[col], 0, 'f', 1))
-            elif col in [13, 14, 15]:
+            elif col in [14, 15]:
                 return QVariant(QString("%1").arg(sb[col], 0, 'i', 0))
 
             return QVariant(str(self.arraydata[index.row()][index.column()]))
@@ -781,7 +781,7 @@ class MyPolTableModel(QAbstractTableModel):
                 return QVariant(QString("%1").arg(sb[col], 0, 'f', 2))
             elif col in [9, 19, 20, 25]:
                 return QVariant(QString("%1").arg(sb[col], 0, 'f', 1))
-            elif col in [13, 14, 15]:
+            elif col in [14, 15]:
                 return QVariant(QString("%1").arg(sb[col], 0, 'i', 0))
 
             return QVariant(str(self.arraydata[index.row()][index.column()]))
