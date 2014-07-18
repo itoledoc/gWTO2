@@ -418,6 +418,8 @@ class WtoDatabase(object):
         if len(new[i.values]) > 0:
             print("Detected PRJ state changes: ")
             print(new[i.values])
+        else:
+            print("No PRJ states changes.")
         self.create_summary()
 
     def populate_sciencegoals_sbxml(self):
