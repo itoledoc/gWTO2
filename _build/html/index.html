@@ -54,7 +54,7 @@
 <h2>Using gWTO2<a class="headerlink" href="#using-gwto2" title="Permalink to this headline">¶</a></h2>
 <div class="admonition note">
 <p class="first admonition-title">Note</p>
-<p><strong>Latest update:</strong> July 18, 2014</p>
+<p><strong>Latest update:</strong> July 20, 2014</p>
 <p><strong>Latest changes in the code:</strong></p>
 <ol class="last arabic simple">
 <li>Added yellow background to SBs that could be executed, but that would prefer
@@ -489,16 +489,17 @@ ipython
 </pre></div>
 </div>
 <p>Once in ipython::</p>
-<div class="highlight-python"><div class="highlight"><pre><span class="kn">import</span> <span class="nn">wtoAlgorithm</span> <span class="kn">as</span> <span class="nn">wto</span>
-<span class="kn">import</span> <span class="nn">ephem</span>
-<span class="kn">import</span> <span class="nn">pandas</span> <span class="kn">as</span> <span class="nn">pd</span>
-<span class="n">datas</span> <span class="o">=</span> <span class="n">wto</span><span class="o">.</span><span class="n">Algorithm</span><span class="p">(</span><span class="n">path</span><span class="o">=</span><span class="s">&#39;./wto_testing/&#39;</span><span class="p">)</span>
+<div class="highlight-python"><div class="highlight"><pre><span class="gp">&gt;&gt;&gt; </span><span class="kn">import</span> <span class="nn">wtoAlgorithm</span> <span class="kn">as</span> <span class="nn">wto</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="kn">import</span> <span class="nn">ephem</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="kn">import</span> <span class="nn">pandas</span> <span class="kn">as</span> <span class="nn">pd</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">datas</span> <span class="o">=</span> <span class="n">wto</span><span class="o">.</span><span class="n">Algorithm</span><span class="p">(</span><span class="n">path</span><span class="o">=</span><span class="s">&#39;./wto_testing/&#39;</span><span class="p">)</span>
 </pre></div>
 </div>
 <p>And the run the following script. You can copy the code, and then paste into
 python with <strong class="command">%paste</strong>, or <a class="reference download internal" href="_downloads/runwto.py"><tt class="xref download docutils literal"><span class="pre">donwload</span> <span class="pre">the</span> <span class="pre">file</span></tt></a>,
 and then load the function with <strong class="command">execfile(&#8216;runwto.py&#8217;)</strong>:</p>
-<div class="highlight-python"><div class="highlight"><pre><span class="k">def</span> <span class="nf">runwto</span><span class="p">(</span><span class="n">pwv</span><span class="p">,</span> <span class="n">array_name</span><span class="o">=</span><span class="bp">None</span><span class="p">,</span> <span class="n">d</span><span class="o">=</span><span class="bp">None</span><span class="p">,</span> <span class="n">num_ant</span><span class="o">=</span><span class="mi">34</span><span class="p">):</span>
+<blockquote>
+<div><div class="highlight-python"><div class="highlight"><pre><span class="k">def</span> <span class="nf">runwto</span><span class="p">(</span><span class="n">pwv</span><span class="p">,</span> <span class="n">array_name</span><span class="o">=</span><span class="bp">None</span><span class="p">,</span> <span class="n">d</span><span class="o">=</span><span class="bp">None</span><span class="p">,</span> <span class="n">num_ant</span><span class="o">=</span><span class="mi">34</span><span class="p">):</span>
     <span class="n">datas</span><span class="o">.</span><span class="n">query_arrays</span><span class="p">()</span>
     <span class="k">if</span> <span class="n">array_name</span> <span class="o">==</span> <span class="s">&#39;default&#39;</span><span class="p">:</span>
         <span class="n">array_name</span> <span class="o">=</span> <span class="bp">None</span>
@@ -529,6 +530,7 @@ and then load the function with <strong class="command">execfile(&#8216;runwto.p
     <span class="n">datas</span><span class="o">.</span><span class="n">num_ant_user</span> <span class="o">=</span> <span class="mi">34</span>
 </pre></div>
 </div>
+</div></blockquote>
 <p>The to run the wto algorithm use a pwv value between 0 and 20, with steps of
 0.05 (e.g., 0.4, 0.45, but no 0.42), and assuming the latest BL Array. Set
 <tt class="docutils literal"><span class="pre">array_name='default'</span></tt> when running <tt class="docutils literal"><span class="pre">runwto</span></tt> (e.g.
@@ -1239,83 +1241,9 @@ or selecttp.</td>
 </div>
 <div class="section" id="the-wto-data-frames">
 <h2>The WTO Data Frames<a class="headerlink" href="#the-wto-data-frames" title="Permalink to this headline">¶</a></h2>
-<div class="section" id="description">
-<h3>Description<a class="headerlink" href="#description" title="Permalink to this headline">¶</a></h3>
 <div class="section" id="wtodatabase-obsprojects">
-<h4>wtoDatabase.obsprojects<a class="headerlink" href="#wtodatabase-obsprojects" title="Permalink to this headline">¶</a></h4>
+<h3>wtoDatabase.obsprojects<a class="headerlink" href="#wtodatabase-obsprojects" title="Permalink to this headline">¶</a></h3>
 <p>Main obsproject table ingested from queries to the archive.</p>
-<div class="highlight-python"><div class="highlight"><pre>SELECT PRJ_ARCHIVE_UID,DELETED,PI,PRJ_NAME,
-       CODE,PRJ_TIME_OF_CREATION,PRJ_SCIENTIFIC_RANK,PRJ_VERSION,
-       PRJ_ASSIGNED_PRIORITY,PRJ_LETTER_GRADE,DOMAIN_ENTITY_STATE,
-       OBS_PROJECT_ID
-FROM ALMA.BMMV_OBSPROJECT obs1, ALMA.OBS_PROJECT_STATUS obs2
-WHERE regexp_like (CODE, &#39;^201[23].*\.[AST]&#39;)
-      AND (PRJ_LETTER_GRADE=&#39;A&#39; OR PRJ_LETTER_GRADE=&#39;B&#39;
-      OR PRJ_LETTER_GRADE=&#39;C&#39;)
-      AND obs2.OBS_PROJECT_ID = obs1.PRJ_ARCHIVE_UID
-</pre></div>
-</div>
-<table border="1" class="docutils">
-<colgroup>
-<col width="33%" />
-<col width="67%" />
-</colgroup>
-<thead valign="bottom">
-<tr class="row-odd"><th class="head">COLUMN</th>
-<th class="head">VALUE</th>
-</tr>
-</thead>
-<tbody valign="top">
-<tr class="row-even"><td>PRJ_ARCHIVE_UID</td>
-<td><em>(string)</em> Project UID</td>
-</tr>
-<tr class="row-odd"><td>DELETED</td>
-<td><em>(boolean int)</em> Is Deleted?</td>
-</tr>
-<tr class="row-even"><td>PI</td>
-<td><em>(string)</em> Principal Investigator</td>
-</tr>
-<tr class="row-odd"><td>PRJ_NAME</td>
-<td><em>(string)</em> Project Name</td>
-</tr>
-<tr class="row-even"><td>** CODE</td>
-<td><em>(string)</em> Project Code (<strong>Index</strong>)</td>
-</tr>
-<tr class="row-odd"><td>PRJ_TIME_OF_CREATION</td>
-<td><em>(string)</em> Project creation timestamp</td>
-</tr>
-<tr class="row-even"><td>PRJ_SCIENTIFIC_RANK</td>
-<td><em>(int64)</em> Project Rank</td>
-</tr>
-<tr class="row-odd"><td>PRJ_VERSION</td>
-<td><em>(string)</em> Project Version</td>
-</tr>
-<tr class="row-even"><td>PRJ_ASSIGNED_PRIORITY</td>
-<td><em>(object)</em> None</td>
-</tr>
-<tr class="row-odd"><td>PRJ_LETTER_GRADE</td>
-<td><em>(string)</em> Project Grade</td>
-</tr>
-<tr class="row-even"><td>DOMAIN_ENTITY_STATE</td>
-<td><em>(string)</em> Project Status (ProTrack)</td>
-</tr>
-<tr class="row-odd"><td>OBS_PROJECT_ID</td>
-<td><em>(string)</em> Project UID</td>
-</tr>
-<tr class="row-even"><td>EXEC</td>
-<td><em>(string)</em> Executive</td>
-</tr>
-<tr class="row-odd"><td>timestamp</td>
-<td><em>(datetime64[ns])</em> Project latest update date</td>
-</tr>
-<tr class="row-even"><td>obsproj</td>
-<td><em>(string)</em> Obsproject XML filename</td>
-</tr>
-</tbody>
-</table>
-</div>
-<div class="section" id="wtodatabase-sciencegoals">
-<h4>wtoDatabase.sciencegoals<a class="headerlink" href="#wtodatabase-sciencegoals" title="Permalink to this headline">¶</a></h4>
 <table border="1" class="docutils">
 <colgroup>
 <col width="27%" />
@@ -1327,35 +1255,105 @@ WHERE regexp_like (CODE, &#39;^201[23].*\.[AST]&#39;)
 </tr>
 </thead>
 <tbody valign="top">
+<tr class="row-even"><td>PRJ_ARCHIVE_UID</td>
+<td><em>(string)</em> Project UID (ALMA.BMMV_OBSPROJECT.PRJ_ARCHIVE_UID)</td>
+</tr>
+<tr class="row-odd"><td>DELETED</td>
+<td><em>(boolean int)</em> Is Deleted? (ALMA.BMMV_OBSPROJECT.DELETED)</td>
+</tr>
+<tr class="row-even"><td>PI</td>
+<td><em>(string)</em> Principal Investigator (ALMA.BMMV_OBSPROJECT.PI)</td>
+</tr>
+<tr class="row-odd"><td>PRJ_NAME</td>
+<td><em>(string)</em> Project Name (ALMA.BMMV_OBSPROJECT.PRJ_NAME)</td>
+</tr>
+<tr class="row-even"><td>** CODE</td>
+<td><em>(string)</em> Project Code (ALMA.BMMV_OBSPROJECT.CODE)</td>
+</tr>
+<tr class="row-odd"><td>PRJ_TIME_OF_CREATION</td>
+<td><em>(string)</em> Project creation timestamp
+(ALMA.BMMV_OBSPROJECT.PRJ_TIME_OF_CREATION)</td>
+</tr>
+<tr class="row-even"><td>PRJ_SCIENTIFIC_RANK</td>
+<td><em>(int64)</em> Project Rank
+(ALMA.BMMV_OBSPROJECT.PRJ_SCIENTIFIC_RANK)</td>
+</tr>
+<tr class="row-odd"><td>PRJ_VERSION</td>
+<td><em>(string)</em> Project Version (ALMA.BMMV_OBSPROJECT.PRJ_VERSION)</td>
+</tr>
+<tr class="row-even"><td>PRJ_LETTER_GRADE</td>
+<td><em>(string)</em> Project Grade
+(ALMA.BMMV_OBSPROJECT.PRJ_LETTER_GRADE)</td>
+</tr>
+<tr class="row-odd"><td>DOMAIN_ENTITY_STATE</td>
+<td><em>(string)</em> Project Status
+(ALMA.BMMV_OBSPROJECT.DOMAIN_ENTITY_STATE)</td>
+</tr>
+<tr class="row-even"><td>OBS_PROJECT_ID</td>
+<td><em>(string)</em> Project UID
+(ALMA.BMMV_OBSPROJECT.OBS_PROJECT_ID)</td>
+</tr>
+<tr class="row-odd"><td>EXEC</td>
+<td><em>(string)</em> Executive
+(ALMA.BMMV_OBSPROPOSAL.ASSOCIATEDEXEC)</td>
+</tr>
+<tr class="row-even"><td>timestamp</td>
+<td><em>(datetime64[ns])</em> Project latest update date
+(ALMA.XML_OBSPROJECT_ENTITIES.TIMESTAMP)</td>
+</tr>
+<tr class="row-odd"><td>obsproj</td>
+<td><em>(string)</em> Obsproject XML filename
+(and link to ALMA.XML_OBSPROJECT_ENTITIES.XML)</td>
+</tr>
+</tbody>
+</table>
+</div>
+<div class="section" id="wtodatabase-sciencegoals">
+<h3>wtoDatabase.sciencegoals<a class="headerlink" href="#wtodatabase-sciencegoals" title="Permalink to this headline">¶</a></h3>
+<table border="1" class="docutils">
+<colgroup>
+<col width="16%" />
+<col width="84%" />
+</colgroup>
+<thead valign="bottom">
+<tr class="row-odd"><th class="head">COLUMN</th>
+<th class="head">VALUE</th>
+</tr>
+</thead>
+<tbody valign="top">
 <tr class="row-even"><td>CODE</td>
-<td><em>(string)</em> Project Code</td>
+<td><em>(string)</em> Project Code (ALMA.BMMV_OBSPROJECT.CODE)</td>
 </tr>
 <tr class="row-odd"><td>** partId</td>
-<td><em>(string)</em> Science Goal partId (<strong>Index</strong>)</td>
+<td><em>(string)</em> Science Goal partId
+(<tt class="docutils literal"><span class="pre">xml:ObsProject.ObsProgram.ScienceGoal.ObsUnitSetRef['partId']</span></tt>)</td>
 </tr>
 <tr class="row-even"><td>AR</td>
-<td><em>(float64)</em> Desired angular resolution (arcsec)</td>
+<td><em>(float64)</em> Desired angular resolution (arcsec)
+(<tt class="docutils literal"><span class="pre">xml:ObsProject.ObsProgram.ScienceGoal.PerformanceParameters.desiredAngularResolution</span></tt>)</td>
 </tr>
 <tr class="row-odd"><td>LAS</td>
-<td><em>(float64)</em> Largest scale (arcser)</td>
+<td><em>(float64)</em> Largest scale (arcsec)
+(<tt class="docutils literal"><span class="pre">xml:ObsProject.ObsProgram.ScienceGoal.PerformanceParameters.desiredLargestScale</span></tt>)</td>
 </tr>
 <tr class="row-even"><td>bands</td>
-<td><em>(string)</em> ALMA Band</td>
+<td><em>(string)</em> ALMA Band
+(<tt class="docutils literal"><span class="pre">xml:ObsProject.ObsProgram.ScienceGoal.requiredReceiverBands</span></tt>)</td>
 </tr>
 <tr class="row-odd"><td>isSpectralScan</td>
-<td><em>(boolean)</em></td>
+<td><em>(boolean)</em> (<tt class="docutils literal"><span class="pre">xml:ObsProject.ObsProgram.ScienceGoals.SpectralSetupParameters.SpectralScan</span></tt>)</td>
 </tr>
 <tr class="row-even"><td>isTimeConstrained</td>
-<td><em>(boolean)</em></td>
+<td><em>(boolean)</em> (<tt class="docutils literal"><span class="pre">xml:ObsProject.ObsProgram.ScienceGoal.PerformanceParameters.isTimeConstrained</span></tt>)</td>
 </tr>
 <tr class="row-odd"><td>useACA</td>
-<td><em>(boolean)</em></td>
+<td><em>(boolean)</em> (<tt class="docutils literal"><span class="pre">xml:ObsProject.ObsProgram.ScienceGoal.PerformanceParameters.useACA</span></tt>)</td>
 </tr>
 <tr class="row-even"><td>useTP</td>
-<td><em>(boolean)</em></td>
+<td><em>(boolean)</em> (<tt class="docutils literal"><span class="pre">xml:ObsProject.ObsProgram.ScienceGoal.PerformanceParameters.useTP</span></tt>)</td>
 </tr>
 <tr class="row-odd"><td>SBS</td>
-<td><em>(list of str)</em> ScienceGoal SBs</td>
+<td><em>(list of strings)</em> <a class="reference internal" href="#sgsb"><em>ScienceGoals SBs</em></a></td>
 </tr>
 <tr class="row-even"><td>startRime</td>
 <td><em>(string)</em> Time constrain start</td>
@@ -1380,9 +1378,14 @@ WHERE regexp_like (CODE, &#39;^201[23].*\.[AST]&#39;)
 </tr>
 </tbody>
 </table>
+<div class="section" id="getting-the-scheduling-blocks-of-a-science-goal">
+<span id="sgsb"></span><h4>Getting the Scheduling Blocks of a Science Goal.<a class="headerlink" href="#getting-the-scheduling-blocks-of-a-science-goal" title="Permalink to this headline">¶</a></h4>
+<p>To get the Scheduling Blocks that are part of a ScienceGoal entity the partId
+is used.</p>
+</div>
 </div>
 <div class="section" id="wtodatabase-schedblocks">
-<h4>wtoDatabase.schedblocks<a class="headerlink" href="#wtodatabase-schedblocks" title="Permalink to this headline">¶</a></h4>
+<h3>wtoDatabase.schedblocks<a class="headerlink" href="#wtodatabase-schedblocks" title="Permalink to this headline">¶</a></h3>
 <table border="1" class="docutils">
 <colgroup>
 <col width="27%" />
@@ -1410,7 +1413,7 @@ WHERE regexp_like (CODE, &#39;^201[23].*\.[AST]&#39;)
 </table>
 </div>
 <div class="section" id="wtodatabase-schedblock-info">
-<h4>wtoDatabase.schedblock_info<a class="headerlink" href="#wtodatabase-schedblock-info" title="Permalink to this headline">¶</a></h4>
+<h3>wtoDatabase.schedblock_info<a class="headerlink" href="#wtodatabase-schedblock-info" title="Permalink to this headline">¶</a></h3>
 <table border="1" class="docutils">
 <colgroup>
 <col width="27%" />
@@ -1492,7 +1495,7 @@ WHERE regexp_like (CODE, &#39;^201[23].*\.[AST]&#39;)
 </table>
 </div>
 <div class="section" id="wtodatabase-target">
-<h4>wtoDatabase.target<a class="headerlink" href="#wtodatabase-target" title="Permalink to this headline">¶</a></h4>
+<h3>wtoDatabase.target<a class="headerlink" href="#wtodatabase-target" title="Permalink to this headline">¶</a></h3>
 <table border="1" class="docutils">
 <colgroup>
 <col width="27%" />
@@ -1520,7 +1523,7 @@ WHERE regexp_like (CODE, &#39;^201[23].*\.[AST]&#39;)
 </table>
 </div>
 <div class="section" id="wtodatabase-fieldsource">
-<h4>wtoDatabase.fieldsource<a class="headerlink" href="#wtodatabase-fieldsource" title="Permalink to this headline">¶</a></h4>
+<h3>wtoDatabase.fieldsource<a class="headerlink" href="#wtodatabase-fieldsource" title="Permalink to this headline">¶</a></h3>
 <table border="1" class="docutils">
 <colgroup>
 <col width="27%" />
@@ -1587,7 +1590,7 @@ WHERE regexp_like (CODE, &#39;^201[23].*\.[AST]&#39;)
 </table>
 </div>
 <div class="section" id="wtodatabase-spectralconf">
-<h4>wtoDatabase.spectralconf<a class="headerlink" href="#wtodatabase-spectralconf" title="Permalink to this headline">¶</a></h4>
+<h3>wtoDatabase.spectralconf<a class="headerlink" href="#wtodatabase-spectralconf" title="Permalink to this headline">¶</a></h3>
 <table border="1" class="docutils">
 <colgroup>
 <col width="27%" />
@@ -1615,7 +1618,7 @@ WHERE regexp_like (CODE, &#39;^201[23].*\.[AST]&#39;)
 </table>
 </div>
 <div class="section" id="wtodatabase-sb-summary">
-<h4>wtoDatabase.sb_summary<a class="headerlink" href="#wtodatabase-sb-summary" title="Permalink to this headline">¶</a></h4>
+<h3>wtoDatabase.sb_summary<a class="headerlink" href="#wtodatabase-sb-summary" title="Permalink to this headline">¶</a></h3>
 <table border="1" class="docutils">
 <colgroup>
 <col width="69%" />
@@ -1727,7 +1730,7 @@ WHERE regexp_like (CODE, &#39;^201[23].*\.[AST]&#39;)
 </table>
 </div>
 <div class="section" id="wtodatabase-qa0">
-<h4>wtoDatabase.qa0<a class="headerlink" href="#wtodatabase-qa0" title="Permalink to this headline">¶</a></h4>
+<h3>wtoDatabase.qa0<a class="headerlink" href="#wtodatabase-qa0" title="Permalink to this headline">¶</a></h3>
 <table border="1" class="docutils">
 <colgroup>
 <col width="42%" />
@@ -1749,7 +1752,7 @@ WHERE regexp_like (CODE, &#39;^201[23].*\.[AST]&#39;)
 </table>
 </div>
 <div class="section" id="wtodatabase-scheduling-proj">
-<h4>wtoDatabase.scheduling_proj<a class="headerlink" href="#wtodatabase-scheduling-proj" title="Permalink to this headline">¶</a></h4>
+<h3>wtoDatabase.scheduling_proj<a class="headerlink" href="#wtodatabase-scheduling-proj" title="Permalink to this headline">¶</a></h3>
 <p>Queries project data from the SCHEDULING_AOS archive tables.</p>
 <div class="highlight-python"><div class="highlight"><pre>SELECT *
 FROM SCHEDULING_AOS.OBSPROJECT
@@ -1831,7 +1834,7 @@ WHERE regexp_like (CODE, &#39;^201[23].*\.[AST]&#39;)
 </table>
 </div>
 <div class="section" id="wtodatabase-scheduling-sb">
-<h4>wtoDatabase.scheduling_sb<a class="headerlink" href="#wtodatabase-scheduling-sb" title="Permalink to this headline">¶</a></h4>
+<h3>wtoDatabase.scheduling_sb<a class="headerlink" href="#wtodatabase-scheduling-sb" title="Permalink to this headline">¶</a></h3>
 <p>Queries scheduling block data from SCHEDULING_AOS tables.:</p>
 <div class="highlight-python"><div class="highlight"><pre>SELECT ou.OBSUNIT_UID,sb.NAME,sb.REPR_BAND,
        sb.SCHEDBLOCK_CTRL_EXEC_COUNT,sb.SCHEDBLOCK_CTRL_STATE,
@@ -1880,14 +1883,29 @@ WHERE sb.SCHEDBLOCKID = ou.OBSUNITID AND sb.CSV = 0
 </table>
 </div>
 <div class="section" id="wtodatabase-sbstate">
-<h4>wtoDatabase.sbstate<a class="headerlink" href="#wtodatabase-sbstate" title="Permalink to this headline">¶</a></h4>
-</div>
+<h3>wtoDatabase.sbstate<a class="headerlink" href="#wtodatabase-sbstate" title="Permalink to this headline">¶</a></h3>
 </div>
 </div>
 <div class="section" id="apendix">
 <h2>Apendix<a class="headerlink" href="#apendix" title="Permalink to this headline">¶</a></h2>
 <div class="section" id="assessment-of-current-array-s-angular-resolution">
 <span id="current-conf"></span><h3>Assessment of Current Array&#8217;s Angular Resolution<a class="headerlink" href="#assessment-of-current-array-s-angular-resolution" title="Permalink to this headline">¶</a></h3>
+<ol class="arabic">
+<li><p class="first">From the dashboard get a list of antennas and pads that are available and
+working in band 3 or 6. This should be saved in a file with the name
+YYYY-MM-DD.cfg, which is a space-separeted values file, with the antenna in the
+first column and pad in the second. (<a class="reference download internal" href="_downloads/2014-07-20.cfg"><tt class="xref download docutils literal"><span class="pre">Example</span> <span class="pre">file</span></tt></a>)</p>
+</li>
+<li><p class="first">Run the script <strong class="command">arrayConfiguration.py</strong>:</p>
+<div class="highlight-python"><div class="highlight"><pre>casapy -c arrayconfiguration.py -s yes -l 2h -i &lt;path&gt;/YYYY-MM-DD.cfg
+</pre></div>
+</div>
+<p>Where <strong class="command">&lt;path&gt;</strong> is the path where you stored the YYYY-MM-DD.cfg file.
+The execution might fail complaining about missing C34-?.cfg files: copy them
+to the path where you are running the script from
+<tt class="file docutils literal"><span class="pre">~/AIV/science/ArrayConfiguration/Tools/Cycle2/*.cfg</span></tt></p>
+</li>
+</ol>
 </div>
 </div>
 <div class="section" id="indices-and-tables">
@@ -1934,9 +1952,11 @@ WHERE sb.SCHEDBLOCKID = ou.OBSUNITID AND sb.CSV = 0
 </ul>
 </li>
 <li><a class="reference internal" href="#the-wto-data-frames">The WTO Data Frames</a><ul>
-<li><a class="reference internal" href="#description">Description</a><ul>
 <li><a class="reference internal" href="#wtodatabase-obsprojects">wtoDatabase.obsprojects</a></li>
-<li><a class="reference internal" href="#wtodatabase-sciencegoals">wtoDatabase.sciencegoals</a></li>
+<li><a class="reference internal" href="#wtodatabase-sciencegoals">wtoDatabase.sciencegoals</a><ul>
+<li><a class="reference internal" href="#getting-the-scheduling-blocks-of-a-science-goal">Getting the Scheduling Blocks of a Science Goal.</a></li>
+</ul>
+</li>
 <li><a class="reference internal" href="#wtodatabase-schedblocks">wtoDatabase.schedblocks</a></li>
 <li><a class="reference internal" href="#wtodatabase-schedblock-info">wtoDatabase.schedblock_info</a></li>
 <li><a class="reference internal" href="#wtodatabase-target">wtoDatabase.target</a></li>
@@ -1947,8 +1967,6 @@ WHERE sb.SCHEDBLOCKID = ou.OBSUNITID AND sb.CSV = 0
 <li><a class="reference internal" href="#wtodatabase-scheduling-proj">wtoDatabase.scheduling_proj</a></li>
 <li><a class="reference internal" href="#wtodatabase-scheduling-sb">wtoDatabase.scheduling_sb</a></li>
 <li><a class="reference internal" href="#wtodatabase-sbstate">wtoDatabase.sbstate</a></li>
-</ul>
-</li>
 </ul>
 </li>
 <li><a class="reference internal" href="#apendix">Apendix</a><ul>

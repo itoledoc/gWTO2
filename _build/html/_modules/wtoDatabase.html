@@ -131,7 +131,7 @@
         <span class="bp">self</span><span class="o">.</span><span class="n">sql1</span> <span class="o">=</span> <span class="nb">str</span><span class="p">(</span>
             <span class="s">&quot;SELECT PRJ_ARCHIVE_UID,DELETED,PI,PRJ_NAME, &quot;</span>
             <span class="s">&quot;CODE,PRJ_TIME_OF_CREATION,PRJ_SCIENTIFIC_RANK,PRJ_VERSION,&quot;</span>
-            <span class="s">&quot;PRJ_ASSIGNED_PRIORITY,PRJ_LETTER_GRADE,DOMAIN_ENTITY_STATE,&quot;</span>
+            <span class="s">&quot;PRJ_LETTER_GRADE,DOMAIN_ENTITY_STATE,&quot;</span>
             <span class="s">&quot;OBS_PROJECT_ID &quot;</span>
             <span class="s">&quot;FROM ALMA.BMMV_OBSPROJECT obs1, ALMA.OBS_PROJECT_STATUS obs2  &quot;</span>
             <span class="s">&quot;WHERE regexp_like (CODE, &#39;^201[23].*\.[AST]&#39;) &quot;</span>
@@ -1075,7 +1075,7 @@
 <span class="sd">        &quot;&quot;&quot;</span>
         <span class="k">if</span> <span class="n">path</span> <span class="ow">is</span> <span class="bp">None</span><span class="p">:</span>
             <span class="n">path</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">path</span>
-        <span class="n">allsb</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">sb_summary</span><span class="p">[</span>
+        <span class="n">allsb</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">sb_summary</span><span class="o">.</span><span class="n">copy</span><span class="p">()[</span>
             <span class="p">[</span><span class="s">&#39;CODE&#39;</span><span class="p">,</span> <span class="s">&#39;PRJ_ARCHIVE_UID&#39;</span><span class="p">,</span> <span class="s">&#39;name&#39;</span><span class="p">,</span> <span class="s">&#39;SB_UID&#39;</span><span class="p">,</span> <span class="s">&#39;band&#39;</span><span class="p">,</span> <span class="s">&#39;repfreq&#39;</span><span class="p">,</span>
              <span class="s">&#39;array&#39;</span><span class="p">,</span> <span class="s">&#39;EXEC&#39;</span><span class="p">,</span> <span class="s">&#39;RA&#39;</span><span class="p">,</span> <span class="s">&#39;DEC&#39;</span><span class="p">]]</span>
         <span class="n">allsb</span><span class="p">[</span><span class="s">&#39;conf&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">pd</span><span class="o">.</span><span class="n">Series</span><span class="p">(</span><span class="n">pd</span><span class="o">.</span><span class="n">np</span><span class="o">.</span><span class="n">zeros</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">allsb</span><span class="p">)),</span> <span class="n">index</span><span class="o">=</span><span class="n">allsb</span><span class="o">.</span><span class="n">index</span><span class="p">)</span>

@@ -498,44 +498,46 @@ Load the environment and start ipython::
 
 Once in ipython:::
 
-    import wtoAlgorithm as wto
-    import ephem
-    import pandas as pd
-    datas = wto.Algorithm(path='./wto_testing/')
+    >>> import wtoAlgorithm as wto
+    >>> import ephem
+    >>> import pandas as pd
+    >>> datas = wto.Algorithm(path='./wto_testing/')
 
 And the run the following script. You can copy the code, and then paste into
 python with :command:`%paste`, or :download:`donwload the file <runwto.py>`,
-and then load the function with :command:`execfile('runwto.py')`::
+and then load the function with :command:`execfile('runwto.py')`:
 
-    def runwto(pwv, array_name=None, d=None, num_ant=34):
-        datas.query_arrays()
-        if array_name == 'default':
-            array_name = None
-            datas.set_bl_prop(array_name)
-        else:
-            array_name = datas.bl_arrays.AV1.values[0]
-            datas.set_bl_prop(array_name)
-            datas.array_ar = 61800 / (100. * datas.ruv.max())
-        if d == None:
-            d = ephem.now()
-        if num_ant != 34:
-            datas.num_ant = num_ant
-        datas.array_name = array_name
-        datas.update()
-        datas.date = d
-        datas.pwv = pwv
-        datas.selector('12m')
-        datas.scorer('12m')
-        print datas.score12m.sort(
-            'score', ascending=False).query(
-            'band != "ALMA_RB_04" and band '
-            '!= "ALMA_RB_08" and isPolarization == False')[
-            ['score','CODE','SB_UID','name','SB_state','band','maxPWVC', 'HA',
-             'elev','etime', 'execount','Total','arrayMinAR','arcorr',
-             'arrayMaxAR','tsysfrac', 'blfrac','frac','sb_array_score',
-             'sb_cond_score', 'DEC','RA', 'isTimeConstrained',
-             'integrationTime', 'PRJ_ARCHIVE_UID']].head(25)
-        datas.num_ant_user = 34
+   .. code-block:: python
+
+      def runwto(pwv, array_name=None, d=None, num_ant=34):
+          datas.query_arrays()
+          if array_name == 'default':
+              array_name = None
+              datas.set_bl_prop(array_name)
+          else:
+              array_name = datas.bl_arrays.AV1.values[0]
+              datas.set_bl_prop(array_name)
+              datas.array_ar = 61800 / (100. * datas.ruv.max())
+          if d == None:
+              d = ephem.now()
+          if num_ant != 34:
+              datas.num_ant = num_ant
+          datas.array_name = array_name
+          datas.update()
+          datas.date = d
+          datas.pwv = pwv
+          datas.selector('12m')
+          datas.scorer('12m')
+          print datas.score12m.sort(
+              'score', ascending=False).query(
+              'band != "ALMA_RB_04" and band '
+              '!= "ALMA_RB_08" and isPolarization == False')[
+              ['score','CODE','SB_UID','name','SB_state','band','maxPWVC', 'HA',
+               'elev','etime', 'execount','Total','arrayMinAR','arcorr',
+               'arrayMaxAR','tsysfrac', 'blfrac','frac','sb_array_score',
+               'sb_cond_score', 'DEC','RA', 'isTimeConstrained',
+               'integrationTime', 'PRJ_ARCHIVE_UID']].head(25)
+          datas.num_ant_user = 34
 
 The to run the wto algorithm use a pwv value between 0 and 20, with steps of
 0.05 (e.g., 0.4, 0.45, but no 0.42), and assuming the latest BL Array. Set
@@ -571,63 +573,60 @@ The WTO API
 The WTO Data Frames
 *******************
 
-Description
-===========
-
 wtoDatabase.obsprojects
------------------------
+=======================
 
 Main obsproject table ingested from queries to the archive.
-::
 
-    SELECT PRJ_ARCHIVE_UID,DELETED,PI,PRJ_NAME,
-           CODE,PRJ_TIME_OF_CREATION,PRJ_SCIENTIFIC_RANK,PRJ_VERSION,
-           PRJ_ASSIGNED_PRIORITY,PRJ_LETTER_GRADE,DOMAIN_ENTITY_STATE,
-           OBS_PROJECT_ID
-    FROM ALMA.BMMV_OBSPROJECT obs1, ALMA.OBS_PROJECT_STATUS obs2
-    WHERE regexp_like (CODE, '^201[23].*\.[AST]')
-          AND (PRJ_LETTER_GRADE='A' OR PRJ_LETTER_GRADE='B'
-          OR PRJ_LETTER_GRADE='C')
-          AND obs2.OBS_PROJECT_ID = obs1.PRJ_ARCHIVE_UID
-
-======================  =============================================
+======================  =============================================================
 COLUMN                  VALUE
-======================  =============================================
-PRJ_ARCHIVE_UID         *(string)* Project UID
-DELETED                 *(boolean int)* Is Deleted?
-PI                      *(string)* Principal Investigator
-PRJ_NAME                *(string)* Project Name
-** CODE                 *(string)* Project Code (**Index**)
+======================  =============================================================
+PRJ_ARCHIVE_UID         *(string)* Project UID (ALMA.BMMV_OBSPROJECT.PRJ_ARCHIVE_UID)
+DELETED                 *(boolean int)* Is Deleted? (ALMA.BMMV_OBSPROJECT.DELETED)
+PI                      *(string)* Principal Investigator (ALMA.BMMV_OBSPROJECT.PI)
+PRJ_NAME                *(string)* Project Name (ALMA.BMMV_OBSPROJECT.PRJ_NAME)
+** CODE                 *(string)* Project Code (ALMA.BMMV_OBSPROJECT.CODE)
 PRJ_TIME_OF_CREATION    *(string)* Project creation timestamp
+                        (ALMA.BMMV_OBSPROJECT.PRJ_TIME_OF_CREATION)
 PRJ_SCIENTIFIC_RANK     *(int64)* Project Rank
-PRJ_VERSION             *(string)* Project Version
-PRJ_ASSIGNED_PRIORITY   *(object)* None
+                        (ALMA.BMMV_OBSPROJECT.PRJ_SCIENTIFIC_RANK)
+PRJ_VERSION             *(string)* Project Version (ALMA.BMMV_OBSPROJECT.PRJ_VERSION)
 PRJ_LETTER_GRADE        *(string)* Project Grade
-DOMAIN_ENTITY_STATE     *(string)* Project Status (ProTrack)
+                        (ALMA.BMMV_OBSPROJECT.PRJ_LETTER_GRADE)
+DOMAIN_ENTITY_STATE     *(string)* Project Status
+                        (ALMA.BMMV_OBSPROJECT.DOMAIN_ENTITY_STATE)
 OBS_PROJECT_ID          *(string)* Project UID
+                        (ALMA.BMMV_OBSPROJECT.OBS_PROJECT_ID)
 EXEC                    *(string)* Executive
+                        (ALMA.BMMV_OBSPROPOSAL.ASSOCIATEDEXEC)
 timestamp               *(datetime64[ns])* Project latest update date
+                        (ALMA.XML_OBSPROJECT_ENTITIES.TIMESTAMP)
 obsproj                 *(string)* Obsproject XML filename
-======================  =============================================
+                        (and link to ALMA.XML_OBSPROJECT_ENTITIES.XML)
+======================  =============================================================
 
 
 
 wtoDatabase.sciencegoals
-------------------------
+========================
 
-==================   ================================================
+==================   =============================================================
 COLUMN               VALUE
-==================   ================================================
-CODE                 *(string)* Project Code
-** partId            *(string)* Science Goal partId (**Index**)
+==================   =============================================================
+CODE                 *(string)* Project Code (ALMA.BMMV_OBSPROJECT.CODE)
+** partId            *(string)* Science Goal partId
+                     (``xml:ObsProject.ObsProgram.ScienceGoal.ObsUnitSetRef['partId']``)
 AR                   *(float64)* Desired angular resolution (arcsec)
-LAS                  *(float64)* Largest scale (arcser)
+                     (``xml:ObsProject.ObsProgram.ScienceGoal.PerformanceParameters.desiredAngularResolution``)
+LAS                  *(float64)* Largest scale (arcsec)
+                     (``xml:ObsProject.ObsProgram.ScienceGoal.PerformanceParameters.desiredLargestScale``)
 bands                *(string)* ALMA Band
-isSpectralScan       *(boolean)*
-isTimeConstrained    *(boolean)*
-useACA               *(boolean)*
-useTP                *(boolean)*
-SBS                  *(list of str)* ScienceGoal SBs
+                     (``xml:ObsProject.ObsProgram.ScienceGoal.requiredReceiverBands``)
+isSpectralScan       *(boolean)* (``xml:ObsProject.ObsProgram.ScienceGoals.SpectralSetupParameters.SpectralScan``)
+isTimeConstrained    *(boolean)* (``xml:ObsProject.ObsProgram.ScienceGoal.PerformanceParameters.isTimeConstrained``)
+useACA               *(boolean)* (``xml:ObsProject.ObsProgram.ScienceGoal.PerformanceParameters.useACA``)
+useTP                *(boolean)* (``xml:ObsProject.ObsProgram.ScienceGoal.PerformanceParameters.useTP``)
+SBS                  *(list of strings)* :ref:`ScienceGoals SBs <sgsb>`
 startRime            *(string)* Time constrain start
 endTime              *(string)* Time constrain end
 allowedMargin        *(float64)* TC allowed margin
@@ -635,10 +634,18 @@ allowedUnits         *(string)* units
 repeats              *(int)*
 note                 *(string)* Time constrain notes
 isavoid              *(boolean)*
-==================   ================================================
+==================   =============================================================
+
+.. _sgsb:
+
+Getting the Scheduling Blocks of a Science Goal.
+------------------------------------------------
+
+To get the Scheduling Blocks that are part of a ScienceGoal entity the partId
+is used.
 
 wtoDatabase.schedblocks
------------------------
+=======================
 
 ==================   ================================================
 COLUMN               VALUE
@@ -651,7 +658,7 @@ sb_xml               object
 
 
 wtoDatabase.schedblock_info
----------------------------
+===========================
 ==================   ================================================
 COLUMN               VALUE
 ==================   ================================================
@@ -680,7 +687,7 @@ maxPWVC              *(float64)*
 ==================   ================================================
 
 wtoDatabase.target
-------------------
+==================
 ==================   ================================================
 COLUMN               VALUE
 ==================   ================================================
@@ -691,7 +698,7 @@ paramRef             *(string)*
 ==================   ================================================
 
 wtoDatabase.fieldsource
------------------------
+=======================
 ==================   ================================================
 COLUMN               VALUE
 ==================   ================================================
@@ -715,7 +722,7 @@ isMosaic             object
 ==================   ================================================
 
 wtoDatabase.spectralconf
-------------------------
+========================
 ==================   ================================================
 COLUMN               VALUE
 ==================   ================================================
@@ -726,7 +733,7 @@ SPWs                 float64
 ==================   ================================================
 
 wtoDatabase.sb_summary
-----------------------
+======================
 ===========================   ============
 COLUMN                        VALUE
 ===========================   ============
@@ -765,7 +772,7 @@ Total_exe                     float6
 ===========================   ============
 
 wtoDatabase.qa0
----------------
+===============
 ==================   =========================
 COLUMN               VALUE
 ==================   =========================
@@ -774,7 +781,7 @@ QA0STATUS            object
 ==================   =========================
 
 wtoDatabase.scheduling_proj
----------------------------
+===========================
 
 Queries project data from the SCHEDULING_AOS archive tables.
 ::
@@ -809,7 +816,7 @@ STATUS_TIMESTAMP
 ===========================   ================================================
 
 wtoDatabase.scheduling_sb
--------------------------
+=========================
 
 Queries scheduling block data from SCHEDULING_AOS tables.::
 
@@ -834,7 +841,7 @@ OBSUNIT_PROJECT_UID            object
 ===========================   ================================================
 
 wtoDatabase.sbstate
--------------------
+===================
 
 *******
 Apendix
@@ -845,6 +852,19 @@ Apendix
 Assessment of Current Array's Angular Resolution
 ================================================
 
+#. From the dashboard get a list of antennas and pads that are available and
+   working in band 3 or 6. This should be saved in a file with the name
+   YYYY-MM-DD.cfg, which is a space-separeted values file, with the antenna in the
+   first column and pad in the second. (:download:`Example file <2014-07-20.cfg>`)
+
+#. Run the script :command:`arrayConfiguration.py`::
+
+     casapy -c arrayconfiguration.py -s yes -l 2h -i <path>/YYYY-MM-DD.cfg
+
+   Where :command:`<path>` is the path where you stored the YYYY-MM-DD.cfg file.
+   The execution might fail complaining about missing C34-?.cfg files: copy them
+   to the path where you are running the script from
+   :file:`~/AIV/science/ArrayConfiguration/Tools/Cycle2/*.cfg`
 
 
 ******************
