@@ -738,6 +738,8 @@ def observable(solarSystem, sourcename, RA, DEC, horizon, isQuery, ephemeris,
             ra, dec, ephe = read_ephemeris(ephemeris, alma.date)
             if not ephe:
                 alma.date = dtemp
+                print("Source %s doesn't have ephemeris for current's date" %
+                      sourcename)
                 return 0, 0, 0, 0, 0, 0, 0, 0, False
             obj = ephem.FixedBody()
             obj._ra = pd.np.deg2rad(ra)
@@ -832,7 +834,6 @@ def read_ephemeris(ephemeris, date):
             c1 = 0
         elif line.startswith('$$EOE') or line.startswith(' $$EOE'):
             if not found:
-                # print "NO EPHEMERIS FOR CURRENT DATE. Setting RA=0, DEC=0"
                 ra = ephem.hours('00:00:00')
                 dec = ephem.degrees('00:00:00')
                 ephe = False
