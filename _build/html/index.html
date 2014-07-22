@@ -54,14 +54,25 @@
 <h2>Using gWTO2<a class="headerlink" href="#using-gwto2" title="Permalink to this headline">¶</a></h2>
 <div class="admonition note">
 <p class="first admonition-title">Note</p>
-<p><strong>Latest update:</strong> July 20, 2014</p>
+<p><strong>Latest update:</strong>
+July 22, 2014</p>
 <p><strong>Latest changes in the code:</strong></p>
 <ol class="last arabic simple">
 <li>Added yellow background to SBs that could be executed, but that would prefer
-another angular resolution</li>
+another angular resolution, <strong>except for point sources</strong>.</li>
 <li>gWTO2 will now detect Project States changes without need to restart, as well
-as SB states changes</li>
+as SB states changes.</li>
 <li>Executive, Grade and Rank columns added/rearrenged.</li>
+</ol>
+</div>
+<div class="admonition warning">
+<p class="first admonition-title">Warning</p>
+<p>TODO List:</p>
+<ol class="last arabic simple">
+<li>Some SBs are Time Constrained, but they have not set the flag
+<tt class="xref std std-keyword docutils literal"><span class="pre">isTimeConstrained</span></tt>.</li>
+<li>Need to handle some SBs that have multiple ScienceParameters.</li>
+<li>Deal with Total Power SBs.</li>
 </ol>
 </div>
 <div class="figure">
@@ -189,7 +200,8 @@ increased by over a factor of 1.3 to reach the PI requested sensitivity.
 <strong>(AoD leader should know.)</strong></li>
 <li><strong>Yellow</strong>: The SB, even when it can be run with the current Array&#8217;s angular
 resolution, does require, or prefers, another configuration. If there is
-nothing else to observe, the AoD could execute it.</li>
+nothing else to observe, the AoD could execute it. <strong>This doesn&#8217;t apply to</strong>
+<strong>point sources.</strong></li>
 </ul>
 </div>
 <div class="section" id="standard-aca-tab-in-bl-aca-gui">
@@ -225,6 +237,7 @@ goes down the horizon limit. <em>This calculated by checking the field sources</
 <em>coordinates of the SB, and not by the representative coordinates.</em></li>
 <li><strong>Grade:</strong> Grade letter for the SB&#8217;s project.</li>
 <li><strong>Executive:</strong> SB&#8217;s project executive.</li>
+<li><strong>Rank:</strong> SB&#8217;s Project science rank</li>
 <li><strong>Exec. Req.:</strong> Number of executions requested for this SB.</li>
 <li><strong>Exec. Done.:</strong> Number of execution blocks for this SB, that have the QA0
 status set to PASS, or in Unset state.</li>
@@ -1246,8 +1259,8 @@ or selecttp.</td>
 <p>Main obsproject table ingested from queries to the archive.</p>
 <table border="1" class="docutils">
 <colgroup>
-<col width="27%" />
-<col width="73%" />
+<col width="28%" />
+<col width="72%" />
 </colgroup>
 <thead valign="bottom">
 <tr class="row-odd"><th class="head">COLUMN</th>
@@ -1256,64 +1269,72 @@ or selecttp.</td>
 </thead>
 <tbody valign="top">
 <tr class="row-even"><td>PRJ_ARCHIVE_UID</td>
-<td><em>(string)</em> Project UID (ALMA.BMMV_OBSPROJECT.PRJ_ARCHIVE_UID)</td>
+<td><em>(string)</em> Project UID (1)</td>
 </tr>
 <tr class="row-odd"><td>DELETED</td>
-<td><em>(boolean int)</em> Is Deleted? (ALMA.BMMV_OBSPROJECT.DELETED)</td>
+<td><em>(boolean int)</em> Is Deleted? (2)</td>
 </tr>
 <tr class="row-even"><td>PI</td>
-<td><em>(string)</em> Principal Investigator (ALMA.BMMV_OBSPROJECT.PI)</td>
+<td><em>(string)</em> Principal Investigator (3)</td>
 </tr>
 <tr class="row-odd"><td>PRJ_NAME</td>
-<td><em>(string)</em> Project Name (ALMA.BMMV_OBSPROJECT.PRJ_NAME)</td>
+<td><em>(string)</em> Project Name (4)</td>
 </tr>
 <tr class="row-even"><td>** CODE</td>
-<td><em>(string)</em> Project Code (ALMA.BMMV_OBSPROJECT.CODE)</td>
+<td><em>(string)</em> Project Code (5)</td>
 </tr>
 <tr class="row-odd"><td>PRJ_TIME_OF_CREATION</td>
-<td><em>(string)</em> Project creation timestamp
-(ALMA.BMMV_OBSPROJECT.PRJ_TIME_OF_CREATION)</td>
+<td><em>(string)</em> Project creation timestamp (6)</td>
 </tr>
 <tr class="row-even"><td>PRJ_SCIENTIFIC_RANK</td>
-<td><em>(int64)</em> Project Rank
-(ALMA.BMMV_OBSPROJECT.PRJ_SCIENTIFIC_RANK)</td>
+<td><em>(int64)</em> Project Rank (7)</td>
 </tr>
 <tr class="row-odd"><td>PRJ_VERSION</td>
-<td><em>(string)</em> Project Version (ALMA.BMMV_OBSPROJECT.PRJ_VERSION)</td>
+<td><em>(string)</em> Project Version (8)</td>
 </tr>
 <tr class="row-even"><td>PRJ_LETTER_GRADE</td>
-<td><em>(string)</em> Project Grade
-(ALMA.BMMV_OBSPROJECT.PRJ_LETTER_GRADE)</td>
+<td><em>(string)</em> Project Grade (9)</td>
 </tr>
 <tr class="row-odd"><td>DOMAIN_ENTITY_STATE</td>
-<td><em>(string)</em> Project Status
-(ALMA.BMMV_OBSPROJECT.DOMAIN_ENTITY_STATE)</td>
+<td><em>(string)</em> Project Status (10)</td>
 </tr>
 <tr class="row-even"><td>OBS_PROJECT_ID</td>
-<td><em>(string)</em> Project UID
-(ALMA.BMMV_OBSPROJECT.OBS_PROJECT_ID)</td>
+<td><em>(string)</em> Project UID (11)</td>
 </tr>
 <tr class="row-odd"><td>EXEC</td>
-<td><em>(string)</em> Executive
-(ALMA.BMMV_OBSPROPOSAL.ASSOCIATEDEXEC)</td>
+<td><em>(string)</em> Executive (12)</td>
 </tr>
 <tr class="row-even"><td>timestamp</td>
-<td><em>(datetime64[ns])</em> Project latest update date
-(ALMA.XML_OBSPROJECT_ENTITIES.TIMESTAMP)</td>
+<td><em>(datetime64[ns])</em> Project latest update date (13)</td>
 </tr>
 <tr class="row-odd"><td>obsproj</td>
-<td><em>(string)</em> Obsproject XML filename
-(and link to ALMA.XML_OBSPROJECT_ENTITIES.XML)</td>
+<td><em>(string)</em> Obsproject XML filename (14)</td>
 </tr>
 </tbody>
 </table>
+<ol class="arabic simple">
+<li>ALMA.BMMV_OBSPROJECT.PRJ_ARCHIVE_UID</li>
+<li>ALMA.BMMV_OBSPROJECT.DELETED</li>
+<li>ALMA.BMMV_OBSPROJECT.PI</li>
+<li>ALMA.BMMV_OBSPROJECT.PRJ_NAME</li>
+<li>ALMA.BMMV_OBSPROJECT.CODE</li>
+<li>ALMA.BMMV_OBSPROJECT.PRJ_TIME_OF_CREATION</li>
+<li>ALMA.BMMV_OBSPROJECT.PRJ_SCIENTIFIC_RANK</li>
+<li>ALMA.BMMV_OBSPROJECT.PRJ_VERSION</li>
+<li>ALMA.BMMV_OBSPROJECT.PRJ_LETTER_GRADE</li>
+<li>ALMA.BMMV_OBSPROJECT.DOMAIN_ENTITY_STATE</li>
+<li>ALMA.BMMV_OBSPROJECT.OBS_PROJECT_ID</li>
+<li>ALMA.BMMV_OBSPROPOSAL.ASSOCIATEDEXEC</li>
+<li>ALMA.XML_OBSPROJECT_ENTITIES.TIMESTAMP</li>
+<li>link to ALMA.XML_OBSPROJECT_ENTITIES.XML</li>
+</ol>
 </div>
 <div class="section" id="wtodatabase-sciencegoals">
 <h3>wtoDatabase.sciencegoals<a class="headerlink" href="#wtodatabase-sciencegoals" title="Permalink to this headline">¶</a></h3>
 <table border="1" class="docutils">
 <colgroup>
-<col width="16%" />
-<col width="84%" />
+<col width="23%" />
+<col width="77%" />
 </colgroup>
 <thead valign="bottom">
 <tr class="row-odd"><th class="head">COLUMN</th>
@@ -1322,62 +1343,79 @@ or selecttp.</td>
 </thead>
 <tbody valign="top">
 <tr class="row-even"><td>CODE</td>
-<td><em>(string)</em> Project Code (ALMA.BMMV_OBSPROJECT.CODE)</td>
+<td><em>(string)</em> Project Code (1)</td>
 </tr>
 <tr class="row-odd"><td>** partId</td>
-<td><em>(string)</em> Science Goal partId
-(<tt class="docutils literal"><span class="pre">xml:ObsProject.ObsProgram.ScienceGoal.ObsUnitSetRef['partId']</span></tt>)</td>
+<td><em>(string)</em> Science Goal partId (2)</td>
 </tr>
 <tr class="row-even"><td>AR</td>
-<td><em>(float64)</em> Desired angular resolution (arcsec)
-(<tt class="docutils literal"><span class="pre">xml:ObsProject.ObsProgram.ScienceGoal.PerformanceParameters.desiredAngularResolution</span></tt>)</td>
+<td><em>(float64)</em> Desired angular resolution (arcsec) (3)</td>
 </tr>
 <tr class="row-odd"><td>LAS</td>
-<td><em>(float64)</em> Largest scale (arcsec)
-(<tt class="docutils literal"><span class="pre">xml:ObsProject.ObsProgram.ScienceGoal.PerformanceParameters.desiredLargestScale</span></tt>)</td>
+<td><em>(float64)</em> Largest scale (arcsec) (4)</td>
 </tr>
 <tr class="row-even"><td>bands</td>
-<td><em>(string)</em> ALMA Band
-(<tt class="docutils literal"><span class="pre">xml:ObsProject.ObsProgram.ScienceGoal.requiredReceiverBands</span></tt>)</td>
+<td><em>(string)</em> ALMA Band (5)</td>
 </tr>
 <tr class="row-odd"><td>isSpectralScan</td>
-<td><em>(boolean)</em> (<tt class="docutils literal"><span class="pre">xml:ObsProject.ObsProgram.ScienceGoals.SpectralSetupParameters.SpectralScan</span></tt>)</td>
+<td><em>(boolean)</em> (6)</td>
 </tr>
 <tr class="row-even"><td>isTimeConstrained</td>
-<td><em>(boolean)</em> (<tt class="docutils literal"><span class="pre">xml:ObsProject.ObsProgram.ScienceGoal.PerformanceParameters.isTimeConstrained</span></tt>)</td>
+<td><em>(boolean)</em> (7)</td>
 </tr>
 <tr class="row-odd"><td>useACA</td>
-<td><em>(boolean)</em> (<tt class="docutils literal"><span class="pre">xml:ObsProject.ObsProgram.ScienceGoal.PerformanceParameters.useACA</span></tt>)</td>
+<td><em>(boolean)</em> (8)</td>
 </tr>
 <tr class="row-even"><td>useTP</td>
-<td><em>(boolean)</em> (<tt class="docutils literal"><span class="pre">xml:ObsProject.ObsProgram.ScienceGoal.PerformanceParameters.useTP</span></tt>)</td>
+<td><em>(boolean)</em> (9)</td>
 </tr>
-<tr class="row-odd"><td>SBS</td>
+<tr class="row-odd"><td>ps</td>
+<td><em>(boolean)</em> Is point source?</td>
+</tr>
+<tr class="row-even"><td>SBS</td>
 <td><em>(list of strings)</em> <a class="reference internal" href="#sgsb"><em>ScienceGoals SBs</em></a></td>
 </tr>
-<tr class="row-even"><td>startRime</td>
-<td><em>(string)</em> Time constrain start</td>
+<tr class="row-odd"><td>startRime</td>
+<td><em>(string)</em> Time constrain start (10)</td>
 </tr>
-<tr class="row-odd"><td>endTime</td>
-<td><em>(string)</em> Time constrain end</td>
+<tr class="row-even"><td>endTime</td>
+<td><em>(string)</em> Time constrain end (11)</td>
 </tr>
-<tr class="row-even"><td>allowedMargin</td>
-<td><em>(float64)</em> TC allowed margin</td>
+<tr class="row-odd"><td>allowedMargin</td>
+<td><em>(float64)</em> TC allowed margin (12)</td>
 </tr>
-<tr class="row-odd"><td>allowedUnits</td>
-<td><em>(string)</em> units</td>
+<tr class="row-even"><td>allowedUnits</td>
+<td><em>(string)</em> units (13)</td>
 </tr>
-<tr class="row-even"><td>repeats</td>
-<td><em>(int)</em></td>
+<tr class="row-odd"><td>repeats</td>
+<td><em>(int)</em> (14)</td>
 </tr>
-<tr class="row-odd"><td>note</td>
-<td><em>(string)</em> Time constrain notes</td>
+<tr class="row-even"><td>note</td>
+<td><em>(string)</em> Time constraint notes (15)</td>
 </tr>
-<tr class="row-even"><td>isavoid</td>
-<td><em>(boolean)</em></td>
+<tr class="row-odd"><td>isavoid</td>
+<td><em>(boolean)</em> Time constrait is to avoid (16)</td>
 </tr>
 </tbody>
 </table>
+<ol class="arabic simple">
+<li>ALMA.BMMV_OBSPROJECT.CODE</li>
+<li><tt class="docutils literal"><span class="pre">xml:ObsProject.ObsProgram.ScienceGoal.ObsUnitSetRef['partId']</span></tt></li>
+<li><tt class="docutils literal"><span class="pre">xml:...PerformanceParameters.desiredAngularResolution</span></tt></li>
+<li><tt class="docutils literal"><span class="pre">xml:...PerformanceParameters.desiredLargestScale</span></tt></li>
+<li><tt class="docutils literal"><span class="pre">xml:...requiredReceiverBands</span></tt></li>
+<li><tt class="docutils literal"><span class="pre">xml:...SpectralSetupParameters.SpectralScan</span></tt></li>
+<li><tt class="docutils literal"><span class="pre">xml:...PerformanceParameters.isTimeConstrained</span></tt></li>
+<li><tt class="docutils literal"><span class="pre">xml:...PerformanceParameters.useACA</span></tt></li>
+<li><tt class="docutils literal"><span class="pre">xml:...PerformanceParameters.useTP</span></tt></li>
+<li><tt class="docutils literal"><span class="pre">xml:...sciencegoal.PerformanceParameters.TemporalParameters.startTime</span></tt></li>
+<li><tt class="docutils literal"><span class="pre">xml:...sciencegoal.PerformanceParameters.TemporalParameters.endTime</span></tt></li>
+<li><tt class="docutils literal"><span class="pre">xml:...sciencegoal.PerformanceParameters.TemporalParameters.allowedMargin</span></tt></li>
+<li>(idem)</li>
+<li><tt class="docutils literal"><span class="pre">xml:...PerformanceParameters.TemporalParameters.repeats</span></tt></li>
+<li><tt class="docutils literal"><span class="pre">xml:...PerformanceParameters.TemporalParameters.note</span></tt></li>
+<li><tt class="docutils literal"><span class="pre">xml:...PerformanceParameters.TemporalParameters.isAvoidConstraint</span></tt></li>
+</ol>
 <div class="section" id="getting-the-scheduling-blocks-of-a-science-goal">
 <span id="sgsb"></span><h4>Getting the Scheduling Blocks of a Science Goal.<a class="headerlink" href="#getting-the-scheduling-blocks-of-a-science-goal" title="Permalink to this headline">¶</a></h4>
 <p>To get the Scheduling Blocks that are part of a ScienceGoal entity the partId
@@ -1388,8 +1426,8 @@ is used.</p>
 <h3>wtoDatabase.schedblocks<a class="headerlink" href="#wtodatabase-schedblocks" title="Permalink to this headline">¶</a></h3>
 <table border="1" class="docutils">
 <colgroup>
-<col width="27%" />
-<col width="73%" />
+<col width="23%" />
+<col width="77%" />
 </colgroup>
 <thead valign="bottom">
 <tr class="row-odd"><th class="head">COLUMN</th>
@@ -1398,16 +1436,16 @@ is used.</p>
 </thead>
 <tbody valign="top">
 <tr class="row-even"><td>SB_UID</td>
-<td>object</td>
+<td><em>(string)</em> SB UID</td>
 </tr>
 <tr class="row-odd"><td>partId</td>
-<td>object</td>
+<td><em>(string)</em> Science Goal partId</td>
 </tr>
 <tr class="row-even"><td>timestamp</td>
-<td>datetime64[ns]</td>
+<td><em>(datetime64[ns])</em> Project latest update date (13)</td>
 </tr>
 <tr class="row-odd"><td>sb_xml</td>
-<td>object</td>
+<td><em>(string)</em> SchedBlock XML filename</td>
 </tr>
 </tbody>
 </table>
@@ -1416,8 +1454,8 @@ is used.</p>
 <h3>wtoDatabase.schedblock_info<a class="headerlink" href="#wtodatabase-schedblock-info" title="Permalink to this headline">¶</a></h3>
 <table border="1" class="docutils">
 <colgroup>
-<col width="27%" />
-<col width="73%" />
+<col width="23%" />
+<col width="77%" />
 </colgroup>
 <thead valign="bottom">
 <tr class="row-odd"><th class="head">COLUMN</th>
@@ -1426,70 +1464,70 @@ is used.</p>
 </thead>
 <tbody valign="top">
 <tr class="row-even"><td>SB_UID</td>
-<td><em>(string)</em></td>
+<td><em>(string)</em> SB UID</td>
 </tr>
 <tr class="row-odd"><td>partId</td>
-<td><em>(string)</em></td>
+<td><em>(string)</em> Science Goal partId</td>
 </tr>
 <tr class="row-even"><td>name</td>
-<td><em>(string)</em></td>
+<td><em>(string)</em> SB Name</td>
 </tr>
 <tr class="row-odd"><td>status_xml</td>
-<td><em>(string)</em></td>
+<td><em>(string)</em> SB status (from xml entity)</td>
 </tr>
 <tr class="row-even"><td>repfreq</td>
-<td><em>(float64)</em></td>
+<td><em>(float64)</em> SB representative frequency (GHz)</td>
 </tr>
 <tr class="row-odd"><td>band</td>
-<td><em>(string)</em></td>
+<td><em>(string)</em> SB requested Band</td>
 </tr>
 <tr class="row-even"><td>array</td>
-<td><em>(string)</em></td>
+<td><em>(string)</em> SB type of array</td>
 </tr>
 <tr class="row-odd"><td>RA</td>
-<td><em>(float64)</em></td>
+<td><em>(float64)</em> Representative RA (degrees)</td>
 </tr>
 <tr class="row-even"><td>DEC</td>
-<td><em>(float64)</em></td>
+<td><em>(float64)</em> Representative DEC (degrees)</td>
 </tr>
 <tr class="row-odd"><td>minAR_old</td>
-<td><em>(float64)</em></td>
+<td><em>(float64)</em> Original minimum angular resolution (arcsec)</td>
 </tr>
 <tr class="row-even"><td>maxAR_old</td>
-<td><em>(float64)</em></td>
+<td><em>(float64)</em> Original maximum angular resolution (arcsec)</td>
 </tr>
 <tr class="row-odd"><td>execount</td>
-<td><em>(float64)</em></td>
+<td><em>(float64)</em> Requested executions</td>
 </tr>
 <tr class="row-even"><td>isPolarization</td>
-<td><em>(boolean)</em></td>
+<td><em>(boolean)</em> Is a polarization SB?</td>
 </tr>
 <tr class="row-odd"><td>amplitude</td>
-<td><em>(string)</em></td>
+<td><em>(string)</em> AmplitudeParameters partId</td>
 </tr>
 <tr class="row-even"><td>baseband</td>
-<td><em>(string)</em></td>
+<td><em>(string)</em> BasebandParameteres partId</td>
 </tr>
 <tr class="row-odd"><td>polarization</td>
-<td><em>(string)</em></td>
+<td><em>(string)</em> PolarizationParameters partId</td>
 </tr>
 <tr class="row-even"><td>phase</td>
-<td><em>(string)</em></td>
+<td><em>(string)</em> PhaseParameters partId</td>
 </tr>
 <tr class="row-odd"><td>delay</td>
-<td><em>(string)</em></td>
+<td><em>(string)</em> DelaryParameters partId</td>
 </tr>
 <tr class="row-even"><td>science</td>
-<td><em>(string)</em></td>
+<td><em>(string)</em> ScienceParameters partId</td>
 </tr>
 <tr class="row-odd"><td>integrationTime</td>
-<td><em>(float64)</em></td>
+<td><em>(float64)</em> Science target integration time (sec)</td>
 </tr>
 <tr class="row-even"><td>subScandur</td>
-<td><em>(float64)</em></td>
+<td><em>(float64)</em> Science target subscan duration (sec)</td>
 </tr>
 <tr class="row-odd"><td>maxPWVC</td>
-<td><em>(float64)</em></td>
+<td><em>(float64)</em> PWV asumed by the OT (mm)</td>
 </tr>
 </tbody>
 </table>

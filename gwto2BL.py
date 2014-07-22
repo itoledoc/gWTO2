@@ -407,7 +407,7 @@ class BLMainWindow(QMainWindow, Ui_BLMainWindow):
                      'scienceRank', 'execount', 'Total',
                      'tsysfrac', 'blfrac', 'frac', 'sb_array_score',
                      'sb_cond_score', 'maxPWVC', 'arrayMinAR', 'arcorr',
-                     'arrayMaxAR', 'integrationTime', 'lascorr',
+                     'arrayMaxAR', 'integrationTime', 'isPointSource',
                      'PRJ_ARCHIVE_UID']]
 
         tc12 = self.datas.score12m.sort(
@@ -464,7 +464,7 @@ class BLMainWindow(QMainWindow, Ui_BLMainWindow):
              u'Rank', u'Exec. Req.',
              u'Exec. Done', u'TSysFrac', u'BLFrac', u'TotalFrac',
              u'Array Score', u'Cond. Score', u'maxPWVC', u'ArrayMinAR',
-             u'ARcorr', u'ArrayMaxAR', u'TimeOnSource', u'LAScorr',
+             u'ARcorr', u'ArrayMaxAR', u'TimeOnSource', u'Point Source',
              u'PRJ UID'], dtype='object')
 
         tc12.columns = Wto.pd.Index(
@@ -600,7 +600,7 @@ class MyStdTableModel(QAbstractTableModel):
                 return QVariant(str(d)[:-2])
             elif col in [0, 16, 17, 18, 21, 22, 23, 24]:
                 return QVariant(QString("%1").arg(sb[col], 0, 'f', 2))
-            elif col in [9, 19, 20, 25, 26]:
+            elif col in [9, 19, 20, 25]:
                 return QVariant(QString("%1").arg(sb[col], 0, 'f', 1))
             elif col in [14, 15]:
                 return QVariant(QString("%1").arg(sb[col], 0, 'i', 0))
@@ -618,7 +618,7 @@ class MyStdTableModel(QAbstractTableModel):
                 c = QVariant(QColor(235, 245, 255))
             else:
                 c = QVariant(QColor(250, 250, 250))
-            if sb[19] < 8.5:
+            if sb[19] < 8.5 and sb[26] == False:
                 c = QVariant(QColor(255, 255, 0))
             if sb[20] == 0:
                 c = QVariant(QColor(255, 110, 110))

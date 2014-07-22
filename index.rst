@@ -15,15 +15,26 @@ Using gWTO2
 ***********
 
 .. note::
-   **Latest update:** |today|
+
+   **Latest update:**
+   |today|
 
    **Latest changes in the code:**
 
    #. Added yellow background to SBs that could be executed, but that would prefer
-      another angular resolution
+      another angular resolution, **except for point sources**.
    #. gWTO2 will now detect Project States changes without need to restart, as well
-      as SB states changes
+      as SB states changes.
    #. Executive, Grade and Rank columns added/rearrenged.
+
+.. warning::
+
+   TODO List:
+
+   #. Some SBs are Time Constrained, but they have not set the flag
+      :keyword:`isTimeConstrained`.
+   #. Need to handle some SBs that have multiple ScienceParameters.
+   #. Deal with Total Power SBs.
 
 .. figure:: Selection_003.png
 
@@ -169,7 +180,8 @@ Meaning of the background colors
 
 * **Yellow**: The SB, even when it can be run with the current Array's angular
   resolution, does require, or prefers, another configuration. If there is
-  nothing else to observe, the AoD could execute it.
+  nothing else to observe, the AoD could execute it. **This doesn't apply to**
+  **point sources.**
 
 Standard (ACA) Tab in BL (ACA) GUI
 ----------------------------------
@@ -204,6 +216,7 @@ Standard (ACA) Tab in BL (ACA) GUI
    *coordinates of the SB, and not by the representative coordinates.*
 #. **Grade:** Grade letter for the SB's project.
 #. **Executive:** SB's project executive.
+#. **Rank:** SB's Project science rank
 #. **Exec. Req.:** Number of executions requested for this SB.
 #. **Exec. Done.:** Number of execution blocks for this SB, that have the QA0
    status set to PASS, or in Unset state.
@@ -578,63 +591,84 @@ wtoDatabase.obsprojects
 
 Main obsproject table ingested from queries to the archive.
 
-======================  =============================================================
+======================  ========================================================
 COLUMN                  VALUE
-======================  =============================================================
-PRJ_ARCHIVE_UID         *(string)* Project UID (ALMA.BMMV_OBSPROJECT.PRJ_ARCHIVE_UID)
-DELETED                 *(boolean int)* Is Deleted? (ALMA.BMMV_OBSPROJECT.DELETED)
-PI                      *(string)* Principal Investigator (ALMA.BMMV_OBSPROJECT.PI)
-PRJ_NAME                *(string)* Project Name (ALMA.BMMV_OBSPROJECT.PRJ_NAME)
-** CODE                 *(string)* Project Code (ALMA.BMMV_OBSPROJECT.CODE)
-PRJ_TIME_OF_CREATION    *(string)* Project creation timestamp
-                        (ALMA.BMMV_OBSPROJECT.PRJ_TIME_OF_CREATION)
-PRJ_SCIENTIFIC_RANK     *(int64)* Project Rank
-                        (ALMA.BMMV_OBSPROJECT.PRJ_SCIENTIFIC_RANK)
-PRJ_VERSION             *(string)* Project Version (ALMA.BMMV_OBSPROJECT.PRJ_VERSION)
-PRJ_LETTER_GRADE        *(string)* Project Grade
-                        (ALMA.BMMV_OBSPROJECT.PRJ_LETTER_GRADE)
-DOMAIN_ENTITY_STATE     *(string)* Project Status
-                        (ALMA.BMMV_OBSPROJECT.DOMAIN_ENTITY_STATE)
-OBS_PROJECT_ID          *(string)* Project UID
-                        (ALMA.BMMV_OBSPROJECT.OBS_PROJECT_ID)
-EXEC                    *(string)* Executive
-                        (ALMA.BMMV_OBSPROPOSAL.ASSOCIATEDEXEC)
-timestamp               *(datetime64[ns])* Project latest update date
-                        (ALMA.XML_OBSPROJECT_ENTITIES.TIMESTAMP)
-obsproj                 *(string)* Obsproject XML filename
-                        (and link to ALMA.XML_OBSPROJECT_ENTITIES.XML)
-======================  =============================================================
+======================  ========================================================
+PRJ_ARCHIVE_UID         *(string)* Project UID (1)
+DELETED                 *(boolean int)* Is Deleted? (2)
+PI                      *(string)* Principal Investigator (3)
+PRJ_NAME                *(string)* Project Name (4)
+** CODE                 *(string)* Project Code (5)
+PRJ_TIME_OF_CREATION    *(string)* Project creation timestamp (6)
+PRJ_SCIENTIFIC_RANK     *(int64)* Project Rank (7)
+PRJ_VERSION             *(string)* Project Version (8)
+PRJ_LETTER_GRADE        *(string)* Project Grade (9)
+DOMAIN_ENTITY_STATE     *(string)* Project Status (10)
+OBS_PROJECT_ID          *(string)* Project UID (11)
+EXEC                    *(string)* Executive (12)
+timestamp               *(datetime64[ns])* Project latest update date (13)
+obsproj                 *(string)* Obsproject XML filename (14)
 
+======================  ========================================================
+
+1. ALMA.BMMV_OBSPROJECT.PRJ_ARCHIVE_UID
+2. ALMA.BMMV_OBSPROJECT.DELETED
+3. ALMA.BMMV_OBSPROJECT.PI
+4. ALMA.BMMV_OBSPROJECT.PRJ_NAME
+5. ALMA.BMMV_OBSPROJECT.CODE
+6. ALMA.BMMV_OBSPROJECT.PRJ_TIME_OF_CREATION
+7. ALMA.BMMV_OBSPROJECT.PRJ_SCIENTIFIC_RANK
+8. ALMA.BMMV_OBSPROJECT.PRJ_VERSION
+9. ALMA.BMMV_OBSPROJECT.PRJ_LETTER_GRADE
+10. ALMA.BMMV_OBSPROJECT.DOMAIN_ENTITY_STATE
+11. ALMA.BMMV_OBSPROJECT.OBS_PROJECT_ID
+12. ALMA.BMMV_OBSPROPOSAL.ASSOCIATEDEXEC
+13. ALMA.XML_OBSPROJECT_ENTITIES.TIMESTAMP
+14. link to ALMA.XML_OBSPROJECT_ENTITIES.XML
 
 
 wtoDatabase.sciencegoals
 ========================
 
-==================   =============================================================
+==================   ===========================================================
 COLUMN               VALUE
-==================   =============================================================
-CODE                 *(string)* Project Code (ALMA.BMMV_OBSPROJECT.CODE)
-** partId            *(string)* Science Goal partId
-                     (``xml:ObsProject.ObsProgram.ScienceGoal.ObsUnitSetRef['partId']``)
-AR                   *(float64)* Desired angular resolution (arcsec)
-                     (``xml:ObsProject.ObsProgram.ScienceGoal.PerformanceParameters.desiredAngularResolution``)
-LAS                  *(float64)* Largest scale (arcsec)
-                     (``xml:ObsProject.ObsProgram.ScienceGoal.PerformanceParameters.desiredLargestScale``)
-bands                *(string)* ALMA Band
-                     (``xml:ObsProject.ObsProgram.ScienceGoal.requiredReceiverBands``)
-isSpectralScan       *(boolean)* (``xml:ObsProject.ObsProgram.ScienceGoals.SpectralSetupParameters.SpectralScan``)
-isTimeConstrained    *(boolean)* (``xml:ObsProject.ObsProgram.ScienceGoal.PerformanceParameters.isTimeConstrained``)
-useACA               *(boolean)* (``xml:ObsProject.ObsProgram.ScienceGoal.PerformanceParameters.useACA``)
-useTP                *(boolean)* (``xml:ObsProject.ObsProgram.ScienceGoal.PerformanceParameters.useTP``)
+==================   ===========================================================
+CODE                 *(string)* Project Code (1)
+** partId            *(string)* Science Goal partId (2)
+AR                   *(float64)* Desired angular resolution (arcsec) (3)
+LAS                  *(float64)* Largest scale (arcsec) (4)
+bands                *(string)* ALMA Band (5)
+isSpectralScan       *(boolean)* (6)
+isTimeConstrained    *(boolean)* (7)
+useACA               *(boolean)* (8)
+useTP                *(boolean)* (9)
+ps                   *(boolean)* Is point source?
 SBS                  *(list of strings)* :ref:`ScienceGoals SBs <sgsb>`
-startRime            *(string)* Time constrain start
-endTime              *(string)* Time constrain end
-allowedMargin        *(float64)* TC allowed margin
-allowedUnits         *(string)* units
-repeats              *(int)*
-note                 *(string)* Time constrain notes
-isavoid              *(boolean)*
-==================   =============================================================
+startRime            *(string)* Time constrain start (10)
+endTime              *(string)* Time constrain end (11)
+allowedMargin        *(float64)* TC allowed margin (12)
+allowedUnits         *(string)* units (13)
+repeats              *(int)* (14)
+note                 *(string)* Time constraint notes (15)
+isavoid              *(boolean)* Time constrait is to avoid (16)
+==================   ===========================================================
+
+1. ALMA.BMMV_OBSPROJECT.CODE
+2. ``xml:ObsProject.ObsProgram.ScienceGoal.ObsUnitSetRef['partId']``
+3. ``xml:...PerformanceParameters.desiredAngularResolution``
+4. ``xml:...PerformanceParameters.desiredLargestScale``
+5. ``xml:...requiredReceiverBands``
+6. ``xml:...SpectralSetupParameters.SpectralScan``
+7. ``xml:...PerformanceParameters.isTimeConstrained``
+8. ``xml:...PerformanceParameters.useACA``
+9. ``xml:...PerformanceParameters.useTP``
+10. ``xml:...sciencegoal.PerformanceParameters.TemporalParameters.startTime``
+11. ``xml:...sciencegoal.PerformanceParameters.TemporalParameters.endTime``
+12. ``xml:...sciencegoal.PerformanceParameters.TemporalParameters.allowedMargin``
+13. (idem)
+14. ``xml:...PerformanceParameters.TemporalParameters.repeats``
+15. ``xml:...PerformanceParameters.TemporalParameters.note``
+16. ``xml:...PerformanceParameters.TemporalParameters.isAvoidConstraint``
 
 .. _sgsb:
 
@@ -647,44 +681,44 @@ is used.
 wtoDatabase.schedblocks
 =======================
 
-==================   ================================================
+==================   ===========================================================
 COLUMN               VALUE
-==================   ================================================
-SB_UID               object
-partId               object
-timestamp            datetime64[ns]
-sb_xml               object
-==================   ================================================
+==================   ===========================================================
+SB_UID               *(string)* SB UID
+partId               *(string)* Science Goal partId
+timestamp            *(datetime64[ns])* Project latest update date (13)
+sb_xml               *(string)* SchedBlock XML filename
+==================   ===========================================================
 
 
 wtoDatabase.schedblock_info
 ===========================
-==================   ================================================
+==================   ===========================================================
 COLUMN               VALUE
-==================   ================================================
-SB_UID               *(string)*
-partId               *(string)*
-name                 *(string)*
-status_xml           *(string)*
-repfreq              *(float64)*
-band                 *(string)*
-array                *(string)*
-RA                   *(float64)*
-DEC                  *(float64)*
-minAR_old            *(float64)*
-maxAR_old            *(float64)*
-execount             *(float64)*
-isPolarization       *(boolean)*
-amplitude            *(string)*
-baseband             *(string)*
-polarization         *(string)*
-phase                *(string)*
-delay                *(string)*
-science              *(string)*
-integrationTime      *(float64)*
-subScandur           *(float64)*
-maxPWVC              *(float64)*
-==================   ================================================
+==================   ===========================================================
+SB_UID               *(string)* SB UID
+partId               *(string)* Science Goal partId
+name                 *(string)* SB Name
+status_xml           *(string)* SB status (from xml entity)
+repfreq              *(float64)* SB representative frequency (GHz)
+band                 *(string)* SB requested Band
+array                *(string)* SB type of array
+RA                   *(float64)* Representative RA (degrees)
+DEC                  *(float64)* Representative DEC (degrees)
+minAR_old            *(float64)* Original minimum angular resolution (arcsec)
+maxAR_old            *(float64)* Original maximum angular resolution (arcsec)
+execount             *(float64)* Requested executions
+isPolarization       *(boolean)* Is a polarization SB?
+amplitude            *(string)* AmplitudeParameters partId
+baseband             *(string)* BasebandParameteres partId
+polarization         *(string)* PolarizationParameters partId
+phase                *(string)* PhaseParameters partId
+delay                *(string)* DelaryParameters partId
+science              *(string)* ScienceParameters partId
+integrationTime      *(float64)* Science target integration time (sec)
+subScandur           *(float64)* Science target subscan duration (sec)
+maxPWVC              *(float64)* PWV asumed by the OT (mm)
+==================   ===========================================================
 
 wtoDatabase.target
 ==================
