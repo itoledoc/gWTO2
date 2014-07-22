@@ -271,8 +271,7 @@ zenith.</li>
 equivalent resolution at 100GHz and source with DEC -23.</li>
 <li><strong>ArrayMinAR:</strong> The maximum array&#8217;s resolution that the current SB will
 accept.</li>
-<li><strong>LASCorr:</strong> The largest angular scale required by the SB, corrected to
-the equivalent scale at 100GHz and source with DEC -23.</li>
+<li><strong>Point Source:</strong> are the targets of the SB point sources?</li>
 <li><strong>TimeOnSource:</strong> Integration time, in seconds, for the science target(s).
 In the case of multisources, this time should be multiplied by the number of
 sources.</li>
@@ -489,6 +488,58 @@ both previous factors:</p>
 </div>
 <div class="section" id="score-and-ranking">
 <span id="score"></span><h3>Score and ranking<a class="headerlink" href="#score-and-ranking" title="Permalink to this headline">¶</a></h3>
+<ol class="arabic">
+<li><p class="first"><strong>SB completion score</strong></p>
+<p>A score between 4 and 10, where 4 is given to SBs that has not been started
+yet, and it rises as the SB gets closer to completion.</p>
+<div class="math">
+<p><img src="_images/math/62e9746e1faa12bc03f0c75c1c0f98e32637eb34.png" alt="\rm{Score}_{\rm{SB\ completion}} =
+4 + 6 \times \frac{\rm{QA0\ Pass} + \rm{QA0\ Unset}}{\rm{Expected\ Executions}}"/></p>
+</div></li>
+<li><p class="first"><strong>SB Grade/Cycle Score</strong></p>
+<div class="math">
+<p><img src="_images/math/df65820522fd17e7620c14a18fd49b55addeb58d.png" alt="\rm{Score}_{\rm{grade}} = 10 ; \rm{if\ grade\ is\ A}
+
+\rm{Score}_{\rm{grade}} = 8  ; \rm{if\ grade\ is\ B\ and\ Cycle\ 1}
+
+\rm{Score}_{\rm{grade}} = 4  ; \rm{if\ grade\ is\ B\ and\ Cycle\ 2}
+
+\rm{Score}_{\rm{grade}} = -100 ; \rm{if\ grade\ is\ C}"/></p>
+</div></li>
+<li><p class="first"><strong>SB Science Score</strong></p>
+<div class="math">
+<p><img src="_images/math/d2b1421173a207196f51bfb11029907d0e9fa2d5.png" alt="\rm{Score}_{\rm{science\ rank}} =
+10 \times \frac{\rm{SB}_{\rm{rank}}}{\rm{max(rank)}}"/></p>
+</div></li>
+<li><p class="first"><strong>SB Array Score</strong></p>
+<div class="math" id="equation-tp">
+<p><span class="eqno">(1)</span><img src="_images/math/b8639f9c9b59da5c36b5b9126fe624c17a6797fa.png" alt="\rm{Score}_{\rm{array}} = 10 ; \rm{\ if\ array\ is\ TP\ or\ 7m}"/></p>
+</div><div class="math" id="equation-match">
+<p><span class="eqno">(2)</span><img src="_images/math/c13a90ab9364d848c6b836998bf5255643178183.png" alt="\rm{Score}_{\rm{array}} = 10 ; \rm{\ if\ } 0.9 \rm{SB}_{\rm{AR}}
+        &lt;= \rm{Array}_{\rm{AR}} &lt;= 1.1 \rm{SB}_{\rm{AR}}"/></p>
+</div><div class="math" id="equation-low">
+<p><span class="eqno">(3)</span><img src="_images/math/21cb3f78b77e8eccf3e9c3ed29c7c67e840c1664.png" alt="\rm{Score}_{\rm{array}} = 9 ; \rm{\ if\ } 0.7 \rm{SB}_{\rm{AR}}
+       &lt;= \rm{Array}_{\rm{AR}} &lt; 0.9 \rm{SB}_{\rm{AR}}"/></p>
+</div><div class="math" id="equation-toolow">
+<p><span class="eqno">(4)</span><img src="_images/math/0fa433fd908b48ed933df8f9f61baf2f32a904fa.png" alt="\rm{Score}_{\rm{array}} = 8.5\frac{\rm{Array}_{\rm{AR}} - \rm{SB}_{\rm{minAR}}}{0.7\rm{SB}_{\rm{AR}} - \rm{SB}_{\rm{minAR}}}
+       ; \rm{\ if\ } \rm{Array}_{\rm{AR}} &lt; 0.7 \rm{SB}_{\rm{AR}}"/></p>
+</div><div class="math" id="equation-high">
+<p><span class="eqno">(5)</span><img src="_images/math/0dff930e562a6a1244afb9ab723be090a2d428dd.png" alt="\rm{Score}_{\rm{array}} = \frac{10}{1.1\rm{SB}_{\rm{AR}} - \rm{SB}_{\rm{maxAR}}} \left(\rm{Array}_{\rm{AR}} - \rm{SB}_{\rm{maxAR}}\right)
+       ; \rm{\ if\ } \rm{Array}_{\rm{AR}} &gt; 1.1 \rm{SB}_{\rm{AR}}"/></p>
+</div><div class="figure">
+<a class="reference internal image-reference" href="_images/figure_1.png"><img alt="_images/figure_1.png" src="_images/figure_1.png" style="width: 588.5px; height: 408.0px;" /></a>
+<p class="caption">In this example, the requested array resolution (<img class="math" src="_images/math/92f6e2b99a975774f1d06bd9d8bd2db52e58d6bd.png" alt="\rm{SB}_{\rm{AR}}"/>)
+is 2.8 arcsec, with a minimun acceptable resolution
+<img class="math" src="_images/math/b33e7aabc1ff7358c54b8b92274490bfa3345677.png" alt="\rm{SB}_{\rm{minAR}} = 0.5"/> and maximum <img class="math" src="_images/math/eb4522772db0bb6fa424a13256d68f1e095d96d3.png" alt="\rm{SB}_{\rm{maxAR}} = 3.5"/></p>
+</div>
+</li>
+<li><p class="first"><strong>SB Executive Score</strong></p>
+</li>
+<li><p class="first"><strong>SB Condition Score</strong></p>
+</li>
+<li><p class="first"><strong>SB Total Score</strong></p>
+</li>
+</ol>
 </div>
 <div class="section" id="checking-observability">
 <span id="check-obs"></span><h3>Checking observability<a class="headerlink" href="#checking-observability" title="Permalink to this headline">¶</a></h3>

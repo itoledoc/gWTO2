@@ -250,8 +250,7 @@ Standard (ACA) Tab in BL (ACA) GUI
    equivalent resolution at 100GHz and source with DEC -23.
 #. **ArrayMinAR:** The maximum array's resolution that the current SB will
    accept.
-#. **LASCorr:** The largest angular scale required by the SB, corrected to
-   the equivalent scale at 100GHz and source with DEC -23.
+#. **Point Source:** are the targets of the SB point sources?
 #. **TimeOnSource:** Integration time, in seconds, for the science target(s).
    In the case of multisources, this time should be multiplied by the number of
    sources.
@@ -492,6 +491,67 @@ Selection and Data preparation
 
 Score and ranking
 =================
+
+
+#. **SB completion score**
+
+   A score between 4 and 10, where 4 is given to SBs that has not been started
+   yet, and it rises as the SB gets closer to completion.
+
+   .. math::
+      \rm{Score}_{\rm{SB\ completion}} =
+      4 + 6 \times \frac{\rm{QA0\ Pass} + \rm{QA0\ Unset}}{\rm{Expected\ Executions}}
+
+#. **SB Grade/Cycle Score**
+
+   .. math::
+      \rm{Score}_{\rm{grade}} = 10 ; \rm{if\ grade\ is\ A}
+
+      \rm{Score}_{\rm{grade}} = 8  ; \rm{if\ grade\ is\ B\ and\ Cycle\ 1}
+
+      \rm{Score}_{\rm{grade}} = 4  ; \rm{if\ grade\ is\ B\ and\ Cycle\ 2}
+
+      \rm{Score}_{\rm{grade}} = -100 ; \rm{if\ grade\ is\ C}
+
+#. **SB Science Score**
+
+   .. math::
+      \rm{Score}_{\rm{science\ rank}} =
+      10 \times \frac{\rm{SB}_{\rm{rank}}}{\rm{max(rank)}}
+
+#. **SB Array Score**
+
+   .. math:: \rm{Score}_{\rm{array}} = 10 ; \rm{\ if\ array\ is\ TP\ or\ 7m}
+      :label: tp
+
+   .. math::  \rm{Score}_{\rm{array}} = 10 ; \rm{\ if\ } 0.9 \rm{SB}_{\rm{AR}}
+              <= \rm{Array}_{\rm{AR}} <= 1.1 \rm{SB}_{\rm{AR}}
+      :label: match
+
+   .. math:: \rm{Score}_{\rm{array}} = 9 ; \rm{\ if\ } 0.7 \rm{SB}_{\rm{AR}}
+             <= \rm{Array}_{\rm{AR}} < 0.9 \rm{SB}_{\rm{AR}}
+      :label: low
+
+   .. math:: \rm{Score}_{\rm{array}} = 8.5\frac{\rm{Array}_{\rm{AR}} - \rm{SB}_{\rm{minAR}}}{0.7\rm{SB}_{\rm{AR}} - \rm{SB}_{\rm{minAR}}}
+             ; \rm{\ if\ } \rm{Array}_{\rm{AR}} < 0.7 \rm{SB}_{\rm{AR}}
+      :label: toolow
+
+   .. math:: \rm{Score}_{\rm{array}} = \frac{10}{1.1\rm{SB}_{\rm{AR}} - \rm{SB}_{\rm{maxAR}}} \left(\rm{Array}_{\rm{AR}} - \rm{SB}_{\rm{maxAR}}\right)
+             ; \rm{\ if\ } \rm{Array}_{\rm{AR}} > 1.1 \rm{SB}_{\rm{AR}}
+      :label: high
+
+   .. figure:: figure_1.png
+      :scale: 50%
+
+      In this example, the requested array resolution (:math:`\rm{SB}_{\rm{AR}}`)
+      is 2.8 arcsec, with a minimun acceptable resolution
+      :math:`\rm{SB}_{\rm{minAR}} = 0.5` and maximum :math:`\rm{SB}_{\rm{maxAR}} = 3.5`
+
+#. **SB Executive Score**
+
+#. **SB Condition Score**
+
+#. **SB Total Score**
 
 .. _check-obs:
 

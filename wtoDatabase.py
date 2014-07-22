@@ -897,10 +897,12 @@ class WtoDatabase(object):
             name_e = name[:-2] + 'TE'
             try:
                 sbinfoE = self.schedblock_info[
-                    self.schedblock_info.name == name_e].ix[0]
+                    (self.schedblock_info.name == name_e) &
+                    (self.schedblock_info.partId == pid)].ix[0]
                 sbnum = 2
                 sbuidE = sbinfoE.SB_UID
                 sbuidC = sbuid
+                print name, name_e
             except IndexError:
                 print "Can't find TE for sb %s" % name
                 sbnum = 1
@@ -908,9 +910,11 @@ class WtoDatabase(object):
             name_e = name[:-2] + 'TC'
             try:
                 sbinfoC = self.schedblock_info[
-                    self.schedblock_info.name == name_e].ix[0]
+                    (self.schedblock_info.name == name_e) &
+                    (self.schedblock_info.partId == pid)].ix[0]
                 sbnum = 2
                 sbuidC = sbinfoC.SB_UID
+                print name, name_e
             except IndexError:
                 sbnum = 1
 
