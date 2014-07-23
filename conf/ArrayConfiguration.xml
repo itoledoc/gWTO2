@@ -8,7 +8,7 @@
         <MetrologyCoefficients AN0="0.0" AW0="0.0" version="0"/>
     </AntennaOnPad>
     <AntennaOnPad antenna="DV24" pad="A093" start="2014-05-17T16:33:22.599-04:00">
-        <MetrologyCoefficients AN0="0.3775" AW0="-6.49" version="1"/>
+        <MetrologyCoefficients AN0="-5.88" AW0="-6.13" version="2"/>
     </AntennaOnPad>
     <AntennaOnPad antenna="DA56" pad="A064" start="2013-01-21T17:12:06.594-03:00">
         <MetrologyCoefficients AN0="-10.8" AW0="1.0" version="2"/>
@@ -29,7 +29,7 @@
         <MetrologyCoefficients AN0="-4.514198" AW0="4.903987" version="1"/>
     </AntennaOnPad>
     <AntennaOnPad antenna="DV21" pad="A107" start="2014-07-18T16:45:54.578-04:00">
-        <MetrologyCoefficients AN0="0.0" AW0="0.0" version="0"/>
+        <MetrologyCoefficients AN0="13.25" AW0="1.74" version="1"/>
     </AntennaOnPad>
     <AntennaOnPad antenna="CM02" pad="J502" start="2012-10-01T13:41:40.833-04:00">
         <MetrologyCoefficients AN0="0.0" AW0="0.0" version="0"/>
@@ -38,7 +38,7 @@
         <MetrologyCoefficients AN0="-13.04" AW0="-13.19" version="1"/>
     </AntennaOnPad>
     <AntennaOnPad antenna="DV12" pad="A094" start="2014-07-15T10:20:45.937-04:00">
-        <MetrologyCoefficients AN0="11.5" AW0="-16.4" version="1"/>
+        <MetrologyCoefficients AN0="12.4" AW0="-12.57" version="2"/>
     </AntennaOnPad>
     <AntennaOnPad antenna="DA58" pad="A001" start="2014-06-12T08:56:08.121-04:00">
         <MetrologyCoefficients AN0="0.0" AW0="0.0" version="0"/>
