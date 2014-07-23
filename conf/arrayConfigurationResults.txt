@@ -1,27 +1,27 @@
 === Array Configuration Summary ==== 
 
-Input file : /home/itoledo/Downloads/2014-07-20.cfg 
-Nant : 34 
+Input file : /home/itoledo/Downloads/2014-07-23.cfg 
+Nant : 35 
 Declination (Degree): -23.00 
 Duration : 2h 
 Frequency (GHz) : 100.0 
 Minimum Proj. BL (meters) : 17.292280 
-Maximum Proj. BL (meters) : 783.548287 
-RMS (meters) : 319.34 
+Maximum Proj. BL (meters) : 1090.991675 
+RMS (meters) : 351.80 
 Shadowing fraction (%): 0.0 
-minor beam (arcsec) : 0.7664 
-major beam (arcsec) : 0.9348 
-Spatial resolution (arcsec) : 0.8464 
+minor beam (arcsec) : 0.6270 
+major beam (arcsec) : 0.9445 
+Spatial resolution (arcsec) : 0.7696 
 Weighting : briggs 
-Sidelobe level (%) : 8.4 
-PA beam (degree): -60.6 
+Sidelobe level (%) : 7.7 
+PA beam (degree): -56.1 
 LAS (arcsec) : 21.4547 
 
 Matching with  ACA-std.cfg:   4.9 %   (uv-overlap: 17.3 m -- 32.1 m)
-Matching with    C34-1.cfg:  16.1 %   (uv-overlap: 17.3 m -- 165.6 m)
-Matching with    C34-2.cfg:  33.8 %   (uv-overlap: 17.3 m -- 303.6 m)
-Matching with    C34-3.cfg:  51.4 %   (uv-overlap: 21.0 m -- 442.7 m)
-Matching with    C34-4.cfg:  58.5 %   (uv-overlap: 21.0 m -- 558.2 m)
-Matching with    C34-5.cfg:  66.9 %   (uv-overlap: 25.9 m -- 783.5 m)
-Matching with    C34-6.cfg:  58.6 %   (uv-overlap: 42.1 m -- 783.5 m)
-Matching with    C34-7.cfg:  58.1 %   (uv-overlap: 42.1 m -- 783.5 m)
+Matching with    C34-1.cfg:  16.9 %   (uv-overlap: 17.3 m -- 165.6 m)
+Matching with    C34-2.cfg:  34.3 %   (uv-overlap: 17.3 m -- 303.6 m)
+Matching with    C34-3.cfg:  50.6 %   (uv-overlap: 21.0 m -- 442.7 m)
+Matching with    C34-4.cfg:  59.9 %   (uv-overlap: 21.0 m -- 558.2 m)
+Matching with    C34-5.cfg:  67.2 %   (uv-overlap: 25.9 m -- 820.2 m)
+Matching with    C34-6.cfg:  59.2 %   (uv-overlap: 42.1 m -- 1091.0 m)
+Matching with    C34-7.cfg:  59.4 %   (uv-overlap: 42.1 m -- 1091.0 m)
