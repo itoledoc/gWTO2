@@ -429,7 +429,7 @@ class WtoAlgorithm(WtoDatabase):
 
         # set condition score:
         pwv_corr = 1 - (abs(self.pwv - maxpwvc) / 6.)
-        if pwv_corr > 6:
+        if pwv_corr < 0.:
             pwv_corr = 0.
 
         if frac < 1:

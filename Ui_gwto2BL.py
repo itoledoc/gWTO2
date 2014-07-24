@@ -307,7 +307,6 @@ class Ui_BLMainWindow(object):
         self.gridLayout_4.setObjectName(_fromUtf8("gridLayout_4"))
 
         self.bl_sheet = QtGui.QTableView(self.bl_tab)
-        self.bl_sheet.setEditTriggers(QtGui.QAbstractItemView.SelectedClicked)
         self.bl_sheet.setDragEnabled(True)
         self.bl_sheet.setSortingEnabled(True)
         self.bl_sheet.setObjectName(_fromUtf8("bl_sheet"))

@@ -946,10 +946,12 @@
             <span class="n">name_e</span> <span class="o">=</span> <span class="n">name</span><span class="p">[:</span><span class="o">-</span><span class="mi">2</span><span class="p">]</span> <span class="o">+</span> <span class="s">&#39;TE&#39;</span>
             <span class="k">try</span><span class="p">:</span>
                 <span class="n">sbinfoE</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">schedblock_info</span><span class="p">[</span>
-                    <span class="bp">self</span><span class="o">.</span><span class="n">schedblock_info</span><span class="o">.</span><span class="n">name</span> <span class="o">==</span> <span class="n">name_e</span><span class="p">]</span><span class="o">.</span><span class="n">ix</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>
+                    <span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">schedblock_info</span><span class="o">.</span><span class="n">name</span> <span class="o">==</span> <span class="n">name_e</span><span class="p">)</span> <span class="o">&amp;</span>
+                    <span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">schedblock_info</span><span class="o">.</span><span class="n">partId</span> <span class="o">==</span> <span class="n">pid</span><span class="p">)]</span><span class="o">.</span><span class="n">ix</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>
                 <span class="n">sbnum</span> <span class="o">=</span> <span class="mi">2</span>
                 <span class="n">sbuidE</span> <span class="o">=</span> <span class="n">sbinfoE</span><span class="o">.</span><span class="n">SB_UID</span>
                 <span class="n">sbuidC</span> <span class="o">=</span> <span class="n">sbuid</span>
+                <span class="k">print</span> <span class="n">name</span><span class="p">,</span> <span class="n">name_e</span>
             <span class="k">except</span> <span class="ne">IndexError</span><span class="p">:</span>
                 <span class="k">print</span> <span class="s">&quot;Can&#39;t find TE for sb </span><span class="si">%s</span><span class="s">&quot;</span> <span class="o">%</span> <span class="n">name</span>
                 <span class="n">sbnum</span> <span class="o">=</span> <span class="mi">1</span>
@@ -957,9 +959,11 @@
             <span class="n">name_e</span> <span class="o">=</span> <span class="n">name</span><span class="p">[:</span><span class="o">-</span><span class="mi">2</span><span class="p">]</span> <span class="o">+</span> <span class="s">&#39;TC&#39;</span>
             <span class="k">try</span><span class="p">:</span>
                 <span class="n">sbinfoC</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">schedblock_info</span><span class="p">[</span>
-                    <span class="bp">self</span><span class="o">.</span><span class="n">schedblock_info</span><span class="o">.</span><span class="n">name</span> <span class="o">==</span> <span class="n">name_e</span><span class="p">]</span><span class="o">.</span><span class="n">ix</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>
+                    <span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">schedblock_info</span><span class="o">.</span><span class="n">name</span> <span class="o">==</span> <span class="n">name_e</span><span class="p">)</span> <span class="o">&amp;</span>
+                    <span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">schedblock_info</span><span class="o">.</span><span class="n">partId</span> <span class="o">==</span> <span class="n">pid</span><span class="p">)]</span><span class="o">.</span><span class="n">ix</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>
                 <span class="n">sbnum</span> <span class="o">=</span> <span class="mi">2</span>
                 <span class="n">sbuidC</span> <span class="o">=</span> <span class="n">sbinfoC</span><span class="o">.</span><span class="n">SB_UID</span>
+                <span class="k">print</span> <span class="n">name</span><span class="p">,</span> <span class="n">name_e</span>
             <span class="k">except</span> <span class="ne">IndexError</span><span class="p">:</span>
                 <span class="n">sbnum</span> <span class="o">=</span> <span class="mi">1</span>
 

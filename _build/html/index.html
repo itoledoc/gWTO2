@@ -55,7 +55,7 @@
 <div class="admonition note">
 <p class="first admonition-title">Note</p>
 <p><strong>Latest update:</strong>
-July 22, 2014</p>
+July 23, 2014</p>
 <p><strong>Latest changes in the code:</strong></p>
 <ol class="last arabic simple">
 <li>Added yellow background to SBs that could be executed, but that would prefer
@@ -65,14 +65,26 @@ as SB states changes.</li>
 <li>Executive, Grade and Rank columns added/rearrenged.</li>
 </ol>
 </div>
+<div class="admonition note">
+<p class="first admonition-title">Note</p>
+<p>TODO List.</p>
+<ol class="last arabic simple">
+<li>Deal with Total Power SBs.</li>
+<li>Add all sb option, to show all SBs with a quick explanation on why they are
+or not observable.</li>
+<li>Add explanations of different Tabs: Time Const, Polarization, Sessions, TP,
+etc.</li>
+<li>Use time constraint info to actually show or not Time Constrained SBs in the
+relevant Tab.</li>
+</ol>
+</div>
 <div class="admonition warning">
 <p class="first admonition-title">Warning</p>
-<p>TODO List:</p>
+<p>Things to be checked.</p>
 <ol class="last arabic simple">
 <li>Some SBs are Time Constrained, but they have not set the flag
 <tt class="xref std std-keyword docutils literal"><span class="pre">isTimeConstrained</span></tt>.</li>
 <li>Need to handle some SBs that have multiple ScienceParameters.</li>
-<li>Deal with Total Power SBs.</li>
 </ol>
 </div>
 <div class="figure">
@@ -497,14 +509,14 @@ yet, and it rises as the SB gets closer to completion.</p>
 4 + 6 \times \frac{\rm{QA0\ Pass} + \rm{QA0\ Unset}}{\rm{Expected\ Executions}}"/></p>
 </div></li>
 <li><p class="first"><strong>SB Grade/Cycle Score</strong></p>
-<div class="math">
-<p><img src="_images/math/df65820522fd17e7620c14a18fd49b55addeb58d.png" alt="\rm{Score}_{\rm{grade}} = 10 ; \rm{if\ grade\ is\ A}
-
-\rm{Score}_{\rm{grade}} = 8  ; \rm{if\ grade\ is\ B\ and\ Cycle\ 1}
-
-\rm{Score}_{\rm{grade}} = 4  ; \rm{if\ grade\ is\ B\ and\ Cycle\ 2}
-
-\rm{Score}_{\rm{grade}} = -100 ; \rm{if\ grade\ is\ C}"/></p>
+<div class="math" id="equation-gA">
+<p><span class="eqno">(1)</span><img src="_images/math/e7f79543ea09340ba144692d76b8ba4894d50919.png" alt="\rm{Score}_{\rm{grade}} = 10 ; \rm{if\ grade\ is\ A}"/></p>
+</div><div class="math" id="equation-gBc1">
+<p><span class="eqno">(2)</span><img src="_images/math/867fa6926c956550d9fd8e0dd1be519f309fddc3.png" alt="\rm{Score}_{\rm{grade}} = 8  ; \rm{if\ grade\ is\ B\ and\ Cycle\ 1}"/></p>
+</div><div class="math" id="equation-gBc2">
+<p><span class="eqno">(3)</span><img src="_images/math/1b1cab2d24ddb7e9a55febad126c647d73a742e0.png" alt="\rm{Score}_{\rm{grade}} = 4  ; \rm{if\ grade\ is\ B\ and\ Cycle\ 2}"/></p>
+</div><div class="math" id="equation-gC">
+<p><span class="eqno">(4)</span><img src="_images/math/67bfd31ffd9623f62855ebd9c5406e8580607c3f.png" alt="\rm{Score}_{\rm{grade}} = -100 ; \rm{if\ grade\ is\ C}"/></p>
 </div></li>
 <li><p class="first"><strong>SB Science Score</strong></p>
 <div class="math">
@@ -513,30 +525,41 @@ yet, and it rises as the SB gets closer to completion.</p>
 </div></li>
 <li><p class="first"><strong>SB Array Score</strong></p>
 <div class="math" id="equation-tp">
-<p><span class="eqno">(1)</span><img src="_images/math/b8639f9c9b59da5c36b5b9126fe624c17a6797fa.png" alt="\rm{Score}_{\rm{array}} = 10 ; \rm{\ if\ array\ is\ TP\ or\ 7m}"/></p>
+<p><span class="eqno">(5)</span><img src="_images/math/b8639f9c9b59da5c36b5b9126fe624c17a6797fa.png" alt="\rm{Score}_{\rm{array}} = 10 ; \rm{\ if\ array\ is\ TP\ or\ 7m}"/></p>
 </div><div class="math" id="equation-match">
-<p><span class="eqno">(2)</span><img src="_images/math/c13a90ab9364d848c6b836998bf5255643178183.png" alt="\rm{Score}_{\rm{array}} = 10 ; \rm{\ if\ } 0.9 \rm{SB}_{\rm{AR}}
+<p><span class="eqno">(6)</span><img src="_images/math/c13a90ab9364d848c6b836998bf5255643178183.png" alt="\rm{Score}_{\rm{array}} = 10 ; \rm{\ if\ } 0.9 \rm{SB}_{\rm{AR}}
         &lt;= \rm{Array}_{\rm{AR}} &lt;= 1.1 \rm{SB}_{\rm{AR}}"/></p>
 </div><div class="math" id="equation-low">
-<p><span class="eqno">(3)</span><img src="_images/math/21cb3f78b77e8eccf3e9c3ed29c7c67e840c1664.png" alt="\rm{Score}_{\rm{array}} = 9 ; \rm{\ if\ } 0.7 \rm{SB}_{\rm{AR}}
+<p><span class="eqno">(7)</span><img src="_images/math/21cb3f78b77e8eccf3e9c3ed29c7c67e840c1664.png" alt="\rm{Score}_{\rm{array}} = 9 ; \rm{\ if\ } 0.7 \rm{SB}_{\rm{AR}}
        &lt;= \rm{Array}_{\rm{AR}} &lt; 0.9 \rm{SB}_{\rm{AR}}"/></p>
 </div><div class="math" id="equation-toolow">
-<p><span class="eqno">(4)</span><img src="_images/math/0fa433fd908b48ed933df8f9f61baf2f32a904fa.png" alt="\rm{Score}_{\rm{array}} = 8.5\frac{\rm{Array}_{\rm{AR}} - \rm{SB}_{\rm{minAR}}}{0.7\rm{SB}_{\rm{AR}} - \rm{SB}_{\rm{minAR}}}
+<p><span class="eqno">(8)</span><img src="_images/math/0fa433fd908b48ed933df8f9f61baf2f32a904fa.png" alt="\rm{Score}_{\rm{array}} = 8.5\frac{\rm{Array}_{\rm{AR}} - \rm{SB}_{\rm{minAR}}}{0.7\rm{SB}_{\rm{AR}} - \rm{SB}_{\rm{minAR}}}
        ; \rm{\ if\ } \rm{Array}_{\rm{AR}} &lt; 0.7 \rm{SB}_{\rm{AR}}"/></p>
 </div><div class="math" id="equation-high">
-<p><span class="eqno">(5)</span><img src="_images/math/0dff930e562a6a1244afb9ab723be090a2d428dd.png" alt="\rm{Score}_{\rm{array}} = \frac{10}{1.1\rm{SB}_{\rm{AR}} - \rm{SB}_{\rm{maxAR}}} \left(\rm{Array}_{\rm{AR}} - \rm{SB}_{\rm{maxAR}}\right)
+<p><span class="eqno">(9)</span><img src="_images/math/0dff930e562a6a1244afb9ab723be090a2d428dd.png" alt="\rm{Score}_{\rm{array}} = \frac{10}{1.1\rm{SB}_{\rm{AR}} - \rm{SB}_{\rm{maxAR}}} \left(\rm{Array}_{\rm{AR}} - \rm{SB}_{\rm{maxAR}}\right)
        ; \rm{\ if\ } \rm{Array}_{\rm{AR}} &gt; 1.1 \rm{SB}_{\rm{AR}}"/></p>
 </div><div class="figure">
 <a class="reference internal image-reference" href="_images/figure_1.png"><img alt="_images/figure_1.png" src="_images/figure_1.png" style="width: 588.5px; height: 408.0px;" /></a>
 <p class="caption">In this example, the requested array resolution (<img class="math" src="_images/math/92f6e2b99a975774f1d06bd9d8bd2db52e58d6bd.png" alt="\rm{SB}_{\rm{AR}}"/>)
 is 2.8 arcsec, with a minimun acceptable resolution
-<img class="math" src="_images/math/b33e7aabc1ff7358c54b8b92274490bfa3345677.png" alt="\rm{SB}_{\rm{minAR}} = 0.5"/> and maximum <img class="math" src="_images/math/eb4522772db0bb6fa424a13256d68f1e095d96d3.png" alt="\rm{SB}_{\rm{maxAR}} = 3.5"/></p>
+<img class="math" src="_images/math/b33e7aabc1ff7358c54b8b92274490bfa3345677.png" alt="\rm{SB}_{\rm{minAR}} = 0.5"/> and maximum
+<img class="math" src="_images/math/eb4522772db0bb6fa424a13256d68f1e095d96d3.png" alt="\rm{SB}_{\rm{maxAR}} = 3.5"/></p>
 </div>
 </li>
 <li><p class="first"><strong>SB Executive Score</strong></p>
-</li>
+<div class="math" id="equation-exscore">
+<p><span class="eqno">(10)</span><img src="_images/math/2c1d5fd1552b6905c768e20a054538d3e3ef7889.png" alt="\rm{Score}_{\rm{executive}} = 10; \rm{default\ to\ all\ executives}"/></p>
+</div></li>
 <li><p class="first"><strong>SB Condition Score</strong></p>
-</li>
+<div class="math" id="equation-frac_und_1">
+<p><span class="eqno">(11)</span><img src="_images/math/cc8e87b683a3e8249ec5f9033e212168cef73297.png" alt="\rm{Score}_{\rm{cond}} = 10 \left(1- (\rm{frac}-1)^{2}\right) \rm{pwv}_{\rm{close}}"/></p>
+</div><div class="math" id="equation-pwv_close">
+<p><span class="eqno">(12)</span><img src="_images/math/4a19a66710bf0700ee34ef70234672b8646532b8.png" alt="\rm{pwv}_{\rm{close}} = 1 - \left|\frac{\rm{pwv} - \rm{maxPWV}}{6}\right|"/></p>
+</div><div class="math" id="equation-frac_1">
+<p><span class="eqno">(13)</span><img src="_images/math/625197f93d7a4b52f313747921340152070fd0de.png" alt="\rm{Score}_{\rm{cond}} = 10"/></p>
+</div><div class="math">
+<p><img src="_images/math/b606edea521a130e1064a48a5147e4930dc8b55c.png" alt=""/></p>
+</div></li>
 <li><p class="first"><strong>SB Total Score</strong></p>
 </li>
 </ol>

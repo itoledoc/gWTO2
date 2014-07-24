@@ -27,14 +27,25 @@ Using gWTO2
       as SB states changes.
    #. Executive, Grade and Rank columns added/rearrenged.
 
+.. note::
+
+   TODO List.
+
+   #. Deal with Total Power SBs.
+   #. Add all sb option, to show all SBs with a quick explanation on why they are
+      or not observable.
+   #. Add explanations of different Tabs: Time Const, Polarization, Sessions, TP,
+      etc.
+   #. Use time constraint info to actually show or not Time Constrained SBs in the
+      relevant Tab.
+
 .. warning::
 
-   TODO List:
+   Things to be checked.
 
    #. Some SBs are Time Constrained, but they have not set the flag
       :keyword:`isTimeConstrained`.
    #. Need to handle some SBs that have multiple ScienceParameters.
-   #. Deal with Total Power SBs.
 
 .. figure:: Selection_003.png
 
@@ -504,14 +515,21 @@ Score and ranking
 
 #. **SB Grade/Cycle Score**
 
-   .. math::
-      \rm{Score}_{\rm{grade}} = 10 ; \rm{if\ grade\ is\ A}
+   .. math:: \rm{Score}_{\rm{grade}} = 10 ; \rm{if\ grade\ is\ A}
+      :label: gA
 
-      \rm{Score}_{\rm{grade}} = 8  ; \rm{if\ grade\ is\ B\ and\ Cycle\ 1}
 
-      \rm{Score}_{\rm{grade}} = 4  ; \rm{if\ grade\ is\ B\ and\ Cycle\ 2}
+   .. math:: \rm{Score}_{\rm{grade}} = 8  ; \rm{if\ grade\ is\ B\ and\ Cycle\ 1}
+      :label: gBc1
 
-      \rm{Score}_{\rm{grade}} = -100 ; \rm{if\ grade\ is\ C}
+
+   .. math:: \rm{Score}_{\rm{grade}} = 4  ; \rm{if\ grade\ is\ B\ and\ Cycle\ 2}
+      :label: gBc2
+
+
+   .. math:: \rm{Score}_{\rm{grade}} = -100 ; \rm{if\ grade\ is\ C}
+      :label: gC
+
 
 #. **SB Science Score**
 
@@ -545,12 +563,26 @@ Score and ranking
 
       In this example, the requested array resolution (:math:`\rm{SB}_{\rm{AR}}`)
       is 2.8 arcsec, with a minimun acceptable resolution
-      :math:`\rm{SB}_{\rm{minAR}} = 0.5` and maximum :math:`\rm{SB}_{\rm{maxAR}} = 3.5`
+      :math:`\rm{SB}_{\rm{minAR}} = 0.5` and maximum
+      :math:`\rm{SB}_{\rm{maxAR}} = 3.5`
 
 #. **SB Executive Score**
 
+   .. math:: \rm{Score}_{\rm{executive}} = 10; \rm{default\ to\ all\ executives}
+      :label: exscore
+
 #. **SB Condition Score**
 
+   .. math:: \rm{Score}_{\rm{cond}} = 10 \left(1- (\rm{frac}-1)^{2}\right) \rm{pwv}_{\rm{close}}
+      :label: frac_und_1
+
+   .. math:: \rm{pwv}_{\rm{close}} = 1 - \left|\frac{\rm{pwv} - \rm{maxPWV}}{6}\right|
+      :label: pwv_close
+
+   .. math:: \rm{Score}_{\rm{cond}} = 10
+      :label: frac_1
+
+   .. math::
 #. **SB Total Score**
 
 .. _check-obs:
