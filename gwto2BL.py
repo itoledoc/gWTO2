@@ -495,6 +495,7 @@ class BLMainWindow(QMainWindow, Ui_BLMainWindow):
         self.bl_sheet.setSortingEnabled(True)
         self.bl_sheet.sortByColumn(0, Qt.DescendingOrder)
         self.bl_sheet.resizeRowsToContents()
+        self.connect(self.bl_sheet, SIGNAL("doubleClicked(QModelIndex)"), self.hola)
         for column in range(26):
             if column in [1, 2, 3, 4, 5, 6, 7, 25, 26]:
                 self.bl_sheet.resizeColumnToContents(column)
@@ -537,6 +538,9 @@ class BLMainWindow(QMainWindow, Ui_BLMainWindow):
             else:
                 self.pol_sheet.setColumnWidth(column, 66)
         progress.close()
+
+    def hola(self, x):
+        print("hola", x.column(), x.row(), self.tmstd12.arraydata[x.row()][2])
 
 
 # noinspection PyMethodOverriding
