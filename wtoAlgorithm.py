@@ -138,105 +138,59 @@ class WtoAlgorithm(WtoDatabase):
             else:
                 array1 = ['TP-Array']
 
-        pwvcol = self.pwvdata[[str(self.pwv)]]
-        sum2 = pd.merge(
-            self.sb_summary, pwvcol, left_on='repfreq', right_index=True)
-        sum2 = sum2.rename(
-            columns={str(self.pwv): 'transmission'})
-        ind1 = sum2.repfreq
-        ind2 = pd.np.around(sum2.maxPWVC, decimals=1).astype(str)
-        sum2['tau_org'] = self.tau.lookup(ind1, ind2)
-        sum2['tsky_org'] = self.tsky.lookup(ind1, ind2)
-        sum2['airmass'] = 1 / pd.np.cos(pd.np.radians(-23.0262015 - sum2.DEC))
-        sum2 = pd.merge(sum2, self.reciever, left_on='band', right_index=True,
-                        how='left')
-        tskycol = self.tsky[[str(self.pwv)]]
-        sum2 = pd.merge(sum2, tskycol, left_on='repfreq', right_index=True)
-        taucol = self.tau[[str(self.pwv)]]
-        sum2 = sum2.rename(
-            columns={str(self.pwv): 'tsky'})
-        sum2 = pd.merge(sum2, taucol, left_on='repfreq', right_index=True)
-        sum2 = sum2.rename(
-            columns={str(self.pwv): 'tau'})
-        print("SBs in sb_summary: %d. SBs merged with tau/tsky info: %d." %
-              (len(self.sb_summary), len(sum2)))
-
-        sum2['tsys'] = (
-            1 + sum2['g']) * \
-            (sum2['trx'] + sum2['tsky'] *
-             ((1 - pd.np.exp(-1 * sum2['airmass'] * sum2['tau'])) /
-              (1 - pd.np.exp(-1. * sum2['tau']))) * 0.95 + 0.05 * 270.) / \
-            (0.95 * pd.np.exp(-1 * sum2['tau'] * sum2['airmass']))
-        sum2['tsys_org'] = (
-            1 + sum2['g']) * \
-            (sum2['trx'] + sum2['tsky_org'] *
-             ((1 - pd.np.exp(-1 * sum2['airmass'] * sum2['tau_org'])) /
-              (1 - pd.np.exp(-1. * sum2['tau_org']))) * 0.95 + 0.05 * 270.) / \
-            (0.95 * pd.np.exp(-1 * sum2['tau_org'] * sum2['airmass']))
-
-        sel1 = sum2[sum2.transmission > self.transmission]
-
-        print("SBs with a transmission higher than %2.1f: %d" %
-              (self.transmission, len(sel1)))
+        sel = self.sb_summary.copy()
 
         if array == '7m':
-            sel2 = sel1[
-                (sel1.array == array1[0]) |
-                (sel1.array == array1[1])]
+            sel = sel[
+                (sel.array == array1[0]) |
+                (sel.array == array1[1])]
         else:
-            sel2 = sel1[sel1.array == array1[0]]
+            sel = sel[sel.array == array1[0]]
 
-        print("SBs for %s array: %d" % (array, len(sel2)))
+        print("SBs for %s array: %d" % (array, len(sel)))
 
-        self.alma.date = self.date
-        lst = pd.np.degrees(self.alma.sidereal_time())
-        print(self.alma.date, lst)
-        ha = (lst - sel2.RA) / 15.
-        ha.loc[ha > 12] = ha.loc[ha > 12] - 24.
-        ha.loc[ha < -12] = 24. + ha.loc[ha < -12]
-        sel2['HA'] = ha
-        sel2 = sel2
-        sel3 = sel2[((sel2.HA > self.minha) & (sel2.HA < self.maxha)) |
-                    (sel2.RA == 0.)]
-        sel3['tsysfrac'] = (sel3.tsys / sel3.tsys_org) ** 2.
-        print("SBs within current HA limits (or RA=0): %d" % len(sel3))
-        sel4 = pd.merge(sel3, self.obser_prop, left_on='SB_UID',
-                        right_index=True)
-        if self.not_horizon is False:
-            sel4 = sel4.query('up == 1 and etime > 1.5')
-            print("SBs over %d degrees, 1.5 hours: %d" %
-                  (self.horizon, len(sel4)))
-        sel4 = sel4.query(
-            'SB_state != "Phase2Submitted"'
-            ' and SB_state != "FullyObserved"'
-            ' and SB_state != "Deleted"'
-            ' and PRJ_state != "Phase2Submitted"'
-            ' and PRJ_state != "Completed"')
-        sel4 = sel4[sel4.name.str.contains('not', case=False) == False]
-        print("SBs with Ok state: %d" % len(sel4))
-        sel4 = sel4.query('execount > Total')
-        print("SBs with missing exec: %d" % len(sel4))
+        pwvcol = self.pwvdata[[str(self.pwv)]]
 
-        fg = self.fieldsource.query(
-            'isQuery == False and name == "Primary:"'
-        ).groupby('SB_UID')
-        p = pd.DataFrame(
-            [fg.pointings.mean(), fg.pointings.count()],
-            index=['mpointings', 'sources']).transpose()
+        len_bf_cond = len(sel)
+        sel = pd.merge(
+            sel, pwvcol, left_on='repfreq', right_index=True)
+        sel.rename(columns={str(self.pwv): 'transmission'}, inplace=True)
+        ind1 = sel.repfreq
+        ind2 = pd.np.around(sel.maxPWVC, decimals=1).astype(str)
 
-        sel4 = pd.merge(sel4, p, left_on='SB_UID', right_index=True, how='left')
+        sel['tau_org'] = self.tau.lookup(ind1, ind2)
+        sel['tsky_org'] = self.tsky.lookup(ind1, ind2)
+        sel['airmass'] = 1 / pd.np.cos(pd.np.radians(-23.0262015 - sel.DEC))
+        sel = pd.merge(sel, self.reciever, left_on='band', right_index=True,
+                       how='left')
+        tskycol = self.tsky[[str(self.pwv)]]
+
+        sel = pd.merge(sel, tskycol, left_on='repfreq', right_index=True)
+        taucol = self.tau[[str(self.pwv)]]
+        sel.rename(columns={str(self.pwv): 'tsky'}, inplace=True)
+        sel = pd.merge(sel, taucol, left_on='repfreq', right_index=True)
+        sel.rename(columns={str(self.pwv): 'tau'}, inplace=True)
+
+        print("SBs in sb_summary: %d. SBs merged with tau/tsky info: %d." %
+              (len_bf_cond, len(sel)))
+
+        sel['sel_array'] = False
 
         if array == '12m':
-            sel4 = sel4.query(
-                '(arrayMinAR < %f and %f < arrayMaxAR) ' %
-                (self.array_ar, self.array_ar))
+            sel.loc[
+                (sel.arrayMinAR < self.array_ar) &
+                (sel.arrayMaxAR > self.array_ar), 'sel_array'] = True
+
             print("SBs for current 12m Array AR: %d. "
                   "(AR=%.2f, #bl=%d, #ant=%d)" %
-                  (len(sel4), self.array_ar, self.num_bl, self.num_ant))
-            sel4['blmax'] = sel4.apply(
+                  (len(sel.query('sel_array == True')), self.array_ar,
+                   self.num_bl, self.num_ant))
+
+            sel['blmax'] = sel.apply(
                 lambda row: rUV.computeBL(row['AR'], row['repfreq']), axis=1)
+
             if self.array_name is not None:
-                sel4['blfrac'] = sel4.apply(
+                sel['blfrac'] = sel.apply(
                     lambda row: (33. * 17) / (1. * len(
                         self.ruv[self.ruv < row['blmax']]))
                     if (row['isPointSource'] == False)
@@ -244,7 +198,7 @@ class WtoAlgorithm(WtoDatabase):
                          (self.num_ant * (self.num_ant - 1) / 2.),
                     axis=1)
             else:
-                sel4['blfrac'] = sel4.apply(
+                sel['blfrac'] = sel.apply(
                     lambda row: (33. * 17) / (1. * len(
                         self.ruv[self.ruv < row['blmax']]))
                     if (row['isPointSource'] == False)
@@ -252,30 +206,138 @@ class WtoAlgorithm(WtoDatabase):
                          (34. * (34. - 1) / 2.),
                     axis=1)
                 if self.num_ant != 34:
-                    sel5 = sel4.copy()
-                    sel5.loc[:, 'blfrac'] = sel5.blfrac * (
+                    sel.loc[:, 'blfrac'] = sel.loc[:, 'blfrac'] * (
                         33 * 17 / (self.num_ant * (
                             self.num_ant - 1) / 2.))
-                    sel4 = sel5.copy()
-            sel5 = sel4.copy()
-            sel5.loc[:, 'blfrac'] = sel5.apply(
+
+            sel.loc[:, 'blfrac'] = sel.apply(
                 lambda row: ret_cycle(row[u'CODE'], row['blfrac']), axis=1
             )
-            sel4['frac'] = sel4.tsysfrac * sel4.blfrac
-            self.select12m = sel4.query('frac < 2.1')
+
+        elif array == '7m':
+            sel['sel_array'] = True
+            sel['blfrac'] = 1.
+            if self.num_ant != 9:
+                sel.loc[:, 'blfrac'] = sel.loc[:, 'blfrac'] * (
+                    9 * 4 / (self.num_ant * (
+                        self.num_ant - 1) / 2.))
+
+        else:
+            sel['sel_array'] = True
+            sel['blfrac'] = 1.
+
+        sel['tsys'] = (
+            1 + sel['g']) * \
+            (sel['trx'] + sel['tsky'] *
+             ((1 - pd.np.exp(-1 * sel['airmass'] * sel['tau'])) /
+              (1 - pd.np.exp(-1. * sel['tau']))) * 0.95 + 0.05 * 270.) / \
+            (0.95 * pd.np.exp(-1 * sel['tau'] * sel['airmass']))
+        sel['tsys_org'] = (
+            1 + sel['g']) * \
+            (sel['trx'] + sel['tsky_org'] *
+             ((1 - pd.np.exp(-1 * sel['airmass'] * sel['tau_org'])) /
+              (1 - pd.np.exp(-1. * sel['tau_org']))) * 0.95 + 0.05 * 270.) / \
+            (0.95 * pd.np.exp(-1 * sel['tau_org'] * sel['airmass']))
+
+        sel['sel_trans'] = False
+
+        sel.loc[(sel.transmission > self.transmission), 'sel_trans'] = True
+
+        print("SBs with a transmission higher than %2.1f: %d" %
+              (self.transmission,
+               len(sel.query('sel_array == True and sel_trans == True'))))
+
+        self.alma.date = self.date
+        lst = pd.np.degrees(self.alma.sidereal_time())
+
+        ha = (lst - sel.RA) / 15.
+        ha.loc[ha > 12] = ha.loc[ha > 12] - 24.
+        ha.loc[ha < -12] = 24. + ha.loc[ha < -12]
+        sel['HA'] = ha
+        sel['sel_ha'] = False
+        sel.loc[
+            ((sel.HA > self.minha) & (sel.HA < self.maxha)) |
+            (sel.RA == 0.), 'sel_ha'] = True
+
+        s3 = len(sel.query('sel_array == True and sel_trans == True and'
+                           ' sel_ha == True'))
+        print("SBs within current HA limits (or RA=0): %d" % s3)
+
+        sel['tsysfrac'] = (sel.tsys / sel.tsys_org) ** 2.
+        sel = pd.merge(sel, self.obser_prop, left_on='SB_UID',
+                       right_index=True)
+
+        sel['sel_el'] = False
+
+        if self.not_horizon is False:
+            sel.loc[(sel.up == 1) & (sel.etime > 1.5), 'sel_el'] = True
+            s4 = len(
+                sel.query('sel_array == True and sel_trans == True and'
+                          ' sel_ha == True and sel_el == True'))
+            print("SBs over %d degrees, 1.5 hours: %d" %
+                  (self.horizon, s4))
+
+        sel['sel_st'] = False
+        sel.loc[(sel.SB_state != "Phase2Submitted") &
+                (sel.SB_state != "FullyObserved") &
+                (sel.SB_state != "Deleted") &
+                (sel.PRJ_state != "Phase2Submitted") &
+                (sel.PRJ_state != "Completed"), 'sel_st'] = True
+        sel.loc[
+            (sel.name.str.contains('not', case=False) == True),
+            'sel_st'] = False
+
+        s5 = len(
+            sel.query(
+                'sel_array == True and sel_trans == True and sel_ha == True '
+                'and sel_el == True and sel_st == True'))
+        print("SBs with Ok state: %d" % s5)
+
+        sel['sel_exe'] = False
+        sel.loc[sel.execount > sel.Total, 'sel_exe'] = True
+
+        s6 = len(
+            sel.query(
+                'sel_array == True and sel_trans == True and sel_ha == True '
+                'and sel_el == True and sel_st == True and sel_exe == True'))
+
+        print("SBs with missing exec: %d" % s6)
+
+        sel['frac'] = sel.tsysfrac * sel.blfrac
+        fg = self.fieldsource.query(
+            'isQuery == False and name == "Primary:"'
+        ).groupby('SB_UID')
+        p = pd.DataFrame(
+            [fg.pointings.mean(), fg.pointings.count()],
+            index=['mpointings', 'sources']).transpose()
+
+        sel = pd.merge(sel, p, left_on='SB_UID', right_index=True, how='left')
+
+        if array == '12m':
+            self.select12m = sel.query(
+                'sel_array == True and sel_trans == True and sel_ha == True '
+                'and sel_el == True and sel_st == True and sel_exe == True and '
+                'frac < 2.1')
+
+            self.all12m = sel
             print("SBs with 'frac' < 2.1: %d" % len(self.select12m))
 
         elif array == '7m':
-            sel4['blfrac'] = sel4.RA * 0. + 1.
-            if self.num_ant != 9:
-                sel4.loc[:, 'blfrac'] = sel4.blfrac * (
-                    9 * 4 / (self.num_ant * (
-                        self.num_ant - 1) / 2.))
-            sel4['frac'] = sel4.tsysfrac * sel4.blfrac
-            self.select7m = sel4.query('frac < 2.1')
+            self.select7m = sel.query(
+                'sel_array == True and sel_trans == True and sel_ha == True '
+                'and sel_el == True and sel_st == True and sel_exe == True and '
+                'frac < 2.1')
+
+            self.all7m = sel
             print("SBs with 'frac' < 2.1: %d" % len(self.select7m))
+
         else:
-            self.selecttp = sel4.query('frac < 2.1')
+            self.selecttp = sel.query(
+                'sel_array == True and sel_trans == True and sel_ha == True '
+                'and sel_el == True and sel_st == True and sel_exe == True and '
+                'frac < 2.1')
+
+            self.alltp = sel
             print("SBs with 'frac' < 2.1: %d" % len(self.selecttp))
 
     def scorer(self, array):
