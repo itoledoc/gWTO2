@@ -80,11 +80,11 @@ class WtoDatabase(object):
 
         # Global SQL search expressions
         self.sql1 = str(
-            "SELECT PRJ_ARCHIVE_UID,DELETED,PI,PRJ_NAME, "
+            "SELECT PRJ_ARCHIVE_UID,DELETED,PI,PRJ_NAME,"
             "CODE,PRJ_TIME_OF_CREATION,PRJ_SCIENTIFIC_RANK,PRJ_VERSION,"
             "PRJ_LETTER_GRADE,DOMAIN_ENTITY_STATE,"
             "OBS_PROJECT_ID "
-            "FROM ALMA.BMMV_OBSPROJECT obs1, ALMA.OBS_PROJECT_STATUS obs2  "
+            "FROM ALMA.BMMV_OBSPROJECT obs1, ALMA.OBS_PROJECT_STATUS obs2 "
             "WHERE regexp_like (CODE, '^201[23].*\.[AST]') "
             "AND (PRJ_LETTER_GRADE='A' OR PRJ_LETTER_GRADE='B' "
             "OR PRJ_LETTER_GRADE='C') "

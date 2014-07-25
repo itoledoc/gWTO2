@@ -457,7 +457,7 @@ class WtoAlgorithm(WtoDatabase):
             sb_grade_score = -100.
 
         # set science score
-        sb_science_score = 10. * srank / self.max_scirank
+        sb_science_score = 10. * (self.max_scirank - srank) / self.max_scirank
 
         # set array score
         if array == '7m' or array == 'tp':
