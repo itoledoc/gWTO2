@@ -1,0 +1,181 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    
+    <title>Playing with the libraries &mdash; gWTO2 2.0RC documentation</title>
+    
+    <link rel="stylesheet" href="_static/default.css" type="text/css" />
+    <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
+    
+    <script type="text/javascript">
+      var DOCUMENTATION_OPTIONS = {
+        URL_ROOT:    './',
+        VERSION:     '2.0RC',
+        COLLAPSE_INDEX: false,
+        FILE_SUFFIX: '.html',
+        HAS_SOURCE:  true
+      };
+    </script>
+    <script type="text/javascript" src="_static/jquery.js"></script>
+    <script type="text/javascript" src="_static/underscore.js"></script>
+    <script type="text/javascript" src="_static/doctools.js"></script>
+    <link rel="search" type="application/opensearchdescription+xml"
+          title="Search within gWTO2 2.0RC documentation"
+          href="_static/opensearch.xml"/>
+    <link rel="top" title="gWTO2 2.0RC documentation" href="index.html" />
+    <link rel="next" title="The WTO API" href="wtoapi.html" />
+    <link rel="prev" title="Selection and Score algorithms" href="algorithm.html" /> 
+  </head>
+  <body>
+    <div class="related">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="genindex.html" title="General Index"
+             accesskey="I">index</a></li>
+        <li class="right" >
+          <a href="py-modindex.html" title="Python Module Index"
+             >modules</a> |</li>
+        <li class="right" >
+          <a href="wtoapi.html" title="The WTO API"
+             accesskey="N">next</a> |</li>
+        <li class="right" >
+          <a href="algorithm.html" title="Selection and Score algorithms"
+             accesskey="P">previous</a> |</li>
+        <li><a href="index.html">gWTO2 2.0RC documentation</a> &raquo;</li> 
+      </ul>
+    </div>  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          <div class="body">
+            
+  <div class="section" id="playing-with-the-libraries">
+<h1>Playing with the libraries<a class="headerlink" href="#playing-with-the-libraries" title="Permalink to this headline">¶</a></h1>
+<p>Load the environment and start ipython:</p>
+<div class="highlight-python"><div class="highlight"><pre>. activateC2Test
+ipython
+</pre></div>
+</div>
+<p>Once in ipython::</p>
+<div class="highlight-python"><div class="highlight"><pre><span class="gp">&gt;&gt;&gt; </span><span class="kn">import</span> <span class="nn">wtoAlgorithm</span> <span class="kn">as</span> <span class="nn">wto</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="kn">import</span> <span class="nn">ephem</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="kn">import</span> <span class="nn">pandas</span> <span class="kn">as</span> <span class="nn">pd</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">datas</span> <span class="o">=</span> <span class="n">wto</span><span class="o">.</span><span class="n">Algorithm</span><span class="p">(</span><span class="n">path</span><span class="o">=</span><span class="s">&#39;./wto_testing/&#39;</span><span class="p">)</span>
+</pre></div>
+</div>
+<p>And the run the following script. You can copy the code, and then paste into
+python with <strong class="command">%paste</strong>, or <a class="reference download internal" href="_downloads/runwto.py"><tt class="xref download docutils literal"><span class="pre">donwload</span> <span class="pre">the</span> <span class="pre">file</span></tt></a>,
+and then load the function with <strong class="command">execfile(&#8216;runwto.py&#8217;)</strong>:</p>
+<blockquote>
+<div><div class="highlight-python"><div class="highlight"><pre><span class="k">def</span> <span class="nf">runwto</span><span class="p">(</span><span class="n">pwv</span><span class="p">,</span> <span class="n">array_name</span><span class="o">=</span><span class="bp">None</span><span class="p">,</span> <span class="n">d</span><span class="o">=</span><span class="bp">None</span><span class="p">,</span> <span class="n">num_ant</span><span class="o">=</span><span class="mi">34</span><span class="p">):</span>
+    <span class="n">datas</span><span class="o">.</span><span class="n">query_arrays</span><span class="p">()</span>
+    <span class="k">if</span> <span class="n">array_name</span> <span class="o">==</span> <span class="s">&#39;default&#39;</span><span class="p">:</span>
+        <span class="n">array_name</span> <span class="o">=</span> <span class="bp">None</span>
+        <span class="n">datas</span><span class="o">.</span><span class="n">set_bl_prop</span><span class="p">(</span><span class="n">array_name</span><span class="p">)</span>
+    <span class="k">else</span><span class="p">:</span>
+        <span class="n">array_name</span> <span class="o">=</span> <span class="n">datas</span><span class="o">.</span><span class="n">bl_arrays</span><span class="o">.</span><span class="n">AV1</span><span class="o">.</span><span class="n">values</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>
+        <span class="n">datas</span><span class="o">.</span><span class="n">set_bl_prop</span><span class="p">(</span><span class="n">array_name</span><span class="p">)</span>
+        <span class="n">datas</span><span class="o">.</span><span class="n">array_ar</span> <span class="o">=</span> <span class="mi">61800</span> <span class="o">/</span> <span class="p">(</span><span class="mf">100.</span> <span class="o">*</span> <span class="n">datas</span><span class="o">.</span><span class="n">ruv</span><span class="o">.</span><span class="n">max</span><span class="p">())</span>
+    <span class="k">if</span> <span class="n">d</span> <span class="o">==</span> <span class="bp">None</span><span class="p">:</span>
+        <span class="n">d</span> <span class="o">=</span> <span class="n">ephem</span><span class="o">.</span><span class="n">now</span><span class="p">()</span>
+    <span class="k">if</span> <span class="n">num_ant</span> <span class="o">!=</span> <span class="mi">34</span><span class="p">:</span>
+        <span class="n">datas</span><span class="o">.</span><span class="n">num_ant</span> <span class="o">=</span> <span class="n">num_ant</span>
+    <span class="n">datas</span><span class="o">.</span><span class="n">array_name</span> <span class="o">=</span> <span class="n">array_name</span>
+    <span class="n">datas</span><span class="o">.</span><span class="n">update</span><span class="p">()</span>
+    <span class="n">datas</span><span class="o">.</span><span class="n">date</span> <span class="o">=</span> <span class="n">d</span>
+    <span class="n">datas</span><span class="o">.</span><span class="n">pwv</span> <span class="o">=</span> <span class="n">pwv</span>
+    <span class="n">datas</span><span class="o">.</span><span class="n">selector</span><span class="p">(</span><span class="s">&#39;12m&#39;</span><span class="p">)</span>
+    <span class="n">datas</span><span class="o">.</span><span class="n">scorer</span><span class="p">(</span><span class="s">&#39;12m&#39;</span><span class="p">)</span>
+    <span class="k">print</span> <span class="n">datas</span><span class="o">.</span><span class="n">score12m</span><span class="o">.</span><span class="n">sort</span><span class="p">(</span>
+        <span class="s">&#39;score&#39;</span><span class="p">,</span> <span class="n">ascending</span><span class="o">=</span><span class="bp">False</span><span class="p">)</span><span class="o">.</span><span class="n">query</span><span class="p">(</span>
+        <span class="s">&#39;band != &quot;ALMA_RB_04&quot; and band &#39;</span>
+        <span class="s">&#39;!= &quot;ALMA_RB_08&quot; and isPolarization == False&#39;</span><span class="p">)[</span>
+        <span class="p">[</span><span class="s">&#39;score&#39;</span><span class="p">,</span><span class="s">&#39;CODE&#39;</span><span class="p">,</span><span class="s">&#39;SB_UID&#39;</span><span class="p">,</span><span class="s">&#39;name&#39;</span><span class="p">,</span><span class="s">&#39;SB_state&#39;</span><span class="p">,</span><span class="s">&#39;band&#39;</span><span class="p">,</span><span class="s">&#39;maxPWVC&#39;</span><span class="p">,</span> <span class="s">&#39;HA&#39;</span><span class="p">,</span>
+         <span class="s">&#39;elev&#39;</span><span class="p">,</span><span class="s">&#39;etime&#39;</span><span class="p">,</span> <span class="s">&#39;execount&#39;</span><span class="p">,</span><span class="s">&#39;Total&#39;</span><span class="p">,</span><span class="s">&#39;arrayMinAR&#39;</span><span class="p">,</span><span class="s">&#39;arcorr&#39;</span><span class="p">,</span>
+         <span class="s">&#39;arrayMaxAR&#39;</span><span class="p">,</span><span class="s">&#39;tsysfrac&#39;</span><span class="p">,</span> <span class="s">&#39;blfrac&#39;</span><span class="p">,</span><span class="s">&#39;frac&#39;</span><span class="p">,</span><span class="s">&#39;sb_array_score&#39;</span><span class="p">,</span>
+         <span class="s">&#39;sb_cond_score&#39;</span><span class="p">,</span> <span class="s">&#39;DEC&#39;</span><span class="p">,</span><span class="s">&#39;RA&#39;</span><span class="p">,</span> <span class="s">&#39;isTimeConstrained&#39;</span><span class="p">,</span>
+         <span class="s">&#39;integrationTime&#39;</span><span class="p">,</span> <span class="s">&#39;PRJ_ARCHIVE_UID&#39;</span><span class="p">]]</span><span class="o">.</span><span class="n">head</span><span class="p">(</span><span class="mi">25</span><span class="p">)</span>
+    <span class="n">datas</span><span class="o">.</span><span class="n">num_ant_user</span> <span class="o">=</span> <span class="mi">34</span>
+</pre></div>
+</div>
+</div></blockquote>
+<p>The to run the wto algorithm use a pwv value between 0 and 20, with steps of
+0.05 (e.g., 0.4, 0.45, but no 0.42), and assuming the latest BL Array. Set
+<tt class="docutils literal"><span class="pre">array_name='default'</span></tt> when running <tt class="docutils literal"><span class="pre">runwto</span></tt> (e.g.
+<tt class="docutils literal"><span class="pre">runwto(X.XX,</span> <span class="pre">array_name='default')</span></tt>) to use the Current configuration parameters
+calculated with arrayConfigurationTools and 34 antennas. Also, to change the
+date to current date use <tt class="docutils literal"><span class="pre">runwto(X.XX,</span> <span class="pre">d=ephem.Date('2014-06-28</span> <span class="pre">03:45')</span></tt></p>
+<p>This will display the top 25 values of datas.scorer12m dataFrame. To check full
+output in an excel table run::</p>
+<div class="highlight-python"><div class="highlight"><pre><span class="n">datas</span><span class="o">.</span><span class="n">score12m</span><span class="o">.</span><span class="n">to_excel</span><span class="p">(</span><span class="s">&#39;output_path/score.xls&#39;</span><span class="p">)</span>
+</pre></div>
+</div>
+<p>Where output_path is the full path to the directory where you want to save the
+score.xls excel spreadsheet.</p>
+</div>
+
+
+          </div>
+        </div>
+      </div>
+      <div class="sphinxsidebar">
+        <div class="sphinxsidebarwrapper">
+  <h4>Previous topic</h4>
+  <p class="topless"><a href="algorithm.html"
+                        title="previous chapter">Selection and Score algorithms</a></p>
+  <h4>Next topic</h4>
+  <p class="topless"><a href="wtoapi.html"
+                        title="next chapter">The WTO API</a></p>
+  <h3>This Page</h3>
+  <ul class="this-page-menu">
+    <li><a href="_sources/play.txt"
+           rel="nofollow">Show Source</a></li>
+  </ul>
+<div id="searchbox" style="display: none">
+  <h3>Quick search</h3>
+    <form class="search" action="search.html" method="get">
+      <input type="text" name="q" />
+      <input type="submit" value="Go" />
+      <input type="hidden" name="check_keywords" value="yes" />
+      <input type="hidden" name="area" value="default" />
+    </form>
+    <p class="searchtip" style="font-size: 90%">
+    Enter search terms or a module, class or function name.
+    </p>
+</div>
+<script type="text/javascript">$('#searchbox').show(0);</script>
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="related">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="genindex.html" title="General Index"
+             >index</a></li>
+        <li class="right" >
+          <a href="py-modindex.html" title="Python Module Index"
+             >modules</a> |</li>
+        <li class="right" >
+          <a href="wtoapi.html" title="The WTO API"
+             >next</a> |</li>
+        <li class="right" >
+          <a href="algorithm.html" title="Selection and Score algorithms"
+             >previous</a> |</li>
+        <li><a href="index.html">gWTO2 2.0RC documentation</a> &raquo;</li> 
+      </ul>
+    </div>
+    <div class="footer">
+        &copy; Copyright 2014, ALMA/I. Toledo.
+      Last updated on Jul 25, 2014.
+      Created using <a href="http://sphinx-doc.org/">Sphinx</a> 1.2.2.
+    </div>
+  </body>
+</html>

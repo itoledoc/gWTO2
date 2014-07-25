@@ -1,0 +1,138 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    
+    <title>Apendix &mdash; gWTO2 2.0RC documentation</title>
+    
+    <link rel="stylesheet" href="_static/default.css" type="text/css" />
+    <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
+    
+    <script type="text/javascript">
+      var DOCUMENTATION_OPTIONS = {
+        URL_ROOT:    './',
+        VERSION:     '2.0RC',
+        COLLAPSE_INDEX: false,
+        FILE_SUFFIX: '.html',
+        HAS_SOURCE:  true
+      };
+    </script>
+    <script type="text/javascript" src="_static/jquery.js"></script>
+    <script type="text/javascript" src="_static/underscore.js"></script>
+    <script type="text/javascript" src="_static/doctools.js"></script>
+    <link rel="search" type="application/opensearchdescription+xml"
+          title="Search within gWTO2 2.0RC documentation"
+          href="_static/opensearch.xml"/>
+    <link rel="top" title="gWTO2 2.0RC documentation" href="index.html" />
+    <link rel="prev" title="The WTO Data Frames" href="wtodata.html" /> 
+  </head>
+  <body>
+    <div class="related">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="genindex.html" title="General Index"
+             accesskey="I">index</a></li>
+        <li class="right" >
+          <a href="py-modindex.html" title="Python Module Index"
+             >modules</a> |</li>
+        <li class="right" >
+          <a href="wtodata.html" title="The WTO Data Frames"
+             accesskey="P">previous</a> |</li>
+        <li><a href="index.html">gWTO2 2.0RC documentation</a> &raquo;</li> 
+      </ul>
+    </div>  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          <div class="body">
+            
+  <div class="section" id="apendix">
+<h1>Apendix<a class="headerlink" href="#apendix" title="Permalink to this headline">¶</a></h1>
+<div class="section" id="assessment-of-current-array-s-angular-resolution">
+<span id="current-conf"></span><h2>Assessment of Current Array&#8217;s Angular Resolution<a class="headerlink" href="#assessment-of-current-array-s-angular-resolution" title="Permalink to this headline">¶</a></h2>
+<ol class="arabic">
+<li><p class="first">From the dashboard get a list of antennas and pads that are available and
+working in band 3 or 6. This should be saved in a file with the name
+YYYY-MM-DD.cfg, which is a space-separeted values file, with the antenna in the
+first column and pad in the second.</p>
+<p>(<a class="reference download internal" href="_downloads/2014-07-20.cfg"><tt class="xref download docutils literal"><span class="pre">Example</span> <span class="pre">file</span></tt></a>)</p>
+</li>
+<li><p class="first">Run the script <strong class="command">arrayConfiguration.py</strong>:</p>
+<div class="highlight-python"><div class="highlight"><pre>casapy -c arrayconfiguration.py -s yes -l 2h -i &lt;path&gt;/YYYY-MM-DD.cfg
+</pre></div>
+</div>
+<p>Where <strong class="command">&lt;path&gt;</strong> is the path where you stored the YYYY-MM-DD.cfg file.
+The execution might fail complaining about missing C34-?.cfg files: copy them
+to the path where you are running the script from
+<tt class="file docutils literal"><span class="pre">~/AIV/science/ArrayConfiguration/Tools/Cycle2/*.cfg</span></tt></p>
+</li>
+</ol>
+</div>
+</div>
+
+
+          </div>
+        </div>
+      </div>
+      <div class="sphinxsidebar">
+        <div class="sphinxsidebarwrapper">
+  <h3><a href="index.html">Table Of Contents</a></h3>
+  <ul>
+<li><a class="reference internal" href="#">Apendix</a><ul>
+<li><a class="reference internal" href="#assessment-of-current-array-s-angular-resolution">Assessment of Current Array&#8217;s Angular Resolution</a></li>
+</ul>
+</li>
+</ul>
+
+  <h4>Previous topic</h4>
+  <p class="topless"><a href="wtodata.html"
+                        title="previous chapter">The WTO Data Frames</a></p>
+  <h3>This Page</h3>
+  <ul class="this-page-menu">
+    <li><a href="_sources/apendix.txt"
+           rel="nofollow">Show Source</a></li>
+  </ul>
+<div id="searchbox" style="display: none">
+  <h3>Quick search</h3>
+    <form class="search" action="search.html" method="get">
+      <input type="text" name="q" />
+      <input type="submit" value="Go" />
+      <input type="hidden" name="check_keywords" value="yes" />
+      <input type="hidden" name="area" value="default" />
+    </form>
+    <p class="searchtip" style="font-size: 90%">
+    Enter search terms or a module, class or function name.
+    </p>
+</div>
+<script type="text/javascript">$('#searchbox').show(0);</script>
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="related">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="genindex.html" title="General Index"
+             >index</a></li>
+        <li class="right" >
+          <a href="py-modindex.html" title="Python Module Index"
+             >modules</a> |</li>
+        <li class="right" >
+          <a href="wtodata.html" title="The WTO Data Frames"
+             >previous</a> |</li>
+        <li><a href="index.html">gWTO2 2.0RC documentation</a> &raquo;</li> 
+      </ul>
+    </div>
+    <div class="footer">
+        &copy; Copyright 2014, ALMA/I. Toledo.
+      Last updated on Jul 25, 2014.
+      Created using <a href="http://sphinx-doc.org/">Sphinx</a> 1.2.2.
+    </div>
+  </body>
+</html>

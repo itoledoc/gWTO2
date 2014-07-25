@@ -1,0 +1,403 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    
+    <title>Selection and Score algorithms &mdash; gWTO2 2.0RC documentation</title>
+    
+    <link rel="stylesheet" href="_static/default.css" type="text/css" />
+    <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
+    
+    <script type="text/javascript">
+      var DOCUMENTATION_OPTIONS = {
+        URL_ROOT:    './',
+        VERSION:     '2.0RC',
+        COLLAPSE_INDEX: false,
+        FILE_SUFFIX: '.html',
+        HAS_SOURCE:  true
+      };
+    </script>
+    <script type="text/javascript" src="_static/jquery.js"></script>
+    <script type="text/javascript" src="_static/underscore.js"></script>
+    <script type="text/javascript" src="_static/doctools.js"></script>
+    <link rel="search" type="application/opensearchdescription+xml"
+          title="Search within gWTO2 2.0RC documentation"
+          href="_static/opensearch.xml"/>
+    <link rel="top" title="gWTO2 2.0RC documentation" href="index.html" />
+    <link rel="next" title="Playing with the libraries" href="play.html" />
+    <link rel="prev" title="Using gWTO2" href="intro.html" /> 
+  </head>
+  <body>
+    <div class="related">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="genindex.html" title="General Index"
+             accesskey="I">index</a></li>
+        <li class="right" >
+          <a href="py-modindex.html" title="Python Module Index"
+             >modules</a> |</li>
+        <li class="right" >
+          <a href="play.html" title="Playing with the libraries"
+             accesskey="N">next</a> |</li>
+        <li class="right" >
+          <a href="intro.html" title="Using gWTO2"
+             accesskey="P">previous</a> |</li>
+        <li><a href="index.html">gWTO2 2.0RC documentation</a> &raquo;</li> 
+      </ul>
+    </div>  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          <div class="body">
+            
+  <div class="section" id="selection-and-score-algorithms">
+<h1>Selection and Score algorithms<a class="headerlink" href="#selection-and-score-algorithms" title="Permalink to this headline">¶</a></h1>
+<div class="section" id="selection-and-data-preparation">
+<span id="selection"></span><h2>Selection and Data preparation<a class="headerlink" href="#selection-and-data-preparation" title="Permalink to this headline">¶</a></h2>
+<p>(<a class="reference internal" href="wtoapi.html#wtoAlgorithm.WtoAlgorithm.selector" title="wtoAlgorithm.WtoAlgorithm.selector"><tt class="xref py py-func docutils literal"><span class="pre">wtoAlgorithm.WtoAlgorithm.selector()</span></tt></a>)</p>
+<ol class="arabic">
+<li><p class="first"><strong>Calculate observability using the pyephem libraries.</strong></p>
+<p>For all the science field sources of an SB and fixed calibration sources,
+we calculate the current elevation, rise LST and set LST.
+If a field source is a Solar System object, or an ephemeris
+source, we calculate first the current RA and DEC, and then the other
+parameters. The current elevation for the SB comes from the source with the
+minimun elevation; the rise LST for the SB is the LST of the source that
+would rise last; and the set LST for the SB is the LST of the source that
+would set first. The rise and set LST are calculated using the elevation
+limit (<cite>horizon</cite>) gave as an input for gWTO.</p>
+<p>Relavant XML child/tag or gWTO2 variables:</p>
+<ul class="simple">
+<li>SchedBlock.FieldSource[&#8216;solarSystemObject&#8217;]</li>
+<li>SchedBlock.FieldSource.sourceCoordinates.longitude</li>
+<li>SchedBlock.FieldSource.sourceCoordinates.latitude</li>
+<li>SchedBlock.FieldSource.isQuery</li>
+<li>SchedBlock.FieldSource.sourceEphemeris</li>
+<li>Date, horizon limit.</li>
+</ul>
+</li>
+<li><p class="first"><strong>Select SB by array type: 12m, 7m, TP.</strong></p>
+<p>Relavant XML child/tag or gWTO2 variables:</p>
+<ul class="simple">
+<li>SchedBlock.ObsUnitControl[&#8216;arrayRequested&#8217;]</li>
+<li>Array Type.</li>
+</ul>
+</li>
+<li><p class="first"><strong>Calculate opacity, airmass and sky Temperature.</strong></p>
+<p>For both the OT asumed conditions and current, actual, conditions,
+based on the current PWV.</p>
+<p>The implementation has several steps:</p>
+<blockquote>
+<div><ol class="arabic simple">
+<li>First, a table with values of Tau as fuction of PWV and representative
+frequencies was created. The file with this tables, in csv format, is
+called <strong>tau.csv</strong>. The frequencies are between 84.0 and 720.0 GHz, with
+steps of 100 MHz; pwv values are between 0.0 and 20.0 mm, in steps of
+0.05. The values were calculated using the atmosphere model algorithms from
+CASA 4.2.1, using as input variables <img class="math" src="_images/math/6c1266441124f971fda425574c0e1e4945b12d23.png" alt="P=580.0"/>, <img class="math" src="_images/math/cf7382c6205f63343eeb2df28f7b56c2d7c18fae.png" alt="H=20.0"/>,
+<img class="math" src="_images/math/3518c52f4a673ccad243bd354fe8c1e5ba49bd43.png" alt="T=270.0"/>, <img class="math" src="_images/math/b7b96959123ced6d57864bf850779e45a9ed7306.png" alt="altitude=5059"/> and <img class="math" src="_images/math/29ffd03b199c9087d1a5225aa9be4375b91cc6c9.png" alt="chansep=0.1"/>.</li>
+<li>A table with Tsky values as function of PWV and representative
+frequencies was also create. The file with this table, in csv format,
+is called <strong>tskyR.csv</strong>. Description of columns, rows, and values is the
+same as the table tau.csv, the only addition, is that the Tsky in the
+tables assumes the airmass of a source at Zenith.</li>
+<li>Internaly, four columns are created for all SBs: <em>tau_org</em> and <em>tsky_org</em>,
+storing the value of tau and tsky for the conditions assumed by the OT,
+i.e., pwv from maxPWVC; <em>tau</em> and <em>tsky</em>, storing
+the values of tau and tsky for the current conditions, i.e.,
+pwv from the gui&#8217;s PWV variable.</li>
+</ol>
+</div></blockquote>
+<p>Relavant XML child/tag or gWTO2 variables:</p>
+<ul class="simple">
+<li>SchedBlock.Preconditions.WeatherConstraints.maxPWVC</li>
+<li>SchedBlock.SchedulingConstraints.representativeCoordinates.latitude</li>
+<li>SchedBlock.SchedulingConstraints.representativeFrequency</li>
+<li>Date, current PWV</li>
+<li>Tsky and Tau tables.</li>
+</ul>
+</li>
+<li><p class="first"><strong>Calculate system Temperatures.</strong></p>
+<p>Two columns are genrated for each SB: <em>tsys_org</em> and <em>tsys</em>, one for the
+OT&#8217;s assumed conditions and the other for the current conditions.
+Tsys, for both cases, is calculated using:</p>
+<blockquote>
+<div><div class="math">
+<p><img src="_images/math/6746e74267f4b9289e0689f3698da26a38fa37ec.png" alt="T_{sys} = \frac{1 + g}{\eta_{eff} e^{-\tau \cdot \sec Z}}
+\left(T_{rx} + T_{sky,Z=0} \left(\frac{1-e^{-\tau \cdot \sec Z}}{e^{-\tau}}\right)
+\eta_{eff} + (1-\eta_{eff}) T_{amb}\right)"/></p>
+</div></div></blockquote>
+<p>Where <img class="math" src="_images/math/67f4714f065d485540ad40829e0717bf75e9dd85.png" alt="g"/> is the sideband gain ratio (<img class="math" src="_images/math/41b9bdb3b433e8ee75764e968aedc6d74a7146f5.png" alt="g=0"/> for SSB and 2SB
+receivers, <img class="math" src="_images/math/9e745ea037f9036698cf5f5d4f182a36210dd4af.png" alt="g=1"/> for DSB); <img class="math" src="_images/math/98b64d0c163d9572e3130e710082e82e7a74e39b.png" alt="\eta_{eff}"/> is the forward efficiency,
+which is set to a value of 0.95; <img class="math" src="_images/math/3e9cf902d39aa125def8f7cae01c92c47a17f20c.png" alt="T_{rx}"/> is the receiver characteristic
+temperature; <img class="math" src="_images/math/d9e99c35d3632bb156b7aca0e93cd78a148a10e8.png" alt="\tau"/> is the oppacity for a source at zenithal distance
+<img class="math" src="_images/math/645e8e061e21bbdf122e8c910559eb1fa24221d1.png" alt="Z=0"/>; <img class="math" src="_images/math/c4563e7ecec2336a3934447a6c10ef8519b0b452.png" alt="Z"/> is the zenithal distance of the representative source
+at transit: <img class="math" src="_images/math/b0f79094f9e0259773ff687fdc98746c8b893fd6.png" alt="T_{sky}"/> is the sky temperature at <img class="math" src="_images/math/645e8e061e21bbdf122e8c910559eb1fa24221d1.png" alt="Z=0"/>; and
+<img class="math" src="_images/math/639d7eed325e7eff458e62f98af610da3ea3624d.png" alt="T_{amb}"/> is the ambient temperature, set to a fixed value of
+<img class="math" src="_images/math/a297b8a2f1a61ac4a12daf834c2d838b8bf3e96a.png" alt="270K"/>.</p>
+<p>Relavant XML child/tag or gWTO2 variables:</p>
+<ul class="simple">
+<li>SchedBlock.SchedulingConstraints.requiredReceiverBands</li>
+</ul>
+</li>
+<li><p class="first"><strong>SBs within spectral ranges with transmission higher than 50% are first</strong>
+<strong>selected.</strong></p>
+<p>For gWTO1, we use to have a limit of 70%, which change to 50% when the pwv
+was under 0.6 mm. For gWTO2 we set the limit to 50%, and a more accurate
+selection is applied later using <img class="math" src="_images/math/efb94025a55aa1eb99667c7b98dfcce242e89e28.png" alt="T_{sys}"/>
+The transmission is calculated from the previously found <img class="math" src="_images/math/8606c09f4e0d78a0a7576c353c5e6f33f92cecfa.png" alt="tau"/> for
+the current conditions:</p>
+<div class="math">
+<p><img src="_images/math/989475255a312fa4ba22b4ef2a2ce0d7de4f3368.png" alt="e^{-\tau_{\rm{sb,pwv}}\cdot \sec Z_{\rm{sb,HA}=0}} &gt; 0.5"/></p>
+</div><p>where <img class="math" src="_images/math/1fcc670ccf41a576017478b8e5ea5e818c7460b6.png" alt="\tau_{\rm{sb,pwv}}"/> is the oppacity for the representative source
+of a scheduling block <em>sb</em> and with the current PWV <img class="math" src="_images/math/bb4bda725d29d553d9e19a757be80d24fc01fc23.png" alt="pwv"/>; and
+<img class="math" src="_images/math/cd4ba9532f7554da09a9b91e20677964d77624a7.png" alt="Z_{sb,\rm{HA}=0}"/> is the zenithal distance for the representative source
+of <em>sb</em> at transit.</p>
+<p>Relavant XML child/tag or gWTO2 variables:</p>
+<ul class="simple">
+<li><img class="math" src="_images/math/1fcc670ccf41a576017478b8e5ea5e818c7460b6.png" alt="\tau_{\rm{sb,pwv}}"/></li>
+</ul>
+</li>
+<li><p class="first"><strong>Select SBs within given HA limits.</strong></p>
+<div class="math">
+<p><img src="_images/math/2ca30b993d613efbf998ce553ac14f1bdfe9a003.png" alt="\rm{minHA} &lt; \rm{HA}_{sb,time} &lt; \rm{maxHA}"/></p>
+</div><p>(mihHA = -5 and maxHA =  3 by default).</p>
+<p>Relavant XML child/tag or gWTO2 variables:</p>
+<ul class="simple">
+<li><img class="math" src="_images/math/13d8f5735b26f6bdb137a079399cd30dfc70b3bd.png" alt="\rm{HA}_{sb,time}"/></li>
+<li><tt class="xref std std-keyword docutils literal"><span class="pre">LST</span></tt></li>
+</ul>
+</li>
+<li><p class="first"><strong>Select SBs over the given elevation limit (20 deg. default) and that won&#8217;t</strong>
+<strong>set for at least 1 1/2 hours.</strong></p>
+<div class="math">
+<p><img src="_images/math/e3a9811f66c41fc75ffb813f00a9bbdfb41e740d.png" alt="\left( \rm{elev} &gt; \rm{horizon} \right) \rm{\ AND\ } \left(
+\rm{SB}_{\rm{set\ time}} &gt; 1.5\rm{hours\ from\ now} \right)"/></p>
+</div><p>Relavant XML child/tag or gWTO2 variables:</p>
+<ul class="simple">
+<li><tt class="xref std std-keyword docutils literal"><span class="pre">LST</span></tt></li>
+<li><tt class="xref std std-keyword docutils literal"><span class="pre">Horizon</span> <span class="pre">Limit</span></tt></li>
+<li><tt class="xref std std-keyword docutils literal"><span class="pre">SB</span> <span class="pre">set</span> <span class="pre">time</span></tt></li>
+</ul>
+</li>
+<li><p class="first"><strong>Remove SBs with states Phase2Submitted, FullyObserved and Deleted.</strong></p>
+<p>Relavant XML child/tag or gWTO2 variables:</p>
+<ul class="simple">
+<li>This information comes from the ALMA.SCHED_BLOCK_STATUS.</li>
+</ul>
+</li>
+<li><p class="first"><strong>Remove SBs that belongs to projects with status Phase2Submitted or Completed.</strong></p>
+<p>Relavant XML child/tag or gWTO2 variables:</p>
+<ul class="simple">
+<li>This information comes from the ALMA.OBS_PROJECT_STATUS, and is crosschecked
+against ALMA.BMMV_OBSPROJECT</li>
+</ul>
+</li>
+<li><p class="first"><strong>Remove SBs that have names like &#8220;Do not&#8221;.</strong></p>
+<p>Currently the OT is not able to handle the SB status &#8220;Deleted&#8221;, so SBs
+that are supposed to be deleted are set to status &#8220;Suspended&#8221;, and the
+name changed to a varation of &#8220;DO NOT OBSERVE&#8221;, &#8220;Do_not_observe&#8221;, &#8220;DO not
+observe descoped&#8221;, etc., depending on the mood of the P2G. The only thing
+in common is the presence of a &#8220;do not&#8221;. Any SB with those words in the name
+is removed.</p>
+<p>Relavant XML child/tag or gWTO2 variables:</p>
+<ul class="simple">
+<li>SchedBlock.name</li>
+</ul>
+</li>
+<li><p class="first"><strong>Remove SBs where the number of requested executions has been achieved</strong></p>
+<p>Given the requested number of executions of a SB (executionCount), check
+if any EB are associated to this SB, and add up the ones with QA0 flags
+<em>Unset</em> and <em>Pass</em>. If this last number is equal or higher than
+executionCount we don&#8217;t select the SB.</p>
+<p>When a QAO <em>Unset</em> flag is set to <em>Fail</em> or <em>Semipass</em>, the number of
+assoc. EB will go down, and then an SB can be back on the list. This method
+avoids over-observing of an SB.</p>
+<p>Relavant XML child/tag or gWTO2 variables:</p>
+<ul class="simple">
+<li>SchedBlock.SchedBlockControl.executionCount</li>
+<li>QA0STATUS column FROM ALMA.AQUA_EXECBLOCK</li>
+</ul>
+</li>
+<li><p class="first"><strong>Select SBs that can be executed with the current array&#8217;s</strong>
+<strong>angular resolution</strong></p>
+<p>Using the minAR and maxAR limits, corrrected by Stéphane&#8217;s script and transformed
+to the equivalent AR at 100GHz, we select SBs that would accept current array&#8217;s
+configuration as set in <em class="guilabel">Array AR:</em>:</p>
+<div class="math">
+<p><img src="_images/math/47a561cdeb129d549fb2bd0508cd39367229a135.png" alt="\rm{minAR}_{\rm{SB}} &lt; \rm{AR}_{\rm{array}} &lt; \rm{maxAR}_{\rm{SB}}"/></p>
+</div><p>Relavant XML child/tag or gWTO2 variables:</p>
+<ul class="simple">
+<li>SchedBlock.SchedulingConstraints.minAcceptableAngResolution</li>
+<li>SchedBlock.SchedulingConstraints.maxAcceptableAngResolution</li>
+<li><tt class="xref std std-keyword docutils literal"><span class="pre">minAR</span></tt>, <tt class="xref std std-keyword docutils literal"><span class="pre">maxAR</span></tt>, Stéphane&#8217;s script</li>
+<li><em class="guilabel">Array AR:</em></li>
+</ul>
+</li>
+<li><p class="first"><strong>Calculate tsysfrac, blfrac and frac columns</strong></p>
+<p>Three new variables are calculated for each SB, that will help to do a final
+selection and assign scores. <tt class="xref std std-keyword docutils literal"><span class="pre">tsysfrac</span></tt> is the multiplicative factor
+the science target integration time should be corrected by, so given the
+current weather conditions (<img class="math" src="_images/math/739c004ce0a5b9e2a0ac6a5a1140c8aceeeef917.png" alt="\rm{T}_{\rm{sys}}"/>, <img class="math" src="_images/math/d9e99c35d3632bb156b7aca0e93cd78a148a10e8.png" alt="\tau"/>)
+the execution would achieve the requested sensitivity:</p>
+<div class="math">
+<p><img src="_images/math/b81536a7296a2edfe7cee338b7e9d22f2703ae81.png" alt="\rm{tsysfrac} = \left(\frac{\rm{Tsys}}{\rm{Tsys\_org}}\right)^{2}"/></p>
+</div><p><tt class="xref std std-keyword docutils literal"><span class="pre">blfrac</span></tt> is the multiplicative factor the science target integration
+time should be corrected by to account for differences between current array&#8217;s
+characteristics (<img class="math" src="_images/math/1e1f404893fdb03a04e1566ca66cd110b9f14334.png" alt="AR"/>, <img class="math" src="_images/math/855aa451e9dd98ba35bb0d6ddde23bacd1986855.png" alt="\rm{Number_of_Baselines}"/>) and requested
+array:</p>
+<div class="math">
+<p><img src="_images/math/90b38c5afa57badc0fe67378e42907c1ef1d01d1.png" alt="\rm{blfrac} = \frac{offered\_baselines}{\rm{available\_baselines}}"/></p>
+</div><p>The offered_baselines will depend on Cycle (32 for cycle 1, 34 for cycle 2).</p>
+<p>Finally, <tt class="xref std std-keyword docutils literal"><span class="pre">frac</span></tt> is the total multiplicative factor accounting for
+both previous factors:</p>
+<div class="math">
+<p><img src="_images/math/fdf905418dab0ce6f914f82c063a025e0dd05bb3.png" alt="\rm{frac} = \rm{tsysfrac} \times\rm{blfrac}"/></p>
+</div></li>
+</ol>
+</div>
+<div class="section" id="score-and-ranking">
+<span id="score"></span><h2>Score and ranking<a class="headerlink" href="#score-and-ranking" title="Permalink to this headline">¶</a></h2>
+<ol class="arabic">
+<li><p class="first"><strong>SB completion score</strong></p>
+<p>A score between 4 and 10, where 4 is given to SBs that has not been started
+yet, and it rises as the SB gets closer to completion.</p>
+<div class="math">
+<p><img src="_images/math/62e9746e1faa12bc03f0c75c1c0f98e32637eb34.png" alt="\rm{Score}_{\rm{SB\ completion}} =
+4 + 6 \times \frac{\rm{QA0\ Pass} + \rm{QA0\ Unset}}{\rm{Expected\ Executions}}"/></p>
+</div></li>
+<li><p class="first"><strong>SB Grade/Cycle Score</strong></p>
+<div class="math" id="equation-gA">
+<p><span class="eqno">(1)</span><img src="_images/math/e7f79543ea09340ba144692d76b8ba4894d50919.png" alt="\rm{Score}_{\rm{grade}} = 10 ; \rm{if\ grade\ is\ A}"/></p>
+</div><div class="math" id="equation-gBc1">
+<p><span class="eqno">(2)</span><img src="_images/math/867fa6926c956550d9fd8e0dd1be519f309fddc3.png" alt="\rm{Score}_{\rm{grade}} = 8  ; \rm{if\ grade\ is\ B\ and\ Cycle\ 1}"/></p>
+</div><div class="math" id="equation-gBc2">
+<p><span class="eqno">(3)</span><img src="_images/math/1b1cab2d24ddb7e9a55febad126c647d73a742e0.png" alt="\rm{Score}_{\rm{grade}} = 4  ; \rm{if\ grade\ is\ B\ and\ Cycle\ 2}"/></p>
+</div><div class="math" id="equation-gC">
+<p><span class="eqno">(4)</span><img src="_images/math/67bfd31ffd9623f62855ebd9c5406e8580607c3f.png" alt="\rm{Score}_{\rm{grade}} = -100 ; \rm{if\ grade\ is\ C}"/></p>
+</div></li>
+<li><p class="first"><strong>SB Science Score</strong></p>
+<div class="math">
+<p><img src="_images/math/e6cc553b3dd14a2b69702432f383208f39a3a45f.png" alt="\rm{Score}_{\rm{science\ rank}} =
+10 \times \frac{\rm{max(rank)} - \rm{SB}_{\rm{rank}}}{\rm{max(rank)}}"/></p>
+</div></li>
+<li><p class="first"><strong>SB Array Score</strong></p>
+<div class="math" id="equation-tp">
+<p><span class="eqno">(5)</span><img src="_images/math/b8639f9c9b59da5c36b5b9126fe624c17a6797fa.png" alt="\rm{Score}_{\rm{array}} = 10 ; \rm{\ if\ array\ is\ TP\ or\ 7m}"/></p>
+</div><div class="math" id="equation-match">
+<p><span class="eqno">(6)</span><img src="_images/math/c13a90ab9364d848c6b836998bf5255643178183.png" alt="\rm{Score}_{\rm{array}} = 10 ; \rm{\ if\ } 0.9 \rm{SB}_{\rm{AR}}
+        &lt;= \rm{Array}_{\rm{AR}} &lt;= 1.1 \rm{SB}_{\rm{AR}}"/></p>
+</div><div class="math" id="equation-low">
+<p><span class="eqno">(7)</span><img src="_images/math/21cb3f78b77e8eccf3e9c3ed29c7c67e840c1664.png" alt="\rm{Score}_{\rm{array}} = 9 ; \rm{\ if\ } 0.7 \rm{SB}_{\rm{AR}}
+       &lt;= \rm{Array}_{\rm{AR}} &lt; 0.9 \rm{SB}_{\rm{AR}}"/></p>
+</div><div class="math" id="equation-toolow">
+<p><span class="eqno">(8)</span><img src="_images/math/0fa433fd908b48ed933df8f9f61baf2f32a904fa.png" alt="\rm{Score}_{\rm{array}} = 8.5\frac{\rm{Array}_{\rm{AR}} - \rm{SB}_{\rm{minAR}}}{0.7\rm{SB}_{\rm{AR}} - \rm{SB}_{\rm{minAR}}}
+       ; \rm{\ if\ } \rm{Array}_{\rm{AR}} &lt; 0.7 \rm{SB}_{\rm{AR}}"/></p>
+</div><div class="math" id="equation-high">
+<p><span class="eqno">(9)</span><img src="_images/math/0dff930e562a6a1244afb9ab723be090a2d428dd.png" alt="\rm{Score}_{\rm{array}} = \frac{10}{1.1\rm{SB}_{\rm{AR}} - \rm{SB}_{\rm{maxAR}}} \left(\rm{Array}_{\rm{AR}} - \rm{SB}_{\rm{maxAR}}\right)
+       ; \rm{\ if\ } \rm{Array}_{\rm{AR}} &gt; 1.1 \rm{SB}_{\rm{AR}}"/></p>
+</div><div class="figure">
+<a class="reference internal image-reference" href="_images/figure_1.png"><img alt="_images/figure_1.png" src="_images/figure_1.png" style="width: 588.5px; height: 408.0px;" /></a>
+<p class="caption">In this example, the requested array resolution (<img class="math" src="_images/math/92f6e2b99a975774f1d06bd9d8bd2db52e58d6bd.png" alt="\rm{SB}_{\rm{AR}}"/>)
+is 2.8 arcsec, with a minimun acceptable resolution
+<img class="math" src="_images/math/b33e7aabc1ff7358c54b8b92274490bfa3345677.png" alt="\rm{SB}_{\rm{minAR}} = 0.5"/> and maximum
+<img class="math" src="_images/math/eb4522772db0bb6fa424a13256d68f1e095d96d3.png" alt="\rm{SB}_{\rm{maxAR}} = 3.5"/></p>
+</div>
+</li>
+<li><p class="first"><strong>SB Executive Score</strong></p>
+<div class="math" id="equation-exscore">
+<p><span class="eqno">(10)</span><img src="_images/math/2c1d5fd1552b6905c768e20a054538d3e3ef7889.png" alt="\rm{Score}_{\rm{executive}} = 10; \rm{default\ to\ all\ executives}"/></p>
+</div></li>
+<li><p class="first"><strong>SB Condition Score</strong></p>
+<div class="math" id="equation-frac_und_1">
+<p><span class="eqno">(11)</span><img src="_images/math/cc8e87b683a3e8249ec5f9033e212168cef73297.png" alt="\rm{Score}_{\rm{cond}} = 10 \left(1- (\rm{frac}-1)^{2}\right) \rm{pwv}_{\rm{close}}"/></p>
+</div><div class="math" id="equation-pwv_close">
+<p><span class="eqno">(12)</span><img src="_images/math/4a19a66710bf0700ee34ef70234672b8646532b8.png" alt="\rm{pwv}_{\rm{close}} = 1 - \left|\frac{\rm{pwv} - \rm{maxPWV}}{6}\right|"/></p>
+</div><div class="math" id="equation-frac_1">
+<p><span class="eqno">(13)</span><img src="_images/math/625197f93d7a4b52f313747921340152070fd0de.png" alt="\rm{Score}_{\rm{cond}} = 10"/></p>
+</div><div class="math">
+<p><img src="_images/math/b606edea521a130e1064a48a5147e4930dc8b55c.png" alt=""/></p>
+</div></li>
+<li><p class="first"><strong>SB Total Score</strong></p>
+</li>
+</ol>
+</div>
+<div class="section" id="checking-observability">
+<span id="check-obs"></span><h2>Checking observability<a class="headerlink" href="#checking-observability" title="Permalink to this headline">¶</a></h2>
+</div>
+</div>
+
+
+          </div>
+        </div>
+      </div>
+      <div class="sphinxsidebar">
+        <div class="sphinxsidebarwrapper">
+  <h3><a href="index.html">Table Of Contents</a></h3>
+  <ul>
+<li><a class="reference internal" href="#">Selection and Score algorithms</a><ul>
+<li><a class="reference internal" href="#selection-and-data-preparation">Selection and Data preparation</a></li>
+<li><a class="reference internal" href="#score-and-ranking">Score and ranking</a></li>
+<li><a class="reference internal" href="#checking-observability">Checking observability</a></li>
+</ul>
+</li>
+</ul>
+
+  <h4>Previous topic</h4>
+  <p class="topless"><a href="intro.html"
+                        title="previous chapter">Using gWTO2</a></p>
+  <h4>Next topic</h4>
+  <p class="topless"><a href="play.html"
+                        title="next chapter">Playing with the libraries</a></p>
+  <h3>This Page</h3>
+  <ul class="this-page-menu">
+    <li><a href="_sources/algorithm.txt"
+           rel="nofollow">Show Source</a></li>
+  </ul>
+<div id="searchbox" style="display: none">
+  <h3>Quick search</h3>
+    <form class="search" action="search.html" method="get">
+      <input type="text" name="q" />
+      <input type="submit" value="Go" />
+      <input type="hidden" name="check_keywords" value="yes" />
+      <input type="hidden" name="area" value="default" />
+    </form>
+    <p class="searchtip" style="font-size: 90%">
+    Enter search terms or a module, class or function name.
+    </p>
+</div>
+<script type="text/javascript">$('#searchbox').show(0);</script>
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="related">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="genindex.html" title="General Index"
+             >index</a></li>
+        <li class="right" >
+          <a href="py-modindex.html" title="Python Module Index"
+             >modules</a> |</li>
+        <li class="right" >
+          <a href="play.html" title="Playing with the libraries"
+             >next</a> |</li>
+        <li class="right" >
+          <a href="intro.html" title="Using gWTO2"
+             >previous</a> |</li>
+        <li><a href="index.html">gWTO2 2.0RC documentation</a> &raquo;</li> 
+      </ul>
+    </div>
+    <div class="footer">
+        &copy; Copyright 2014, ALMA/I. Toledo.
+      Last updated on Jul 25, 2014.
+      Created using <a href="http://sphinx-doc.org/">Sphinx</a> 1.2.2.
+    </div>
+  </body>
+</html>

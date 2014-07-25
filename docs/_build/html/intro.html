@@ -1,0 +1,336 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    
+    <title>Using gWTO2 &mdash; gWTO2 2.0RC documentation</title>
+    
+    <link rel="stylesheet" href="_static/default.css" type="text/css" />
+    <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
+    
+    <script type="text/javascript">
+      var DOCUMENTATION_OPTIONS = {
+        URL_ROOT:    './',
+        VERSION:     '2.0RC',
+        COLLAPSE_INDEX: false,
+        FILE_SUFFIX: '.html',
+        HAS_SOURCE:  true
+      };
+    </script>
+    <script type="text/javascript" src="_static/jquery.js"></script>
+    <script type="text/javascript" src="_static/underscore.js"></script>
+    <script type="text/javascript" src="_static/doctools.js"></script>
+    <link rel="search" type="application/opensearchdescription+xml"
+          title="Search within gWTO2 2.0RC documentation"
+          href="_static/opensearch.xml"/>
+    <link rel="top" title="gWTO2 2.0RC documentation" href="index.html" />
+    <link rel="next" title="Introduction" href="using.html" />
+    <link rel="prev" title="Welcome to gWTO2 documentation" href="index.html" /> 
+  </head>
+  <body>
+    <div class="related">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="genindex.html" title="General Index"
+             accesskey="I">index</a></li>
+        <li class="right" >
+          <a href="py-modindex.html" title="Python Module Index"
+             >modules</a> |</li>
+        <li class="right" >
+          <a href="using.html" title="Introduction"
+             accesskey="N">next</a> |</li>
+        <li class="right" >
+          <a href="index.html" title="Welcome to gWTO2 documentation"
+             accesskey="P">previous</a> |</li>
+        <li><a href="index.html">gWTO2 2.0RC documentation</a> &raquo;</li> 
+      </ul>
+    </div>  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          <div class="body">
+            
+  <div class="section" id="using-gwto2">
+<h1>Using gWTO2<a class="headerlink" href="#using-gwto2" title="Permalink to this headline">¶</a></h1>
+<div class="section" id="starting-the-gui">
+<h2>Starting the GUI<a class="headerlink" href="#starting-the-gui" title="Permalink to this headline">¶</a></h2>
+<p>gWTO2 is tested and deployed at the osf-red machine, within the aod account.
+A virtual environment of python, based on the
+<a class="reference external" href="http://docs.continuum.io/anaconda/index.html">Anaconda distribution</a>,
+must be loaded before using it. This is achieved by running:</p>
+<div class="highlight-python"><div class="highlight"><pre>. activateC2Test
+</pre></div>
+</div>
+<p>The Anaconda distribution is based on python 2.7.6 and includes numpy, pandas,
+pyephem and other libraries need by gWTO.</p>
+<p>The gui is run executing the gWTO2.py comand:</p>
+<div class="highlight-python"><div class="highlight"><pre>Usage: gWTO2.py arg1 [options]
+    arg1 must be BL or ACA
+
+Options:
+  -h, --help            show this help message and exit
+  -c, --clean           Force clean up of gWTO2 cache
+  -p PATH, --path=PATH  Path for cache
+</pre></div>
+</div>
+<p>So, to run gWTO2 for baseline correlator use argument <em class="xref std std-option">BL</em>, and
+<em class="xref std std-option">ACA</em> for Total Power and ACA. The <em class="xref std std-option">-c</em> option should only be
+used once per day.</p>
+<p>I would also recommend to set the option <em class="xref std std-option">-p</em> to something like
+<tt class="docutils literal"><span class="pre">'/.wto_myname/'</span></tt> so different users running gWTO won&#8217;t mess up the cache
+for each other. <strong>After playing with gWTO2 using a different path, please</strong>
+<strong>delete the directory created with the name .wto_myname</strong></p>
+</div>
+<div class="section" id="the-gwto2-window">
+<h2>The gWTO2 window<a class="headerlink" href="#the-gwto2-window" title="Permalink to this headline">¶</a></h2>
+<p>After starting <strong class="command">gWTO2 BL</strong> you will be presented with the gui shown on
+<a class="reference internal" href="#fig2"><em>Figure 2</em></a>.
+If the <em class="xref std std-option">-c</em> option was used, or the cache have been manually erased it,
+the time until the gui is ready can be up to 5-7 minutes.</p>
+<div class="figure" id="fig2">
+<img alt="_images/gWTO2__BL_001.png" src="_images/gWTO2__BL_001.png" />
+<p class="caption">Figure 2</p>
+</div>
+<p>The gui for ACA (<strong class="command">gWTO2 ACA</strong>) is almost the same, except for the lack
+of <em class="guilabel">Array Options</em>, and the presence of a tab <em class="guilabel">TP</em> that
+will be used for handling Total Power SBs.</p>
+</div>
+<div class="section" id="setting-up-variables">
+<h2>Setting up variables<a class="headerlink" href="#setting-up-variables" title="Permalink to this headline">¶</a></h2>
+<p>After opening, the <em class="guilabel">Date</em> will be by default the current UTC time,
+<em class="guilabel">PWV</em> is set to 1.2 mm., the <em class="guilabel">Horizon</em> limit is 20 degrees,
+<em class="guilabel">minHA</em>, minimum hour angle, is -5 and <em class="guilabel">maxHA</em>, maximum
+hour angle, is 3. The <em class="guilabel">LST</em> field is not editable, and it shows the
+LST for the date/time set in the <em class="guilabel">Date</em> field.</p>
+<dl class="docutils">
+<dt><strong>(For BL GUI only.)</strong></dt>
+<dd>The box with the array variables will have the
+<em class="guilabel">Std. Conf.:</em> field set to <tt class="xref std std-keyword docutils literal"><span class="pre">Current</span> <span class="pre">Conf.</span></tt>
+This <tt class="xref std std-keyword docutils literal"><span class="pre">Current</span> <span class="pre">Conf.</span></tt> comes from the output of the CASA script
+<strong class="command">arrayConfigurationTools.py</strong>, which can be found at
+<tt class="file docutils literal"><span class="pre">~/AIV/science/ArrayConfiguration/Tools/arrayConfigurationTools.py</span></tt>.
+It is made with the antennas that in principle can be used for the current
+ES Block. <strong>It is the AoD Lead&#8217;s duty to create the relevant files from</strong>
+<strong>time to time to account for antenna movements or new antennas added</strong>.
+<a class="reference internal" href="apendix.html#current-conf"><em>(Instructions)</em></a></dd>
+<dt><strong>(For BL GUI only.)</strong></dt>
+<dd>The values given at <em class="guilabel">Array AR:</em>  and <em class="guilabel">Antennas:</em>
+are set according to the <em>current array&#8217;s</em> angular resolution and
+number of antennas offered officially for cycle 2.
+<strong>The only field you can modify at this stage in the &#8216;Antenna&#8217;</strong>
+<strong>field, which is the number of antennas</strong>. The idea is that the user will use
+this information to have an idea of the current configuration characteristics,
+and to run gWTO2 to plan observations ahead of time, or when Baseline arrays
+have not been created in the last 6 to 12 hours.</dd>
+<dt><strong>(For BL GUI only, when observing.)</strong></dt>
+<dd>The user should press the button <em class="guilabel">Now</em>, and a pop up window
+similar to the one shown in <a class="reference internal" href="#fig3"><em>Figure 3</em></a> will appear.</dd>
+</dl>
+<div class="figure" id="fig3">
+<img alt="_images/gWTO2__BL_002.png" src="_images/gWTO2__BL_002.png" />
+<p class="caption">Figure 3</p>
+</div>
+<p>The window show the normalized histogram of the baseline lengths, and a fit to
+this distribution, taking the data from latest Baseline Array created.
+From this distribution the array&#8217;s resolution is estimated, and the number of
+antennas is also show. <strong>The user should check that the array resolution is</strong>
+<strong>close the the &#8220;Current Conf.&#8221; value, and that no outliers are fitted</strong>. If
+happy press the <em class="guilabel">OK</em> button, and this will set the
+<em class="guilabel">Array AR:</em> and <em class="guilabel">Antennas:</em> fields
+in the main window. If <em class="guilabel">Cancel</em> is pressed instead, the main window
+will go back to <tt class="xref std std-keyword docutils literal"><span class="pre">Current</span> <span class="pre">Conf.</span></tt>. Also, when accepting the new array
+estimates you will not longer be able to change the number of antennas unless
+you go back to :keyword&#8221;<cite>Current Conf.</cite></p>
+<p>The <em class="guilabel">BL Arrays:</em> Combo menu is also populated with the list of the
+baselines arrays created in the last 6 to 12 hours.</p>
+<dl class="docutils">
+<dt><strong>For ACA GUI only</strong></dt>
+<dd>The number of antennas is 9 by default. Change the number according to the
+number of antennas that are available.</dd>
+</dl>
+</div>
+<div class="section" id="running">
+<h2>Running<a class="headerlink" href="#running" title="Permalink to this headline">¶</a></h2>
+<p>When you are happy with the <em class="guilabel">Date</em>, <em class="guilabel">PWV</em> and
+array variables (also the <em class="guilabel">Horizon</em>, <em class="guilabel">minHA</em> and
+<em class="guilabel">maxHA</em> values) you can run the selector and scoring algorithms
+pressing the button <em class="guilabel">Run</em>.</p>
+<p>After an interval of a few seconds (5 to 15 seconds) you will be presented
+with something similar to <a class="reference internal" href="#fig4"><em>Figure 4</em></a>.</p>
+<div class="figure" id="fig4">
+<img alt="_images/gWTO2__BL_003.png" src="_images/gWTO2__BL_003.png" />
+<p class="caption">Figure 4</p>
+</div>
+</div>
+<div class="section" id="reading-the-output-scores">
+<h2>Reading the output Scores<a class="headerlink" href="#reading-the-output-scores" title="Permalink to this headline">¶</a></h2>
+<div class="section" id="meaning-of-the-background-colors">
+<h3>Meaning of the background colors<a class="headerlink" href="#meaning-of-the-background-colors" title="Permalink to this headline">¶</a></h3>
+<ul class="simple">
+<li><strong>Red</strong>: Means that the integration time for the science target needs to be
+increased by over a factor of 1.3 to reach the PI requested sensitivity.
+<strong>Do not change the integration time unless a clear policy has been set.</strong>
+<strong>(AoD leader should know.)</strong></li>
+<li><strong>Yellow</strong>: The SB, even when it can be run with the current Array&#8217;s angular
+resolution, does require, or prefers, another configuration. If there is
+nothing else to observe, the AoD could execute it. <strong>This doesn&#8217;t apply to</strong>
+<strong>point sources.</strong></li>
+</ul>
+</div>
+<div class="section" id="standard-aca-tab-in-bl-aca-gui">
+<h3>Standard (ACA) Tab in BL (ACA) GUI<a class="headerlink" href="#standard-aca-tab-in-bl-aca-gui" title="Permalink to this headline">¶</a></h3>
+<ol class="arabic simple">
+<li><strong>Score:</strong> The score is the weighted mean of different scores calculated
+for each observable SB. The score is a value between 0 and 10,
+10 being the highest score.<ol class="arabic">
+<li>Condition Score, 35%. A score depending on the current PWV, number of
+available antennas, and pwv used by the OT.</li>
+<li>Array Score, 20%. Depends in how close to the current array&#8217;s resolution
+is the SB asked angular resolution. For ACA and TP this is fixed to 10.</li>
+<li>SB Completition Score, 15%. SBs already started and closer to be completed
+get higher scores</li>
+<li>Letter Grade Score, 15%. Score given by Cycle and letter grade.</li>
+<li>Executive Score, 10%. Score given by the executive of the Project.</li>
+<li>Science Rank Score, 5%. Score given by the scientific ranking of the
+project.</li>
+</ol>
+</li>
+<li><strong>CODE:</strong> Project Code</li>
+<li><strong>SB UID:</strong> Scheduling Block&#8217;s UID</li>
+<li><strong>SB Name:</strong> Scheduling Block&#8217;s Name</li>
+<li><strong>SB State:</strong> Scheduling Block&#8217;s state, or status, taken from the project
+tracker</li>
+<li><strong>Band:</strong> Receiver(s) asked by the SB.</li>
+<li><strong>RA:</strong> Representative Right Ascension.</li>
+<li><strong>DEC:</strong> Representative Declination.</li>
+<li><strong>HA:</strong> Hour Angle for the given date and time.</li>
+<li><strong>Elev.:</strong> Elevation, in degrees, for the given date and time.</li>
+<li><strong>Sets in:</strong> Time left until the first of the field sources (science targets)
+goes down the horizon limit. <em>This calculated by checking the field sources</em>
+<em>coordinates of the SB, and not by the representative coordinates.</em></li>
+<li><strong>Grade:</strong> Grade letter for the SB&#8217;s project.</li>
+<li><strong>Executive:</strong> SB&#8217;s project executive.</li>
+<li><strong>Rank:</strong> SB&#8217;s Project science rank</li>
+<li><strong>Exec. Req.:</strong> Number of executions requested for this SB.</li>
+<li><strong>Exec. Done.:</strong> Number of execution blocks for this SB, that have the QA0
+status set to PASS, or in Unset state.</li>
+<li><strong>TsysFrac:</strong> Given the TSys assumed by the PI in the OT, and the actual TSys
+with the given pwv, this is the multiplicative factor for the time on source
+(integration time) to reach the sensitivity asked by the PI. E.G., if the
+TSysFrac is 0.8 it means that with the 80% of the asked integration time the
+rms will be achieved.</li>
+<li><strong>BLFrac.:</strong> Given the current number of antennas and array configuration the
+number of usable baselines is calculated, and is compared with the SB
+requirements, e.g., 34 antennas for BL, 9 for ACA. The ratio of these two
+number gives the corrective factor needed to achieve the PI requested rms.
+E.G., if the factor is 1.22, it means that the ToS should be a 22% higher to
+achieve the rms.</li>
+<li><strong>TotalFrac.:</strong> The total multiplicative factor for the time on source needed
+given the calculated TsysFrac and BLFrac. If TotalFrac is higher than 1.3,
+which means that if the SB is run with these conditions the rms achieved
+would be sqrt(1/1.3) ~ 87% of the asked rms, the whole row will have a
+red background.
+<strong>This does not mean the AoD should change the ToS, unless</strong>
+<strong>a clear policy has been given by PMG or the ES leader.</strong></li>
+<li><strong>Array Score:</strong> The array score, given for information purposes.</li>
+<li><strong>Cond. Score:</strong> The condition score, given for information purposes.</li>
+<li><strong>maxPWVC:</strong> The PWV used by the PI/P2G on the OT to calculate how much
+integration time is needed to get the sensitivy requested.</li>
+<li><strong>ArrayMinAR:</strong> The minimum array&#8217;s resolution that the current SB will
+accept. This value comes from Stephane&#8217;s script, and is corrected for all SBs
+to the equivalent resolution at a 100GHZ and a source that would transit at
+zenith.</li>
+<li><strong>ArrCorr:</strong> The angular resolution requiered by the SB, corrected to the
+equivalent resolution at 100GHz and source with DEC -23.</li>
+<li><strong>ArrayMinAR:</strong> The maximum array&#8217;s resolution that the current SB will
+accept.</li>
+<li><strong>Point Source:</strong> are the targets of the SB point sources?</li>
+<li><strong>TimeOnSource:</strong> Integration time, in seconds, for the science target(s).
+In the case of multisources, this time should be multiplied by the number of
+sources.</li>
+<li><strong>PRJ UID:</strong> The SB&#8217;s project UID.</li>
+</ol>
+</div>
+</div>
+</div>
+
+
+          </div>
+        </div>
+      </div>
+      <div class="sphinxsidebar">
+        <div class="sphinxsidebarwrapper">
+  <h3><a href="index.html">Table Of Contents</a></h3>
+  <ul>
+<li><a class="reference internal" href="#">Using gWTO2</a><ul>
+<li><a class="reference internal" href="#starting-the-gui">Starting the GUI</a></li>
+<li><a class="reference internal" href="#the-gwto2-window">The gWTO2 window</a></li>
+<li><a class="reference internal" href="#setting-up-variables">Setting up variables</a></li>
+<li><a class="reference internal" href="#running">Running</a></li>
+<li><a class="reference internal" href="#reading-the-output-scores">Reading the output Scores</a><ul>
+<li><a class="reference internal" href="#meaning-of-the-background-colors">Meaning of the background colors</a></li>
+<li><a class="reference internal" href="#standard-aca-tab-in-bl-aca-gui">Standard (ACA) Tab in BL (ACA) GUI</a></li>
+</ul>
+</li>
+</ul>
+</li>
+</ul>
+
+  <h4>Previous topic</h4>
+  <p class="topless"><a href="index.html"
+                        title="previous chapter">Welcome to gWTO2 documentation</a></p>
+  <h4>Next topic</h4>
+  <p class="topless"><a href="using.html"
+                        title="next chapter">Introduction</a></p>
+  <h3>This Page</h3>
+  <ul class="this-page-menu">
+    <li><a href="_sources/intro.txt"
+           rel="nofollow">Show Source</a></li>
+  </ul>
+<div id="searchbox" style="display: none">
+  <h3>Quick search</h3>
+    <form class="search" action="search.html" method="get">
+      <input type="text" name="q" />
+      <input type="submit" value="Go" />
+      <input type="hidden" name="check_keywords" value="yes" />
+      <input type="hidden" name="area" value="default" />
+    </form>
+    <p class="searchtip" style="font-size: 90%">
+    Enter search terms or a module, class or function name.
+    </p>
+</div>
+<script type="text/javascript">$('#searchbox').show(0);</script>
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="related">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="genindex.html" title="General Index"
+             >index</a></li>
+        <li class="right" >
+          <a href="py-modindex.html" title="Python Module Index"
+             >modules</a> |</li>
+        <li class="right" >
+          <a href="using.html" title="Introduction"
+             >next</a> |</li>
+        <li class="right" >
+          <a href="index.html" title="Welcome to gWTO2 documentation"
+             >previous</a> |</li>
+        <li><a href="index.html">gWTO2 2.0RC documentation</a> &raquo;</li> 
+      </ul>
+    </div>
+    <div class="footer">
+        &copy; Copyright 2014, ALMA/I. Toledo.
+      Last updated on Jul 25, 2014.
+      Created using <a href="http://sphinx-doc.org/">Sphinx</a> 1.2.2.
+    </div>
+  </body>
+</html>
