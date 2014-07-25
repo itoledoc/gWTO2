@@ -3,26 +3,22 @@
    You can adapt this file completely to your liking, but it should at least
    contain the root `toctree` directive.
 
-******************************
-Welcome to gWTO2 documentation
-******************************
+****************************
+gWTO2 Documentation Contents
+****************************
 
-Contents:
+:download:`(Download PDF version) <_build/latex/gWTO2.pdf>`.
 
 .. toctree::
-   :titlesonly:
    :maxdepth: 2
 
-   intro
-   using
+   intro2
+   usingwto
    algorithm
    play
    wtoapi
    wtodata
    apendix
-
-Download the pdf version of the documentation from this
-:download:`link <_build/latex/gWTO2.pdf>`.
 
 .. note::
 

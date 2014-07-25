@@ -5,7 +5,7 @@ Using gWTO2
 Starting the GUI
 ================
 
-gWTO2 is tested and deployed at the osf-red machine, within the aod account.
+gWTO2 is tested and deployed at the **osf-red** machine, within the **aod** account.
 A virtual environment of python, based on the
 `Anaconda distribution <http://docs.continuum.io/anaconda/index.html>`_,
 must be loaded before using it. This is achieved by running::

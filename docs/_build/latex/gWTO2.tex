@@ -121,15 +121,26 @@
 \phantomsection\label{index::doc}
 
 
-Contents:
+\code{(Download PDF version)}.
+
+
+\chapter{Introduction}
+\label{intro2:introduction}\label{intro2:gwto2-documentation-contents}\label{intro2::doc}
+General description of gWTO2.
+\begin{figure}[htbp]
+\centering
+\capstart
+
+\scalebox{0.600000}{\includegraphics{Selection_003.png}}
+\caption{Screenshot of gWTO2 RC}\end{figure}
 
 
 \chapter{Using gWTO2}
-\label{intro:using-gwto2}\label{intro::doc}\label{intro:welcome-to-gwto2-documentation}
+\label{usingwto:using-gwto2}\label{usingwto::doc}
 
 \section{Starting the GUI}
-\label{intro:starting-the-gui}
-gWTO2 is tested and deployed at the osf-red machine, within the aod account.
+\label{usingwto:starting-the-gui}
+gWTO2 is tested and deployed at the \textbf{osf-red} machine, within the \textbf{aod} account.
 A virtual environment of python, based on the
 \href{http://docs.continuum.io/anaconda/index.html}{Anaconda distribution} (http://docs.continuum.io/anaconda/index.html),
 must be loaded before using it. This is achieved by running:
@@ -164,9 +175,9 @@ for each other. \textbf{After playing with gWTO2 using a different path, please}
 
 
 \section{The gWTO2 window}
-\label{intro:the-gwto2-window}
+\label{usingwto:the-gwto2-window}
 After starting \textbf{gWTO2 BL} you will be presented with the gui shown on
-{\hyperref[intro:fig2]{\emph{Figure 2}}} (\autopageref*{intro:fig2}).
+{\hyperref[usingwto:fig2]{\emph{Figure 2}}} (\autopageref*{usingwto:fig2}).
 If the \emph{\texttt{-c}} option was used, or the cache have been manually erased it,
 the time until the gui is ready can be up to 5-7 minutes.
 \begin{figure}[htbp]
@@ -174,7 +185,7 @@ the time until the gui is ready can be up to 5-7 minutes.
 \capstart
 
 \includegraphics{gWTO2__BL_001.png}
-\caption{Figure 2}\label{intro:fig2}\end{figure}
+\caption{Figure 2}\label{usingwto:fig2}\end{figure}
 
 The gui for ACA (\textbf{gWTO2 ACA}) is almost the same, except for the lack
 of \emph{Array Options}, and the presence of a tab \emph{TP} that
@@ -182,7 +193,7 @@ will be used for handling Total Power SBs.
 
 
 \section{Setting up variables}
-\label{intro:setting-up-variables}
+\label{usingwto:setting-up-variables}
 After opening, the \emph{Date} will be by default the current UTC time,
 \emph{PWV} is set to 1.2 mm., the \emph{Horizon} limit is 20 degrees,
 \emph{minHA}, minimum hour angle, is -5 and \emph{maxHA}, maximum
@@ -212,7 +223,7 @@ have not been created in the last 6 to 12 hours.
 
 \item[{\textbf{(For BL GUI only, when observing.)}}] \leavevmode
 The user should press the button \emph{Now}, and a pop up window
-similar to the one shown in {\hyperref[intro:fig3]{\emph{Figure 3}}} (\autopageref*{intro:fig3}) will appear.
+similar to the one shown in {\hyperref[usingwto:fig3]{\emph{Figure 3}}} (\autopageref*{usingwto:fig3}) will appear.
 
 \end{description}
 \begin{figure}[htbp]
@@ -220,7 +231,7 @@ similar to the one shown in {\hyperref[intro:fig3]{\emph{Figure 3}}} (\autopager
 \capstart
 
 \includegraphics{gWTO2__BL_002.png}
-\caption{Figure 3}\label{intro:fig3}\end{figure}
+\caption{Figure 3}\label{usingwto:fig3}\end{figure}
 
 The window show the normalized histogram of the baseline lengths, and a fit to
 this distribution, taking the data from latest Baseline Array created.
@@ -245,27 +256,27 @@ number of antennas that are available.
 
 
 \section{Running}
-\label{intro:running}
+\label{usingwto:running}
 When you are happy with the \emph{Date}, \emph{PWV} and
 array variables (also the \emph{Horizon}, \emph{minHA} and
 \emph{maxHA} values) you can run the selector and scoring algorithms
 pressing the button \emph{Run}.
 
 After an interval of a few seconds (5 to 15 seconds) you will be presented
-with something similar to {\hyperref[intro:fig4]{\emph{Figure 4}}} (\autopageref*{intro:fig4}).
+with something similar to {\hyperref[usingwto:fig4]{\emph{Figure 4}}} (\autopageref*{usingwto:fig4}).
 \begin{figure}[htbp]
 \centering
 \capstart
 
 \includegraphics{gWTO2__BL_003.png}
-\caption{Figure 4}\label{intro:fig4}\end{figure}
+\caption{Figure 4}\label{usingwto:fig4}\end{figure}
 
 
 \section{Reading the output Scores}
-\label{intro:reading-the-output-scores}
+\label{usingwto:reading-the-output-scores}
 
 \subsection{Meaning of the background colors}
-\label{intro:meaning-of-the-background-colors}\begin{itemize}
+\label{usingwto:meaning-of-the-background-colors}\begin{itemize}
 \item {} 
 \textbf{Red}: Means that the integration time for the science target needs to be
 increased by over a factor of 1.3 to reach the PI requested sensitivity.
@@ -282,7 +293,7 @@ nothing else to observe, the AoD could execute it. \textbf{This doesn't apply to
 
 
 \subsection{Standard (ACA) Tab in BL (ACA) GUI}
-\label{intro:standard-aca-tab-in-bl-aca-gui}\begin{enumerate}
+\label{usingwto:standard-aca-tab-in-bl-aca-gui}\begin{enumerate}
 \item {} 
 \textbf{Score:} The score is the weighted mean of different scores calculated
 for each observable SB. The score is a value between 0 and 10,
@@ -421,17 +432,6 @@ sources.
 \textbf{PRJ UID:} The SB's project UID.
 
 \end{enumerate}
-
-
-\chapter{Introduction}
-\label{using:introduction}\label{using::doc}
-General description of gWTO2.
-\begin{figure}[htbp]
-\centering
-\capstart
-
-\scalebox{0.600000}{\includegraphics{Selection_003.png}}
-\caption{Screenshot of gWTO2 RC}\end{figure}
 
 
 \chapter{Selection and Score algorithms}
@@ -2660,9 +2660,6 @@ to the path where you are running the script from
 \code{\textasciitilde{}/AIV/science/ArrayConfiguration/Tools/Cycle2/*.cfg}
 
 \end{enumerate}
-
-Download the pdf version of the documentation from this
-\code{link}.
 
 \begin{notice}{note}{Note:}
 \textbf{Latest update:}
