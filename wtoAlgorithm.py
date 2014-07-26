@@ -490,13 +490,13 @@ class WtoAlgorithm(WtoDatabase):
         sb_exec_score = self.exec_prio[execu]
 
         # set condition score:
-        pwv_corr = 1 - (abs(self.pwv - maxpwvc) / 6.)
-        if pwv_corr < 0.:
-            pwv_corr = 0.
+        pwv_corr = 1 - (abs(self.pwv - maxpwvc) / 4.)
+        if pwv_corr < 0.1:
+            pwv_corr = 0.1
 
         if frac < 1:
             x = frac - 1.
-            sb_cond_score = 10 * (1 - (x ** 2.)) * pwv_corr
+            sb_cond_score = 10 * (1 - (x ** 10.)) * pwv_corr
         elif frac == 1:
             sb_cond_score = 10.
         else:
