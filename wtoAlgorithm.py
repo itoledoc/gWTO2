@@ -381,7 +381,7 @@ class WtoAlgorithm(WtoDatabase):
                 r['execount'], r['Total'], r['scienceRank'], r['AR'],
                 r['arrayMinAR'], r['arrayMaxAR'], r['LAS'],
                 r['grade'], r['repfreq'], r['DEC'], r['EXEC'], array,
-                r['frac'], r['maxPWVC'], r['CODE']),
+                r['frac'], r['maxPWVC'], r['CODE'], r['isPointSource']),
             axis=1)
         scores = pd.DataFrame(scores.values.tolist(), index=scores.index)
         scores.columns = pd.Index(
@@ -400,7 +400,7 @@ class WtoAlgorithm(WtoDatabase):
 
     def calculate_score(self, ecount, tcount, srank, ar, aminar, amaxar,
                         las, grade, repfreq, dec, execu, array,
-                        frac, maxpwvc, code):
+                        frac, maxpwvc, code, points):
 
         """
         Please go to the :ref:`Score and ranking <score>` section for an
@@ -476,9 +476,11 @@ class WtoAlgorithm(WtoDatabase):
 
             elif 0.9 * arcorr > self.array_ar >= 0.7 * arcorr:
                 sb_array_score = 9.0
-            elif self.array_ar < 0.7 * arcorr:
+            elif self.array_ar < 0.7 * arcorr and not points:
                 l = 0.7 * arcorr - aminar
                 sb_array_score = ((self.array_ar - aminar) / l) * 8.5
+            elif self.array_ar < 0.7 * arcorr and not points:
+                sb_array_score = 8.5
             elif self.array_ar > 1.1 * arcorr:
                 l = arcorr * 1.1 - amaxar
                 s = 10. / l
