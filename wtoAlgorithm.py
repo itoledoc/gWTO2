@@ -479,7 +479,7 @@ class WtoAlgorithm(WtoDatabase):
             elif self.array_ar < 0.7 * arcorr and not points:
                 l = 0.7 * arcorr - aminar
                 sb_array_score = ((self.array_ar - aminar) / l) * 8.5
-            elif self.array_ar < 0.7 * arcorr and not points:
+            elif self.array_ar < 0.7 * arcorr and points:
                 sb_array_score = 8.5
             elif self.array_ar > 1.1 * arcorr:
                 l = arcorr * 1.1 - amaxar
