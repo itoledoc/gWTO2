@@ -465,8 +465,8 @@ class WtoAlgorithm(WtoDatabase):
             arcorr = 0.
             lascorr = 0.
         else:
-            c_bmax = 0.862 / pd.np.cos(pd.np.radians(-23.0262015) -
-                                       pd.np.radians(dec)) + 0.138
+            c_bmax = 0.4001 / pd.np.cos(pd.np.radians(-23.0262015) -
+                                        pd.np.radians(dec)) + 0.6103
             c_freq = repfreq / 100.
             corr = c_freq / c_bmax
             arcorr = ar * corr

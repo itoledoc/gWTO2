@@ -601,11 +601,18 @@ class WtoDatabase(object):
                         index=[partid])
                     new = False
                 else:
-                    self.sciencegoals.ix[partid] = (
-                        code, partid, ar, las, bands, isspectralscan,
-                        istimeconst, useaca, usetp, ps, assoc_sbs[partid],
-                        starttime, endtime, allowedmarg,
-                        allowedmarg_unit, repeats, note, isavoid)
+                    df = pd.DataFrame(
+                        [(code, partid, ar, las, bands, isspectralscan,
+                          istimeconst, useaca, usetp, ps, assoc_sbs[partid],
+                          starttime, endtime, allowedmarg,
+                          allowedmarg_unit, repeats, note, isavoid)],
+                        columns=['CODE', 'partId', 'AR', 'LAS', 'bands',
+                                 'isSpectralScan', 'isTimeConstrained',
+                                 'useACA', 'useTP', 'ps', 'SBS', 'startTime',
+                                 'endTime', 'allowedMargin', 'allowedUnits',
+                                 'repeats', 'note', 'isavoid'],
+                        index=[partid])
+                    self.sciencegoals = pd.concat([self.sciencegoals, df])
 
         except AttributeError, e:
             print "Project %s has no ObsUnitSets (%s)" % (code, e)
@@ -816,6 +823,7 @@ class WtoDatabase(object):
         :param new:
         """
         partid = ss.attrib['entityPartId']
+        lspw_res = []
         try:
             corrconf = ss.BLCorrelatorConfiguration
             nbb = len(corrconf.BLBaseBandConfig)
@@ -823,6 +831,13 @@ class WtoDatabase(object):
             for n in range(nbb):
                 bbconf = corrconf.BLBaseBandConfig[n]
                 nspw += len(bbconf.BLSpectralWindow)
+                for spw in range(len(bbconf.BLSpectralWindow)):
+                    tspw = bbconf.BLSpectralWindow
+                    bandw = tspw.effectiveBandwidth.pyval
+                    bandwun = tspw.effectiveBandwidth.attrib['unit']
+                    numchan = tspw.effectiveNumberOfChannels.pyval
+                    lspw_res.append(1000. * convert_ghz(bandw, bandwun) /
+                                    numchan)
         except AttributeError:
             corrconf = ss.ACACorrelatorConfiguration
             nbb = len(corrconf.ACABaseBandConfig)
@@ -830,13 +845,24 @@ class WtoDatabase(object):
             for n in range(nbb):
                 bbconf = corrconf.ACABaseBandConfig[n]
                 nspw += len(bbconf.ACASpectralWindow)
+                for spw in range(len(bbconf.ACASpectralWindow)):
+                    tspw = bbconf.ACASpectralWindow
+                    bandw = tspw.effectiveBandwidth.pyval
+                    bandwun = tspw.effectiveBandwidth.attrib['unit']
+                    numchan = tspw.effectiveNumberOfChannels.pyval
+                    lspw_res.append(1000. * convert_ghz(bandw, bandwun) /
+                                    numchan)
         if new:
             self.spectralconf = pd.DataFrame(
-                [(partid, sbuid, nbb, nspw)],
-                columns=['specRef', 'SB_UID', 'BaseBands', 'SPWs'],
+                [(partid, sbuid, nbb, nspw, lspw_res)],
+                columns=['specRef', 'SB_UID', 'BaseBands', 'SPWs', 'spw_res'],
                 index=[partid])
         else:
-            self.spectralconf.ix[partid] = (partid, sbuid, nbb, nspw)
+            df = pd.DataFrame(
+                [(partid, sbuid, nbb, nspw, lspw_res)],
+                columns=['specRef', 'SB_UID', 'BaseBands', 'SPWs', 'spw_res'],
+                index=[partid])
+            self.spectralconf = pd.concat([self.spectralconf, df])
 
     def row_schedblocks(self, sb_uid, partid, new=False):
 
@@ -879,8 +905,8 @@ class WtoDatabase(object):
         sg = self.sciencegoals.ix[pid]
         repfreq = sbinfo.repfreq
         dec = sbinfo.DEC
-        c_bmax = 0.862 / pd.np.cos(pd.np.radians(-23.0262015) -
-                                   pd.np.radians(dec)) + 0.138
+        c_bmax = 0.4001 / pd.np.cos(pd.np.radians(-23.0262015) -
+                                   pd.np.radians(dec)) + 0.6103
         c_freq = repfreq / 100.
         corr = c_freq / c_bmax
         useaca = sg.useACA
