@@ -927,8 +927,13 @@ def read_ephemeris(ephemeris, date):
                     ephe = False
                     return ra, dec, ephe
                 # noinspection PyUnboundLocalVariable
-                ra = ephem.hours(data[23:36].strip().replace(' ', ':'))
-                dec = ephem.degrees(data[37:51].strip().replace(' ', ':'))
+                ra_temp = data[23:36].strip()
+                dec_temp = data[37:50].strip()
+                if len(ra_temp.split()) > 3:
+                    ra_temp = data[23:36].strip()
+                    dec_temp = data[35:46].strip()
+                ra = ephem.hours(ra_temp.replace(' ', ':'))
+                dec = ephem.degrees(dec_temp.replace(' ', ':'))
                 ephe = True
                 print(ra, dec, ephe)
                 return pd.np.degrees(ra), pd.np.degrees(dec), ephe
