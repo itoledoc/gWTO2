@@ -433,7 +433,7 @@
                 <span class="n">r</span><span class="p">[</span><span class="s">&#39;execount&#39;</span><span class="p">],</span> <span class="n">r</span><span class="p">[</span><span class="s">&#39;Total&#39;</span><span class="p">],</span> <span class="n">r</span><span class="p">[</span><span class="s">&#39;scienceRank&#39;</span><span class="p">],</span> <span class="n">r</span><span class="p">[</span><span class="s">&#39;AR&#39;</span><span class="p">],</span>
                 <span class="n">r</span><span class="p">[</span><span class="s">&#39;arrayMinAR&#39;</span><span class="p">],</span> <span class="n">r</span><span class="p">[</span><span class="s">&#39;arrayMaxAR&#39;</span><span class="p">],</span> <span class="n">r</span><span class="p">[</span><span class="s">&#39;LAS&#39;</span><span class="p">],</span>
                 <span class="n">r</span><span class="p">[</span><span class="s">&#39;grade&#39;</span><span class="p">],</span> <span class="n">r</span><span class="p">[</span><span class="s">&#39;repfreq&#39;</span><span class="p">],</span> <span class="n">r</span><span class="p">[</span><span class="s">&#39;DEC&#39;</span><span class="p">],</span> <span class="n">r</span><span class="p">[</span><span class="s">&#39;EXEC&#39;</span><span class="p">],</span> <span class="n">array</span><span class="p">,</span>
-                <span class="n">r</span><span class="p">[</span><span class="s">&#39;frac&#39;</span><span class="p">],</span> <span class="n">r</span><span class="p">[</span><span class="s">&#39;maxPWVC&#39;</span><span class="p">],</span> <span class="n">r</span><span class="p">[</span><span class="s">&#39;CODE&#39;</span><span class="p">]),</span>
+                <span class="n">r</span><span class="p">[</span><span class="s">&#39;frac&#39;</span><span class="p">],</span> <span class="n">r</span><span class="p">[</span><span class="s">&#39;maxPWVC&#39;</span><span class="p">],</span> <span class="n">r</span><span class="p">[</span><span class="s">&#39;CODE&#39;</span><span class="p">],</span> <span class="n">r</span><span class="p">[</span><span class="s">&#39;isPointSource&#39;</span><span class="p">]),</span>
             <span class="n">axis</span><span class="o">=</span><span class="mi">1</span><span class="p">)</span>
         <span class="n">scores</span> <span class="o">=</span> <span class="n">pd</span><span class="o">.</span><span class="n">DataFrame</span><span class="p">(</span><span class="n">scores</span><span class="o">.</span><span class="n">values</span><span class="o">.</span><span class="n">tolist</span><span class="p">(),</span> <span class="n">index</span><span class="o">=</span><span class="n">scores</span><span class="o">.</span><span class="n">index</span><span class="p">)</span>
         <span class="n">scores</span><span class="o">.</span><span class="n">columns</span> <span class="o">=</span> <span class="n">pd</span><span class="o">.</span><span class="n">Index</span><span class="p">(</span>
@@ -452,7 +452,7 @@
 </div>
 <div class="viewcode-block" id="WtoAlgorithm.calculate_score"><a class="viewcode-back" href="../wtoapi.html#wtoAlgorithm.WtoAlgorithm.calculate_score">[docs]</a>    <span class="k">def</span> <span class="nf">calculate_score</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">ecount</span><span class="p">,</span> <span class="n">tcount</span><span class="p">,</span> <span class="n">srank</span><span class="p">,</span> <span class="n">ar</span><span class="p">,</span> <span class="n">aminar</span><span class="p">,</span> <span class="n">amaxar</span><span class="p">,</span>
                         <span class="n">las</span><span class="p">,</span> <span class="n">grade</span><span class="p">,</span> <span class="n">repfreq</span><span class="p">,</span> <span class="n">dec</span><span class="p">,</span> <span class="n">execu</span><span class="p">,</span> <span class="n">array</span><span class="p">,</span>
-                        <span class="n">frac</span><span class="p">,</span> <span class="n">maxpwvc</span><span class="p">,</span> <span class="n">code</span><span class="p">):</span>
+                        <span class="n">frac</span><span class="p">,</span> <span class="n">maxpwvc</span><span class="p">,</span> <span class="n">code</span><span class="p">,</span> <span class="n">points</span><span class="p">):</span>
 
         <span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Please go to the :ref:`Score and ranking &lt;score&gt;` section for an</span>
@@ -517,8 +517,8 @@
             <span class="n">arcorr</span> <span class="o">=</span> <span class="mf">0.</span>
             <span class="n">lascorr</span> <span class="o">=</span> <span class="mf">0.</span>
         <span class="k">else</span><span class="p">:</span>
-            <span class="n">c_bmax</span> <span class="o">=</span> <span class="mf">0.862</span> <span class="o">/</span> <span class="n">pd</span><span class="o">.</span><span class="n">np</span><span class="o">.</span><span class="n">cos</span><span class="p">(</span><span class="n">pd</span><span class="o">.</span><span class="n">np</span><span class="o">.</span><span class="n">radians</span><span class="p">(</span><span class="o">-</span><span class="mf">23.0262015</span><span class="p">)</span> <span class="o">-</span>
-                                       <span class="n">pd</span><span class="o">.</span><span class="n">np</span><span class="o">.</span><span class="n">radians</span><span class="p">(</span><span class="n">dec</span><span class="p">))</span> <span class="o">+</span> <span class="mf">0.138</span>
+            <span class="n">c_bmax</span> <span class="o">=</span> <span class="mf">0.4001</span> <span class="o">/</span> <span class="n">pd</span><span class="o">.</span><span class="n">np</span><span class="o">.</span><span class="n">cos</span><span class="p">(</span><span class="n">pd</span><span class="o">.</span><span class="n">np</span><span class="o">.</span><span class="n">radians</span><span class="p">(</span><span class="o">-</span><span class="mf">23.0262015</span><span class="p">)</span> <span class="o">-</span>
+                                        <span class="n">pd</span><span class="o">.</span><span class="n">np</span><span class="o">.</span><span class="n">radians</span><span class="p">(</span><span class="n">dec</span><span class="p">))</span> <span class="o">+</span> <span class="mf">0.6103</span>
             <span class="n">c_freq</span> <span class="o">=</span> <span class="n">repfreq</span> <span class="o">/</span> <span class="mf">100.</span>
             <span class="n">corr</span> <span class="o">=</span> <span class="n">c_freq</span> <span class="o">/</span> <span class="n">c_bmax</span>
             <span class="n">arcorr</span> <span class="o">=</span> <span class="n">ar</span> <span class="o">*</span> <span class="n">corr</span>
@@ -528,9 +528,11 @@
 
             <span class="k">elif</span> <span class="mf">0.9</span> <span class="o">*</span> <span class="n">arcorr</span> <span class="o">&gt;</span> <span class="bp">self</span><span class="o">.</span><span class="n">array_ar</span> <span class="o">&gt;=</span> <span class="mf">0.7</span> <span class="o">*</span> <span class="n">arcorr</span><span class="p">:</span>
                 <span class="n">sb_array_score</span> <span class="o">=</span> <span class="mf">9.0</span>
-            <span class="k">elif</span> <span class="bp">self</span><span class="o">.</span><span class="n">array_ar</span> <span class="o">&lt;</span> <span class="mf">0.7</span> <span class="o">*</span> <span class="n">arcorr</span><span class="p">:</span>
+            <span class="k">elif</span> <span class="bp">self</span><span class="o">.</span><span class="n">array_ar</span> <span class="o">&lt;</span> <span class="mf">0.7</span> <span class="o">*</span> <span class="n">arcorr</span> <span class="ow">and</span> <span class="ow">not</span> <span class="n">points</span><span class="p">:</span>
                 <span class="n">l</span> <span class="o">=</span> <span class="mf">0.7</span> <span class="o">*</span> <span class="n">arcorr</span> <span class="o">-</span> <span class="n">aminar</span>
                 <span class="n">sb_array_score</span> <span class="o">=</span> <span class="p">((</span><span class="bp">self</span><span class="o">.</span><span class="n">array_ar</span> <span class="o">-</span> <span class="n">aminar</span><span class="p">)</span> <span class="o">/</span> <span class="n">l</span><span class="p">)</span> <span class="o">*</span> <span class="mf">8.5</span>
+            <span class="k">elif</span> <span class="bp">self</span><span class="o">.</span><span class="n">array_ar</span> <span class="o">&lt;</span> <span class="mf">0.7</span> <span class="o">*</span> <span class="n">arcorr</span> <span class="ow">and</span> <span class="n">points</span><span class="p">:</span>
+                <span class="n">sb_array_score</span> <span class="o">=</span> <span class="mf">8.5</span>
             <span class="k">elif</span> <span class="bp">self</span><span class="o">.</span><span class="n">array_ar</span> <span class="o">&gt;</span> <span class="mf">1.1</span> <span class="o">*</span> <span class="n">arcorr</span><span class="p">:</span>
                 <span class="n">l</span> <span class="o">=</span> <span class="n">arcorr</span> <span class="o">*</span> <span class="mf">1.1</span> <span class="o">-</span> <span class="n">amaxar</span>
                 <span class="n">s</span> <span class="o">=</span> <span class="mf">10.</span> <span class="o">/</span> <span class="n">l</span>
@@ -542,13 +544,13 @@
         <span class="n">sb_exec_score</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">exec_prio</span><span class="p">[</span><span class="n">execu</span><span class="p">]</span>
 
         <span class="c"># set condition score:</span>
-        <span class="n">pwv_corr</span> <span class="o">=</span> <span class="mi">1</span> <span class="o">-</span> <span class="p">(</span><span class="nb">abs</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">pwv</span> <span class="o">-</span> <span class="n">maxpwvc</span><span class="p">)</span> <span class="o">/</span> <span class="mf">6.</span><span class="p">)</span>
-        <span class="k">if</span> <span class="n">pwv_corr</span> <span class="o">&lt;</span> <span class="mf">0.</span><span class="p">:</span>
-            <span class="n">pwv_corr</span> <span class="o">=</span> <span class="mf">0.</span>
+        <span class="n">pwv_corr</span> <span class="o">=</span> <span class="mi">1</span> <span class="o">-</span> <span class="p">(</span><span class="nb">abs</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">pwv</span> <span class="o">-</span> <span class="n">maxpwvc</span><span class="p">)</span> <span class="o">/</span> <span class="mf">4.</span><span class="p">)</span>
+        <span class="k">if</span> <span class="n">pwv_corr</span> <span class="o">&lt;</span> <span class="mf">0.1</span><span class="p">:</span>
+            <span class="n">pwv_corr</span> <span class="o">=</span> <span class="mf">0.1</span>
 
         <span class="k">if</span> <span class="n">frac</span> <span class="o">&lt;</span> <span class="mi">1</span><span class="p">:</span>
             <span class="n">x</span> <span class="o">=</span> <span class="n">frac</span> <span class="o">-</span> <span class="mf">1.</span>
-            <span class="n">sb_cond_score</span> <span class="o">=</span> <span class="mi">10</span> <span class="o">*</span> <span class="p">(</span><span class="mi">1</span> <span class="o">-</span> <span class="p">(</span><span class="n">x</span> <span class="o">**</span> <span class="mf">2.</span><span class="p">))</span> <span class="o">*</span> <span class="n">pwv_corr</span>
+            <span class="n">sb_cond_score</span> <span class="o">=</span> <span class="mi">10</span> <span class="o">*</span> <span class="p">(</span><span class="mi">1</span> <span class="o">-</span> <span class="p">(</span><span class="n">x</span> <span class="o">**</span> <span class="mf">10.</span><span class="p">))</span> <span class="o">*</span> <span class="n">pwv_corr</span>
         <span class="k">elif</span> <span class="n">frac</span> <span class="o">==</span> <span class="mi">1</span><span class="p">:</span>
             <span class="n">sb_cond_score</span> <span class="o">=</span> <span class="mf">10.</span>
         <span class="k">else</span><span class="p">:</span>
@@ -1020,7 +1022,7 @@
     </div>
     <div class="footer">
         &copy; Copyright 2014, ALMA/I. Toledo.
-      Last updated on Jul 25, 2014.
+      Last updated on Jul 28, 2014.
       Created using <a href="http://sphinx-doc.org/">Sphinx</a> 1.2.2.
     </div>
   </body>

@@ -1,4 +1,4 @@
-This is pdfTeX, Version 3.1415926-2.6-1.40.14 (TeX Live 2014/dev) (format=pdflatex 2014.7.14)  25 JUL 2014 17:42
+This is pdfTeX, Version 3.1415926-2.6-1.40.14 (TeX Live 2014/dev) (format=pdflatex 2014.7.14)  28 JUL 2014 00:50
 entering extended mode
  restricted \write18 enabled.
  %&-line parsing enabled.
@@ -926,81 +926,81 @@ LaTeX Font Info:    Font shape `T1/ptm/bx/n' in size <14.4> not available
 (Font)              Font shape `T1/ptm/b/n' tried instead on input line 127.
 LaTeX Font Info:    Font shape `T1/ptm/bx/n' in size <24.88> not available
 (Font)              Font shape `T1/ptm/b/n' tried instead on input line 127.
-<Selection_003.png, id=204, 1362.08875pt x 919.435pt>
+<Selection_003.png, id=214, 1362.08875pt x 919.435pt>
 File: Selection_003.png Graphic file (type png)
  <use Selection_003.png>
-Package pdftex.def Info: Selection_003.png used on input line 134.
+Package pdftex.def Info: Selection_003.png used on input line 132.
 (pdftex.def)             Requested size: 1362.08543pt x 919.43275pt.
 File: Selection_003.png Graphic file (type png)
 
 <use Selection_003.png>
-Package pdftex.def Info: Selection_003.png used on input line 134.
+Package pdftex.def Info: Selection_003.png used on input line 132.
 (pdftex.def)             Requested size: 452.96788pt x 305.7574pt.
  [3 <./Selection_003.png>] [4
 
 ]
 Chapter 2.
 LaTeX Font Info:    Font shape `T1/pcr/m/it' in size <10> not available
-(Font)              Font shape `T1/pcr/m/sl' tried instead on input line 167.
-<gWTO2__BL_001.png, id=217, 1096.095pt x 879.285pt>
+(Font)              Font shape `T1/pcr/m/sl' tried instead on input line 198.
+<gWTO2__BL_001.png, id=229, 1096.095pt x 879.285pt>
 File: gWTO2__BL_001.png Graphic file (type png)
  <use gWTO2__BL_001.png>
-Package pdftex.def Info: gWTO2__BL_001.png used on input line 187.
+Package pdftex.def Info: gWTO2__BL_001.png used on input line 218.
 (pdftex.def)             Requested size: 1096.09233pt x 879.28287pt.
 File: gWTO2__BL_001.png Graphic file (type png)
 
 <use gWTO2__BL_001.png>
-Package pdftex.def Info: gWTO2__BL_001.png used on input line 187.
+Package pdftex.def Info: gWTO2__BL_001.png used on input line 218.
 (pdftex.def)             Requested size: 452.96788pt x 363.36696pt.
 
-Underfull \hbox (badness 10000) in paragraph at lines 203--213
+Underfull \hbox (badness 10000) in paragraph at lines 234--244
 []\T1/ptm/m/n/10 The box with the ar-ray vari-ables will have the \T1/ptm/m/it/
 10 Std. Conf.:
  []
 
 
-Underfull \hbox (badness 10000) in paragraph at lines 203--213
+Underfull \hbox (badness 10000) in paragraph at lines 234--244
 \T1/ptm/m/n/10 field set to \T1/pcr/m/n/10 Current Conf. \T1/ptm/m/n/10 This \T
 1/pcr/m/n/10 Current Conf. \T1/ptm/m/n/10 comes from the out-
  []
 
 
-Underfull \hbox (badness 10000) in paragraph at lines 203--213
+Underfull \hbox (badness 10000) in paragraph at lines 234--244
 \T1/ptm/m/n/10 put of the CASA script \T1/ptm/b/n/10 ar-ray-Con-fig-u-ra-tionTo
 ols.py\T1/ptm/m/n/10 , which can be found at
  []
 
 
-Underfull \hbox (badness 10000) in paragraph at lines 203--213
+Underfull \hbox (badness 10000) in paragraph at lines 234--244
 \T1/pcr/m/n/10 ~/AIV/science/ArrayConfiguration/Tools/arrayConfigurationTools.p
 y\T1/ptm/m/n/10 . It
  []
 
 [5] [6 <./gWTO2__BL_001.png>]
-<gWTO2__BL_002.png, id=231, 589.20125pt x 526.96875pt>
+<gWTO2__BL_002.png, id=242, 589.20125pt x 526.96875pt>
 File: gWTO2__BL_002.png Graphic file (type png)
  <use gWTO2__BL_002.png>
-Package pdftex.def Info: gWTO2__BL_002.png used on input line 233.
+Package pdftex.def Info: gWTO2__BL_002.png used on input line 264.
 (pdftex.def)             Requested size: 589.1998pt x 526.96745pt.
 File: gWTO2__BL_002.png Graphic file (type png)
 
 <use gWTO2__BL_002.png>
-Package pdftex.def Info: gWTO2__BL_002.png used on input line 233.
+Package pdftex.def Info: gWTO2__BL_002.png used on input line 264.
 (pdftex.def)             Requested size: 452.96788pt x 405.13196pt.
  [7 <./gWTO2__BL_002.png>]
-<gWTO2__BL_003.png, id=238, 1927.2pt x 1084.05pt>
+<gWTO2__BL_003.png, id=249, 1927.2pt x 1084.05pt>
 File: gWTO2__BL_003.png Graphic file (type png)
  <use gWTO2__BL_003.png>
-Package pdftex.def Info: gWTO2__BL_003.png used on input line 271.
+Package pdftex.def Info: gWTO2__BL_003.png used on input line 302.
 (pdftex.def)             Requested size: 1927.19533pt x 1084.04736pt.
 File: gWTO2__BL_003.png Graphic file (type png)
 
 <use gWTO2__BL_003.png>
-Package pdftex.def Info: gWTO2__BL_003.png used on input line 271.
+Package pdftex.def Info: gWTO2__BL_003.png used on input line 302.
 (pdftex.def)             Requested size: 452.96788pt x 254.78487pt.
 LaTeX Font Info:    Font shape `T1/phv/bx/n' in size <12> not available
-(Font)              Font shape `T1/phv/b/n' tried instead on input line 278.
-LaTeX Font Info:    Try loading font information for TS1+ptm on input line 280.
+(Font)              Font shape `T1/phv/b/n' tried instead on input line 309.
+LaTeX Font Info:    Try loading font information for TS1+ptm on input line 311.
 
 
 (/usr/share/texlive/texmf-dist/tex/latex/psnfss/ts1ptm.fd
@@ -1009,50 +1009,50 @@ File: ts1ptm.fd 2001/06/04 font definitions for TS1/ptm.
 Chapter 3.
 [11
 
-] [12] [13] <figure_1.png, id=329, 850.6179pt x 589.7232pt>
+] [12] [13] <figure_1.png, id=340, 850.6179pt x 589.7232pt>
 File: figure_1.png Graphic file (type png)
 
 <use figure_1.png>
-Package pdftex.def Info: figure_1.png used on input line 796.
+Package pdftex.def Info: figure_1.png used on input line 827.
 (pdftex.def)             Requested size: 850.61583pt x 589.72176pt.
 File: figure_1.png Graphic file (type png)
  <use figure_1.png>
-Package pdftex.def Info: figure_1.png used on input line 796.
+Package pdftex.def Info: figure_1.png used on input line 827.
 (pdftex.def)             Requested size: 452.96788pt x 314.03654pt.
  [14] [15 <./figure_1.png>] [16
 
 ]
 Chapter 4.
 LaTeX Font Info:    Font shape `T1/pcr/bx/n' in size <9> not available
-(Font)              Font shape `T1/pcr/b/n' tried instead on input line 837.
+(Font)              Font shape `T1/pcr/b/n' tried instead on input line 868.
 [17] [18]
 Chapter 5.
 LaTeX Font Info:    Font shape `T1/pcr/bx/n' in size <10> not available
-(Font)              Font shape `T1/pcr/b/n' tried instead on input line 910.
+(Font)              Font shape `T1/pcr/b/n' tried instead on input line 941.
 [19
 
 ] [20] [21]
-Underfull \hbox (badness 10000) in paragraph at lines 1447--1450
+Underfull \hbox (badness 10000) in paragraph at lines 1478--1481
 \T1/ptm/m/n/10 Method that han-dles the score cal-cu-la-tion for each ar-ray ty
 pe. It ap-plies
  []
 
-[22] [23] <diagram.png, id=456, 2218.2875pt x 3128.68875pt>
+[22] [23] <diagram.png, id=467, 2218.2875pt x 3128.68875pt>
 File: diagram.png Graphic file (type png)
  <use diagram.png>
-Package pdftex.def Info: diagram.png used on input line 1635.
+Package pdftex.def Info: diagram.png used on input line 1666.
 (pdftex.def)             Requested size: 2218.28212pt x 3128.68117pt.
 File: diagram.png Graphic file (type png)
 
 <use diagram.png>
-Package pdftex.def Info: diagram.png used on input line 1635.
+Package pdftex.def Info: diagram.png used on input line 1666.
 (pdftex.def)             Requested size: 452.96788pt x 638.85515pt.
  [24 <./diagram.png (PNG copy)>]
 Chapter 6.
 [25
 
 ]
-Overfull \hbox (10.03215pt too wide) in paragraph at lines 1907--1908
+Overfull \hbox (10.03215pt too wide) in paragraph at lines 1938--1939
 []\T1/pcr/m/n/10 xml:...sciencegoal.PerformanceParameters.TemporalParameters.al
 lowedMargin 
  []
@@ -1060,7 +1060,7 @@ lowedMargin
 [26] [27] [28] [29] [30]
 Chapter 7.
 
-Underfull \hbox (badness 10000) in paragraph at lines 2702--2714
+Underfull \hbox (badness 10000) in paragraph at lines 2733--2745
 
  []
 
@@ -1141,21 +1141,21 @@ Underfull \hbox (badness 10000) in paragraph at lines 53--54
 [37
 
 ])
-Package atveryend Info: Empty hook `BeforeClearDocument' on input line 2740.
-Package atveryend Info: Empty hook `AfterLastShipout' on input line 2740.
+Package atveryend Info: Empty hook `BeforeClearDocument' on input line 2771.
+Package atveryend Info: Empty hook `AfterLastShipout' on input line 2771.
  (./gWTO2.aux)
-Package atveryend Info: Executing hook `AtVeryEndDocument' on input line 2740.
-Package atveryend Info: Executing hook `AtEndAfterFileList' on input line 2740.
+Package atveryend Info: Executing hook `AtVeryEndDocument' on input line 2771.
+Package atveryend Info: Executing hook `AtEndAfterFileList' on input line 2771.
 
 Package rerunfilecheck Info: File `gWTO2.out' has not changed.
-(rerunfilecheck)             Checksum: 43E89FE76AE701C244F8C071C5215A79;2176.
-Package atveryend Info: Empty hook `AtVeryVeryEnd' on input line 2740.
+(rerunfilecheck)             Checksum: 3552D68BF8395D8EC2920EC28CCD8B75;2312.
+Package atveryend Info: Empty hook `AtVeryVeryEnd' on input line 2771.
  ) 
 Here is how much of TeX's memory you used:
- 9506 strings out of 495034
- 132586 string characters out of 6181677
- 236078 words of memory out of 5000000
- 12212 multiletter control sequences out of 15000+600000
+ 9512 strings out of 495034
+ 132694 string characters out of 6181677
+ 236174 words of memory out of 5000000
+ 12216 multiletter control sequences out of 15000+600000
  66023 words of font info for 73 fonts, out of 8000000 for 9000
  15 hyphenation exceptions out of 8191
  36i,19n,45p,1237b,561s stack positions out of 5000i,500n,10000p,200000b,80000s
@@ -1176,10 +1176,10 @@ etic/uhvbo8a.pfb></usr/share/texlive/texmf-dist/fonts/type1/urw/helvetic/uhvr8a
 .pfb></usr/share/texlive/texmf-dist/fonts/type1/urw/times/utmb8a.pfb></usr/shar
 e/texlive/texmf-dist/fonts/type1/urw/times/utmr8a.pfb></usr/share/texlive/texmf
 -dist/fonts/type1/urw/times/utmri8a.pfb>
-Output written on gWTO2.pdf (41 pages, 1420985 bytes).
+Output written on gWTO2.pdf (41 pages, 1422821 bytes).
 PDF statistics:
- 727 PDF objects out of 1000 (max. 8388607)
- 649 compressed objects within 7 object streams
- 254 named destinations out of 1000 (max. 500000)
- 303 words of extra memory for PDF output out of 10000 (max. 10000000)
+ 738 PDF objects out of 1000 (max. 8388607)
+ 660 compressed objects within 7 object streams
+ 256 named destinations out of 1000 (max. 500000)
+ 319 words of extra memory for PDF output out of 10000 (max. 10000000)
 

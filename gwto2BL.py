@@ -554,7 +554,10 @@ class MyStdTableModel(QAbstractTableModel):
         self.headerdata = headerdata
 
     def rowCount(self, parent):
-        return len(self.arraydata)
+        try:
+            return len(self.arraydata)
+        except IndexError:
+            return 0
 
     def columnCount(self, parent):
         try:
@@ -648,7 +651,10 @@ class MyTcTableModel(QAbstractTableModel):
         self.headerdata = headerdata
 
     def rowCount(self, parent):
-        return len(self.arraydata)
+        try:
+            return len(self.arraydata)
+        except IndexError:
+            return 0
 
     def columnCount(self, parent):
         try:
@@ -733,7 +739,10 @@ class MyPolTableModel(QAbstractTableModel):
         self.headerdata = headerdata
 
     def rowCount(self, parent):
-        return len(self.arraydata)
+        try:
+            return len(self.arraydata)
+        except IndexError:
+            return 0
 
     def columnCount(self, parent):
         try:

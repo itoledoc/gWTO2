@@ -1,33 +1,35 @@
 \BOOKMARK [0][-]{chapter.1}{Introduction}{}% 1
-\BOOKMARK [0][-]{chapter.2}{Using gWTO2}{}% 2
-\BOOKMARK [1][-]{section.2.1}{Starting the GUI}{chapter.2}% 3
-\BOOKMARK [1][-]{section.2.2}{The gWTO2 window}{chapter.2}% 4
-\BOOKMARK [1][-]{section.2.3}{Setting up variables}{chapter.2}% 5
-\BOOKMARK [1][-]{section.2.4}{Running}{chapter.2}% 6
-\BOOKMARK [1][-]{section.2.5}{Reading the output Scores}{chapter.2}% 7
-\BOOKMARK [0][-]{chapter.3}{Selection and Score algorithms}{}% 8
-\BOOKMARK [1][-]{section.3.1}{Selection and Data preparation}{chapter.3}% 9
-\BOOKMARK [1][-]{section.3.2}{Score and ranking}{chapter.3}% 10
-\BOOKMARK [1][-]{section.3.3}{Checking observability}{chapter.3}% 11
-\BOOKMARK [0][-]{chapter.4}{Playing with the libraries}{}% 12
-\BOOKMARK [0][-]{chapter.5}{The WTO API}{}% 13
-\BOOKMARK [1][-]{section.5.1}{wtoDatabase.py: the gWTO database library.}{chapter.5}% 14
-\BOOKMARK [1][-]{section.5.2}{wtoAlgorithm.py: the gWTO selector and scorer library.}{chapter.5}% 15
-\BOOKMARK [0][-]{chapter.6}{The WTO Data Frames}{}% 16
-\BOOKMARK [1][-]{section.6.1}{wtoDatabase.obsprojects}{chapter.6}% 17
-\BOOKMARK [1][-]{section.6.2}{wtoDatabase.sciencegoals}{chapter.6}% 18
-\BOOKMARK [1][-]{section.6.3}{wtoDatabase.schedblocks}{chapter.6}% 19
-\BOOKMARK [1][-]{section.6.4}{wtoDatabase.schedblock\137info}{chapter.6}% 20
-\BOOKMARK [1][-]{section.6.5}{wtoDatabase.target}{chapter.6}% 21
-\BOOKMARK [1][-]{section.6.6}{wtoDatabase.fieldsource}{chapter.6}% 22
-\BOOKMARK [1][-]{section.6.7}{wtoDatabase.spectralconf}{chapter.6}% 23
-\BOOKMARK [1][-]{section.6.8}{wtoDatabase.sb\137summary}{chapter.6}% 24
-\BOOKMARK [1][-]{section.6.9}{wtoDatabase.qa0}{chapter.6}% 25
-\BOOKMARK [1][-]{section.6.10}{wtoDatabase.scheduling\137proj}{chapter.6}% 26
-\BOOKMARK [1][-]{section.6.11}{wtoDatabase.scheduling\137sb}{chapter.6}% 27
-\BOOKMARK [1][-]{section.6.12}{wtoDatabase.sbstate}{chapter.6}% 28
-\BOOKMARK [0][-]{chapter.7}{Apendix}{}% 29
-\BOOKMARK [1][-]{section.7.1}{Assessment of Current Array's Angular Resolution}{chapter.7}% 30
-\BOOKMARK [0][-]{chapter.8}{Indices and tables}{}% 31
-\BOOKMARK [0][-]{section*.60}{Python Module Index}{}% 32
-\BOOKMARK [0][-]{section*.61}{Index}{}% 33
+\BOOKMARK [1][-]{section.1.1}{Goal}{chapter.1}% 2
+\BOOKMARK [1][-]{section.1.2}{Considerations and problem description}{chapter.1}% 3
+\BOOKMARK [0][-]{chapter.2}{Using gWTO2}{}% 4
+\BOOKMARK [1][-]{section.2.1}{Starting the GUI}{chapter.2}% 5
+\BOOKMARK [1][-]{section.2.2}{The gWTO2 window}{chapter.2}% 6
+\BOOKMARK [1][-]{section.2.3}{Setting up variables}{chapter.2}% 7
+\BOOKMARK [1][-]{section.2.4}{Running}{chapter.2}% 8
+\BOOKMARK [1][-]{section.2.5}{Reading the output Scores}{chapter.2}% 9
+\BOOKMARK [0][-]{chapter.3}{Selection and Score algorithms}{}% 10
+\BOOKMARK [1][-]{section.3.1}{Selection and Data preparation}{chapter.3}% 11
+\BOOKMARK [1][-]{section.3.2}{Score and ranking}{chapter.3}% 12
+\BOOKMARK [1][-]{section.3.3}{Checking observability}{chapter.3}% 13
+\BOOKMARK [0][-]{chapter.4}{Playing with the libraries}{}% 14
+\BOOKMARK [0][-]{chapter.5}{The WTO API}{}% 15
+\BOOKMARK [1][-]{section.5.1}{wtoDatabase.py: the gWTO database library.}{chapter.5}% 16
+\BOOKMARK [1][-]{section.5.2}{wtoAlgorithm.py: the gWTO selector and scorer library.}{chapter.5}% 17
+\BOOKMARK [0][-]{chapter.6}{The WTO Data Frames}{}% 18
+\BOOKMARK [1][-]{section.6.1}{wtoDatabase.obsprojects}{chapter.6}% 19
+\BOOKMARK [1][-]{section.6.2}{wtoDatabase.sciencegoals}{chapter.6}% 20
+\BOOKMARK [1][-]{section.6.3}{wtoDatabase.schedblocks}{chapter.6}% 21
+\BOOKMARK [1][-]{section.6.4}{wtoDatabase.schedblock\137info}{chapter.6}% 22
+\BOOKMARK [1][-]{section.6.5}{wtoDatabase.target}{chapter.6}% 23
+\BOOKMARK [1][-]{section.6.6}{wtoDatabase.fieldsource}{chapter.6}% 24
+\BOOKMARK [1][-]{section.6.7}{wtoDatabase.spectralconf}{chapter.6}% 25
+\BOOKMARK [1][-]{section.6.8}{wtoDatabase.sb\137summary}{chapter.6}% 26
+\BOOKMARK [1][-]{section.6.9}{wtoDatabase.qa0}{chapter.6}% 27
+\BOOKMARK [1][-]{section.6.10}{wtoDatabase.scheduling\137proj}{chapter.6}% 28
+\BOOKMARK [1][-]{section.6.11}{wtoDatabase.scheduling\137sb}{chapter.6}% 29
+\BOOKMARK [1][-]{section.6.12}{wtoDatabase.sbstate}{chapter.6}% 30
+\BOOKMARK [0][-]{chapter.7}{Apendix}{}% 31
+\BOOKMARK [1][-]{section.7.1}{Assessment of Current Array's Angular Resolution}{chapter.7}% 32
+\BOOKMARK [0][-]{chapter.8}{Indices and tables}{}% 33
+\BOOKMARK [0][-]{section*.60}{Python Module Index}{}% 34
+\BOOKMARK [0][-]{section*.61}{Index}{}% 35

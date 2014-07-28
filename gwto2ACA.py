@@ -467,10 +467,17 @@ class MyStdTableModel(QAbstractTableModel):
         self.headerdata = headerdata
 
     def rowCount(self, parent):
-        return len(self.arraydata)
+        try:
+            return len(self.arraydata)
+        except IndexError:
+            print("Table ACA is empty")
+            return 0
 
     def columnCount(self, parent):
-        return len(self.arraydata[0])
+        try:
+            return len(self.arraydata[0])
+        except IndexError:
+            return 0
 
     # noinspection PyTypeChecker
     def data(self, index, role):

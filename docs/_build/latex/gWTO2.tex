@@ -14,7 +14,7 @@
 
 
 \title{gWTO2 Documentation (Draft)}
-\date{July 25, 2014}
+\date{July 28, 2014}
 \release{2.0RC}
 \author{PMGs}
 \newcommand{\sphinxlogo}{}
@@ -125,14 +125,45 @@
 
 
 \chapter{Introduction}
-\label{intro2:introduction}\label{intro2:gwto2-documentation-contents}\label{intro2::doc}
-General description of gWTO2.
-\begin{figure}[htbp]
+\label{intro2:introduction}\label{intro2:gwto2-documentation-contents}\label{intro2::doc}\begin{figure}[htbp]
 \centering
 \capstart
 
 \scalebox{0.600000}{\includegraphics{Selection_003.png}}
 \caption{Screenshot of gWTO2 RC}\end{figure}
+
+
+\section{Goal}
+\label{intro2:goal}
+gWTO2 (gui for What To Observe cycle 2) is a real-time scheduler that uses both
+a selection and score algorithms to select the best SB to observe given the
+current conditions. However, its main goal is to provide a flexible and dynamic
+benchmark where to test and optimize the algorithms that are being use in the
+official scheduling tool for ALMA: the Dynamical Schedulling Algorithm (DSA).
+
+The criteria behind gWTO2 comes from \href{http://almascience.eso.org/documents-and-tools/cycle-2/alma-proposers-guide}{Alma Cycle 2 Proposer Guide} (http://almascience.eso.org/documents-and-tools/cycle-2/alma-proposers-guide):
+\begin{quote}
+
+Science observations will be executed by ALMA operations staff, taking into
+account (in rough order of priority): the weather conditions,
+the configuration of the array, target elevation and other practical
+constraints, the projects’ assigned priority group, and executive balance.
+All other things being equal, the project with the highest scientific rank
+will be observed.''
+
+\begin{flushright}
+---\emph{Section 5.1 of the ALMA Cycle 2 Proposers Guide.}
+\end{flushright}
+\end{quote}
+
+
+\section{Considerations and problem description}
+\label{intro2:considerations-and-problem-description}
+It is easy at any given time to use these criteria to create an algorithm that
+selects the best SB to run, given the current pwv, array configuration,
+number of antennas and the target's horizontal coordinates; however the
+algorithm needs to be more complex to achieve an optimal efficiency in the use
+of telescope time, which finally traduces in a maximum scientific output.
 
 
 \chapter{Using gWTO2}
@@ -1357,7 +1388,7 @@ A WtoAlgorithm instance.
 \index{calculate\_score() (wtoAlgorithm.WtoAlgorithm method)}
 
 \begin{fulllineitems}
-\phantomsection\label{wtoapi:wtoAlgorithm.WtoAlgorithm.calculate_score}\pysiglinewithargsret{\bfcode{calculate\_score}}{\emph{ecount}, \emph{tcount}, \emph{srank}, \emph{ar}, \emph{aminar}, \emph{amaxar}, \emph{las}, \emph{grade}, \emph{repfreq}, \emph{dec}, \emph{execu}, \emph{array}, \emph{frac}, \emph{maxpwvc}, \emph{code}}{}
+\phantomsection\label{wtoapi:wtoAlgorithm.WtoAlgorithm.calculate_score}\pysiglinewithargsret{\bfcode{calculate\_score}}{\emph{ecount}, \emph{tcount}, \emph{srank}, \emph{ar}, \emph{aminar}, \emph{amaxar}, \emph{las}, \emph{grade}, \emph{repfreq}, \emph{dec}, \emph{execu}, \emph{array}, \emph{frac}, \emph{maxpwvc}, \emph{code}, \emph{points}}{}
 Please go to the {\hyperref[algorithm:score]{\emph{Score and ranking}}} (\autopageref*{algorithm:score}) section for an
 algorithm's description.
 \begin{quote}\begin{description}
@@ -2663,7 +2694,7 @@ to the path where you are running the script from
 
 \begin{notice}{note}{Note:}
 \textbf{Latest update:}
-July 25, 2014
+July 28, 2014
 
 \textbf{Latest changes in the code:}
 \begin{enumerate}
