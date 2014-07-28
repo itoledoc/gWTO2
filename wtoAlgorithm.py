@@ -376,18 +376,26 @@ class WtoAlgorithm(WtoDatabase):
             return None
 
         self.max_scirank = df.scienceRank.max()
-        scores = df.apply(
-            lambda r: self.calculate_score(
-                r['execount'], r['Total'], r['scienceRank'], r['AR'],
-                r['arrayMinAR'], r['arrayMaxAR'], r['LAS'],
-                r['grade'], r['repfreq'], r['DEC'], r['EXEC'], array,
-                r['frac'], r['maxPWVC'], r['CODE'], r['isPointSource']),
-            axis=1)
-        scores = pd.DataFrame(scores.values.tolist(), index=scores.index)
-        scores.columns = pd.Index(
-            [u'sb_cond_score', u'sb_array_score', u'sb_completion_score',
-             u'sb_exec_score', u'sb_science_score', u'sb_grade_score',
-             u'arcorr', u'score', u'lascorr'])
+        if len(df) > 0:
+            scores = df.apply(
+                lambda r: self.calculate_score(
+                    r['execount'], r['Total'], r['scienceRank'], r['AR'],
+                    r['arrayMinAR'], r['arrayMaxAR'], r['LAS'],
+                    r['grade'], r['repfreq'], r['DEC'], r['EXEC'], array,
+                    r['frac'], r['maxPWVC'], r['CODE'], r['isPointSource']),
+                axis=1)
+            scores = pd.DataFrame(scores.values.tolist(), index=scores.index)
+            scores.columns = pd.Index(
+                [u'sb_cond_score', u'sb_array_score', u'sb_completion_score',
+                u'sb_exec_score', u'sb_science_score', u'sb_grade_score',
+                u'arcorr', u'score', u'lascorr'])
+        else:
+            scores = pd.DataFrame(
+                columns=pd.Index(
+                    [u'sb_cond_score', u'sb_array_score',
+                     u'sb_completion_score', u'sb_exec_score',
+                     u'sb_science_score', u'sb_grade_score', u'arcorr',
+                     u'score', u'lascorr']))
         if array == '12m':
             self.score12m = pd.merge(
                 self.select12m, scores, left_on='SB_UID', right_index=True)
