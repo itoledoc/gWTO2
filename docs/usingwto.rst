@@ -45,6 +45,7 @@ the time until the gui is ready can be up to 5-7 minutes.
 .. _fig2:
 
 .. figure:: gWTO2__BL_001.png
+   :align: center
 
    Figure 2
 
@@ -89,6 +90,7 @@ LST for the date/time set in the :guilabel:`Date` field.
 .. _fig3:
 
 .. figure:: gWTO2__BL_002.png
+   :align: center
 
    Figure 3
 
@@ -125,6 +127,7 @@ with something similar to :ref:`Figure 4 <fig4>`.
 .. _fig4:
 
 .. figure:: gWTO2__BL_003.png
+   :align: center
 
    Figure 4
 

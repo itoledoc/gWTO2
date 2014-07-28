@@ -7,10 +7,10 @@
 gWTO2 Documentation Contents
 ****************************
 
-:download:`(Download PDF version) <_build/latex/gWTO2.pdf>`.
+:download:`Download documentation in PDF<_build/latex/gWTO2.pdf>`.
 
 .. toctree::
-   :maxdepth: 2
+   :maxdepth: 3
 
    intro2
    usingwto

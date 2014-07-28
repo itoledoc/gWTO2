@@ -205,7 +205,7 @@ latex_elements = {
 #  author, documentclass [howto, manual, or own class]).
 latex_documents = [
   ('index', 'gWTO2.tex', u'gWTO2 Documentation (Draft)',
-   u'PMGs', 'manual'),
+   u'itoledo@alma.cl', 'manual'),
 ]
 
 # The name of an image file (relative to this directory) to place at the top of

@@ -872,9 +872,10 @@ class WtoDatabase(object):
         :param partid:
         :param new:
         """
-        sql = "SELECT TIMESTAMP, XMLTYPE.getClobVal(xml) " \
-              "FROM ALMA.xml_schedblock_entities " \
-              "WHERE archive_uid = '%s'" % sb_uid
+        sql = str(
+            "SELECT TIMESTAMP, XMLTYPE.getClobVal(xml) "
+            "FROM ALMA.xml_schedblock_entities "
+            "WHERE archive_uid = '%s'" % sb_uid)
         self.cursor.execute(sql)
         data = self.cursor.fetchall()
         xml_content = data[0][1].read()
@@ -906,7 +907,7 @@ class WtoDatabase(object):
         repfreq = sbinfo.repfreq
         dec = sbinfo.DEC
         c_bmax = 0.4001 / pd.np.cos(pd.np.radians(-23.0262015) -
-                                   pd.np.radians(dec)) + 0.6103
+                                    pd.np.radians(dec)) + 0.6103
         c_freq = repfreq / 100.
         corr = c_freq / c_bmax
         useaca = sg.useACA

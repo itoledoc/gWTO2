@@ -289,6 +289,7 @@ Score and ranking
       :label: high
 
    .. figure:: figure_1.png
+      :align: center
       :scale: 50%
 
       In this example, the requested array resolution (:math:`\rm{SB}_{\rm{AR}}`)

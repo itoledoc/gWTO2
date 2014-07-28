@@ -944,3 +944,21 @@ def ret_cycle(code, blfrac):
         return blfrac * (31. * 16.) / (33. * 17)
     else:
         return blfrac * 1.
+
+
+def eq_to_hor(dec, ha, lat, horizon):
+    ha_temp = ha * 15.
+    if ha_temp < 0:
+        ha_temp += 360.
+    alt = pd.np.arcsin(
+        pd.np.sin(pd.np.radians(dec)) * pd.np.sin(pd.np.radians(lat)) +
+        pd.np.cos(pd.np.radians(dec)) * pd.np.cos(pd.np.radians(lat)) *
+        pd.np.cos(pd.np.radians(ha_temp)))
+    ha_rad = pd.np.arccos(
+        (pd.np.sin(pd.np.radians(horizon)) - pd.np.sin(pd.np.radians(dec)) * pd.np.sin(pd.np.radians(lat))) /
+        (pd.np.cos(pd.np.radians(dec)) * pd.np.cos(pd.np.radians(lat)))
+    )
+    ha_ran = pd.np.abs(pd.np.degrees(ha_rad) / 15.)
+    ha_h = ha / 15.
+
+    return pd.np.degrees(alt), ha_ran - ha_h
