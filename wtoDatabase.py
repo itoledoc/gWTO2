@@ -872,10 +872,9 @@ class WtoDatabase(object):
         :param partid:
         :param new:
         """
-        sql = str(
-            "SELECT TIMESTAMP, XMLTYPE.getClobVal(xml) "
-            "FROM ALMA.xml_schedblock_entities "
-            "WHERE archive_uid = '%s'" % sb_uid)
+        sql = "SELECT TIMESTAMP, XMLTYPE.getClobVal(xml) " \
+              "FROM ALMA.xml_schedblock_entities " \
+              "WHERE archive_uid = '%s'" % sb_uid
         self.cursor.execute(sql)
         data = self.cursor.fetchall()
         xml_content = data[0][1].read()
