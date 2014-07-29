@@ -347,6 +347,9 @@ class WtoDatabase(object):
                 for pid in pidlist:
                     sblist = self.sciencegoals.ix[pid].SBS
                     for sb in sblist:
+                        if type(sb) == list:
+                            print len(sb)
+                            sb = sb[0]
                         print "\tUpdating sb %s of project %s" % (sb, code)
                         self.row_schedblocks(sb, pid)
                         self.row_schedblock_info(sb)
