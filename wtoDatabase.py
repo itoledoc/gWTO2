@@ -347,9 +347,6 @@ class WtoDatabase(object):
                 for pid in pidlist:
                     sblist = self.sciencegoals.ix[pid].SBS
                     for sb in sblist:
-                        if type(sb) == list:
-                            print len(sb)
-                            sb = sb[0]
                         print "\tUpdating sb %s of project %s" % (sb, code)
                         self.row_schedblocks(sb, pid)
                         self.row_schedblock_info(sb)
@@ -604,18 +601,11 @@ class WtoDatabase(object):
                         index=[partid])
                     new = False
                 else:
-                    df = pd.DataFrame(
-                        [(code, partid, ar, las, bands, isspectralscan,
-                          istimeconst, useaca, usetp, ps, assoc_sbs[partid],
-                          starttime, endtime, allowedmarg,
-                          allowedmarg_unit, repeats, note, isavoid)],
-                        columns=['CODE', 'partId', 'AR', 'LAS', 'bands',
-                                 'isSpectralScan', 'isTimeConstrained',
-                                 'useACA', 'useTP', 'ps', 'SBS', 'startTime',
-                                 'endTime', 'allowedMargin', 'allowedUnits',
-                                 'repeats', 'note', 'isavoid'],
-                        index=[partid])
-                    self.sciencegoals = pd.concat([self.sciencegoals, df])
+                    self.sciencegoals.ix[partid] = (
+                        code, partid, ar, las, bands, isspectralscan,
+                        istimeconst, useaca, usetp, ps, assoc_sbs[partid],
+                        starttime, endtime, allowedmarg,
+                        allowedmarg_unit, repeats, note, isavoid)
 
         except AttributeError, e:
             print "Project %s has no ObsUnitSets (%s)" % (code, e)
@@ -826,7 +816,6 @@ class WtoDatabase(object):
         :param new:
         """
         partid = ss.attrib['entityPartId']
-        lspw_res = []
         try:
             corrconf = ss.BLCorrelatorConfiguration
             nbb = len(corrconf.BLBaseBandConfig)
@@ -834,13 +823,6 @@ class WtoDatabase(object):
             for n in range(nbb):
                 bbconf = corrconf.BLBaseBandConfig[n]
                 nspw += len(bbconf.BLSpectralWindow)
-                for spw in range(len(bbconf.BLSpectralWindow)):
-                    tspw = bbconf.BLSpectralWindow
-                    bandw = tspw.effectiveBandwidth.pyval
-                    bandwun = tspw.effectiveBandwidth.attrib['unit']
-                    numchan = tspw.effectiveNumberOfChannels.pyval
-                    lspw_res.append(1000. * convert_ghz(bandw, bandwun) /
-                                    numchan)
         except AttributeError:
             corrconf = ss.ACACorrelatorConfiguration
             nbb = len(corrconf.ACABaseBandConfig)
@@ -848,24 +830,13 @@ class WtoDatabase(object):
             for n in range(nbb):
                 bbconf = corrconf.ACABaseBandConfig[n]
                 nspw += len(bbconf.ACASpectralWindow)
-                for spw in range(len(bbconf.ACASpectralWindow)):
-                    tspw = bbconf.ACASpectralWindow
-                    bandw = tspw.effectiveBandwidth.pyval
-                    bandwun = tspw.effectiveBandwidth.attrib['unit']
-                    numchan = tspw.effectiveNumberOfChannels.pyval
-                    lspw_res.append(1000. * convert_ghz(bandw, bandwun) /
-                                    numchan)
         if new:
             self.spectralconf = pd.DataFrame(
-                [(partid, sbuid, nbb, nspw, lspw_res)],
-                columns=['specRef', 'SB_UID', 'BaseBands', 'SPWs', 'spw_res'],
+                [(partid, sbuid, nbb, nspw)],
+                columns=['specRef', 'SB_UID', 'BaseBands', 'SPWs'],
                 index=[partid])
         else:
-            df = pd.DataFrame(
-                [(partid, sbuid, nbb, nspw, lspw_res)],
-                columns=['specRef', 'SB_UID', 'BaseBands', 'SPWs', 'spw_res'],
-                index=[partid])
-            self.spectralconf = pd.concat([self.spectralconf, df])
+            self.spectralconf.ix[partid] = (partid, sbuid, nbb, nspw)
 
     def row_schedblocks(self, sb_uid, partid, new=False):
 
