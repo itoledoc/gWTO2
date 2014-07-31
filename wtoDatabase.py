@@ -346,6 +346,7 @@ class WtoDatabase(object):
                     self.sciencegoals.CODE == code].partId.tolist()
                 for pid in pidlist:
                     sblist = self.sciencegoals.ix[pid].SBS
+                    print sblist
                     for sb in sblist:
                         print "\tUpdating sb %s of project %s" % (sb, code)
                         self.row_schedblocks(sb, pid)
@@ -556,26 +557,26 @@ class WtoDatabase(object):
                             allowedmarg_unit = temppar.allowedMargin.attrib[
                                 'unit']
                         except AttributeError:
-                            allowedmarg = None
-                            allowedmarg_unit = None
+                            allowedmarg = pd.np.nan
+                            allowedmarg_unit = pd.np.nan
                         repeats = temppar.repeats.pyval
                         note = temppar.note.pyval
                         try:
                             isavoid = temppar.isAvoidConstraint.pyval
                         except AttributeError:
-                            isavoid = None
+                            isavoid = pd.np.nan
                     except AttributeError, e:
                         print("Project %s is timeconstrain but no parameters?"
                               "(%s)" % (code, e))
                         temppar, starttime, endtime, allowedmarg = (
-                            None, None, None, None)
+                            pd.np.nan, pd.np.nan, pd.np.nan, pd.np.nan)
                         allowedmarg_unit, repeats, note, isavoid = (
-                            None, None, None, None)
+                            pd.np.nan, pd.np.nan, pd.np.nan, pd.np.nan)
                 else:
                     temppar, starttime, endtime, allowedmarg = (
-                        None, None, None, None)
+                        pd.np.nan, pd.np.nan, pd.np.nan, pd.np.nan)
                     allowedmarg_unit, repeats, note, isavoid = (
-                        None, None, None, None)
+                        pd.np.nan, pd.np.nan, pd.np.nan, pd.np.nan)
 
                 try:
                     # noinspection PyUnusedLocal
@@ -600,12 +601,14 @@ class WtoDatabase(object):
                                  'repeats', 'note', 'isavoid'],
                         index=[partid])
                     new = False
+
                 else:
-                    self.sciencegoals.ix[partid] = (
+                    self.sciencegoals.loc[partid] = (
                         code, partid, ar, las, bands, isspectralscan,
-                        istimeconst, useaca, usetp, ps, assoc_sbs[partid],
+                        istimeconst, useaca, usetp, ps, '',
                         starttime, endtime, allowedmarg,
                         allowedmarg_unit, repeats, note, isavoid)
+                    self.sciencegoals.loc[partid, 'SBS'] = assoc_sbs[partid]
 
         except AttributeError, e:
             print "Project %s has no ObsUnitSets (%s)" % (code, e)
