@@ -346,8 +346,8 @@ class WtoDatabase(object):
                     self.sciencegoals.CODE == code].partId.tolist()
                 for pid in pidlist:
                     sblist = self.sciencegoals.ix[pid].SBS
-                    print sblist
-                    for sb in sblist:
+                    print sblist.split(',')
+                    for sb in sblist.split(','):
                         print "\tUpdating sb %s of project %s" % (sb, code)
                         self.row_schedblocks(sb, pid)
                         self.row_schedblock_info(sb)
@@ -475,7 +475,7 @@ class WtoDatabase(object):
         c = 1
         for pid in sbpartid:
             sblist = self.sciencegoals.ix[pid].SBS
-            for sb in sblist:
+            for sb in sblist.split(','):
                 self.row_schedblocks(sb, pid, new=new)
                 new = False
             print "%d/%d ScienceGoals SBs ingested" % (c, sizel)
@@ -591,7 +591,8 @@ class WtoDatabase(object):
                 if new:
                     self.sciencegoals = pd.DataFrame(
                         [(code, partid, ar, las, bands, isspectralscan,
-                          istimeconst, useaca, usetp, ps, assoc_sbs[partid],
+                          istimeconst, useaca, usetp, ps,
+                          ','.join(assoc_sbs[partid]),
                           starttime, endtime, allowedmarg,
                           allowedmarg_unit, repeats, note, isavoid)],
                         columns=['CODE', 'partId', 'AR', 'LAS', 'bands',
@@ -605,10 +606,10 @@ class WtoDatabase(object):
                 else:
                     self.sciencegoals.loc[partid] = (
                         code, partid, ar, las, bands, isspectralscan,
-                        istimeconst, useaca, usetp, ps, '',
+                        istimeconst, useaca, usetp, ps,
+                        ','.join(assoc_sbs[partid]),
                         starttime, endtime, allowedmarg,
                         allowedmarg_unit, repeats, note, isavoid)
-                    self.sciencegoals.loc[partid, 'SBS'] = (assoc_sbs[partid])
 
         except AttributeError, e:
             print "Project %s has no ObsUnitSets (%s)" % (code, e)
