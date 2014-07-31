@@ -608,7 +608,7 @@ class WtoDatabase(object):
                         istimeconst, useaca, usetp, ps, '',
                         starttime, endtime, allowedmarg,
                         allowedmarg_unit, repeats, note, isavoid)
-                    self.sciencegoals.loc[partid, 'SBS'] = assoc_sbs[partid]
+                    self.sciencegoals.loc[partid, 'SBS'] = (assoc_sbs[partid])
 
         except AttributeError, e:
             print "Project %s has no ObsUnitSets (%s)" % (code, e)
