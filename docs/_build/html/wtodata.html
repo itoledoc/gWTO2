@@ -219,8 +219,8 @@
 <li><tt class="docutils literal"><span class="pre">xml:...PerformanceParameters.TemporalParameters.note</span></tt></li>
 <li><tt class="docutils literal"><span class="pre">xml:...PerformanceParameters.TemporalParameters.isAvoidConstraint</span></tt></li>
 </ol>
-<div class="section" id="getting-the-scheduling-blocks-of-a-science-goal">
-<span id="sgsb"></span><h3>Getting the Scheduling Blocks of a Science Goal.<a class="headerlink" href="#getting-the-scheduling-blocks-of-a-science-goal" title="Permalink to this headline">¶</a></h3>
+<div class="section" id="extracting-science-goals-sbs">
+<span id="sgsb"></span><h3>Extracting Science Goals&#8217; SBs.<a class="headerlink" href="#extracting-science-goals-sbs" title="Permalink to this headline">¶</a></h3>
 <p>To get the Scheduling Blocks that are part of a ScienceGoal entity the partId
 is used.</p>
 </div>
@@ -739,7 +739,7 @@ WHERE sb.SCHEDBLOCKID = ou.OBSUNITID AND sb.CSV = 0
 <li><a class="reference internal" href="#">The WTO Data Frames</a><ul>
 <li><a class="reference internal" href="#wtodatabase-obsprojects">wtoDatabase.obsprojects</a></li>
 <li><a class="reference internal" href="#wtodatabase-sciencegoals">wtoDatabase.sciencegoals</a><ul>
-<li><a class="reference internal" href="#getting-the-scheduling-blocks-of-a-science-goal">Getting the Scheduling Blocks of a Science Goal.</a></li>
+<li><a class="reference internal" href="#extracting-science-goals-sbs">Extracting Science Goals&#8217; SBs.</a></li>
 </ul>
 </li>
 <li><a class="reference internal" href="#wtodatabase-schedblocks">wtoDatabase.schedblocks</a></li>
@@ -804,7 +804,7 @@ WHERE sb.SCHEDBLOCKID = ou.OBSUNITID AND sb.CSV = 0
     </div>
     <div class="footer">
         &copy; Copyright 2014, ALMA/I. Toledo.
-      Last updated on Jul 25, 2014.
+      Last updated on Aug 04, 2014.
       Created using <a href="http://sphinx-doc.org/">Sphinx</a> 1.2.2.
     </div>
   </body>

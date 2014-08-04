@@ -14,7 +14,7 @@
 
 
 \title{gWTO2 Documentation (Draft)}
-\date{July 28, 2014}
+\date{August 04, 2014}
 \release{2.0RC}
 \author{itoledo@alma.cl}
 \newcommand{\sphinxlogo}{}
@@ -163,7 +163,8 @@ It is easy at any given time to use these criteria to create an algorithm that
 selects the best SB to run, given the current pwv, array configuration,
 number of antennas and the target's horizontal coordinates; however the
 algorithm needs to be more complex to achieve an optimal efficiency in the use
-of telescope time, which finally traduces in a maximum scientific output.
+of telescope time. This optimal efficiency is defined as obtaining the maximum
+scientific output given the avilable observing time.
 
 
 \chapter{Using gWTO2}
@@ -1952,8 +1953,8 @@ ALMA.BMMV\_OBSPROJECT.CODE
 \end{enumerate}
 
 
-\subsection{Getting the Scheduling Blocks of a Science Goal.}
-\label{wtodata:getting-the-scheduling-blocks-of-a-science-goal}\label{wtodata:sgsb}
+\subsection{Extracting Science Goals' SBs.}
+\label{wtodata:sgsb}\label{wtodata:extracting-science-goals-sbs}
 To get the Scheduling Blocks that are part of a ScienceGoal entity the partId
 is used.
 

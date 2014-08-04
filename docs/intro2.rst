@@ -38,5 +38,6 @@ It is easy at any given time to use these criteria to create an algorithm that
 selects the best SB to run, given the current pwv, array configuration,
 number of antennas and the target's horizontal coordinates; however the
 algorithm needs to be more complex to achieve an optimal efficiency in the use
-of telescope time, which finally traduces in a maximum scientific output.
+of telescope time. This optimal efficiency is defined as obtaining the maximum
+scientific output given the avilable observing time.
 

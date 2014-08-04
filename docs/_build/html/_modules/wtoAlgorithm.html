@@ -996,6 +996,24 @@
         <span class="k">return</span> <span class="n">blfrac</span> <span class="o">*</span> <span class="p">(</span><span class="mf">31.</span> <span class="o">*</span> <span class="mf">16.</span><span class="p">)</span> <span class="o">/</span> <span class="p">(</span><span class="mf">33.</span> <span class="o">*</span> <span class="mi">17</span><span class="p">)</span>
     <span class="k">else</span><span class="p">:</span>
         <span class="k">return</span> <span class="n">blfrac</span> <span class="o">*</span> <span class="mf">1.</span>
+
+
+<span class="k">def</span> <span class="nf">eq_to_hor</span><span class="p">(</span><span class="n">dec</span><span class="p">,</span> <span class="n">ha</span><span class="p">,</span> <span class="n">lat</span><span class="p">,</span> <span class="n">horizon</span><span class="p">):</span>
+    <span class="n">ha_temp</span> <span class="o">=</span> <span class="n">ha</span> <span class="o">*</span> <span class="mf">15.</span>
+    <span class="k">if</span> <span class="n">ha_temp</span> <span class="o">&lt;</span> <span class="mi">0</span><span class="p">:</span>
+        <span class="n">ha_temp</span> <span class="o">+=</span> <span class="mf">360.</span>
+    <span class="n">alt</span> <span class="o">=</span> <span class="n">pd</span><span class="o">.</span><span class="n">np</span><span class="o">.</span><span class="n">arcsin</span><span class="p">(</span>
+        <span class="n">pd</span><span class="o">.</span><span class="n">np</span><span class="o">.</span><span class="n">sin</span><span class="p">(</span><span class="n">pd</span><span class="o">.</span><span class="n">np</span><span class="o">.</span><span class="n">radians</span><span class="p">(</span><span class="n">dec</span><span class="p">))</span> <span class="o">*</span> <span class="n">pd</span><span class="o">.</span><span class="n">np</span><span class="o">.</span><span class="n">sin</span><span class="p">(</span><span class="n">pd</span><span class="o">.</span><span class="n">np</span><span class="o">.</span><span class="n">radians</span><span class="p">(</span><span class="n">lat</span><span class="p">))</span> <span class="o">+</span>
+        <span class="n">pd</span><span class="o">.</span><span class="n">np</span><span class="o">.</span><span class="n">cos</span><span class="p">(</span><span class="n">pd</span><span class="o">.</span><span class="n">np</span><span class="o">.</span><span class="n">radians</span><span class="p">(</span><span class="n">dec</span><span class="p">))</span> <span class="o">*</span> <span class="n">pd</span><span class="o">.</span><span class="n">np</span><span class="o">.</span><span class="n">cos</span><span class="p">(</span><span class="n">pd</span><span class="o">.</span><span class="n">np</span><span class="o">.</span><span class="n">radians</span><span class="p">(</span><span class="n">lat</span><span class="p">))</span> <span class="o">*</span>
+        <span class="n">pd</span><span class="o">.</span><span class="n">np</span><span class="o">.</span><span class="n">cos</span><span class="p">(</span><span class="n">pd</span><span class="o">.</span><span class="n">np</span><span class="o">.</span><span class="n">radians</span><span class="p">(</span><span class="n">ha_temp</span><span class="p">)))</span>
+    <span class="n">ha_rad</span> <span class="o">=</span> <span class="n">pd</span><span class="o">.</span><span class="n">np</span><span class="o">.</span><span class="n">arccos</span><span class="p">(</span>
+        <span class="p">(</span><span class="n">pd</span><span class="o">.</span><span class="n">np</span><span class="o">.</span><span class="n">sin</span><span class="p">(</span><span class="n">pd</span><span class="o">.</span><span class="n">np</span><span class="o">.</span><span class="n">radians</span><span class="p">(</span><span class="n">horizon</span><span class="p">))</span> <span class="o">-</span> <span class="n">pd</span><span class="o">.</span><span class="n">np</span><span class="o">.</span><span class="n">sin</span><span class="p">(</span><span class="n">pd</span><span class="o">.</span><span class="n">np</span><span class="o">.</span><span class="n">radians</span><span class="p">(</span><span class="n">dec</span><span class="p">))</span> <span class="o">*</span> <span class="n">pd</span><span class="o">.</span><span class="n">np</span><span class="o">.</span><span class="n">sin</span><span class="p">(</span><span class="n">pd</span><span class="o">.</span><span class="n">np</span><span class="o">.</span><span class="n">radians</span><span class="p">(</span><span class="n">lat</span><span class="p">)))</span> <span class="o">/</span>
+        <span class="p">(</span><span class="n">pd</span><span class="o">.</span><span class="n">np</span><span class="o">.</span><span class="n">cos</span><span class="p">(</span><span class="n">pd</span><span class="o">.</span><span class="n">np</span><span class="o">.</span><span class="n">radians</span><span class="p">(</span><span class="n">dec</span><span class="p">))</span> <span class="o">*</span> <span class="n">pd</span><span class="o">.</span><span class="n">np</span><span class="o">.</span><span class="n">cos</span><span class="p">(</span><span class="n">pd</span><span class="o">.</span><span class="n">np</span><span class="o">.</span><span class="n">radians</span><span class="p">(</span><span class="n">lat</span><span class="p">)))</span>
+    <span class="p">)</span>
+    <span class="n">ha_ran</span> <span class="o">=</span> <span class="n">pd</span><span class="o">.</span><span class="n">np</span><span class="o">.</span><span class="n">abs</span><span class="p">(</span><span class="n">pd</span><span class="o">.</span><span class="n">np</span><span class="o">.</span><span class="n">degrees</span><span class="p">(</span><span class="n">ha_rad</span><span class="p">)</span> <span class="o">/</span> <span class="mf">15.</span><span class="p">)</span>
+    <span class="n">ha_h</span> <span class="o">=</span> <span class="n">ha</span> <span class="o">/</span> <span class="mf">15.</span>
+
+    <span class="k">return</span> <span class="n">pd</span><span class="o">.</span><span class="n">np</span><span class="o">.</span><span class="n">degrees</span><span class="p">(</span><span class="n">alt</span><span class="p">),</span> <span class="n">ha_ran</span> <span class="o">-</span> <span class="n">ha_h</span>
 </pre></div>
 
           </div>
@@ -1035,7 +1053,7 @@
     </div>
     <div class="footer">
         &copy; Copyright 2014, ALMA/I. Toledo.
-      Last updated on Jul 28, 2014.
+      Last updated on Aug 04, 2014.
       Created using <a href="http://sphinx-doc.org/">Sphinx</a> 1.2.2.
     </div>
   </body>

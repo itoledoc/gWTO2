@@ -88,8 +88,8 @@ isavoid              *(boolean)* Time constrait is to avoid (16)
 
 .. _sgsb:
 
-Getting the Scheduling Blocks of a Science Goal.
-------------------------------------------------
+Extracting Science Goals' SBs.
+------------------------------
 
 To get the Scheduling Blocks that are part of a ScienceGoal entity the partId
 is used.

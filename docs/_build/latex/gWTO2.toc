@@ -21,7 +21,7 @@
 \contentsline {chapter}{\numberline {6}The WTO Data Frames}{25}{chapter.6}
 \contentsline {section}{\numberline {6.1}wtoDatabase.obsprojects}{25}{section.6.1}
 \contentsline {section}{\numberline {6.2}wtoDatabase.sciencegoals}{26}{section.6.2}
-\contentsline {subsection}{\numberline {6.2.1}Getting the Scheduling Blocks of a Science Goal.}{26}{subsection.6.2.1}
+\contentsline {subsection}{\numberline {6.2.1}Extracting Science Goals' SBs.}{26}{subsection.6.2.1}
 \contentsline {section}{\numberline {6.3}wtoDatabase.schedblocks}{27}{section.6.3}
 \contentsline {section}{\numberline {6.4}wtoDatabase.schedblock\_info}{27}{section.6.4}
 \contentsline {section}{\numberline {6.5}wtoDatabase.target}{27}{section.6.5}
