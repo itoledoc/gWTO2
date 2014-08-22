@@ -3,6 +3,16 @@
     <option name="myName" value="Project Default" />
     <option name="myLocal" value="false" />
     <inspection_tool class="PyAttributeOutsideInitInspection" enabled="false" level="WEAK WARNING" enabled_by_default="false" />
+    <inspection_tool class="PyCompatibilityInspection" enabled="false" level="WARNING" enabled_by_default="false">
+      <option name="ourVersions">
+        <value>
+          <list size="2">
+            <item index="0" class="java.lang.String" itemvalue="2.6" />
+            <item index="1" class="java.lang.String" itemvalue="2.7" />
+          </list>
+        </value>
+      </option>
+    </inspection_tool>
     <inspection_tool class="PyPep8Inspection" enabled="true" level="WEAK WARNING" enabled_by_default="true">
       <option name="ignoredErrors">
         <list>
@@ -13,7 +23,7 @@
     <inspection_tool class="PyUnresolvedReferencesInspection" enabled="true" level="WARNING" enabled_by_default="true">
       <option name="ignoredIdentifiers">
         <value>
-          <list size="7">
+          <list size="10">
             <item index="0" class="java.lang.String" itemvalue="cx_Oracle.connect" />
             <item index="1" class="java.lang.String" itemvalue="wtoDatabase.ObsProject.*" />
             <item index="2" class="java.lang.String" itemvalue="numpy.radians" />
@@ -21,6 +31,9 @@
             <item index="4" class="java.lang.String" itemvalue="float.loc" />
             <item index="5" class="java.lang.String" itemvalue="numpy.deg2rad" />
             <item index="6" class="java.lang.String" itemvalue="cx_Oracle" />
+            <item index="7" class="java.lang.String" itemvalue="numpy.abs" />
+            <item index="8" class="java.lang.String" itemvalue="numpy.arccos" />
+            <item index="9" class="java.lang.String" itemvalue="numpy.arcsin" />
           </list>
         </value>
       </option>

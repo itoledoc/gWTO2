@@ -1,27 +1,27 @@
 === Array Configuration Summary ==== 
 
-Input file : 2014-08-04.cfg 
-Nant : 34 
+Input file : 2014-08-21.cfg 
+Nant : 35 
 Declination (Degree): -23.00 
 Duration : 2h 
 Frequency (GHz) : 100.0 
-Minimum Proj. BL (meters) : 20.055839 
-Maximum Proj. BL (meters) : 900.919703 
-RMS (meters) : 377.03 
+Minimum Proj. BL (meters) : 33.019802 
+Maximum Proj. BL (meters) : 1241.017563 
+RMS (meters) : 474.11 
 Shadowing fraction (%): 0.0 
-minor beam (arcsec) : 0.6439 
-major beam (arcsec) : 0.7723 
-Spatial resolution (arcsec) : 0.7051 
+minor beam (arcsec) : 0.5275 
+major beam (arcsec) : 0.5884 
+Spatial resolution (arcsec) : 0.5571 
 Weighting : briggs 
 Sidelobe level (%) : 8.2 
-PA beam (degree): -56.1 
-LAS (arcsec) : 18.4984 
+PA beam (degree): 84.1 
+LAS (arcsec) : 11.2357 
 
-Matching with  ACA-std.cfg:   0.0 %   (uv-overlap: 20.1 m -- 32.1 m)
-Matching with    C34-1.cfg:  14.5 %   (uv-overlap: 20.1 m -- 165.6 m)
-Matching with    C34-2.cfg:  32.6 %   (uv-overlap: 20.1 m -- 303.6 m)
-Matching with    C34-3.cfg:  48.3 %   (uv-overlap: 21.0 m -- 442.7 m)
-Matching with    C34-4.cfg:  58.6 %   (uv-overlap: 21.0 m -- 558.2 m)
-Matching with    C34-5.cfg:  67.6 %   (uv-overlap: 25.9 m -- 820.2 m)
-Matching with    C34-6.cfg:  63.7 %   (uv-overlap: 42.1 m -- 900.9 m)
-Matching with    C34-7.cfg:  62.1 %   (uv-overlap: 42.1 m -- 900.9 m)
+Matching with  ACA-std.cfg:   0.0 %   (uv-overlap: 0.0 m -- 0.0 m)
+Matching with    C34-1.cfg:  10.6 %   (uv-overlap: 33.0 m -- 165.6 m)
+Matching with    C34-2.cfg:  26.5 %   (uv-overlap: 33.0 m -- 303.6 m)
+Matching with    C34-3.cfg:  41.6 %   (uv-overlap: 33.0 m -- 442.7 m)
+Matching with    C34-4.cfg:  51.1 %   (uv-overlap: 33.0 m -- 558.2 m)
+Matching with    C34-5.cfg:  63.1 %   (uv-overlap: 33.0 m -- 820.2 m)
+Matching with    C34-6.cfg:  70.7 %   (uv-overlap: 42.1 m -- 1091.0 m)
+Matching with    C34-7.cfg:  67.7 %   (uv-overlap: 42.1 m -- 1241.0 m)
