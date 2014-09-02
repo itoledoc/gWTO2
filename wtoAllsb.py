@@ -46,12 +46,11 @@ class WtoDatabase(object):
     :type forcenew: boolean, default False
     """
 
-    def __init__(self, path='/.wto_all/', source=None, forcenew=False):
+    def __init__(self, path='/.wto_all/', forcenew=False):
         """
 
 
         """
-        self.source = source
         self.new = forcenew
         # Default Paths and Preferences
         if path[-1] != '/':
@@ -61,22 +60,22 @@ class WtoDatabase(object):
         self.sbxml = self.path + 'sbxml/'
         self.obsxml = self.path + 'obsxml/'
         self.preferences = pd.Series(
-            ['obsproject.pandas', source, 'sciencegoals.pandas',
+            ['obsproject.pandas', 'sciencegoals.pandas',
              'scheduling.pandas', 'special.list', 'pwvdata.pandas',
              'executive.pandas', 'sbxml_table.pandas', 'sbinfo.pandas',
              'newar.pandas', 'fieldsource.pandas', 'target.pandas',
              'spectralconf.pandas'],
-            index=['obsproject_table', 'source', 'sciencegoals_table',
+            index=['obsproject_table', 'sciencegoals_table',
                    'scheduling_table', 'special', 'pwv_data',
                    'executive_table', 'sbxml_table', 'sbinfo_table',
                    'newar_table', 'fieldsource_table', 'target_table',
                    'spectralconf_table'])
-        self.states = ["Approved", "Phase1Submitted", "Broken",
-                       "Canceled", "Rejected"]
+        self.states = ["Canceled", "Rejected"]
 
         # Global SQL search expressions
+        # Search Project's PT information and match with Status
         self.sql1 = str(
-            "SELECT PRJ_ARCHIVE_UID,DELETED,PI,PRJ_NAME,"
+            "SELECT PRJ_ARCHIVE_UID,PI,PRJ_NAME,"
             "CODE,PRJ_TIME_OF_CREATION,PRJ_SCIENTIFIC_RANK,PRJ_VERSION,"
             "PRJ_LETTER_GRADE,DOMAIN_ENTITY_STATE,"
             "OBS_PROJECT_ID "
@@ -85,15 +84,23 @@ class WtoDatabase(object):
             "AND (PRJ_LETTER_GRADE='A' OR PRJ_LETTER_GRADE='B' "
             "OR PRJ_LETTER_GRADE='C') "
             "AND obs2.OBS_PROJECT_ID = obs1.PRJ_ARCHIVE_UID")
+
+        # Query Projects currently on SCHEDULING_AOS
         self.sqlsched_proj = str(
             "SELECT * FROM SCHEDULING_AOS.OBSPROJECT "
             "WHERE regexp_like (CODE, '^201[23].*\.[AST]')")
+
+        # Query SBs status
         self.sqlstates = str(
             "SELECT DOMAIN_ENTITY_STATE,DOMAIN_ENTITY_ID,OBS_PROJECT_ID "
             "FROM ALMA.SCHED_BLOCK_STATUS")
+
+        # Query QA0 flgas from AQUA tables
         self.sqlqa0 = str(
             "SELECT SCHEDBLOCKUID,QA0STATUS FROM ALMA.AQUA_EXECBLOCK "
             "WHERE regexp_like (OBSPROJECTCODE, '^201[23].*\.[AST]')")
+
+        # Query SBs in the SCHEDULING_AOS tables
         self.sqlsched_sb = str(
             "SELECT ou.OBSUNIT_UID,sb.NAME,sb.REPR_BAND,"
             "sb.SCHEDBLOCK_CTRL_EXEC_COUNT,sb.SCHEDBLOCK_CTRL_STATE,"
@@ -107,49 +114,40 @@ class WtoDatabase(object):
         self.cursor = self.connection.cursor()
 
         # Populate different dataframes related to projects and SBs statuses
+
+        # self.scheduling_proj: data frame with projects at SCHEDULING_AOS
         self.cursor.execute(self.sqlsched_proj)
         self.scheduling_proj = pd.DataFrame(
             self.cursor.fetchall(),
             columns=[rec[0] for rec in self.cursor.description]
         ).set_index('CODE', drop=False)
 
-        self.cursor.execute(self.sqlstates)
-        self.sbstates = pd.DataFrame(
-            self.cursor.fetchall(),
-            columns=[rec[0] for rec in self.cursor.description]
-        ).set_index('DOMAIN_ENTITY_ID')
-
-        self.cursor.execute(self.sqlqa0)
-        self.qa0 = pd.DataFrame(
-            self.cursor.fetchall(),
-            columns=[rec[0] for rec in self.cursor.description]
-        ).set_index('SCHEDBLOCKUID', drop=False)
-
+        # self.scheduling_sb: SBs at SCHEDULING_AOS
         self.cursor.execute(self.sqlsched_sb)
         self.scheduling_sb = pd.DataFrame(
             self.cursor.fetchall(),
             columns=[rec[0] for rec in self.cursor.description]
         ).set_index('OBSUNIT_UID', drop=False)
 
+        # self.sbstates: SBs status (PT?)
+        self.cursor.execute(self.sqlstates)
+        self.sbstates = pd.DataFrame(
+            self.cursor.fetchall(),
+            columns=[rec[0] for rec in self.cursor.description]
+        ).set_index('DOMAIN_ENTITY_ID')
+
+        # self.qa0: QAO flags for observed SBs
+        self.cursor.execute(self.sqlqa0)
+        self.qa0 = pd.DataFrame(
+            self.cursor.fetchall(),
+            columns=[rec[0] for rec in self.cursor.description]
+        ).set_index('SCHEDBLOCKUID', drop=False)
+
         # Initialize with saved data and update, Default behavior.
         if not self.new:
             try:
                 self.obsproject = pd.read_pickle(
                     self.path + self.preferences.obsproject_table)
-                self.sciencegoals = pd.read_pickle(
-                    self.path + self.preferences.sciencegoals_table)
-                self.schedblocks = pd.read_pickle(
-                    self.path + self.preferences.sbxml_table)
-                self.schedblock_info = pd.read_pickle(
-                    self.path + self.preferences.sbinfo_table)
-                self.newar = pd.read_pickle(
-                    self.path + self.preferences.newar_table)
-                self.fieldsource = pd.read_pickle(
-                    self.path + self.preferences.fieldsource_table)
-                self.target = pd.read_pickle(
-                    self.path + self.preferences.target_table)
-                self.spectralconf = pd.read_pickle(
-                    self.path + self.preferences.spectralconf_table)
             except IOError, e:
                 print e
                 self.new = True
@@ -184,53 +182,20 @@ class WtoDatabase(object):
         sql2 = str(
             "SELECT PROJECTUID,ASSOCIATEDEXEC "
             "FROM ALMA.BMMV_OBSPROPOSAL "
-            "WHERE (CYCLE='2012.1' OR CYCLE='2013.1' OR CYCLE='2013.A' "
-            "OR CYCLE='2012.A')")
+            "WHERE regexp_like (CYCLE, '^201[23].[1A]')")
 
         self.cursor.execute(sql2)
         self.executive = pd.DataFrame(
             self.cursor.fetchall(), columns=['PRJ_ARCHIVE_UID', 'EXEC'])
 
-        if self.source is None:
-            self.cursor.execute(self.sql1)
-            df1 = pd.DataFrame(
-                self.cursor.fetchall(),
-                columns=[rec[0] for rec in self.cursor.description])
-            print(len(df1.query('DOMAIN_ENTITY_STATE not in @states')))
-            self.obsproject = pd.merge(
-                df1.query('DOMAIN_ENTITY_STATE not in @states'), self.executive,
-                on='PRJ_ARCHIVE_UID').set_index('CODE', drop=False)
-        else:
-            if type(self.source) is not str and type(self.source) is not list:
-                print "The source should be a string or a list"
-                return None
-            try:
-                if type(self.source) is str:
-                    fp = open(self.source, 'r')
-                    read_csv = csv.reader(fp)
-                else:
-                    read_csv = self.source
-                c = 0
-                for l in read_csv:
-                    if type(self.source) is str:
-                        l = l[0]
-                    sql3 = self.sql1 + ' AND OBS1.PRJ_CODE = ' + '\'%s\'' % l
-                    self.cursor.execute(sql3)
-                    if c == 0:
-                        df2 = pd.DataFrame(
-                            self.cursor.fetchall(),
-                            columns=[rec[0] for rec in self.cursor.description])
-                    else:
-                        df2.ix[c] = pd.Series(
-                            self.cursor.fetchall()[0], index=df2.columns)
-                    c += 1
-                self.obsproject = pd.merge(
-                    df2.query('DOMAIN_ENTITY_STATE not in @states'),
-                    self.executive,
-                    on='PRJ_ARCHIVE_UID').set_index('CODE', drop=False)
-            except IOError:
-                print "Source filename does not exist"
-                return None
+        self.cursor.execute(self.sql1)
+        df1 = pd.DataFrame(
+            self.cursor.fetchall(),
+            columns=[rec[0] for rec in self.cursor.description])
+        print(len(df1.query('DOMAIN_ENTITY_STATE not in @states')))
+        self.obsproject = pd.merge(
+            df1.query('DOMAIN_ENTITY_STATE not in @states'), self.executive,
+            on='PRJ_ARCHIVE_UID').set_index('CODE', drop=False)
 
         timestamp = pd.Series(
             np.zeros(len(self.obsproject), dtype=object),
