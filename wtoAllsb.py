@@ -168,10 +168,10 @@ class WtoDatabase(object):
                     self.path + 'aqua_execblock.pandas')
                 self.executive = pd.read_pickle(
                     self.path + 'executive.pandas')
-                self.obsproject = pd.read_pickle(
-                    self.path + 'obsproject.pandas')
-                self.obsproposal = pd.read_pickle(
-                    self.path + 'obsproposal.pandas')
+                self.obsprojects = pd.read_pickle(
+                    self.path + 'obsprojects.pandas')
+                self.obsproposals = pd.read_pickle(
+                    self.path + 'obsproposals.pandas')
                 self.saos_obsproject = pd.read_pickle(
                     self.path + 'saos_obsproject.pands')
                 self.saos_schedblock = pd.read_pickle(
@@ -249,16 +249,19 @@ class WtoDatabase(object):
             self.path + 'aqua_execblock.pandas')
         self.executive.to_pickle(
             self.path + 'executive.pandas')
-        self.obsproject.to_pickle(
-            self.path + 'obsproject.pandas')
-        self.obsproposal.to_pickle(
-            self.path + 'obsproposal.pandas')
+        self.obsprojects.to_pickle(
+            self.path + 'obsprojects.pandas')
+        self.obsproposals.to_pickle(
+            self.path + 'obsproposals.pandas')
         self.saos_obsproject.to_pickle(
             self.path + 'saos_obsproject.pands')
         self.saos_schedblock.to_pickle(
             self.path + 'saos_schedblock.pandas')
         self.targets_proj.to_pickle(
             self.path + 'targets_proj')
+
+        # Second Step, read SBs
+
 
     def get_projectxml(self, code, state, n, c):
         """
@@ -523,7 +526,6 @@ class WtoDatabase(object):
                 obsp_uid, sgid, typetar, solarSystem, sourceName, ra, dec,
                 isMosaic)
         except AttributeError:
-            print('creating')
             self.targets_proj = pd.DataFrame(
                 [(obsp_uid, sgid, typetar, solarSystem, sourceName, ra, dec,
                  isMosaic)],
