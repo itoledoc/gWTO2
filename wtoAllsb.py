@@ -60,94 +60,106 @@ class WtoDatabase(object):
         self.sbxml = self.path + 'sbxml/'
         self.obsxml = self.path + 'obsxml/'
         self.preferences = pd.Series(
-            ['obsproject.pandas', 'sciencegoals.pandas',
+            ['project.pandas', 'sciencegoals.pandas',
              'scheduling.pandas', 'special.list', 'pwvdata.pandas',
              'executive.pandas', 'sbxml_table.pandas', 'sbinfo.pandas',
              'newar.pandas', 'fieldsource.pandas', 'target.pandas',
              'spectralconf.pandas'],
-            index=['obsproject_table', 'sciencegoals_table',
+            index=['project_table', 'sciencegoals_table',
                    'scheduling_table', 'special', 'pwv_data',
                    'executive_table', 'sbxml_table', 'sbinfo_table',
                    'newar_table', 'fieldsource_table', 'target_table',
                    'spectralconf_table'])
-        self.states = ["Canceled", "Rejected"]
-
-        # Global SQL search expressions
-        # Search Project's PT information and match with Status
-        self.sql1 = str(
-            "SELECT PRJ_ARCHIVE_UID,PI,PRJ_NAME,"
-            "CODE,PRJ_TIME_OF_CREATION,PRJ_SCIENTIFIC_RANK,PRJ_VERSION,"
-            "PRJ_LETTER_GRADE,DOMAIN_ENTITY_STATE,"
-            "OBS_PROJECT_ID "
-            "FROM ALMA.BMMV_OBSPROJECT obs1, ALMA.OBS_PROJECT_STATUS obs2 "
-            "WHERE regexp_like (CODE, '^201[23].*\.[AST]') "
-            "AND (PRJ_LETTER_GRADE='A' OR PRJ_LETTER_GRADE='B' "
-            "OR PRJ_LETTER_GRADE='C') "
-            "AND obs2.OBS_PROJECT_ID = obs1.PRJ_ARCHIVE_UID")
-
-        # Query Projects currently on SCHEDULING_AOS
-        self.sqlsched_proj = str(
-            "SELECT * FROM SCHEDULING_AOS.OBSPROJECT "
-            "WHERE regexp_like (CODE, '^201[23].*\.[AST]')")
-
-        # Query SBs status
-        self.sqlstates = str(
-            "SELECT DOMAIN_ENTITY_STATE,DOMAIN_ENTITY_ID,OBS_PROJECT_ID "
-            "FROM ALMA.SCHED_BLOCK_STATUS")
-
-        # Query QA0 flgas from AQUA tables
-        self.sqlqa0 = str(
-            "SELECT SCHEDBLOCKUID,QA0STATUS FROM ALMA.AQUA_EXECBLOCK "
-            "WHERE regexp_like (OBSPROJECTCODE, '^201[23].*\.[AST]')")
-
-        # Query SBs in the SCHEDULING_AOS tables
-        self.sqlsched_sb = str(
-            "SELECT ou.OBSUNIT_UID,sb.NAME,sb.REPR_BAND,"
-            "sb.SCHEDBLOCK_CTRL_EXEC_COUNT,sb.SCHEDBLOCK_CTRL_STATE,"
-            "sb.MIN_ANG_RESOLUTION,sb.MAX_ANG_RESOLUTION,"
-            "ou.OBSUNIT_PROJECT_UID "
-            "FROM SCHEDULING_AOS.SCHEDBLOCK sb, SCHEDULING_AOS.OBSUNIT ou "
-            "WHERE sb.SCHEDBLOCKID = ou.OBSUNITID AND sb.CSV = 0")
+        self.status = ["Canceled", "Rejected"]
 
         # Global Oracle Connection
         self.connection = cx_Oracle.connect(conx_string)
         self.cursor = self.connection.cursor()
 
+        # Global SQL search expressions
+        # Search Project's PT information and match with PT Status
+        self.sql1 = str(
+            "SELECT PRJ_ARCHIVE_UID as OBSPROJECT_UID,PI,PRJ_NAME,"
+            "CODE,PRJ_SCIENTIFIC_RANK,PRJ_VERSION,"
+            "PRJ_LETTER_GRADE,DOMAIN_ENTITY_STATE as PRJ_STATUS,"
+            "ARCHIVE_UID as OBSPROPOSAL_UID "
+            "FROM ALMA.BMMV_OBSPROJECT obs1, ALMA.OBS_PROJECT_STATUS obs2,"
+            " ALMA.BMMV_OBSPROPOSAL obs3 "
+            "WHERE regexp_like (CODE, '^201[23].*\.[AST]') "
+            "AND (PRJ_LETTER_GRADE='A' OR PRJ_LETTER_GRADE='B' "
+            "OR PRJ_LETTER_GRADE='C') "
+            "AND obs2.OBS_PROJECT_ID = obs1.PRJ_ARCHIVE_UID AND "
+            "obs1.PRJ_ARCHIVE_UID = obs3.PROJECTUID")
+
         # Populate different dataframes related to projects and SBs statuses
 
         # self.scheduling_proj: data frame with projects at SCHEDULING_AOS
+        # Query Projects currently on SCHEDULING_AOS
+        self.sqlsched_proj = str(
+            "SELECT CODE,OBSPROJECT_UID as OBSPROJECT_UID,"
+            "VERSION as PRJ_SAOS_VERSION, STATUS as PRJ_SAOS_STATUS "
+            "FROM SCHEDULING_AOS.OBSPROJECT "
+            "WHERE regexp_like (CODE, '^201[23].*\.[AST]')")
         self.cursor.execute(self.sqlsched_proj)
-        self.scheduling_proj = pd.DataFrame(
+        self.saos_obsproject = pd.DataFrame(
             self.cursor.fetchall(),
             columns=[rec[0] for rec in self.cursor.description]
         ).set_index('CODE', drop=False)
 
         # self.scheduling_sb: SBs at SCHEDULING_AOS
+        # Query SBs in the SCHEDULING_AOS tables
+        self.sqlsched_sb = str(
+            "SELECT ou.OBSUNIT_UID as OUS_UID, sb.NAME as SB_NAME,"
+            "sb.SCHEDBLOCK_CTRL_EXEC_COUNT,"
+            "sb.SCHEDBLOCK_CTRL_STATE as SB_SAOS_STATUS,"
+            "ou.OBSUNIT_PROJECT_UID as OBSPROJECT_UID "
+            "FROM SCHEDULING_AOS.SCHEDBLOCK sb, SCHEDULING_AOS.OBSUNIT ou "
+            "WHERE sb.SCHEDBLOCKID = ou.OBSUNITID AND sb.CSV = 0")
         self.cursor.execute(self.sqlsched_sb)
-        self.scheduling_sb = pd.DataFrame(
+        self.saos_schedblock = pd.DataFrame(
             self.cursor.fetchall(),
             columns=[rec[0] for rec in self.cursor.description]
-        ).set_index('OBSUNIT_UID', drop=False)
+        ).set_index('OUS_UID', drop=False)
 
         # self.sbstates: SBs status (PT?)
+        # Query SBs status
+        self.sqlstates = str(
+            "SELECT DOMAIN_ENTITY_STATE as SB_STATE,"
+            "DOMAIN_ENTITY_ID as SB_UID,OBS_PROJECT_ID as OBSPROJECT_UID "
+            "FROM ALMA.SCHED_BLOCK_STATUS")
         self.cursor.execute(self.sqlstates)
-        self.sbstates = pd.DataFrame(
+        self.sb_status = pd.DataFrame(
             self.cursor.fetchall(),
             columns=[rec[0] for rec in self.cursor.description]
-        ).set_index('DOMAIN_ENTITY_ID')
+        ).set_index('SB_UID', drop=False)
 
         # self.qa0: QAO flags for observed SBs
+        # Query QA0 flaas from AQUA tables
+        self.sqlqa0 = str(
+            "SELECT SCHEDBLOCKUID as SB_UID,QA0STATUS "
+            "FROM ALMA.AQUA_EXECBLOCK "
+            "WHERE regexp_like (OBSPROJECTCODE, '^201[23].*\.[AST]')")
+
         self.cursor.execute(self.sqlqa0)
-        self.qa0 = pd.DataFrame(
+        self.aqua_execblock = pd.DataFrame(
             self.cursor.fetchall(),
             columns=[rec[0] for rec in self.cursor.description]
-        ).set_index('SCHEDBLOCKUID', drop=False)
+        ).set_index('SB_UID', drop=False)
+
+        # Query for Executives
+        sql2 = str(
+            "SELECT PROJECTUID as OBSPROJECT_UID, ASSOCIATEDEXEC "
+            "FROM ALMA.BMMV_OBSPROPOSAL "
+            "WHERE regexp_like (CYCLE, '^201[23].[1A]')")
+        self.cursor.execute(sql2)
+        self.executive = pd.DataFrame(
+            self.cursor.fetchall(), columns=['OBSPROJECT_UID', 'EXEC'])
 
         # Initialize with saved data and update, Default behavior.
         if not self.new:
             try:
-                self.obsproject = pd.read_pickle(
-                    self.path + self.preferences.obsproject_table)
+                self.projects = pd.read_pickle(
+                    self.path + self.preferences.project_table)
             except IOError, e:
                 print e
                 self.new = True
@@ -177,61 +189,326 @@ class WtoDatabase(object):
         :return: None
         """
         # noinspection PyUnusedLocal
-        states = self.states
+        status = self.status
 
-        sql2 = str(
-            "SELECT PROJECTUID,ASSOCIATEDEXEC "
-            "FROM ALMA.BMMV_OBSPROPOSAL "
-            "WHERE regexp_like (CYCLE, '^201[23].[1A]')")
-
-        self.cursor.execute(sql2)
-        self.executive = pd.DataFrame(
-            self.cursor.fetchall(), columns=['PRJ_ARCHIVE_UID', 'EXEC'])
-
+        # Query for Projects, from BMMV.
         self.cursor.execute(self.sql1)
         df1 = pd.DataFrame(
             self.cursor.fetchall(),
             columns=[rec[0] for rec in self.cursor.description])
-        print(len(df1.query('DOMAIN_ENTITY_STATE not in @states')))
-        self.obsproject = pd.merge(
-            df1.query('DOMAIN_ENTITY_STATE not in @states'), self.executive,
-            on='PRJ_ARCHIVE_UID').set_index('CODE', drop=False)
+        self.q1 = df1
+        print(len(df1.query('PRJ_STATUS not in @status')))
+        self.projects = pd.merge(
+            df1.query('PRJ_STATUS not in @status'), self.executive,
+            on='OBSPROJECT_UID'
+        ).set_index('CODE', drop=False)
 
         timestamp = pd.Series(
-            np.zeros(len(self.obsproject), dtype=object),
-            index=self.obsproject.index)
-        self.obsproject['timestamp'] = timestamp
-        self.obsproject['obsproj'] = pd.Series(
-            np.zeros(len(self.obsproject), dtype=object),
-            index=self.obsproject.index)
-        codes = self.obsproject.CODE.tolist()
-        for c in codes:
-            self.get_obsproject(c)
+            np.zeros(len(self.projects), dtype=object),
+            index=self.projects.index)
+        self.projects['timestamp'] = timestamp
+        self.projects['xmlfile'] = pd.Series(
+            np.zeros(len(self.projects), dtype=object),
+            index=self.projects.index)
         self.filter_c1()
-        print len(self.obsproject)
-        self.obsproject.to_pickle(
-            self.path + self.preferences.obsproject_table)
+        # Download and read obsprojects and obsprosal
+        number = self.projects.__len__()
+        c = 1
+        for r in self.projects.iterrows():
+            xmlfilename, obsproj = self.get_projectxml(
+                r[1].CODE, r[1].PRJ_STATUS, number, c)
+            c += 1
+            if obsproj:
+                self.read_obsproject(xmlfilename)
+            else:
+                self.read_obsproposal(xmlfilename, r[1].CODE)
+        self.projects.to_pickle(
+            self.path + self.preferences.project_table)
 
-    def get_obsproject(self, code):
+    def get_projectxml(self, code, state, n, c):
         """
 
         :param code:
         """
-        print("Downloading Project %s obsproject.xml" % code)
-        self.cursor.execute(
-            "SELECT TIMESTAMP, XMLTYPE.getClobVal(xml) "
-            "FROM ALMA.XML_OBSPROJECT_ENTITIES "
-            "WHERE ARCHIVE_UID = '%s'" % self.obsproject.ix[
-                code, 'PRJ_ARCHIVE_UID'])
-        data = self.cursor.fetchall()[0]
+
+        if state not in ['Approved', 'PhaseISubmitted']:
+            print("Downloading Project %s obsproject.xml, status %s. (%s/%s)" %
+                  (code, self.projects.ix[code, 'PRJ_STATUS'], c, n))
+            self.cursor.execute(
+                "SELECT TIMESTAMP, XMLTYPE.getClobVal(xml) "
+                "FROM ALMA.XML_OBSPROJECT_ENTITIES "
+                "WHERE ARCHIVE_UID = '%s'" % self.projects.ix[
+                    code, 'OBSPROJECT_UID'])
+            obsproj = True
+        else:
+            print("Downloading Project %s obsproposal.xml, status %s. (%s/%s)" %
+                  (code, self.projects.ix[code, 'PRJ_STATUS'], c, n))
+            self.cursor.execute(
+                "SELECT TIMESTAMP, XMLTYPE.getClobVal(xml) "
+                "FROM ALMA.XML_OBSPROPOSAL_ENTITIES "
+                "WHERE ARCHIVE_UID = '%s'" % self.projects.ix[
+                    code, 'OBSPROPOSAL_UID'])
+            obsproj = False
+        try:
+            data = self.cursor.fetchall()[0]
+        except IndexError:
+            print "Project %s not found on archive?" % self.projects.ix[code]
+            return 0
         xml_content = data[1].read()
         xmlfilename = code + '.xml'
-        self.obsproject.loc[code, 'timestamp'] = data[0]
+        self.projects.loc[code, 'timestamp'] = data[0]
         filename = self.obsxml + xmlfilename
         io_file = open(filename, 'w')
         io_file.write(xml_content)
         io_file.close()
-        self.obsproject.loc[code, 'obsproj'] = xmlfilename
+        self.projects.loc[code, 'xmlfile'] = xmlfilename
+        return xmlfilename, obsproj
+
+    def read_obsproject(self, xml):
+
+        try:
+            obsparse = ObsProject(xml, self.obsxml)
+        except KeyError:
+            print("Something went wrong while trying to parse %s" % xml)
+            return 0
+
+        code = obsparse.code.pyval
+        prj_version = obsparse.version.pyval
+        staff_note = obsparse.staffProjectNote.pyval
+        is_calibration = obsparse.isCalibration.pyval
+        obsproject_uid = obsparse.ObsProjectEntity.attrib['entityId']
+        try:
+            is_ddt = obsparse.isDDT.pyval
+        except AttributeError:
+            is_ddt = False
+
+        try:
+            self.obsprojects.ix[code] = (
+                code, obsproject_uid, prj_version, staff_note, is_ddt,
+                is_calibration
+            )
+        except AttributeError:
+            self.obsprojects = pd.DataFrame(
+                [(code, obsproject_uid, prj_version, staff_note, is_ddt,
+                  is_calibration)],
+                columns=['CODE', 'OBSPROJECT_UID', 'PRJ_VERSION', 'staffNote',
+                         'isDDT', 'isCalibration'],
+                index=[code]
+            )
+
+        obsprog = obsparse.ObsProgram
+        sg_list = obsprog.findall(prj + 'ScienceGoal')
+        c = 0
+        for sg in sg_list:
+            self.read_sciencegoals(sg, obsproject_uid, c + 1)
+            c += 1
+
+        oussg_list = obsprog.ObsPlan.findall(prj + 'ObsUnitSet')
+        for oussg in oussg_list:
+            groupous_list = oussg.findall(prj + 'ObsUnitSet')
+            OUS_ID = oussg.attrib['entityPartId']
+            oussg_name = oussg.name.pyval
+            OBSPROJECT_UID = oussg.ObsProjectRef.attrib['entityId']
+            for groupous in groupous_list:
+                groupous_id = groupous.attrib['entityPartId']
+                memous_list = groupous.findall(prj + 'ObsUnitSet')
+                groupous_name = groupous.name.pyval
+                for memous in memous_list:
+                    memous_id = memous.attrib['entityPartId']
+                    memous_name = memous.name.pyval
+                    try:
+                        SB_UID = memous.SchedBlockRef.attrib['entityId']
+                    except AttributeError:
+                        continue
+
+                    oucontrol = memous.ObsUnitControl
+                    execount = oucontrol.aggregatedExecutionCount.pyval
+                    array = memous.ObsUnitControl.attrib['arrayRequested']
+                    sql = "SELECT TIMESTAMP, XMLTYPE.getClobVal(xml) " \
+                          "FROM ALMA.xml_schedblock_entities " \
+                          "WHERE archive_uid = '%s'" % SB_UID
+                    self.cursor.execute(sql)
+                    data = self.cursor.fetchall()
+                    xml_content = data[0][1].read()
+                    filename = SB_UID.replace(':', '_').replace('/', '_') +\
+                        '.xml'
+                    io_file = open(self.sbxml + filename, 'w')
+                    io_file.write(xml_content)
+                    io_file.close()
+                    xml = filename
+
+                    if array == 'ACA':
+                        array = 'SEVEN-M'
+                    try:
+                        self.sg_schedblock.ix[SB_UID] = (
+                            OBSPROJECT_UID, OUS_ID, oussg_name, groupous_id,
+                            groupous_name, memous_id, memous_name, SB_UID,
+                            array, execount, xml)
+                    except AttributeError:
+                        self.sg_schedblock = pd.DataFrame(
+                            [(OBSPROJECT_UID, OUS_ID, oussg_name, groupous_id,
+                              groupous_name, memous_id, memous_name, SB_UID,
+                              array, execount, xml)],
+                            columns=['OBSPROJECT_UID', 'OUS_ID', 'oussg_name',
+                                     'groupous_id', 'groupous_name',
+                                     'memous_id', 'memous_name', 'SB_UID',
+                                     'array', 'execount', 'xmlfile'],
+                            index=[SB_UID]
+                        )
+
+    def read_obsproposal(self, xml, code):
+
+        try:
+            obsparse = ObsProposal(xml, self.obsxml)
+        except KeyError:
+            print("Something went wrong while trying to parse %s" % xml)
+            return 0
+
+        prj_version = None
+        staff_note = None
+        is_calibration = None
+        obsproject_uid = obsparse.data.ObsProjectRef.attrib['entityId']
+        is_ddt = None
+
+        try:
+            self.obsproposals.ix[code] = (
+                code, obsproject_uid, prj_version, staff_note, is_ddt,
+                is_calibration
+            )
+        except AttributeError:
+            self.obsproposals = pd.DataFrame(
+                [(code, obsproject_uid, prj_version, staff_note, is_ddt,
+                  is_calibration)],
+                columns=['CODE', 'OBSPROJECT_UID', 'PRJ_VERSION', 'staffNote',
+                         'isDDT', 'isCalibration'],
+                index=[code]
+            )
+
+        sg_list = obsparse.data.findall(prj + 'ScienceGoal')
+        c = 0
+        for sg in sg_list:
+            self.read_sciencegoals(sg, obsproject_uid, c + 1)
+            c += 1
+
+    def read_sciencegoals(self, sg, obsproject_uid, idnum):
+
+        sg_id = obsproject_uid + '_' + str(idnum)
+        try:
+            ous_id = sg.ObsUnitSetRef.attrib['partId']
+            hasSB = True
+        except AttributeError:
+            ous_id = None
+            hasSB = False
+        sg_name = sg.name.pyval
+        bands = sg.findall(prj + 'requiredReceiverBands')[0].pyval
+        estimatedTime = convert_tsec(sg.estimatedTotalTime.pyval,
+                                     sg.estimatedTotalTime.attrib['unit'])
+        e12mTime = 0
+        eACATime = 0
+        eTPTime = 0
+
+        performance = sg.PerformanceParameters
+        AR = convert_sec(
+            performance.desiredAngularResolution.pyval,
+            performance.desiredAngularResolution.attrib['unit'])
+        LAS = convert_sec(
+            performance.desiredLargestScale.pyval,
+            performance.desiredLargestScale.attrib['unit'])
+        sensitivity = convert_jy(
+            performance.desiredSensitivity.pyval,
+            performance.desiredSensitivity.attrib['unit'])
+        useACA = performance.useACA.pyval
+        useTP = performance.useTP.pyval
+        isPointSource = performance.isPointSource.pyval
+        try:
+            isTimeConstrained = performance.isTimeConstrained.pyval
+        except AttributeError:
+            isTimeConstrained = None
+        spectral = sg.SpectralSetupParameters
+        repFreq = convert_ghz(
+            spectral.representativeFrequency.pyval,
+            spectral.representativeFrequency.attrib['unit'])
+        polarization = spectral.attrib['polarisation']
+        type_pol = spectral.attrib['type']
+        ARcor = AR * repFreq / 100.
+        LAScor = LAS * repFreq / 100.
+
+        two_12m = self.needs2(ARcor, LAScor)
+        targets = sg.findall(prj + 'TargetParameters')
+        num_targets = len(targets)
+        c = 1
+        for t in targets:
+            self.read_pro_targets(t, sg_id, obsproject_uid, c)
+            c += 1
+
+        try:
+            self.sciencegoals.ix[sg_id] = (
+                obsproject_uid, ous_id, sg_name, bands, estimatedTime, e12mTime,
+                eACATime, eTPTime, AR, LAS, ARcor, LAScor, sensitivity, useACA,
+                useTP, isTimeConstrained, repFreq, isPointSource, polarization,
+                type_pol, hasSB, two_12m, num_targets)
+        except AttributeError:
+            self.sciencegoals = pd.DataFrame(
+                [(obsproject_uid, ous_id, sg_name, bands, estimatedTime,
+                  e12mTime, eACATime, eTPTime, AR, LAS, ARcor, LAScor,
+                  sensitivity, useACA, useTP, isTimeConstrained, repFreq,
+                  isPointSource, polarization, type_pol, hasSB, two_12m,
+                  num_targets)],
+                columns=['OBSPROJECT_UID', 'OUS_UID', 'sg_name', 'band',
+                         'estimatedTime', 'e12mTime', 'eACATime', 'eTPTime',
+                         'AR', 'LAS', 'ARcor', 'LAScor', 'sensitivity',
+                         'useACA', 'useTP', 'isTimeConstrained', 'repFreq',
+                         'isPointSource', 'polarization', 'type', 'hasSB',
+                         'two_12m', 'num_targets'],
+                index=[sg_id]
+            )
+
+    def read_pro_targets(self, target, sgid, obsp_uid, c):
+
+        tid = sgid + '_' + str(c)
+        try:
+            solarSystem = target.attrib['solarSystemObject']
+        except KeyError:
+            solarSystem = None
+
+        typetar = target.attrib['type']
+        sourceName = target.sourceName.pyval
+        coord = target.sourceCoordinates
+        ra = convert_deg(coord.findall(val + 'longitude')[0].pyval,
+                         coord.findall(val + 'longitude')[0].attrib['unit'])
+        dec = convert_deg(coord.findall(val + 'latitude')[0].pyval,
+                          coord.findall(val + 'latitude')[0].attrib['unit'])
+        try:
+            isMosaic = target.isMosaic.pyval
+        except AttributeError:
+            isMosaic = None
+
+        try:
+            self.targets_proj.ix[tid] = (
+                obsp_uid, sgid, typetar, solarSystem, sourceName, ra, dec,
+                isMosaic)
+        except AttributeError:
+            print('creating')
+            self.targets_proj = pd.DataFrame(
+                [(obsp_uid, sgid, typetar, solarSystem, sourceName, ra, dec,
+                 isMosaic)],
+                columns=['OBSPROJECT_UID', 'SG_ID', 'tartype', 'solarSystem',
+                         'sourceName', 'RA', 'DEC', 'isMosaic'],
+                index=[tid]
+            )
+
+    def needs2(self, AR, LAS):
+
+        if (0.57 > AR >= 0.41) and LAS >= 9.1:
+            return True
+        elif (0.75 > AR >= 0.57) and LAS >= 9.1:
+            return True
+        elif (1.11 > AR >= 0.75) and LAS >= 14.4:
+            return True
+        elif (1.40 > AR >= 1.11) and LAS >= 18.0:
+            return True
+        else:
+            return False
 
     def filter_c1(self):
         """
@@ -245,16 +522,35 @@ class WtoDatabase(object):
                                 dtype='object')
         toc2 = c1c2[c1c2.fillna('no').C2.str.startswith('Yes')]
         check_c1 = pd.merge(
-            self.obsproject[self.obsproject.CODE.str.startswith('2012')],
+            self.projects[self.projects.CODE.str.startswith('2012')],
             toc2, on='CODE', how='right').set_index(
                 'CODE', drop=False)[['CODE']]
-        check_c2 = self.obsproject[
-            self.obsproject.CODE.str.startswith('2013')][['CODE']]
-        self.checked = pd.concat([check_c1, check_c2])
+        check_c2 = self.projects[
+            self.projects.CODE.str.startswith('2013')][['CODE']]
+        checked = pd.concat([check_c1, check_c2])
         temp = pd.merge(
-            self.obsproject, self.checked, on='CODE',
-            copy=False).set_index('CODE', drop=False)
-        self.obsproject = temp
+            self.projects, checked, on='CODE',
+            copy=False, how='inner').set_index('CODE', drop=False)
+        self.projects = temp
+
+
+class ObsProposal(object):
+    """
+
+    :param xml_file:
+    :param path:
+    """
+
+    def __init__(self, xml_file, path='./'):
+        """
+
+        :param xml_file:
+        :param path:
+        """
+        io_file = open(path + xml_file)
+        tree = objectify.parse(io_file)
+        io_file.close()
+        self.data = tree.getroot()
 
 
 class ObsProject(object):
