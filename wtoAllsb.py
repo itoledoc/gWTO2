@@ -178,8 +178,7 @@ class WtoDatabase(object):
                     self.path + 'saos_schedblock.pandas')
                 self.targets_proj = pd.read_pickle(
                     self.path + 'targets_proj')
-            except IOError, e:
-                print e
+            except IOError:
                 self.new = True
 
         # Create main dataframes
@@ -479,21 +478,27 @@ class WtoDatabase(object):
             self.read_pro_targets(t, sg_id, obsproject_uid, c)
             c += 1
 
+        extendedTime, compactTime, sevenTime, TPTime = self.distributeTime(
+            estimatedTime, two_12m, useACA, useTP
+        )
+
         try:
             self.sciencegoals.ix[sg_id] = (
-                obsproject_uid, ous_id, sg_name, bands, estimatedTime, e12mTime,
-                eACATime, eTPTime, AR, LAS, ARcor, LAScor, sensitivity, useACA,
-                useTP, isTimeConstrained, repFreq, isPointSource, polarization,
-                type_pol, hasSB, two_12m, num_targets)
+                obsproject_uid, ous_id, sg_name, bands, estimatedTime,
+                extendedTime, compactTime, sevenTime, TPTime, AR, LAS, ARcor,
+                LAScor, sensitivity, useACA, useTP, isTimeConstrained, repFreq,
+                isPointSource, polarization, type_pol, hasSB, two_12m,
+                num_targets)
         except AttributeError:
             self.sciencegoals = pd.DataFrame(
                 [(obsproject_uid, ous_id, sg_name, bands, estimatedTime,
-                  e12mTime, eACATime, eTPTime, AR, LAS, ARcor, LAScor,
-                  sensitivity, useACA, useTP, isTimeConstrained, repFreq,
-                  isPointSource, polarization, type_pol, hasSB, two_12m,
-                  num_targets)],
+                  extendedTime, compactTime, sevenTime, TPTime, AR, LAS, ARcor,
+                  LAScor, sensitivity, useACA, useTP, isTimeConstrained,
+                  repFreq, isPointSource, polarization, type_pol, hasSB,
+                  two_12m, num_targets)],
                 columns=['OBSPROJECT_UID', 'OUS_UID', 'sg_name', 'band',
-                         'estimatedTime', 'e12mTime', 'eACATime', 'eTPTime',
+                         'estimatedTime', 'eExt12Time', 'eComp12Time', 'eACATime',
+                         'eTPTime',
                          'AR', 'LAS', 'ARcor', 'LAScor', 'sensitivity',
                          'useACA', 'useTP', 'isTimeConstrained', 'repFreq',
                          'isPointSource', 'polarization', 'type', 'hasSB',
@@ -546,6 +551,29 @@ class WtoDatabase(object):
             return True
         else:
             return False
+
+    def distributeTime(self, tiempo, doce, siete, single):
+
+        if single and doce:
+            timeU = tiempo / (1 + 0.5 + 2 + 4)
+            return timeU, 0.5 * timeU, 2 * timeU, 4 * timeU
+        elif single and not doce:
+            timeU = tiempo / (1 + 2 + 4.)
+            return timeU, 0., 2 * timeU, 4 * timeU
+        elif siete and doce:
+            timeU = tiempo / (1 + 0.5 + 2.)
+            return timeU, 0.5 * timeU, 2 * timeU, 0.
+        elif siete and not doce:
+            timeU = tiempo / (1 + 2.)
+            return timeU, 0., 2 * timeU, 0.
+        elif doce:
+            timeU = tiempo / 1.5
+            return timeU, 1.5 * timeU, 0., 0.
+        elif not doce:
+            return tiempo, 0., 0., 0.
+        else:
+            print("couldn't distribute time...")
+            return None
 
     def filter_c1(self):
         """
