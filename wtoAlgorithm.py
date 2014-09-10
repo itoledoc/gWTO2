@@ -807,7 +807,11 @@ def observable(solarSystem, sourcename, RA, DEC, horizon, isQuery, ephemeris,
             obj.radius = 0.
             neverup = False
         elif solarSystem == 'Ephemeris':
-            ra, dec, ephe = read_ephemeris(ephemeris, alma.date)
+            try:
+                ra, dec, ephe = read_ephemeris(ephemeris, alma.date)
+            except TypeError:
+                print ephemeris, sourcename
+                ephe = False
             if not ephe:
                 alma.date = dtemp
                 print("Source %s doesn't have ephemeris for current's date" %
