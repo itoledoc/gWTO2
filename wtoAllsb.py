@@ -568,7 +568,7 @@ class WtoDatabase(object):
             return timeU, 0., 2 * timeU, 0.
         elif doce:
             timeU = tiempo / 1.5
-            return timeU, 1.5 * timeU, 0., 0.
+            return timeU, 0.5 * timeU, 0., 0.
         elif not doce:
             return tiempo, 0., 0., 0.
         else:
