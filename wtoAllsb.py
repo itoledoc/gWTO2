@@ -159,7 +159,25 @@ class WtoDatabase(object):
         if not self.new:
             try:
                 self.projects = pd.read_pickle(
-                    self.path + self.preferences.project_table)
+                    self.path + 'projects.pandas')
+                self.sg_schedblock = pd.read_pickle(
+                    self.path + 'sg_schedblock.pandas')
+                self.sciencegoals = pd.read_pickle(
+                    self.path + 'sciencegoals.pandas')
+                self.aqua_execblock = pd.read_pickle(
+                    self.path + 'aqua_execblock.pandas')
+                self.executive = pd.read_pickle(
+                    self.path + 'executive.pandas')
+                self.obsproject = pd.read_pickle(
+                    self.path + 'obsproject.pandas')
+                self.obsproposal = pd.read_pickle(
+                    self.path + 'obsproposal.pandas')
+                self.saos_obsproject = pd.read_pickle(
+                    self.path + 'saos_obsproject.pands')
+                self.saos_schedblock = pd.read_pickle(
+                    self.path + 'saos_schedblock.pandas')
+                self.targets_proj = pd.read_pickle(
+                    self.path + 'targets_proj')
             except IOError, e:
                 print e
                 self.new = True
@@ -196,7 +214,6 @@ class WtoDatabase(object):
         df1 = pd.DataFrame(
             self.cursor.fetchall(),
             columns=[rec[0] for rec in self.cursor.description])
-        self.q1 = df1
         print(len(df1.query('PRJ_STATUS not in @status')))
         self.projects = pd.merge(
             df1.query('PRJ_STATUS not in @status'), self.executive,
@@ -223,7 +240,25 @@ class WtoDatabase(object):
             else:
                 self.read_obsproposal(xmlfilename, r[1].CODE)
         self.projects.to_pickle(
-            self.path + self.preferences.project_table)
+            self.path + 'projects.pandas')
+        self.sg_schedblock.to_pickle(
+            self.path + 'sg_schedblock.pandas')
+        self.sciencegoals.to_pickle(
+            self.path + 'sciencegoals.pandas')
+        self.aqua_execblock.to_pickle(
+            self.path + 'aqua_execblock.pandas')
+        self.executive.to_pickle(
+            self.path + 'executive.pandas')
+        self.obsproject.to_pickle(
+            self.path + 'obsproject.pandas')
+        self.obsproposal.to_pickle(
+            self.path + 'obsproposal.pandas')
+        self.saos_obsproject.to_pickle(
+            self.path + 'saos_obsproject.pands')
+        self.saos_schedblock.to_pickle(
+            self.path + 'saos_schedblock.pandas')
+        self.targets_proj.to_pickle(
+            self.path + 'targets_proj')
 
     def get_projectxml(self, code, state, n, c):
         """
