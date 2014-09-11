@@ -173,8 +173,8 @@ class WtoDatabase(object):
                     self.path + 'saos_obsproject.pands')
                 self.saos_schedblock = pd.read_pickle(
                     self.path + 'saos_schedblock.pandas')
-                self.targets_sg = pd.read_pickle(
-                    self.path + 'targets_sg')
+                self.sg_targets = pd.read_pickle(
+                    self.path + 'sg_targets')
             except IOError:
                 self.new = True
 
@@ -253,13 +253,13 @@ class WtoDatabase(object):
             self.path + 'saos_obsproject.pands')
         self.saos_schedblock.to_pickle(
             self.path + 'saos_schedblock.pandas')
-        self.targets_sg.to_pickle(
-            self.path + 'targets_sg')
+        self.sg_targets.to_pickle(
+            self.path + 'sg_targets')
 
     def process_wto(self):
         for sg_sb in self.sg_sbs.iterrows():
-            self.row_schedblocks(sg_sb[1].SB_UID, sg_sb[1].OBSPROJECT_UID,
-                                 sg_sb[1].OUS_ID, new=True)
+            self.read_schedblocks(sg_sb[1].SB_UID, sg_sb[1].OBSPROJECT_UID,
+                                  sg_sb[1].OUS_ID, new=True)
 
     def get_projectxml(self, code, state, n, c):
         """
@@ -528,11 +528,11 @@ class WtoDatabase(object):
             isMosaic = None
 
         try:
-            self.targets_sg.ix[tid] = (
+            self.sg_targets.ix[tid] = (
                 tid, obsp_uid, sgid, typetar, solarSystem, sourceName, ra, dec,
                 isMosaic)
         except AttributeError:
-            self.targets_sg = pd.DataFrame(
+            self.sg_targets = pd.DataFrame(
                 [(tid, obsp_uid, sgid, typetar, solarSystem, sourceName, ra,
                   dec, isMosaic)],
                 columns=['TARG_ID', 'OBSPROJECT_UID', 'SG_ID', 'tarType',
@@ -563,7 +563,7 @@ class WtoDatabase(object):
             copy=False, how='inner').set_index('CODE', drop=False)
         self.projects = temp
 
-    def row_schedblocks(self, sb_uid, obs_uid, ous_id, new=False):
+    def read_schedblocks(self, sb_uid, obs_uid, ous_id, new=False):
 
         # Open SB with SB parser class
         """
@@ -611,27 +611,28 @@ class WtoDatabase(object):
 
         for n in range(n_fs):
             if new:
-                self.row_fieldsource(xml.data.FieldSource[n], sb_uid, array,
-                                     new=new)
+                self.read_fieldsource(xml.data.FieldSource[n], sb_uid, array,
+                                      new=new)
                 new = False
             else:
-                self.row_fieldsource(xml.data.FieldSource[n], sb_uid, array)
+                self.read_fieldsource(xml.data.FieldSource[n], sb_uid, array)
 
         new = new_orig
         for n in range(n_tg):
             if new:
-                self.row_target(xml.data.Target[n], sb_uid, new=new)
+                self.read_target(xml.data.Target[n], sb_uid, new=new)
                 new = False
             else:
-                self.row_target(xml.data.Target[n], sb_uid)
+                self.read_target(xml.data.Target[n], sb_uid)
 
         new = new_orig
         for n in range(n_ss):
             if new:
-                self.row_spectralconf(xml.data.SpectralSpec[n], sb_uid, new=new)
+                self.read_spectralconf(xml.data.SpectralSpec[n], sb_uid,
+                                       new=new)
                 new = False
             else:
-                self.row_spectralconf(xml.data.SpectralSpec[n], sb_uid)
+                self.read_spectralconf(xml.data.SpectralSpec[n], sb_uid)
 
         try:
             self.schedblocks.ix[sb_uid] = (
@@ -651,7 +652,7 @@ class WtoDatabase(object):
                          'isPolarization', 'maxPWVC'],
                 index=[sb_uid])
 
-    def row_fieldsource(self, fs, sbuid, array, new=False):
+    def read_fieldsource(self, fs, sbuid, array, new=False):
         """
 
         :param fs:
@@ -705,7 +706,7 @@ class WtoDatabase(object):
             qc_intendeduse, qc_ra, qc_dec, qc_use, qc_radius, qc_radius_unit,
             ephemeris, pointings, ismosaic, array)
 
-    def row_target(self, tg, sbuid, new=False):
+    def read_target(self, tg, sbuid, new=False):
         """
 
         :param tg:
@@ -726,7 +727,7 @@ class WtoDatabase(object):
             self.target.ix[partid] = (partid, sbuid, specref, fieldref,
                                       paramref)
 
-    def row_spectralconf(self, ss, sbuid, new=False):
+    def read_spectralconf(self, ss, sbuid, new=False):
         """
 
         :param ss:
