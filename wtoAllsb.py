@@ -176,8 +176,8 @@ class WtoDatabase(object):
                     self.path + 'saos_obsproject.pands')
                 self.saos_schedblock = pd.read_pickle(
                     self.path + 'saos_schedblock.pandas')
-                self.targets_proj = pd.read_pickle(
-                    self.path + 'targets_proj')
+                self.targets_sg = pd.read_pickle(
+                    self.path + 'targets_sg')
             except IOError:
                 self.new = True
 
@@ -256,8 +256,8 @@ class WtoDatabase(object):
             self.path + 'saos_obsproject.pands')
         self.saos_schedblock.to_pickle(
             self.path + 'saos_schedblock.pandas')
-        self.targets_proj.to_pickle(
-            self.path + 'targets_proj')
+        self.targets_sg.to_pickle(
+            self.path + 'targets_sg')
 
     def process_wto(self):
         for sg_sb in self.sg_sbs.iterrows():
