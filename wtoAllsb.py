@@ -39,9 +39,6 @@ class WtoDatabase(object):
 
     :param path: Path for data cache.
     :type path: str, default '$HOME/.wto'
-    :param source: File or list of strings with the codes of the projects
-        to be ingested by WtoDatabase.
-    :type source: list or str
     :param forcenew: Force cache cleaning and reload from archive.
     :type forcenew: boolean, default False
     """
@@ -134,7 +131,7 @@ class WtoDatabase(object):
         ).set_index('SB_UID', drop=False)
 
         # self.qa0: QAO flags for observed SBs
-        # Query QA0 flaas from AQUA tables
+        # Query QA0 flags from AQUA tables
         self.sqlqa0 = str(
             "SELECT SCHEDBLOCKUID as SB_UID,QA0STATUS "
             "FROM ALMA.AQUA_EXECBLOCK "
@@ -575,7 +572,7 @@ class WtoDatabase(object):
         :param new:
         """
         sb = self.sg_sbs.ix[sb_uid]
-        sg_id = sb.sg_id
+        sg_id = sb.SG_ID
         xml = SchedBlocK(sb.xmlfile, self.sbxml)
         new_orig = new
         # Extract root level data
@@ -590,6 +587,7 @@ class WtoDatabase(object):
         weather = preconditions.findall('.//' + prj + 'WeatherConstraints')[0]
 
         try:
+            # noinspection PyUnusedLocal
             polarparam = xml.data.PolarizationCalParameters
             ispolarization = True
         except AttributeError:
@@ -759,6 +757,7 @@ class WtoDatabase(object):
             self.spectralconf.ix[partid] = (partid, sbuid, nbb, nspw)
 
 
+# noinspection PyPep8Naming
 def distributeTime(tiempo, doce, siete, single):
 
     if single and doce:
@@ -783,6 +782,7 @@ def distributeTime(tiempo, doce, siete, single):
         return None
 
 
+# noinspection PyPep8Naming
 def needs2(AR, LAS):
 
     if (0.57 > AR >= 0.41) and LAS >= 9.1:
