@@ -69,89 +69,6 @@ class WtoDatabase(object):
                    'spectralconf_table'])
         self.status = ["Canceled", "Rejected"]
 
-        # Global Oracle Connection
-        self.connection = cx_Oracle.connect(conx_string)
-        self.cursor = self.connection.cursor()
-
-        # Global SQL search expressions
-        # Search Project's PT information and match with PT Status
-        self.sql1 = str(
-            "SELECT PRJ_ARCHIVE_UID as OBSPROJECT_UID,PI,PRJ_NAME,"
-            "CODE,PRJ_SCIENTIFIC_RANK,PRJ_VERSION,"
-            "PRJ_LETTER_GRADE,DOMAIN_ENTITY_STATE as PRJ_STATUS,"
-            "ARCHIVE_UID as OBSPROPOSAL_UID "
-            "FROM ALMA.BMMV_OBSPROJECT obs1, ALMA.OBS_PROJECT_STATUS obs2,"
-            " ALMA.BMMV_OBSPROPOSAL obs3 "
-            "WHERE regexp_like (CODE, '^201[23].*\.[AST]') "
-            "AND (PRJ_LETTER_GRADE='A' OR PRJ_LETTER_GRADE='B' "
-            "OR PRJ_LETTER_GRADE='C') "
-            "AND obs2.OBS_PROJECT_ID = obs1.PRJ_ARCHIVE_UID AND "
-            "obs1.PRJ_ARCHIVE_UID = obs3.PROJECTUID")
-
-        # Populate different dataframes related to projects and SBs statuses
-
-        # self.scheduling_proj: data frame with projects at SCHEDULING_AOS
-        # Query Projects currently on SCHEDULING_AOS
-        self.sqlsched_proj = str(
-            "SELECT CODE,OBSPROJECT_UID as OBSPROJECT_UID,"
-            "VERSION as PRJ_SAOS_VERSION, STATUS as PRJ_SAOS_STATUS "
-            "FROM SCHEDULING_AOS.OBSPROJECT "
-            "WHERE regexp_like (CODE, '^201[23].*\.[AST]')")
-        self.cursor.execute(self.sqlsched_proj)
-        self.saos_obsproject = pd.DataFrame(
-            self.cursor.fetchall(),
-            columns=[rec[0] for rec in self.cursor.description]
-        ).set_index('CODE', drop=False)
-
-        # self.scheduling_sb: SBs at SCHEDULING_AOS
-        # Query SBs in the SCHEDULING_AOS tables
-        self.sqlsched_sb = str(
-            "SELECT ou.OBSUNIT_UID as OUS_ID, sb.NAME as SB_NAME,"
-            "sb.SCHEDBLOCK_CTRL_EXEC_COUNT,"
-            "sb.SCHEDBLOCK_CTRL_STATE as SB_SAOS_STATUS,"
-            "ou.OBSUNIT_PROJECT_UID as OBSPROJECT_UID "
-            "FROM SCHEDULING_AOS.SCHEDBLOCK sb, SCHEDULING_AOS.OBSUNIT ou "
-            "WHERE sb.SCHEDBLOCKID = ou.OBSUNITID AND sb.CSV = 0")
-        self.cursor.execute(self.sqlsched_sb)
-        self.saos_schedblock = pd.DataFrame(
-            self.cursor.fetchall(),
-            columns=[rec[0] for rec in self.cursor.description]
-        ).set_index('OUS_ID', drop=False)
-
-        # self.sbstates: SBs status (PT?)
-        # Query SBs status
-        self.sqlstates = str(
-            "SELECT DOMAIN_ENTITY_STATE as SB_STATE,"
-            "DOMAIN_ENTITY_ID as SB_UID,OBS_PROJECT_ID as OBSPROJECT_UID "
-            "FROM ALMA.SCHED_BLOCK_STATUS")
-        self.cursor.execute(self.sqlstates)
-        self.sb_status = pd.DataFrame(
-            self.cursor.fetchall(),
-            columns=[rec[0] for rec in self.cursor.description]
-        ).set_index('SB_UID', drop=False)
-
-        # self.qa0: QAO flags for observed SBs
-        # Query QA0 flags from AQUA tables
-        self.sqlqa0 = str(
-            "SELECT SCHEDBLOCKUID as SB_UID,QA0STATUS "
-            "FROM ALMA.AQUA_EXECBLOCK "
-            "WHERE regexp_like (OBSPROJECTCODE, '^201[23].*\.[AST]')")
-
-        self.cursor.execute(self.sqlqa0)
-        self.aqua_execblock = pd.DataFrame(
-            self.cursor.fetchall(),
-            columns=[rec[0] for rec in self.cursor.description]
-        ).set_index('SB_UID', drop=False)
-
-        # Query for Executives
-        sql2 = str(
-            "SELECT PROJECTUID as OBSPROJECT_UID, ASSOCIATEDEXEC "
-            "FROM ALMA.BMMV_OBSPROPOSAL "
-            "WHERE regexp_like (CYCLE, '^201[23].[1A]')")
-        self.cursor.execute(sql2)
-        self.executive = pd.DataFrame(
-            self.cursor.fetchall(), columns=['OBSPROJECT_UID', 'EXEC'])
-
         # Initialize with saved data and update, Default behavior.
         if not self.new:
             try:
@@ -175,7 +92,8 @@ class WtoDatabase(object):
                     self.path + 'saos_schedblock.pandas')
                 self.sg_targets = pd.read_pickle(
                     self.path + 'sg_targets')
-            except IOError:
+            except IOError, e:
+                print e
                 self.new = True
 
         # Create main dataframes
@@ -185,6 +103,88 @@ class WtoDatabase(object):
             os.mkdir(self.path)
             os.mkdir(self.sbxml)
             os.mkdir(self.obsxml)
+            # Global Oracle Connection
+            self.connection = cx_Oracle.connect(conx_string)
+            self.cursor = self.connection.cursor()
+
+            # Global SQL search expressions
+            # Search Project's PT information and match with PT Status
+            self.sql1 = str(
+                "SELECT PRJ_ARCHIVE_UID as OBSPROJECT_UID,PI,PRJ_NAME,"
+                "CODE,PRJ_SCIENTIFIC_RANK,PRJ_VERSION,"
+                "PRJ_LETTER_GRADE,DOMAIN_ENTITY_STATE as PRJ_STATUS,"
+                "ARCHIVE_UID as OBSPROPOSAL_UID "
+                "FROM ALMA.BMMV_OBSPROJECT obs1, ALMA.OBS_PROJECT_STATUS obs2,"
+                " ALMA.BMMV_OBSPROPOSAL obs3 "
+                "WHERE regexp_like (CODE, '^201[23].*\.[AST]') "
+                "AND (PRJ_LETTER_GRADE='A' OR PRJ_LETTER_GRADE='B' "
+                "OR PRJ_LETTER_GRADE='C') "
+                "AND obs2.OBS_PROJECT_ID = obs1.PRJ_ARCHIVE_UID AND "
+                "obs1.PRJ_ARCHIVE_UID = obs3.PROJECTUID")
+
+            # Populate different dataframes related to projects and SBs statuses
+
+            # self.scheduling_proj: data frame with projects at SCHEDULING_AOS
+            # Query Projects currently on SCHEDULING_AOS
+            self.sqlsched_proj = str(
+                "SELECT CODE,OBSPROJECT_UID as OBSPROJECT_UID,"
+                "VERSION as PRJ_SAOS_VERSION, STATUS as PRJ_SAOS_STATUS "
+                "FROM SCHEDULING_AOS.OBSPROJECT "
+                "WHERE regexp_like (CODE, '^201[23].*\.[AST]')")
+            self.cursor.execute(self.sqlsched_proj)
+            self.saos_obsproject = pd.DataFrame(
+                self.cursor.fetchall(),
+                columns=[rec[0] for rec in self.cursor.description]
+            ).set_index('CODE', drop=False)
+
+            # self.scheduling_sb: SBs at SCHEDULING_AOS
+            # Query SBs in the SCHEDULING_AOS tables
+            self.sqlsched_sb = str(
+                "SELECT ou.OBSUNIT_UID as OUS_ID, sb.NAME as SB_NAME,"
+                "sb.SCHEDBLOCK_CTRL_EXEC_COUNT,"
+                "sb.SCHEDBLOCK_CTRL_STATE as SB_SAOS_STATUS,"
+                "ou.OBSUNIT_PROJECT_UID as OBSPROJECT_UID "
+                "FROM SCHEDULING_AOS.SCHEDBLOCK sb, SCHEDULING_AOS.OBSUNIT ou "
+                "WHERE sb.SCHEDBLOCKID = ou.OBSUNITID AND sb.CSV = 0")
+            self.cursor.execute(self.sqlsched_sb)
+            self.saos_schedblock = pd.DataFrame(
+                self.cursor.fetchall(),
+                columns=[rec[0] for rec in self.cursor.description]
+            ).set_index('OUS_ID', drop=False)
+
+            # self.sbstates: SBs status (PT?)
+            # Query SBs status
+            self.sqlstates = str(
+                "SELECT DOMAIN_ENTITY_STATE as SB_STATE,"
+                "DOMAIN_ENTITY_ID as SB_UID,OBS_PROJECT_ID as OBSPROJECT_UID "
+                "FROM ALMA.SCHED_BLOCK_STATUS")
+            self.cursor.execute(self.sqlstates)
+            self.sb_status = pd.DataFrame(
+                self.cursor.fetchall(),
+                columns=[rec[0] for rec in self.cursor.description]
+            ).set_index('SB_UID', drop=False)
+
+            # self.qa0: QAO flags for observed SBs
+            # Query QA0 flags from AQUA tables
+            self.sqlqa0 = str(
+                "SELECT SCHEDBLOCKUID as SB_UID,QA0STATUS "
+                "FROM ALMA.AQUA_EXECBLOCK "
+                "WHERE regexp_like (OBSPROJECTCODE, '^201[23].*\.[AST]')")
+
+            self.cursor.execute(self.sqlqa0)
+            self.aqua_execblock = pd.DataFrame(
+                self.cursor.fetchall(),
+                columns=[rec[0] for rec in self.cursor.description]
+            ).set_index('SB_UID', drop=False)
+
+            # Query for Executives
+            sql2 = str(
+                "SELECT PROJECTUID as OBSPROJECT_UID, ASSOCIATEDEXEC "
+                "FROM ALMA.BMMV_OBSPROPOSAL "
+                "WHERE regexp_like (CYCLE, '^201[23].[1A]')")
+            self.cursor.execute(sql2)
+            self.executive = pd.DataFrame(
+                self.cursor.fetchall(), columns=['OBSPROJECT_UID', 'EXEC'])
             self.start_wto()
 
     def start_wto(self):
@@ -257,9 +257,14 @@ class WtoDatabase(object):
             self.path + 'sg_targets')
 
     def process_wto(self):
-        for sg_sb in self.sg_sbs.iterrows():
-            self.read_schedblocks(sg_sb[1].SB_UID, sg_sb[1].OBSPROJECT_UID,
-                                  sg_sb[1].OUS_ID, new=True)
+        try:
+            self.schedblocks = pd.read_pickle(
+                self.path + 'schedblocks.pandas')
+        except IOError:
+            for sg_sb in self.sg_sbs.iterrows():
+                self.read_schedblocks(sg_sb[1].SB_UID, sg_sb[1].OBSPROJECT_UID,
+                                      sg_sb[1].OUS_ID, new=True)
+            self.schedblocks.to_pickle(self.path + 'schedblocks.pandas')
 
     def get_projectxml(self, code, state, n, c):
         """
@@ -579,6 +584,11 @@ class WtoDatabase(object):
         array = xml.data.findall(
             './/' + prj + 'ObsUnitControl')[0].attrib['arrayRequested']
         name = xml.data.findall('.//' + prj + 'name')[0].pyval
+        type12m = 'None'
+        if name.rfind('TC') != -1:
+            type12m = 'Comp'
+        elif array == 'TWELVE-M':
+            type12m = 'Ext'
         status = xml.data.attrib['status']
 
         schedconstr = xml.data.SchedulingConstraints
@@ -639,17 +649,17 @@ class WtoDatabase(object):
                 sb_uid, obs_uid, sg_id, ous_id,
                 name, status, repfreq, band, array,
                 ra, dec, minar_old, maxar_old, execount,
-                ispolarization, maxpwv)
+                ispolarization, maxpwv, type12m)
         except AttributeError:
             self.schedblocks = pd.DataFrame(
                 [(sb_uid, obs_uid, sg_id, ous_id,
                   name, status, repfreq, band, array,
                   ra, dec, minar_old, maxar_old, execount,
-                  ispolarization, maxpwv)],
+                  ispolarization, maxpwv, type12m)],
                 columns=['SB_UID', 'OBSPROJECT_UID', 'SG_ID', 'OUS_ID',
                          'sbName', 'sbStatusXml', 'repfreq', 'band', 'array',
                          'RA', 'DEC', 'minAR_ot', 'maxAR_ot', 'execount',
-                         'isPolarization', 'maxPWVC'],
+                         'isPolarization', 'maxPWVC', 'array12mType'],
                 index=[sb_uid])
 
     def read_fieldsource(self, fs, sbuid, array, new=False):
@@ -797,6 +807,29 @@ def needs2(AR, LAS):
     else:
         return False
 
+
+def twelvem_sbs(qa0, sciencegoals, schedblocks, wto_path):
+    qa0group = qa0.groupby(['SB_UID', 'QA0STATUS'])
+    qa0count = qa0group.QA0STATUS.count().unstack()
+
+    for sg in sciencegoals.iterrows():
+        if sg.hasSB and sg.isPhaseII:
+            pass
+        elif not sg.isPhaseII:
+            sbnum = 1
+            useaca = 'N'
+            ar = sg.AR
+            las = sg.LAS
+            repfreq = sg.repFreq
+            if sg.two_12m:
+                sbnum = 2
+            if sg.useACA:
+                useaca = 'N'
+            newAR = ARes.arrayRes(
+                [wto_path, ar, las, repfreq, useaca, sbnum])
+            newAR.silentRun()
+            print newAR.run()
+    pass
 
 class ObsProposal(object):
     """
