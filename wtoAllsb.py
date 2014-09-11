@@ -260,12 +260,12 @@ class WtoDatabase(object):
             self.path + 'targets_proj')
 
         # Second Step, read SBs
-        for sg_sb in self.sg_schedblock.iterrows():
+        for sg_sb in self.sg_sbs.iterrows():
             self.row_schedblocks(sg_sb[1].SB_UID, sg_sb[1].OBSPROJECT_UID,
                                  sg_sb[1].OUS_ID, new=True)
 
     def process_wto(self):
-        for sg_sb in self.sg_schedblock.iterrows():
+        for sg_sb in self.sg_sbs.iterrows():
             self.row_schedblocks(sg_sb[1].SB_UID, sg_sb[1].OBSPROJECT_UID,
                                  sg_sb[1].OUS_ID, new=True)
 
@@ -616,7 +616,7 @@ class WtoDatabase(object):
         :param sb_uid:
         :param new:
         """
-        sb = self.sg_schedblock.ix[sb_uid]
+        sb = self.sg_sbs.ix[sb_uid]
         xml = SchedBlocK(sb.xmlfile, self.sbxml)
         new_orig = new
         # Extract root level data
