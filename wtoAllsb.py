@@ -344,7 +344,7 @@ class WtoDatabase(object):
         sg_list = obsprog.findall(prj + 'ScienceGoal')
         c = 0
         for sg in sg_list:
-            self.read_sciencegoals(sg, obsproject_uid, c + 1, obsprog, True)
+            self.read_sciencegoals(sg, obsproject_uid, c + 1, True, obsprog)
             c += 1
 
     def read_obsproposal(self, xml, code):
