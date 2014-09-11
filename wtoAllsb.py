@@ -109,7 +109,7 @@ class WtoDatabase(object):
         # self.scheduling_sb: SBs at SCHEDULING_AOS
         # Query SBs in the SCHEDULING_AOS tables
         self.sqlsched_sb = str(
-            "SELECT ou.OBSUNIT_UID as OUS_UID, sb.NAME as SB_NAME,"
+            "SELECT ou.OBSUNIT_UID as OUS_ID, sb.NAME as SB_NAME,"
             "sb.SCHEDBLOCK_CTRL_EXEC_COUNT,"
             "sb.SCHEDBLOCK_CTRL_STATE as SB_SAOS_STATUS,"
             "ou.OBSUNIT_PROJECT_UID as OBSPROJECT_UID "
@@ -119,7 +119,7 @@ class WtoDatabase(object):
         self.saos_schedblock = pd.DataFrame(
             self.cursor.fetchall(),
             columns=[rec[0] for rec in self.cursor.description]
-        ).set_index('OUS_UID', drop=False)
+        ).set_index('OUS_ID', drop=False)
 
         # self.sbstates: SBs status (PT?)
         # Query SBs status
@@ -240,8 +240,8 @@ class WtoDatabase(object):
                 self.read_obsproposal(xmlfilename, r[1].CODE)
         self.projects.to_pickle(
             self.path + 'projects.pandas')
-        self.sg_schedblock.to_pickle(
-            self.path + 'sg_schedblock.pandas')
+        self.sg_sbs.to_pickle(
+            self.path + 'sg_sbs.pandas')
         self.sciencegoals.to_pickle(
             self.path + 'sciencegoals.pandas')
         self.aqua_execblock.to_pickle(
@@ -260,7 +260,14 @@ class WtoDatabase(object):
             self.path + 'targets_proj')
 
         # Second Step, read SBs
+        for sg_sb in self.sg_schedblock.iterrows():
+            self.row_schedblocks(sg_sb[1].SB_UID, sg_sb[1].OBSPROJECT_UID,
+                                 sg_sb[1].OUS_ID, new=True)
 
+    def process_wto(self):
+        for sg_sb in self.sg_schedblock.iterrows():
+            self.row_schedblocks(sg_sb[1].SB_UID, sg_sb[1].OBSPROJECT_UID,
+                                 sg_sb[1].OUS_ID, new=True)
 
     def get_projectxml(self, code, state, n, c):
         """
@@ -337,61 +344,8 @@ class WtoDatabase(object):
         sg_list = obsprog.findall(prj + 'ScienceGoal')
         c = 0
         for sg in sg_list:
-            self.read_sciencegoals(sg, obsproject_uid, c + 1)
+            self.read_sciencegoals(sg, obsproject_uid, c + 1, obsprog, True)
             c += 1
-
-        oussg_list = obsprog.ObsPlan.findall(prj + 'ObsUnitSet')
-        for oussg in oussg_list:
-            groupous_list = oussg.findall(prj + 'ObsUnitSet')
-            OUS_ID = oussg.attrib['entityPartId']
-            oussg_name = oussg.name.pyval
-            OBSPROJECT_UID = oussg.ObsProjectRef.attrib['entityId']
-            for groupous in groupous_list:
-                groupous_id = groupous.attrib['entityPartId']
-                memous_list = groupous.findall(prj + 'ObsUnitSet')
-                groupous_name = groupous.name.pyval
-                for memous in memous_list:
-                    memous_id = memous.attrib['entityPartId']
-                    memous_name = memous.name.pyval
-                    try:
-                        SB_UID = memous.SchedBlockRef.attrib['entityId']
-                    except AttributeError:
-                        continue
-
-                    oucontrol = memous.ObsUnitControl
-                    execount = oucontrol.aggregatedExecutionCount.pyval
-                    array = memous.ObsUnitControl.attrib['arrayRequested']
-                    sql = "SELECT TIMESTAMP, XMLTYPE.getClobVal(xml) " \
-                          "FROM ALMA.xml_schedblock_entities " \
-                          "WHERE archive_uid = '%s'" % SB_UID
-                    self.cursor.execute(sql)
-                    data = self.cursor.fetchall()
-                    xml_content = data[0][1].read()
-                    filename = SB_UID.replace(':', '_').replace('/', '_') +\
-                        '.xml'
-                    io_file = open(self.sbxml + filename, 'w')
-                    io_file.write(xml_content)
-                    io_file.close()
-                    xml = filename
-
-                    if array == 'ACA':
-                        array = 'SEVEN-M'
-                    try:
-                        self.sg_schedblock.ix[SB_UID] = (
-                            OBSPROJECT_UID, OUS_ID, oussg_name, groupous_id,
-                            groupous_name, memous_id, memous_name, SB_UID,
-                            array, execount, xml)
-                    except AttributeError:
-                        self.sg_schedblock = pd.DataFrame(
-                            [(OBSPROJECT_UID, OUS_ID, oussg_name, groupous_id,
-                              groupous_name, memous_id, memous_name, SB_UID,
-                              array, execount, xml)],
-                            columns=['OBSPROJECT_UID', 'OUS_ID', 'oussg_name',
-                                     'groupous_id', 'groupous_name',
-                                     'memous_id', 'memous_name', 'SB_UID',
-                                     'array', 'execount', 'xmlfile'],
-                            index=[SB_UID]
-                        )
 
     def read_obsproposal(self, xml, code):
 
@@ -424,10 +378,10 @@ class WtoDatabase(object):
         sg_list = obsparse.data.findall(prj + 'ScienceGoal')
         c = 0
         for sg in sg_list:
-            self.read_sciencegoals(sg, obsproject_uid, c + 1)
+            self.read_sciencegoals(sg, obsproject_uid, c + 1, False, None)
             c += 1
 
-    def read_sciencegoals(self, sg, obsproject_uid, idnum):
+    def read_sciencegoals(self, sg, obsproject_uid, idnum, isObsproj, obsprog):
 
         sg_id = obsproject_uid + '_' + str(idnum)
         try:
@@ -440,9 +394,6 @@ class WtoDatabase(object):
         bands = sg.findall(prj + 'requiredReceiverBands')[0].pyval
         estimatedTime = convert_tsec(sg.estimatedTotalTime.pyval,
                                      sg.estimatedTotalTime.attrib['unit'])
-        e12mTime = 0
-        eACATime = 0
-        eTPTime = 0
 
         performance = sg.PerformanceParameters
         AR = convert_sec(
@@ -484,19 +435,19 @@ class WtoDatabase(object):
 
         try:
             self.sciencegoals.ix[sg_id] = (
-                obsproject_uid, ous_id, sg_name, bands, estimatedTime,
+                sg_id, obsproject_uid, ous_id, sg_name, bands, estimatedTime,
                 extendedTime, compactTime, sevenTime, TPTime, AR, LAS, ARcor,
                 LAScor, sensitivity, useACA, useTP, isTimeConstrained, repFreq,
                 isPointSource, polarization, type_pol, hasSB, two_12m,
                 num_targets)
         except AttributeError:
             self.sciencegoals = pd.DataFrame(
-                [(obsproject_uid, ous_id, sg_name, bands, estimatedTime,
+                [(sg_id, obsproject_uid, ous_id, sg_name, bands, estimatedTime,
                   extendedTime, compactTime, sevenTime, TPTime, AR, LAS, ARcor,
                   LAScor, sensitivity, useACA, useTP, isTimeConstrained,
                   repFreq, isPointSource, polarization, type_pol, hasSB,
                   two_12m, num_targets)],
-                columns=['OBSPROJECT_UID', 'OUS_UID', 'sg_name', 'band',
+                columns=['sg_id', 'OBSPROJECT_UID', 'OUS_ID', 'sg_name', 'band',
                          'estimatedTime', 'eExt12Time', 'eComp12Time',
                          'eACATime', 'eTPTime',
                          'AR', 'LAS', 'ARcor', 'LAScor', 'sensitivity',
@@ -505,6 +456,63 @@ class WtoDatabase(object):
                          'two_12m', 'num_targets'],
                 index=[sg_id]
             )
+
+        if isObsproj:
+            oussg_list = obsprog.ObsPlan.findall(prj + 'ObsUnitSet')
+            for oussg in oussg_list:
+                groupous_list = oussg.findall(prj + 'ObsUnitSet')
+                OUS_ID = oussg.attrib['entityPartId']
+                oussg_name = oussg.name.pyval
+                OBSPROJECT_UID = oussg.ObsProjectRef.attrib['entityId']
+                for groupous in groupous_list:
+                    groupous_id = groupous.attrib['entityPartId']
+                    memous_list = groupous.findall(prj + 'ObsUnitSet')
+                    groupous_name = groupous.name.pyval
+                    for memous in memous_list:
+                        memous_id = memous.attrib['entityPartId']
+                        memous_name = memous.name.pyval
+                        try:
+                            SB_UID = memous.SchedBlockRef.attrib['entityId']
+                        except AttributeError:
+                            continue
+
+                        oucontrol = memous.ObsUnitControl
+                        execount = oucontrol.aggregatedExecutionCount.pyval
+                        array = memous.ObsUnitControl.attrib['arrayRequested']
+                        sql = "SELECT TIMESTAMP, XMLTYPE.getClobVal(xml) " \
+                              "FROM ALMA.xml_schedblock_entities " \
+                              "WHERE archive_uid = '%s'" % SB_UID
+                        self.cursor.execute(sql)
+                        data = self.cursor.fetchall()
+                        xml_content = data[0][1].read()
+                        filename = SB_UID.replace(':', '_').replace('/', '_') +\
+                            '.xml'
+                        io_file = open(self.sbxml + filename, 'w')
+                        io_file.write(xml_content)
+                        io_file.close()
+                        xml = filename
+
+                        if array == 'ACA':
+                            array = 'SEVEN-M'
+                        try:
+                            self.sg_sbs.ix[SB_UID] = (
+                                OBSPROJECT_UID, OUS_ID, sg_id, oussg_name,
+                                groupous_id,
+                                groupous_name, memous_id, memous_name, SB_UID,
+                                array, execount, xml)
+                        except AttributeError:
+                            self.sg_sbs = pd.DataFrame(
+                                [(OBSPROJECT_UID, OUS_ID, sg_id, oussg_name,
+                                  groupous_id,
+                                  groupous_name, memous_id, memous_name, SB_UID,
+                                  array, execount, xml)],
+                                columns=['OBSPROJECT_UID', 'OUS_ID', 'sg_id',
+                                         'oussg_name',
+                                         'groupous_id', 'groupous_name',
+                                         'memous_id', 'memous_name', 'SB_UID',
+                                         'array', 'execount', 'xmlfile'],
+                                index=[SB_UID]
+                            )
 
     def read_pro_targets(self, target, sgid, obsp_uid, c):
 
@@ -539,7 +547,8 @@ class WtoDatabase(object):
                 index=[tid]
             )
 
-    def needs2(self, AR, LAS):
+    @staticmethod
+    def needs2(AR, LAS):
 
         if (0.57 > AR >= 0.41) and LAS >= 9.1:
             return True
@@ -552,7 +561,8 @@ class WtoDatabase(object):
         else:
             return False
 
-    def distributeTime(self, tiempo, doce, siete, single):
+    @staticmethod
+    def distributeTime(tiempo, doce, siete, single):
 
         if single and doce:
             timeU = tiempo / (1 + 0.5 + 2 + 4)
@@ -597,6 +607,304 @@ class WtoDatabase(object):
             self.projects, checked, on='CODE',
             copy=False, how='inner').set_index('CODE', drop=False)
         self.projects = temp
+
+    def row_schedblocks(self, sb_uid, obs_uid, ous_id, new=False):
+
+        # Open SB with SB parser class
+        """
+
+        :param sb_uid:
+        :param new:
+        """
+        sb = self.sg_schedblock.ix[sb_uid]
+        xml = SchedBlocK(sb.xmlfile, self.sbxml)
+        new_orig = new
+        # Extract root level data
+        array = xml.data.findall(
+            './/' + prj + 'ObsUnitControl')[0].attrib['arrayRequested']
+        name = xml.data.findall('.//' + prj + 'name')[0].pyval
+        status = xml.data.attrib['status']
+
+        schedconstr = xml.data.SchedulingConstraints
+        schedcontrol = xml.data.SchedBlockControl
+        preconditions = xml.data.Preconditions
+        weather = preconditions.findall('.//' + prj + 'WeatherConstraints')[0]
+
+        try:
+            ampliparam = xml.data.AmplitudeCalParameters
+            amplitude = str(ampliparam.attrib['entityPartId'])
+        except AttributeError:
+            amplitude = None
+
+        try:
+            phaseparam = xml.data.PhaseCalParameters
+            phase = str(phaseparam.attrib['entityPartId'])
+        except AttributeError:
+            phase = None
+
+        try:
+            bandpassparam = xml.data.BandpassCalParameters
+            bandpass = str(bandpassparam.attrib['entityPartId'])
+        except AttributeError:
+            bandpass = None
+        try:
+            polarparam = xml.data.PolarizationCalParameters
+            polarization = str(polarparam.attrib['entityPartId'])
+            ispolarization = True
+        except AttributeError:
+            ispolarization = False
+            polarization = None
+        try:
+            delayparam = xml.data.DelayCalParameters
+            delay = str(delayparam.attrib['entityPartId'])
+        except AttributeError:
+            delay = None
+        scienceparam = xml.data.ScienceParameters
+        science = str(scienceparam.attrib['entityPartId'])
+        integrationtime = scienceparam.integrationTime.pyval
+        integrationtime_unit = scienceparam.integrationTime.attrib['unit']
+        integrationtime = convert_tsec(integrationtime, integrationtime_unit)
+        subscandur = scienceparam.subScanDuration.pyval
+        subscandur_unit = scienceparam.subScanDuration.attrib['unit']
+        subscandur = convert_tsec(subscandur, subscandur_unit)
+
+        repfreq = schedconstr.representativeFrequency.pyval
+        ra = schedconstr.representativeCoordinates.findall(
+            val + 'longitude')[0].pyval
+        dec = schedconstr.representativeCoordinates.findall(
+            val + 'latitude')[0].pyval
+        minar_old = schedconstr.minAcceptableAngResolution.pyval
+        maxar_old = schedconstr.maxAcceptableAngResolution.pyval
+        band = schedconstr.attrib['representativeReceiverBand']
+
+        execount = schedcontrol.executionCount.pyval
+        maxpwv = weather.maxPWVC.pyval
+
+        n_fs = len(xml.data.FieldSource)
+        n_tg = len(xml.data.Target)
+        n_ss = len(xml.data.SpectralSpec)
+
+        for n in range(n_fs):
+            if new:
+                self.row_fieldsource(xml.data.FieldSource[n], sb_uid, array,
+                                     new=new)
+                new = False
+            else:
+                self.row_fieldsource(xml.data.FieldSource[n], sb_uid, array)
+
+        new = new_orig
+        for n in range(n_tg):
+            if new:
+                self.row_target(xml.data.Target[n], sb_uid, new=new)
+                new = False
+            else:
+                self.row_target(xml.data.Target[n], sb_uid)
+
+        new = new_orig
+        for n in range(n_ss):
+            if new:
+                self.row_spectralconf(xml.data.SpectralSpec[n], sb_uid, new=new)
+                new = False
+            else:
+                self.row_spectralconf(xml.data.SpectralSpec[n], sb_uid)
+
+        try:
+            self.schedblocks.ix[sb_uid] = (
+                sb_uid, obs_uid, ous_id, name, status,
+                repfreq, band, array, ra, dec, minar_old, maxar_old, execount,
+                ispolarization, amplitude, bandpass, polarization, phase, delay,
+                science, integrationtime, subscandur, maxpwv)
+        except AttributeError:
+            self.schedblocks = pd.DataFrame(
+                [(sb_uid, obs_uid, ous_id, name, status,
+                  repfreq, band, array, ra, dec, minar_old,
+                  maxar_old, execount, ispolarization, amplitude,
+                  bandpass, polarization, phase, delay,
+                  science, integrationtime, subscandur, maxpwv)],
+                columns=['SB_UID', 'OBSPROJECT_UID', 'OUS_ID', 'name',
+                         'status_xml', 'repfreq', 'band', 'array', 'RA', 'DEC',
+                         'minAR_old', 'maxAR_old', 'execount', 'isPolarization',
+                         'amplitude', 'bandpass', 'polarization', 'phase',
+                         'delay', 'science', 'integrationTime', 'subScandur',
+                         'maxPWVC'],
+                index=[sb_uid])
+
+    def row_fieldsource(self, fs, sbuid, array, new=False):
+        """
+
+        :param fs:
+        :param sbuid:
+        :param new:
+        """
+        partid = fs.attrib['entityPartId']
+        coord = fs.sourceCoordinates
+        solarsystem = fs.attrib['solarSystemObject']
+        sourcename = fs.sourceName.pyval
+        name = fs.name.pyval
+        isquery = fs.isQuery.pyval
+        pointings = len(fs.findall(sbl + 'PointingPattern/' + sbl +
+                                   'phaseCenterCoordinates'))
+        try:
+            ismosaic = fs.PointingPattern.isMosaic.pyval
+        except AttributeError:
+            ismosaic = False
+        if isquery:
+            querysource = fs.QuerySource
+            qc_intendeduse = querysource.attrib['intendedUse']
+            qcenter = querysource.queryCenter
+            qc_ra = qcenter.findall(val + 'longitude')[0].pyval
+            qc_dec = qcenter.findall(val + 'latitude')[0].pyval
+            qc_use = querysource.use.pyval
+            qc_radius = querysource.searchRadius.pyval
+            qc_radius_unit = querysource.searchRadius.attrib['unit']
+        else:
+            qc_intendeduse, qc_ra, qc_dec, qc_use, qc_radius, qc_radius_unit = (
+                None, None, None, None, None, None
+            )
+        ra = coord.findall(val + 'longitude')[0].pyval
+        dec = coord.findall(val + 'latitude')[0].pyval
+        if solarsystem == 'Ephemeris':
+            ephemeris = fs.sourceEphemeris.pyval
+        else:
+            ephemeris = None
+        if new:
+            self.fieldsource = pd.DataFrame(
+                [(partid, sbuid, solarsystem, sourcename, name, ra, dec,
+                  isquery, qc_intendeduse, qc_ra, qc_dec, qc_use, qc_radius,
+                  qc_radius_unit, ephemeris, pointings, ismosaic, array)],
+                columns=['fieldRef', 'SB_UID', 'solarSystem', 'sourcename',
+                         'name', 'RA',
+                         'DEC', 'isQuery', 'intendedUse', 'qRA', 'qDEC', 'use',
+                         'search_radius', 'rad_unit', 'ephemeris',
+                         'pointings', 'isMosaic', 'arraySB'],
+                index=[partid]
+            )
+        self.fieldsource.ix[partid] = (
+            partid, sbuid, solarsystem, sourcename, name, ra, dec, isquery,
+            qc_intendeduse, qc_ra, qc_dec, qc_use, qc_radius, qc_radius_unit,
+            ephemeris, pointings, ismosaic, array)
+
+    def row_target(self, tg, sbuid, new=False):
+        """
+
+        :param tg:
+        :param sbuid:
+        :param new:
+        """
+        partid = tg.attrib['entityPartId']
+        specref = tg.AbstractInstrumentSpecRef.attrib['partId']
+        fieldref = tg.FieldSourceRef.attrib['partId']
+        paramref = tg.ObservingParametersRef.attrib['partId']
+        if new:
+            self.target = pd.DataFrame(
+                [(sbuid, specref, fieldref, paramref)],
+                columns=['SB_UID', 'specRef', 'fieldRef', 'paramRef'],
+                index=[partid])
+        else:
+            self.target.ix[partid] = (sbuid, specref, fieldref, paramref)
+
+    def row_spectralconf(self, ss, sbuid, new=False):
+        """
+
+        :param ss:
+        :param sbuid:
+        :param new:
+        """
+        partid = ss.attrib['entityPartId']
+        try:
+            corrconf = ss.BLCorrelatorConfiguration
+            nbb = len(corrconf.BLBaseBandConfig)
+            nspw = 0
+            for n in range(nbb):
+                bbconf = corrconf.BLBaseBandConfig[n]
+                nspw += len(bbconf.BLSpectralWindow)
+        except AttributeError:
+            corrconf = ss.ACACorrelatorConfiguration
+            nbb = len(corrconf.ACABaseBandConfig)
+            nspw = 0
+            for n in range(nbb):
+                bbconf = corrconf.ACABaseBandConfig[n]
+                nspw += len(bbconf.ACASpectralWindow)
+        if new:
+            self.spectralconf = pd.DataFrame(
+                [(partid, sbuid, nbb, nspw)],
+                columns=['specRef', 'SB_UID', 'BaseBands', 'SPWs'],
+                index=[partid])
+        else:
+            self.spectralconf.ix[partid] = (partid, sbuid, nbb, nspw)
+
+    # def row_newar(self, sbuid, new=False):
+    #     """
+    #
+    #     :param sbuid:
+    #     :param new:
+    #     """
+    #     repfreq = schedblock.repFreq
+    #     dec = schedblock.DEC
+    #     c_bmax = 0.4001 / pd.np.cos(pd.np.radians(-23.0262015) -
+    #                                 pd.np.radians(dec)) + 0.6103
+    #     c_freq = repfreq / 100.
+    #     corr = c_freq / c_bmax
+    #     useaca = sg.useACA
+    #     if useaca:
+    #         useaca = 'Y'
+    #     else:
+    #         useaca = 'N'
+    #     ar = sg.AR
+    #     las = sg.LAS
+    #     name = sbinfo['name']
+    #     sbnum = 1
+    #     sbuidE = sbuid
+    #     if name.endswith('TC'):
+    #         name_e = name[:-2] + 'TE'
+    #         try:
+    #             sbinfoE = self.schedblock_info[
+    #                 (self.schedblock_info.name == name_e) &
+    #                 (self.schedblock_info.partId == pid)].ix[0]
+    #             sbnum = 2
+    #             sbuidE = sbinfoE.SB_UID
+    #             sbuidC = sbuid
+    #             print name, name_e
+    #         except IndexError:
+    #             print "Can't find TE for sb %s" % name
+    #             sbnum = 1
+    #     if name.endswith('TE'):
+    #         name_e = name[:-2] + 'TC'
+    #         try:
+    #             sbinfoC = self.schedblock_info[
+    #                 (self.schedblock_info.name == name_e) &
+    #                 (self.schedblock_info.partId == pid)].ix[0]
+    #             sbnum = 2
+    #             sbuidC = sbinfoC.SB_UID
+    #             print name, name_e
+    #         except IndexError:
+    #             sbnum = 1
+    #
+    #     newAR = ARes.arrayRes([self.wto_path, ar, las, repfreq, useaca, sbnum])
+    #     newAR.silentRun()
+    #     minarE, maxarE, minarC, maxarC = newAR.run()
+    #
+    #     if new and sbnum == 1:
+    #         self.newar = pd.DataFrame(
+    #             [(minarE, maxarE, minarE * corr, maxarE * corr)],
+    #             columns=['minAR', 'maxAR', 'arrayMinAR', 'arrayMaxAR'],
+    #             index=[sbuidE])
+    #     elif new and sbnum == 2:
+    #         self.newar = pd.DataFrame(
+    #             [(minarE, maxarE, minarE * corr, maxarE * corr)],
+    #             columns=['minAR', 'maxAR', 'arrayMinAR', 'arrayMaxAR'],
+    #             index=[sbuidE])
+    #         self.newar.ix[sbuidC] = (minarC, maxarC, minarC * corr,
+    #                                  maxarC * corr)
+    #     else:
+    #         if sbnum == 1:
+    #             self.newar.ix[sbuidE] = (minarE, maxarE, minarE * corr,
+    #                                      maxarE * corr)
+    #         if sbnum == 2:
+    #             self.newar.ix[sbuidE] = (minarE, maxarE, minarE * corr,
+    #                                      maxarE * corr)
+    #             self.newar.ix[sbuidC] = (minarC, maxarC, minarC * corr,
+    #                                      maxarC * corr)
 
 
 class ObsProposal(object):
