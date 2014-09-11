@@ -462,6 +462,8 @@ class WtoDatabase(object):
             for oussg in oussg_list:
                 groupous_list = oussg.findall(prj + 'ObsUnitSet')
                 OUS_ID = oussg.attrib['entityPartId']
+                if OUS_ID != ous_id:
+                    continue
                 oussg_name = oussg.name.pyval
                 OBSPROJECT_UID = oussg.ObsProjectRef.attrib['entityId']
                 for groupous in groupous_list:
@@ -617,6 +619,7 @@ class WtoDatabase(object):
         :param new:
         """
         sb = self.sg_sbs.ix[sb_uid]
+        sg_id = sb.sg_id
         xml = SchedBlocK(sb.xmlfile, self.sbxml)
         new_orig = new
         # Extract root level data
@@ -710,18 +713,18 @@ class WtoDatabase(object):
 
         try:
             self.schedblocks.ix[sb_uid] = (
-                sb_uid, obs_uid, ous_id, name, status,
+                sb_uid, sg_id, obs_uid, ous_id, name, status,
                 repfreq, band, array, ra, dec, minar_old, maxar_old, execount,
                 ispolarization, amplitude, bandpass, polarization, phase, delay,
                 science, integrationtime, subscandur, maxpwv)
         except AttributeError:
             self.schedblocks = pd.DataFrame(
-                [(sb_uid, obs_uid, ous_id, name, status,
+                [(sb_uid, sg_id, obs_uid, ous_id, name, status,
                   repfreq, band, array, ra, dec, minar_old,
                   maxar_old, execount, ispolarization, amplitude,
                   bandpass, polarization, phase, delay,
                   science, integrationtime, subscandur, maxpwv)],
-                columns=['SB_UID', 'OBSPROJECT_UID', 'OUS_ID', 'name',
+                columns=['SB_UID', 'sg_id', 'OBSPROJECT_UID', 'OUS_ID', 'name',
                          'status_xml', 'repfreq', 'band', 'array', 'RA', 'DEC',
                          'minAR_old', 'maxAR_old', 'execount', 'isPolarization',
                          'amplitude', 'bandpass', 'polarization', 'phase',
