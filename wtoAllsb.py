@@ -421,7 +421,7 @@ class WtoDatabase(object):
         ARcor = AR * repFreq / 100.
         LAScor = LAS * repFreq / 100.
 
-        two_12m = self.needs2(ARcor, LAScor)
+        two_12m = needs2(ARcor, LAScor)
         targets = sg.findall(prj + 'TargetParameters')
         num_targets = len(targets)
         c = 1
@@ -429,7 +429,7 @@ class WtoDatabase(object):
             self.read_pro_targets(t, sg_id, obsproject_uid, c)
             c += 1
 
-        extendedTime, compactTime, sevenTime, TPTime = self.distributeTime(
+        extendedTime, compactTime, sevenTime, TPTime = distributeTime(
             estimatedTime, two_12m, useACA, useTP
         )
 
@@ -439,21 +439,21 @@ class WtoDatabase(object):
                 extendedTime, compactTime, sevenTime, TPTime, AR, LAS, ARcor,
                 LAScor, sensitivity, useACA, useTP, isTimeConstrained, repFreq,
                 isPointSource, polarization, type_pol, hasSB, two_12m,
-                num_targets)
+                num_targets, isObsproj)
         except AttributeError:
             self.sciencegoals = pd.DataFrame(
                 [(sg_id, obsproject_uid, ous_id, sg_name, bands, estimatedTime,
                   extendedTime, compactTime, sevenTime, TPTime, AR, LAS, ARcor,
                   LAScor, sensitivity, useACA, useTP, isTimeConstrained,
                   repFreq, isPointSource, polarization, type_pol, hasSB,
-                  two_12m, num_targets)],
-                columns=['sg_id', 'OBSPROJECT_UID', 'OUS_ID', 'sg_name', 'band',
+                  two_12m, num_targets, isObsproj)],
+                columns=['SG_ID', 'OBSPROJECT_UID', 'OUS_ID', 'sg_name', 'band',
                          'estimatedTime', 'eExt12Time', 'eComp12Time',
                          'eACATime', 'eTPTime',
                          'AR', 'LAS', 'ARcor', 'LAScor', 'sensitivity',
                          'useACA', 'useTP', 'isTimeConstrained', 'repFreq',
                          'isPointSource', 'polarization', 'type', 'hasSB',
-                         'two_12m', 'num_targets'],
+                         'two_12m', 'num_targets', 'isPhaseII'],
                 index=[sg_id]
             )
 
@@ -464,23 +464,22 @@ class WtoDatabase(object):
                 OUS_ID = oussg.attrib['entityPartId']
                 if OUS_ID != ous_id:
                     continue
-                oussg_name = oussg.name.pyval
+                ous_name = oussg.name.pyval
                 OBSPROJECT_UID = oussg.ObsProjectRef.attrib['entityId']
                 for groupous in groupous_list:
-                    groupous_id = groupous.attrib['entityPartId']
-                    memous_list = groupous.findall(prj + 'ObsUnitSet')
-                    groupous_name = groupous.name.pyval
-                    for memous in memous_list:
-                        memous_id = memous.attrib['entityPartId']
-                        memous_name = memous.name.pyval
+                    gous_id = groupous.attrib['entityPartId']
+                    mous_list = groupous.findall(prj + 'ObsUnitSet')
+                    gous_name = groupous.name.pyval
+                    for mous in mous_list:
+                        mous_id = mous.attrib['entityPartId']
+                        mous_name = mous.name.pyval
                         try:
-                            SB_UID = memous.SchedBlockRef.attrib['entityId']
+                            SB_UID = mous.SchedBlockRef.attrib['entityId']
                         except AttributeError:
                             continue
-
-                        oucontrol = memous.ObsUnitControl
+                        oucontrol = mous.ObsUnitControl
                         execount = oucontrol.aggregatedExecutionCount.pyval
-                        array = memous.ObsUnitControl.attrib['arrayRequested']
+                        array = mous.ObsUnitControl.attrib['arrayRequested']
                         sql = "SELECT TIMESTAMP, XMLTYPE.getClobVal(xml) " \
                               "FROM ALMA.xml_schedblock_entities " \
                               "WHERE archive_uid = '%s'" % SB_UID
@@ -498,21 +497,21 @@ class WtoDatabase(object):
                             array = 'SEVEN-M'
                         try:
                             self.sg_sbs.ix[SB_UID] = (
-                                OBSPROJECT_UID, OUS_ID, sg_id, oussg_name,
-                                groupous_id,
-                                groupous_name, memous_id, memous_name, SB_UID,
+                                SB_UID, OBSPROJECT_UID, sg_id,
+                                ous_id, ous_name, gous_id,
+                                gous_name, mous_id, mous_name,
                                 array, execount, xml)
                         except AttributeError:
                             self.sg_sbs = pd.DataFrame(
-                                [(OBSPROJECT_UID, OUS_ID, sg_id, oussg_name,
-                                  groupous_id,
-                                  groupous_name, memous_id, memous_name, SB_UID,
+                                [(SB_UID, OBSPROJECT_UID, sg_id,
+                                  ous_id, ous_name, gous_id,
+                                  gous_name, mous_id, mous_name,
                                   array, execount, xml)],
-                                columns=['OBSPROJECT_UID', 'OUS_ID', 'sg_id',
-                                         'oussg_name',
-                                         'groupous_id', 'groupous_name',
-                                         'memous_id', 'memous_name', 'SB_UID',
-                                         'array', 'execount', 'xmlfile'],
+                                columns=[
+                                    'SB_UID', 'OBSPROJECT_UID', 'SG_ID',
+                                    'OUS_ID', 'ous_name', 'GOUS_ID',
+                                    'gous_name', 'MOUS_ID', 'mous_name',
+                                    'array', 'execount', 'xmlfile'],
                                 index=[SB_UID]
                             )
 
@@ -537,55 +536,17 @@ class WtoDatabase(object):
             isMosaic = None
 
         try:
-            self.targets_proj.ix[tid] = (
-                obsp_uid, sgid, typetar, solarSystem, sourceName, ra, dec,
+            self.targets_sg.ix[tid] = (
+                tid, obsp_uid, sgid, typetar, solarSystem, sourceName, ra, dec,
                 isMosaic)
         except AttributeError:
-            self.targets_proj = pd.DataFrame(
-                [(obsp_uid, sgid, typetar, solarSystem, sourceName, ra, dec,
-                 isMosaic)],
-                columns=['OBSPROJECT_UID', 'SG_ID', 'tartype', 'solarSystem',
-                         'sourceName', 'RA', 'DEC', 'isMosaic'],
+            self.targets_sg = pd.DataFrame(
+                [(tid, obsp_uid, sgid, typetar, solarSystem, sourceName, ra,
+                  dec, isMosaic)],
+                columns=['TARG_ID', 'OBSPROJECT_UID', 'SG_ID', 'tarType',
+                         'solarSystem', 'sourceName', 'RA', 'DEC', 'isMosaic'],
                 index=[tid]
             )
-
-    @staticmethod
-    def needs2(AR, LAS):
-
-        if (0.57 > AR >= 0.41) and LAS >= 9.1:
-            return True
-        elif (0.75 > AR >= 0.57) and LAS >= 9.1:
-            return True
-        elif (1.11 > AR >= 0.75) and LAS >= 14.4:
-            return True
-        elif (1.40 > AR >= 1.11) and LAS >= 18.0:
-            return True
-        else:
-            return False
-
-    @staticmethod
-    def distributeTime(tiempo, doce, siete, single):
-
-        if single and doce:
-            timeU = tiempo / (1 + 0.5 + 2 + 4)
-            return timeU, 0.5 * timeU, 2 * timeU, 4 * timeU
-        elif single and not doce:
-            timeU = tiempo / (1 + 2 + 4.)
-            return timeU, 0., 2 * timeU, 4 * timeU
-        elif siete and doce:
-            timeU = tiempo / (1 + 0.5 + 2.)
-            return timeU, 0.5 * timeU, 2 * timeU, 0.
-        elif siete and not doce:
-            timeU = tiempo / (1 + 2.)
-            return timeU, 0., 2 * timeU, 0.
-        elif doce:
-            timeU = tiempo / 1.5
-            return timeU, 0.5 * timeU, 0., 0.
-        elif not doce:
-            return tiempo, 0., 0., 0.
-        else:
-            print("couldn't distribute time...")
-            return None
 
     def filter_c1(self):
         """
@@ -634,42 +595,10 @@ class WtoDatabase(object):
         weather = preconditions.findall('.//' + prj + 'WeatherConstraints')[0]
 
         try:
-            ampliparam = xml.data.AmplitudeCalParameters
-            amplitude = str(ampliparam.attrib['entityPartId'])
-        except AttributeError:
-            amplitude = None
-
-        try:
-            phaseparam = xml.data.PhaseCalParameters
-            phase = str(phaseparam.attrib['entityPartId'])
-        except AttributeError:
-            phase = None
-
-        try:
-            bandpassparam = xml.data.BandpassCalParameters
-            bandpass = str(bandpassparam.attrib['entityPartId'])
-        except AttributeError:
-            bandpass = None
-        try:
             polarparam = xml.data.PolarizationCalParameters
-            polarization = str(polarparam.attrib['entityPartId'])
             ispolarization = True
         except AttributeError:
             ispolarization = False
-            polarization = None
-        try:
-            delayparam = xml.data.DelayCalParameters
-            delay = str(delayparam.attrib['entityPartId'])
-        except AttributeError:
-            delay = None
-        scienceparam = xml.data.ScienceParameters
-        science = str(scienceparam.attrib['entityPartId'])
-        integrationtime = scienceparam.integrationTime.pyval
-        integrationtime_unit = scienceparam.integrationTime.attrib['unit']
-        integrationtime = convert_tsec(integrationtime, integrationtime_unit)
-        subscandur = scienceparam.subScanDuration.pyval
-        subscandur_unit = scienceparam.subScanDuration.attrib['unit']
-        subscandur = convert_tsec(subscandur, subscandur_unit)
 
         repfreq = schedconstr.representativeFrequency.pyval
         ra = schedconstr.representativeCoordinates.findall(
@@ -713,23 +642,20 @@ class WtoDatabase(object):
 
         try:
             self.schedblocks.ix[sb_uid] = (
-                sb_uid, sg_id, obs_uid, ous_id, name, status,
-                repfreq, band, array, ra, dec, minar_old, maxar_old, execount,
-                ispolarization, amplitude, bandpass, polarization, phase, delay,
-                science, integrationtime, subscandur, maxpwv)
+                sb_uid, obs_uid, sg_id, ous_id,
+                name, status, repfreq, band, array,
+                ra, dec, minar_old, maxar_old, execount,
+                ispolarization, maxpwv)
         except AttributeError:
             self.schedblocks = pd.DataFrame(
-                [(sb_uid, sg_id, obs_uid, ous_id, name, status,
-                  repfreq, band, array, ra, dec, minar_old,
-                  maxar_old, execount, ispolarization, amplitude,
-                  bandpass, polarization, phase, delay,
-                  science, integrationtime, subscandur, maxpwv)],
-                columns=['SB_UID', 'sg_id', 'OBSPROJECT_UID', 'OUS_ID', 'name',
-                         'status_xml', 'repfreq', 'band', 'array', 'RA', 'DEC',
-                         'minAR_old', 'maxAR_old', 'execount', 'isPolarization',
-                         'amplitude', 'bandpass', 'polarization', 'phase',
-                         'delay', 'science', 'integrationTime', 'subScandur',
-                         'maxPWVC'],
+                [(sb_uid, obs_uid, sg_id, ous_id,
+                  name, status, repfreq, band, array,
+                  ra, dec, minar_old, maxar_old, execount,
+                  ispolarization, maxpwv)],
+                columns=['SB_UID', 'OBSPROJECT_UID', 'SG_ID', 'OUS_ID',
+                         'sbName', 'sbStatusXml', 'repfreq', 'band', 'array',
+                         'RA', 'DEC', 'minAR_ot', 'maxAR_ot', 'execount',
+                         'isPolarization', 'maxPWVC'],
                 index=[sb_uid])
 
     def row_fieldsource(self, fs, sbuid, array, new=False):
@@ -776,10 +702,9 @@ class WtoDatabase(object):
                   isquery, qc_intendeduse, qc_ra, qc_dec, qc_use, qc_radius,
                   qc_radius_unit, ephemeris, pointings, ismosaic, array)],
                 columns=['fieldRef', 'SB_UID', 'solarSystem', 'sourcename',
-                         'name', 'RA',
-                         'DEC', 'isQuery', 'intendedUse', 'qRA', 'qDEC', 'use',
-                         'search_radius', 'rad_unit', 'ephemeris',
-                         'pointings', 'isMosaic', 'arraySB'],
+                         'name', 'RA', 'DEC', 'isQuery', 'intendedUse', 'qRA',
+                         'qDEC', 'use', 'search_radius', 'rad_unit',
+                         'ephemeris', 'pointings', 'isMosaic', 'arraySB'],
                 index=[partid]
             )
         self.fieldsource.ix[partid] = (
@@ -800,11 +725,13 @@ class WtoDatabase(object):
         paramref = tg.ObservingParametersRef.attrib['partId']
         if new:
             self.target = pd.DataFrame(
-                [(sbuid, specref, fieldref, paramref)],
-                columns=['SB_UID', 'specRef', 'fieldRef', 'paramRef'],
+                [(partid, sbuid, specref, fieldref, paramref)],
+                columns=['targetId', 'SB_UID', 'specRef', 'fieldRef',
+                         'paramRef'],
                 index=[partid])
         else:
-            self.target.ix[partid] = (sbuid, specref, fieldref, paramref)
+            self.target.ix[partid] = (partid, sbuid, specref, fieldref,
+                                      paramref)
 
     def row_spectralconf(self, ss, sbuid, new=False):
         """
@@ -836,78 +763,43 @@ class WtoDatabase(object):
         else:
             self.spectralconf.ix[partid] = (partid, sbuid, nbb, nspw)
 
-    # def row_newar(self, sbuid, new=False):
-    #     """
-    #
-    #     :param sbuid:
-    #     :param new:
-    #     """
-    #     repfreq = schedblock.repFreq
-    #     dec = schedblock.DEC
-    #     c_bmax = 0.4001 / pd.np.cos(pd.np.radians(-23.0262015) -
-    #                                 pd.np.radians(dec)) + 0.6103
-    #     c_freq = repfreq / 100.
-    #     corr = c_freq / c_bmax
-    #     useaca = sg.useACA
-    #     if useaca:
-    #         useaca = 'Y'
-    #     else:
-    #         useaca = 'N'
-    #     ar = sg.AR
-    #     las = sg.LAS
-    #     name = sbinfo['name']
-    #     sbnum = 1
-    #     sbuidE = sbuid
-    #     if name.endswith('TC'):
-    #         name_e = name[:-2] + 'TE'
-    #         try:
-    #             sbinfoE = self.schedblock_info[
-    #                 (self.schedblock_info.name == name_e) &
-    #                 (self.schedblock_info.partId == pid)].ix[0]
-    #             sbnum = 2
-    #             sbuidE = sbinfoE.SB_UID
-    #             sbuidC = sbuid
-    #             print name, name_e
-    #         except IndexError:
-    #             print "Can't find TE for sb %s" % name
-    #             sbnum = 1
-    #     if name.endswith('TE'):
-    #         name_e = name[:-2] + 'TC'
-    #         try:
-    #             sbinfoC = self.schedblock_info[
-    #                 (self.schedblock_info.name == name_e) &
-    #                 (self.schedblock_info.partId == pid)].ix[0]
-    #             sbnum = 2
-    #             sbuidC = sbinfoC.SB_UID
-    #             print name, name_e
-    #         except IndexError:
-    #             sbnum = 1
-    #
-    #     newAR = ARes.arrayRes([self.wto_path, ar, las, repfreq, useaca, sbnum])
-    #     newAR.silentRun()
-    #     minarE, maxarE, minarC, maxarC = newAR.run()
-    #
-    #     if new and sbnum == 1:
-    #         self.newar = pd.DataFrame(
-    #             [(minarE, maxarE, minarE * corr, maxarE * corr)],
-    #             columns=['minAR', 'maxAR', 'arrayMinAR', 'arrayMaxAR'],
-    #             index=[sbuidE])
-    #     elif new and sbnum == 2:
-    #         self.newar = pd.DataFrame(
-    #             [(minarE, maxarE, minarE * corr, maxarE * corr)],
-    #             columns=['minAR', 'maxAR', 'arrayMinAR', 'arrayMaxAR'],
-    #             index=[sbuidE])
-    #         self.newar.ix[sbuidC] = (minarC, maxarC, minarC * corr,
-    #                                  maxarC * corr)
-    #     else:
-    #         if sbnum == 1:
-    #             self.newar.ix[sbuidE] = (minarE, maxarE, minarE * corr,
-    #                                      maxarE * corr)
-    #         if sbnum == 2:
-    #             self.newar.ix[sbuidE] = (minarE, maxarE, minarE * corr,
-    #                                      maxarE * corr)
-    #             self.newar.ix[sbuidC] = (minarC, maxarC, minarC * corr,
-    #                                      maxarC * corr)
+
+def distributeTime(tiempo, doce, siete, single):
+
+    if single and doce:
+        timeU = tiempo / (1 + 0.5 + 2 + 4)
+        return timeU, 0.5 * timeU, 2 * timeU, 4 * timeU
+    elif single and not doce:
+        timeU = tiempo / (1 + 2 + 4.)
+        return timeU, 0., 2 * timeU, 4 * timeU
+    elif siete and doce:
+        timeU = tiempo / (1 + 0.5 + 2.)
+        return timeU, 0.5 * timeU, 2 * timeU, 0.
+    elif siete and not doce:
+        timeU = tiempo / (1 + 2.)
+        return timeU, 0., 2 * timeU, 0.
+    elif doce:
+        timeU = tiempo / 1.5
+        return timeU, 0.5 * timeU, 0., 0.
+    elif not doce:
+        return tiempo, 0., 0., 0.
+    else:
+        print("couldn't distribute time...")
+        return None
+
+
+def needs2(AR, LAS):
+
+    if (0.57 > AR >= 0.41) and LAS >= 9.1:
+        return True
+    elif (0.75 > AR >= 0.57) and LAS >= 9.1:
+        return True
+    elif (1.11 > AR >= 0.75) and LAS >= 14.4:
+        return True
+    elif (1.40 > AR >= 1.11) and LAS >= 18.0:
+        return True
+    else:
+        return False
 
 
 class ObsProposal(object):
