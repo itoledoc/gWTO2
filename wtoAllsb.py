@@ -160,8 +160,8 @@ class WtoDatabase(object):
             try:
                 self.projects = pd.read_pickle(
                     self.path + 'projects.pandas')
-                self.sg_schedblock = pd.read_pickle(
-                    self.path + 'sg_schedblock.pandas')
+                self.sg_sbs = pd.read_pickle(
+                    self.path + 'sg_sbs.pandas')
                 self.sciencegoals = pd.read_pickle(
                     self.path + 'sciencegoals.pandas')
                 self.aqua_execblock = pd.read_pickle(
