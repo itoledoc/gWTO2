@@ -259,11 +259,6 @@ class WtoDatabase(object):
         self.targets_proj.to_pickle(
             self.path + 'targets_proj')
 
-        # Second Step, read SBs
-        for sg_sb in self.sg_sbs.iterrows():
-            self.row_schedblocks(sg_sb[1].SB_UID, sg_sb[1].OBSPROJECT_UID,
-                                 sg_sb[1].OUS_ID, new=True)
-
     def process_wto(self):
         for sg_sb in self.sg_sbs.iterrows():
             self.row_schedblocks(sg_sb[1].SB_UID, sg_sb[1].OBSPROJECT_UID,
