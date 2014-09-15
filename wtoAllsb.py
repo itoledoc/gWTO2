@@ -20,6 +20,17 @@ sbl = '{Alma/ObsPrep/SchedBlock}'
 pd.options.display.width = 200
 pd.options.display.max_columns = 55
 
+confDf = pd.DataFrame(
+    [('C34-1', 3.73, 2.49, 1.62, 1.08, 0.81, 0.57)],
+    columns=['Conf', 'ALMA_RB_03', 'ALMA_RB_04', 'ALMA_RB_06', 'ALMA_RB_07',
+             'ALMA_RB_08', 'ALMA_RB_09'],
+    index=['C34-1'])
+confDf.ix['C34-2'] = ('C34-2', 2.04, 1.36, 0.89, 0.59, 0.44, 0.31)
+confDf.ix['C34-3'] = ('C34-3', 1.4, 0.93, 0.61, 0.4, 0.3, 0.21)
+confDf.ix['C34-4'] = ('C34-4', 1.11, 0.74, 0.48, 0.32, 0.24, 0.17)
+confDf.ix['C34-5'] = ('C34-5', 0.75, 0.50, 0.33, 0.22, 0.16, 0.12)
+confDf.ix['C34-6'] = ('C34-6', 0.57, 0.38, 0.25, 0.16, 0.12, 0.09)
+confDf.ix['C34-7'] = ('C34-7', 0.41, 0.27, 0.18, 0.12, None, None)
 
 # noinspection PyPep8Naming
 class WtoDatabase(object):
@@ -411,8 +422,8 @@ class WtoDatabase(object):
             isTimeConstrained = None
         spectral = sg.SpectralSetupParameters
         repFreq = convert_ghz(
-            spectral.representativeFrequency.pyval,
-            spectral.representativeFrequency.attrib['unit'])
+            performance.representativeFrequency.pyval,
+            performance.representativeFrequency.attrib['unit'])
         polarization = spectral.attrib['polarisation']
         type_pol = spectral.attrib['type']
         ARcor = AR * repFreq / 100.
@@ -477,9 +488,10 @@ class WtoDatabase(object):
                         oucontrol = mous.ObsUnitControl
                         execount = oucontrol.aggregatedExecutionCount.pyval
                         array = mous.ObsUnitControl.attrib['arrayRequested']
-                        sql = "SELECT TIMESTAMP, XMLTYPE.getClobVal(xml) " \
-                              "FROM ALMA.xml_schedblock_entities " \
-                              "WHERE archive_uid = '%s'" % SB_UID
+                        sql = str(
+                            "SELECT TIMESTAMP, XMLTYPE.getClobVal(xml) "
+                            "FROM ALMA.xml_schedblock_entities "
+                            "WHERE archive_uid = '%s'" % SB_UID)
                         self.cursor.execute(sql)
                         data = self.cursor.fetchall()
                         xml_content = data[0][1].read()
@@ -808,28 +820,192 @@ def needs2(AR, LAS):
         return False
 
 
-def twelvem_sbs(qa0, sciencegoals, schedblocks, wto_path):
+def twelvem_sbs(qa0, sciencegoals, schedblocks, sgtargets, projects, wto_path):
     qa0group = qa0.groupby(['SB_UID', 'QA0STATUS'])
     qa0count = qa0group.QA0STATUS.count().unstack()
+    arrayt = schedblocks.groupby(
+        ['SG_ID', 'array12mType']
+    ).array12mType.count().unstack()
 
+    sbplus = pd.merge(
+        schedblocks.query('array == "TWELVE-M"')[
+            ['SG_ID', 'SB_UID', 'sbName', 'execount']],
+        qa0count, left_on='SB_UID', right_index=True, how='left').fillna(0)
+
+    c = 0
     for sg in sciencegoals.iterrows():
-        if sg.hasSB and sg.isPhaseII:
-            pass
-        elif not sg.isPhaseII:
-            sbnum = 1
-            useaca = 'N'
-            ar = sg.AR
-            las = sg.LAS
-            repfreq = sg.repFreq
-            if sg.two_12m:
+        # We assume that if a SG asks for two 12m configurations, there will be
+        # only two 12m SB present. However, we are not sure if this is true in
+        # the future. e.g. One science goal, two sources separated in the sky,
+        # two groupOUS with TC/TE 12m SBs.
+        sbnum = 1
+        useaca = 'N'
+        ar = sg[1].AR
+        las = sg[1].LAS
+        repfreq = sg[1].repFreq
+        conf = best_conf(ar, sg[1].band)
+        if sg[1].hasSB and sg[1].isPhaseII:
+            # Has SBs, merge SBs with same Configuration to calculate time left
+            # and correct wrong two 12m configuration assumptions.
+            compact = arrayt.ix[sg[1].SG_ID].Comp
+            sg_12sbs = sbplus[(sbplus.SG_ID == sg[1].SG_ID) &
+                              (sbplus.sbName.str.contains(
+                                  ' not', case=False) == False)]
+
+            if sg_12sbs.__len__() == 0:
+                print sg[1].SG_ID
+                continue
+            if compact == 1:
                 sbnum = 2
-            if sg.useACA:
-                useaca = 'N'
-            newAR = ARes.arrayRes(
-                [wto_path, ar, las, repfreq, useaca, sbnum])
-            newAR.silentRun()
-            print newAR.run()
-    pass
+                sbextended = sg_12sbs[sg_12sbs.sbName.str.contains('TE')].iloc[0]
+                sbextended_complete = 1. * sbextended.Pass / sbextended.execount
+                sbextended_UID = sbextended.SB_UID + '_TE'
+                sbcompact = sg_12sbs[sg_12sbs.sbName.str.contains('TC')].iloc[0]
+                sbcompact_complete = 1. * sbcompact.Pass / sbcompact.execount
+                sbcompact_UID = sbcompact.SB_UID + '_TC'
+
+            else:
+                SB_UID = sg_12sbs.iloc[0].SB_UID + '_all'
+                sbcomplete = 1. * sg_12sbs.sum().Pass / sg_12sbs.sum().execount
+
+            if sg[1].useACA:
+                useaca = 'Y'
+
+            if sg[1].two_12m and compact == 1:
+                extendedTime = sg[1].eExt12Time
+                compactTime = sg[1].eComp12Time
+            elif sg[1].two_12m and compact == 0:
+                extendedTime = sg[1].eExt12Time + sg[1].eComp12Time
+                compactTime = 0.
+            elif not sg[1].two_12m and compact == 1:
+                extendedTime = sg[1].eExt12Time * 1. / 1.5
+                compactTime = sg[1].eExt12Time * 0.5 / 1.5
+
+            RA, DEC = schedblocks[
+                (schedblocks.SG_ID == sg[1].SG_ID) &
+                (schedblocks.array == 'TWELVE-M')][
+                    ['RA', 'DEC']].iloc[0].tolist()
+
+        elif not sg[1].isPhaseII:
+            # Is PhaseI, create fake SBs
+            print "Create Fake"
+            SB_UID = 'SB_T'
+            sbcomplete = 0
+
+            if sg[1].two_12m:
+                sbnum = 2
+                sbextended_UID = 'SB_TE'
+                sbextended_complete = 0.
+                sbcompact_complete = 0.
+                sbcompact_UID = 'SB_TC'
+                estimatedTime = sg[1].estimatedTime
+                extendedTime = sg[1].eExt12Time
+                compactTime = sg[1].eComp12Time
+
+            if sg[1].useACA:
+                useaca = 'Y'
+
+            RA, DEC = sgtargets[
+                sgtargets.SG_ID == sg[1].SG_ID][
+                    ['RA', 'DEC']].iloc[0].tolist()
+
+        else:
+            print "What???, %s" % sg[1].SG_ID
+            continue
+
+        newAR = ARes.arrayRes(
+            [wto_path, ar, las, repfreq, useaca, sbnum])
+        newAR.silentRun()
+        minarE, maxarE, minarC, maxarC = newAR.run()
+
+        try:
+            type(df)
+        except NameError:
+            df = pd.DataFrame(
+                None, columns=[
+                    'SG_ID', 'SB', 'RA', 'DEC', 'repFreq', 'minAR', 'maxAR',
+                    'AR', 'LAS', 'completion', 'estimatedTime', 'bestConf'])
+
+        if sbnum == 2:
+            df.loc[c] = (
+                sg[1].SG_ID, sbextended_UID, RA, DEC, repfreq,
+                minarE * repfreq / 100., maxarE * repfreq / 100., ar, las,
+                sbextended_complete, extendedTime, conf)
+            if conf == 'C34-7' or conf == 'C34-6':
+                confc = 'C34-3'
+            elif conf == 'C34-5':
+                confc = 'C34-2'
+            else:
+                confc = 'C34-1'
+            c += 1
+            df.loc[c] = (
+                sg[1].SG_ID, sbcompact_UID, RA, DEC, repfreq,
+                minarC * repfreq / 100., maxarC * repfreq / 100., ar, las,
+                sbcompact_complete, compactTime, confc)
+        else:
+            df.loc[c] = (
+                sg[1].SG_ID, SB_UID, RA, DEC, repfreq, minarE * repfreq / 100.,
+                maxarE * repfreq / 100., ar, las, sbcomplete,
+                sg[1].eExt12Time, conf)
+            c += 1
+
+    print len(df)
+    df_sg = pd.merge(df, sciencegoals, on='SG_ID', how='left')
+    df_sg_pro = pd.merge(df_sg, projects, on='OBSPROJECT_UID', how='left')
+
+    df_sg_pro['C34_7'] = df_sg_pro.apply(
+        lambda r: True if (r['minAR'] <= 0.41 and r['maxAR'] >= 0.41) else
+        False, axis=1)
+    df_sg_pro['C34_6'] = df_sg_pro.apply(
+        lambda r: True if (r['minAR'] <= 0.57 and r['maxAR'] >= 0.57) else
+        False, axis=1)
+    df_sg_pro['C34_5'] = df_sg_pro.apply(
+        lambda r: True if (r['minAR'] <= 0.75 and r['maxAR'] >= 0.75) else
+        False, axis=1)
+    df_sg_pro['C34_4'] = df_sg_pro.apply(
+        lambda r: True if (r['minAR'] <= 1.11 and r['maxAR'] >= 1.11) else
+        False, axis=1)
+    df_sg_pro['C34_3'] = df_sg_pro.apply(
+        lambda r: True if (r['minAR'] <= 1.4 and r['maxAR'] >= 1.4) else
+        False, axis=1)
+    df_sg_pro['C34_2'] = df_sg_pro.apply(
+        lambda r: True if (r['minAR'] <= 2.04 and r['maxAR'] >= 2.04) else
+        False, axis=1)
+    df_sg_pro['C34_1'] = df_sg_pro.apply(
+        lambda r: True if (r['minAR'] <= 3.73 and r['maxAR'] >= 3.73) else
+        False, axis=1)
+
+    # df[
+    #    [u'SG_ID', u'SB', u'RA', u'DEC', u'repFreq_x', u'minAR', u'maxAR',
+    #     u'AR_x', u'LAS_x', u'completion', u'estimatedTime_x', u'bestConf',
+    #     u'OBSPROJECT_UID', u'sg_name', u'band', u'estimatedTime_y',
+    #     u'eExt12Time', u'eComp12Time', u'eACATime', u'eTPTime', u'ARcor',
+    #     u'LAScor', u'sensitivity', u'useACA', u'useTP', u'isTimeConstrained',
+    #     u'polarization', u'type', u'hasSB', u'two_12m', u'num_targets',
+    #     u'isPhaseII', u'PRJ_NAME', u'CODE', u'PRJ_SCIENTIFIC_RANK',
+    #     u'PRJ_LETTER_GRADE', u'PRJ_STATUS', u'EXEC', u'C34_7', u'C34_6',
+    #     u'C34_5', u'C34_4', u'C34_3', u'C34_2', u'C34_1']]
+    # df.columns = pd.Index(
+    #     [u'SG_ID', u'SB (int. id)', u'RA', u'DEC', u'repFreq',
+    #      u'ArrayMinAR (100GHz)', u'ArrayMaxAR (100GHz)', u'SG AR', u'SG LAS',
+    #      u'completion factor', u'Conf. Estimated Time', u'bestConf',
+    #      u'OBSPROJECT_UID', u'sg_name', u'band', u'SG EstimatedTime',
+    #      u'SG Ext12Time', u'SG Comp12Time', u'SG ACATime', u'SG TPTime',
+    #      u'AR (100GHz)', u'LAS (100GHz)', u'sensitivity', u'useACA', u'useTP',
+    #      u'isTimeConstrained', u'polarization', u'type', u'hasSB',
+    #      u'two_12m?',
+    #      u'num_targets', u'isPhaseII', u'PRJ_NAME', u'CODE',
+    #      u'PRJ_SCIENTIFIC_RANK', u'PRJ_LETTER_GRADE', u'PRJ_STATUS', u'EXEC',
+    #      u'C34_7', u'C34_6', u'C34_5', u'C34_4', u'C34_3', u'C34_2',
+    #      u'C34_1'],
+    #     dtype='object')
+    return df_sg_pro
+
+
+def best_conf(AR, band, conf=confDf):
+    a = abs(conf.loc[:, band] - AR)
+    return a.idxmin()
+
 
 class ObsProposal(object):
     """
