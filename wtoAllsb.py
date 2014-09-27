@@ -129,7 +129,7 @@ class WtoDatabase(object):
                 " ALMA.BMMV_OBSPROPOSAL obs3 "
                 "WHERE regexp_like (CODE, '^201[23].*\.[AST]') "
                 "AND (PRJ_LETTER_GRADE='A' OR PRJ_LETTER_GRADE='B' "
-                "OR PRJ_LETTER_GRADE='C') "
+                "OR PRJ_LETTER_GRADE='C') AND PRJ_SCIENTIFIC_RANK < 9999 "
                 "AND obs2.OBS_PROJECT_ID = obs1.PRJ_ARCHIVE_UID AND "
                 "obs1.PRJ_ARCHIVE_UID = obs3.PROJECTUID")
 
@@ -942,6 +942,7 @@ def twelvem_sbs(qa0, sciencegoals, schedblocks, sgtargets, projects, wto_path):
                 sg[1].SG_ID, sbcompact_UID, RA, DEC, repfreq,
                 minarC * repfreq / 100., maxarC * repfreq / 100., ar, las,
                 sbcompact_complete, compactTime, confc)
+            c += 1
         else:
             df.loc[c] = (
                 sg[1].SG_ID, SB_UID, RA, DEC, repfreq, minarE * repfreq / 100.,
