@@ -80,7 +80,7 @@ def main():
 
     if len(args) == 0:
         print("Please specify sb uid")
-        return None
+        exit()
 
     if options.filet not in ['csv', 'xls']:
         print "-f must be csv or xls"
