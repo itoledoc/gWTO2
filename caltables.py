@@ -5,12 +5,8 @@ import cx_Oracle
 import pandas as pd
 import optparse
 
-conx_string = 'almasu/alma4dba@ALMA_ONLINE.OSF.CL'
-connection = cx_Oracle.connect(conx_string)
-cursor = connection.cursor()
 
-
-def query_atm(uid):
+def query_atm(uid, cursor):
 
     sql = str(
         'SELECT ARCHIVE_UID, ANTENNA_NAME, RECEIVER_BAND_ENUMV,'
@@ -89,7 +85,14 @@ def main():
     if options.filet not in ['csv', 'xls']:
         print "-f must be csv or xls"
         exit()
-    df = query_atm(args[0])
+
+    conx_string = 'almasu/alma4dba@ALMA_ONLINE.OSF.CL'
+    connection = cx_Oracle.connect(conx_string)
+    cursor = connection.cursor()
+
+    df = query_atm(args[0], cursor)
+    cursor.close()
+    connection.close()
     if len(df) == 0:
         print "The specified SB was not found on the archive"
         exit()
