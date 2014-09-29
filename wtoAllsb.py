@@ -3,7 +3,7 @@ __metaclass__ = type
 
 import numpy as np
 import pandas as pd
-import csv
+import ephem
 import cx_Oracle
 import os
 from lxml import objectify
@@ -15,7 +15,6 @@ conx_string_sco = 'almasu/alma4dba@ALMA_ONLINE.SCO.CL'
 prj = '{Alma/ObsPrep/ObsProject}'
 val = '{Alma/ValueTypes}'
 sbl = '{Alma/ObsPrep/SchedBlock}'
-
 
 pd.options.display.width = 200
 pd.options.display.max_columns = 55
@@ -31,6 +30,7 @@ confDf.ix['C34-4'] = ('C34-4', 1.11, 0.74, 0.48, 0.32, 0.24, 0.17)
 confDf.ix['C34-5'] = ('C34-5', 0.75, 0.50, 0.33, 0.22, 0.16, 0.12)
 confDf.ix['C34-6'] = ('C34-6', 0.57, 0.38, 0.25, 0.16, 0.12, 0.09)
 confDf.ix['C34-7'] = ('C34-7', 0.41, 0.27, 0.18, 0.12, None, None)
+
 
 # noinspection PyPep8Naming
 class WtoDatabase(object):
@@ -80,6 +80,7 @@ class WtoDatabase(object):
                    'spectralconf_table'])
         self.status = ["Canceled", "Rejected"]
 
+        self.grades= pd.read_table(self.wto_path + 'conf/c2grade.csv', sep=',')
         # Initialize with saved data and update, Default behavior.
         if not self.new:
             try:
@@ -196,6 +197,7 @@ class WtoDatabase(object):
             self.cursor.execute(sql2)
             self.executive = pd.DataFrame(
                 self.cursor.fetchall(), columns=['OBSPROJECT_UID', 'EXEC'])
+
             self.start_wto()
 
     def start_wto(self):
@@ -535,10 +537,26 @@ class WtoDatabase(object):
         typetar = target.attrib['type']
         sourceName = target.sourceName.pyval
         coord = target.sourceCoordinates
-        ra = convert_deg(coord.findall(val + 'longitude')[0].pyval,
-                         coord.findall(val + 'longitude')[0].attrib['unit'])
-        dec = convert_deg(coord.findall(val + 'latitude')[0].pyval,
-                          coord.findall(val + 'latitude')[0].attrib['unit'])
+        coord_type = coord.attrib['system']
+        if coord_type == 'J2000':
+            ra = convert_deg(coord.findall(val + 'longitude')[0].pyval,
+                             coord.findall(val + 'longitude')[0].attrib['unit'])
+            dec = convert_deg(coord.findall(val + 'latitude')[0].pyval,
+                              coord.findall(val + 'latitude')[0].attrib['unit'])
+        elif coord_type == 'galactic':
+            lon = convert_deg(
+                coord.findall(val + 'longitude')[0].pyval,
+                coord.findall(val + 'longitude')[0].attrib['unit'])
+            lat = dec = convert_deg(
+                coord.findall(val + 'latitude')[0].pyval,
+                coord.findall(val + 'latitude')[0].attrib['unit'])
+            eph = ephem.Galactic(pd.np.radians(lon), pd.np.radians(lat))
+            ra = pd.np.degrees(eph.to_radec()[0])
+            dec = pd.np.degrees(eph.to_radec()[1])
+        else:
+            print "coord type is %s, deal with it" % coord_type
+            ra = 0
+            dec = 0
         try:
             isMosaic = target.isMosaic.pyval
         except AttributeError:
@@ -574,7 +592,13 @@ class WtoDatabase(object):
                 'CODE', drop=False)[['CODE']]
         check_c2 = self.projects[
             self.projects.CODE.str.startswith('2013')][['CODE']]
-        checked = pd.concat([check_c1, check_c2])
+        grades = self.grades[
+            (self.grades.aprcflag == 'A') | (self.grades.aprcflag == 'B') |
+            (self.grades.aprcflag == 'C')]
+        check_c2_g = pd.merge(
+            grades, check_c2, on='CODE', how='left').set_index(
+                'CODE', drop=False)[['CODE']]
+        checked = pd.concat([check_c1, check_c2_g])
         temp = pd.merge(
             self.projects, checked, on='CODE',
             copy=False, how='inner').set_index('CODE', drop=False)
