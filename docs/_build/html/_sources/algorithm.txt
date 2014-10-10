@@ -245,9 +245,10 @@ Score and ranking
 
 #. **SB Grade/Cycle Score**
 
-   .. math:: \rm{Score}_{\rm{grade}} = 10 ; \rm{if\ grade\ is\ A}
+   .. math:: \rm{Score}_{\rm{grade}} = 10 ; \rm{if\ grade\ is\ A\ and\ Cycle\ 2}
       :label: gA
 
+   .. math:: \rm{Score}_{\rm{grade}} = 9 ; \rm{if\ grade\ is\ A\ and\ Cycle\ 1}
 
    .. math:: \rm{Score}_{\rm{grade}} = 8  ; \rm{if\ grade\ is\ B\ and\ Cycle\ 1}
       :label: gBc1
@@ -255,7 +256,6 @@ Score and ranking
 
    .. math:: \rm{Score}_{\rm{grade}} = 4  ; \rm{if\ grade\ is\ B\ and\ Cycle\ 2}
       :label: gBc2
-
 
    .. math:: \rm{Score}_{\rm{grade}} = -100 ; \rm{if\ grade\ is\ C}
       :label: gC

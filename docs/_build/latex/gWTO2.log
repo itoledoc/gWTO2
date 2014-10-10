@@ -1,4 +1,4 @@
-This is pdfTeX, Version 3.1415926-2.6-1.40.14 (TeX Live 2014/dev) (format=pdflatex 2014.7.14)  4 AUG 2014 10:45
+This is pdfTeX, Version 3.1415926-2.6-1.40.14 (TeX Live 2014/dev) (format=pdflatex 2014.8.31)  29 SEP 2014 22:36
 entering extended mode
  restricted \write18 enabled.
  %&-line parsing enabled.
@@ -641,6 +641,10 @@ Package: parskip 2001/04/09 non-zero parskip adjustments
 (/usr/share/texlive/texmf-dist/tex/latex/base/alltt.sty
 Package: alltt 1997/06/16 v2.0g defines alltt environment
 )
+(/usr/share/texlive/texmf-dist/tex/latex/upquote/upquote.sty
+Package: upquote 2012/04/19 v1.3 upright-quote and grave-accent glyphs in verba
+tim
+)
 (/usr/share/texlive/texmf-dist/tex/latex/graphics/graphicx.sty
 Package: graphicx 1999/02/16 v1.0f Enhanced LaTeX Graphics (DPC,SPQR)
 
@@ -801,28 +805,28 @@ Writing index file gWTO2.idx
 (./gWTO2.aux)
 \openout1 = `gWTO2.aux'.
 
-LaTeX Font Info:    Checking defaults for OML/cmm/m/it on input line 117.
-LaTeX Font Info:    ... okay on input line 117.
-LaTeX Font Info:    Checking defaults for T1/cmr/m/n on input line 117.
-LaTeX Font Info:    ... okay on input line 117.
-LaTeX Font Info:    Checking defaults for OT1/cmr/m/n on input line 117.
-LaTeX Font Info:    ... okay on input line 117.
-LaTeX Font Info:    Checking defaults for OMS/cmsy/m/n on input line 117.
-LaTeX Font Info:    ... okay on input line 117.
-LaTeX Font Info:    Checking defaults for OMX/cmex/m/n on input line 117.
-LaTeX Font Info:    ... okay on input line 117.
-LaTeX Font Info:    Checking defaults for U/cmr/m/n on input line 117.
-LaTeX Font Info:    ... okay on input line 117.
-LaTeX Font Info:    Checking defaults for TS1/cmr/m/n on input line 117.
-LaTeX Font Info:    Try loading font information for TS1+cmr on input line 117.
+LaTeX Font Info:    Checking defaults for OML/cmm/m/it on input line 119.
+LaTeX Font Info:    ... okay on input line 119.
+LaTeX Font Info:    Checking defaults for T1/cmr/m/n on input line 119.
+LaTeX Font Info:    ... okay on input line 119.
+LaTeX Font Info:    Checking defaults for OT1/cmr/m/n on input line 119.
+LaTeX Font Info:    ... okay on input line 119.
+LaTeX Font Info:    Checking defaults for OMS/cmsy/m/n on input line 119.
+LaTeX Font Info:    ... okay on input line 119.
+LaTeX Font Info:    Checking defaults for OMX/cmex/m/n on input line 119.
+LaTeX Font Info:    ... okay on input line 119.
+LaTeX Font Info:    Checking defaults for U/cmr/m/n on input line 119.
+LaTeX Font Info:    ... okay on input line 119.
+LaTeX Font Info:    Checking defaults for TS1/cmr/m/n on input line 119.
+LaTeX Font Info:    Try loading font information for TS1+cmr on input line 119.
 
  (/usr/share/texlive/texmf-dist/tex/latex/base/ts1cmr.fd
 File: ts1cmr.fd 1999/05/25 v2.5h Standard LaTeX font definitions
 )
-LaTeX Font Info:    ... okay on input line 117.
-LaTeX Font Info:    Checking defaults for PD1/pdf/m/n on input line 117.
-LaTeX Font Info:    ... okay on input line 117.
-LaTeX Font Info:    Try loading font information for T1+ptm on input line 117.
+LaTeX Font Info:    ... okay on input line 119.
+LaTeX Font Info:    Checking defaults for PD1/pdf/m/n on input line 119.
+LaTeX Font Info:    ... okay on input line 119.
+LaTeX Font Info:    Try loading font information for T1+ptm on input line 119.
 
 (/usr/share/texlive/texmf-dist/tex/latex/psnfss/t1ptm.fd
 File: t1ptm.fd 2001/06/04 font definitions for T1/ptm.
@@ -856,7 +860,7 @@ File: epstopdf-sys.cfg 2010/07/13 v1.3 Configuration of (r)epstopdf for TeX Liv
 e
 ))
 \AtBeginShipoutBox=\box41
-Package hyperref Info: Link coloring ON on input line 117.
+Package hyperref Info: Link coloring ON on input line 119.
 
 (/usr/share/texlive/texmf-dist/tex/latex/hyperref/nameref.sty
 Package: nameref 2012/10/27 v2.43 Cross-referencing by name of section
@@ -866,33 +870,33 @@ Package: gettitlestring 2010/12/03 v1.4 Cleanup title references (HO)
 )
 \c@section@level=\count130
 )
-LaTeX Info: Redefining \ref on input line 117.
-LaTeX Info: Redefining \pageref on input line 117.
-LaTeX Info: Redefining \nameref on input line 117.
+LaTeX Info: Redefining \ref on input line 119.
+LaTeX Info: Redefining \pageref on input line 119.
+LaTeX Info: Redefining \nameref on input line 119.
 
 (./gWTO2.out) (./gWTO2.out)
 \@outlinefile=\write6
 \openout6 = `gWTO2.out'.
 
 
-Underfull \hbox (badness 10000) in paragraph at lines 120--120
+Underfull \hbox (badness 10000) in paragraph at lines 122--122
 
  []
 
-LaTeX Font Info:    Try loading font information for T1+phv on input line 120.
+LaTeX Font Info:    Try loading font information for T1+phv on input line 122.
 (/usr/share/texlive/texmf-dist/tex/latex/psnfss/t1phv.fd
 File: t1phv.fd 2001/06/04 scalable font definitions for T1/phv.
 )
 LaTeX Font Info:    Font shape `T1/phv/bx/n' in size <24.88> not available
-(Font)              Font shape `T1/phv/b/n' tried instead on input line 120.
+(Font)              Font shape `T1/phv/b/n' tried instead on input line 122.
 LaTeX Font Info:    Font shape `T1/phv/m/it' in size <17.28> not available
-(Font)              Font shape `T1/phv/m/sl' tried instead on input line 120.
+(Font)              Font shape `T1/phv/m/sl' tried instead on input line 122.
 LaTeX Font Info:    Font shape `T1/phv/bx/it' in size <17.28> not available
-(Font)              Font shape `T1/phv/b/it' tried instead on input line 120.
+(Font)              Font shape `T1/phv/b/it' tried instead on input line 122.
 LaTeX Font Info:    Font shape `T1/phv/b/it' in size <17.28> not available
-(Font)              Font shape `T1/phv/b/sl' tried instead on input line 120.
+(Font)              Font shape `T1/phv/b/sl' tried instead on input line 122.
 LaTeX Font Info:    Font shape `T1/phv/bx/n' in size <17.28> not available
-(Font)              Font shape `T1/phv/b/n' tried instead on input line 120.
+(Font)              Font shape `T1/phv/b/n' tried instead on input line 122.
 <<ot1.cmap>> [1
 
 {/usr/share/texlive/texmf-dist/fonts/map/pdftex/updmap/pdftex.map}] [2
@@ -907,11 +911,11 @@ LaTeX Font Info:    Font shape `T1/ptm/bx/n' in size <10> not available
 
 Adding blank page after the table of contents.
 LaTeX Font Info:    Font shape `T1/phv/bx/n' in size <10> not available
-(Font)              Font shape `T1/phv/b/n' tried instead on input line 120.
+(Font)              Font shape `T1/phv/b/n' tried instead on input line 122.
 [1
 
 ] [2]
-LaTeX Font Info:    Try loading font information for T1+pcr on input line 124.
+LaTeX Font Info:    Try loading font information for T1+pcr on input line 126.
  (/usr/share/texlive/texmf-dist/tex/latex/psnfss/t1pcr.fd
 File: t1pcr.fd 2001/06/04 font definitions for T1/pcr.
 ) [1
@@ -921,57 +925,57 @@ File: t1pcr.fd 2001/06/04 font definitions for T1/pcr.
 ]
 Chapter 1.
 LaTeX Font Info:    Font shape `T1/phv/bx/n' in size <14.4> not available
-(Font)              Font shape `T1/phv/b/n' tried instead on input line 127.
+(Font)              Font shape `T1/phv/b/n' tried instead on input line 129.
 LaTeX Font Info:    Font shape `T1/ptm/bx/n' in size <14.4> not available
-(Font)              Font shape `T1/ptm/b/n' tried instead on input line 127.
+(Font)              Font shape `T1/ptm/b/n' tried instead on input line 129.
 LaTeX Font Info:    Font shape `T1/ptm/bx/n' in size <24.88> not available
-(Font)              Font shape `T1/ptm/b/n' tried instead on input line 127.
+(Font)              Font shape `T1/ptm/b/n' tried instead on input line 129.
 <Selection_003.png, id=214, 1362.08875pt x 919.435pt>
 File: Selection_003.png Graphic file (type png)
  <use Selection_003.png>
-Package pdftex.def Info: Selection_003.png used on input line 132.
+Package pdftex.def Info: Selection_003.png used on input line 134.
 (pdftex.def)             Requested size: 1362.08543pt x 919.43275pt.
 File: Selection_003.png Graphic file (type png)
 
 <use Selection_003.png>
-Package pdftex.def Info: Selection_003.png used on input line 132.
+Package pdftex.def Info: Selection_003.png used on input line 134.
 (pdftex.def)             Requested size: 452.96788pt x 305.7574pt.
  [3 <./Selection_003.png>] [4
 
 ]
 Chapter 2.
 LaTeX Font Info:    Font shape `T1/pcr/m/it' in size <10> not available
-(Font)              Font shape `T1/pcr/m/sl' tried instead on input line 199.
+(Font)              Font shape `T1/pcr/m/sl' tried instead on input line 201.
 <gWTO2__BL_001.png, id=229, 1096.095pt x 879.285pt>
 File: gWTO2__BL_001.png Graphic file (type png)
  <use gWTO2__BL_001.png>
-Package pdftex.def Info: gWTO2__BL_001.png used on input line 219.
+Package pdftex.def Info: gWTO2__BL_001.png used on input line 221.
 (pdftex.def)             Requested size: 1096.09233pt x 879.28287pt.
 File: gWTO2__BL_001.png Graphic file (type png)
 
 <use gWTO2__BL_001.png>
-Package pdftex.def Info: gWTO2__BL_001.png used on input line 219.
+Package pdftex.def Info: gWTO2__BL_001.png used on input line 221.
 (pdftex.def)             Requested size: 452.96788pt x 363.36696pt.
 
-Underfull \hbox (badness 10000) in paragraph at lines 235--245
+Underfull \hbox (badness 10000) in paragraph at lines 237--247
 []\T1/ptm/m/n/10 The box with the ar-ray vari-ables will have the \T1/ptm/m/it/
 10 Std. Conf.:
  []
 
 
-Underfull \hbox (badness 10000) in paragraph at lines 235--245
+Underfull \hbox (badness 10000) in paragraph at lines 237--247
 \T1/ptm/m/n/10 field set to \T1/pcr/m/n/10 Current Conf. \T1/ptm/m/n/10 This \T
 1/pcr/m/n/10 Current Conf. \T1/ptm/m/n/10 comes from the out-
  []
 
 
-Underfull \hbox (badness 10000) in paragraph at lines 235--245
+Underfull \hbox (badness 10000) in paragraph at lines 237--247
 \T1/ptm/m/n/10 put of the CASA script \T1/ptm/b/n/10 ar-ray-Con-fig-u-ra-tionTo
 ols.py\T1/ptm/m/n/10 , which can be found at
  []
 
 
-Underfull \hbox (badness 10000) in paragraph at lines 235--245
+Underfull \hbox (badness 10000) in paragraph at lines 237--247
 \T1/pcr/m/n/10 ~/AIV/science/ArrayConfiguration/Tools/arrayConfigurationTools.p
 y\T1/ptm/m/n/10 . It
  []
@@ -980,27 +984,27 @@ y\T1/ptm/m/n/10 . It
 <gWTO2__BL_002.png, id=242, 589.20125pt x 526.96875pt>
 File: gWTO2__BL_002.png Graphic file (type png)
  <use gWTO2__BL_002.png>
-Package pdftex.def Info: gWTO2__BL_002.png used on input line 265.
+Package pdftex.def Info: gWTO2__BL_002.png used on input line 267.
 (pdftex.def)             Requested size: 589.1998pt x 526.96745pt.
 File: gWTO2__BL_002.png Graphic file (type png)
 
 <use gWTO2__BL_002.png>
-Package pdftex.def Info: gWTO2__BL_002.png used on input line 265.
+Package pdftex.def Info: gWTO2__BL_002.png used on input line 267.
 (pdftex.def)             Requested size: 452.96788pt x 405.13196pt.
  [7 <./gWTO2__BL_002.png>]
 <gWTO2__BL_003.png, id=249, 1927.2pt x 1084.05pt>
 File: gWTO2__BL_003.png Graphic file (type png)
  <use gWTO2__BL_003.png>
-Package pdftex.def Info: gWTO2__BL_003.png used on input line 303.
+Package pdftex.def Info: gWTO2__BL_003.png used on input line 305.
 (pdftex.def)             Requested size: 1927.19533pt x 1084.04736pt.
 File: gWTO2__BL_003.png Graphic file (type png)
 
 <use gWTO2__BL_003.png>
-Package pdftex.def Info: gWTO2__BL_003.png used on input line 303.
+Package pdftex.def Info: gWTO2__BL_003.png used on input line 305.
 (pdftex.def)             Requested size: 452.96788pt x 254.78487pt.
 LaTeX Font Info:    Font shape `T1/phv/bx/n' in size <12> not available
-(Font)              Font shape `T1/phv/b/n' tried instead on input line 310.
-LaTeX Font Info:    Try loading font information for TS1+ptm on input line 312.
+(Font)              Font shape `T1/phv/b/n' tried instead on input line 312.
+LaTeX Font Info:    Try loading font information for TS1+ptm on input line 314.
 
 
 (/usr/share/texlive/texmf-dist/tex/latex/psnfss/ts1ptm.fd
@@ -1013,26 +1017,30 @@ Chapter 3.
 File: figure_1.png Graphic file (type png)
 
 <use figure_1.png>
-Package pdftex.def Info: figure_1.png used on input line 828.
+Package pdftex.def Info: figure_1.png used on input line 832.
 (pdftex.def)             Requested size: 850.61583pt x 589.72176pt.
 File: figure_1.png Graphic file (type png)
  <use figure_1.png>
-Package pdftex.def Info: figure_1.png used on input line 828.
+Package pdftex.def Info: figure_1.png used on input line 832.
 (pdftex.def)             Requested size: 452.96788pt x 314.03654pt.
  [14] [15 <./figure_1.png>] [16
 
 ]
 Chapter 4.
 LaTeX Font Info:    Font shape `T1/pcr/bx/n' in size <9> not available
-(Font)              Font shape `T1/pcr/b/n' tried instead on input line 869.
-[17] [18]
+(Font)              Font shape `T1/pcr/b/n' tried instead on input line 873.
+LaTeX Font Info:    Try loading font information for TS1+pcr on input line 876.
+
+(/usr/share/texlive/texmf-dist/tex/latex/psnfss/ts1pcr.fd
+File: ts1pcr.fd 2001/06/04 font definitions for TS1/pcr.
+) [17] [18]
 Chapter 5.
 LaTeX Font Info:    Font shape `T1/pcr/bx/n' in size <10> not available
-(Font)              Font shape `T1/pcr/b/n' tried instead on input line 942.
+(Font)              Font shape `T1/pcr/b/n' tried instead on input line 946.
 [19
 
 ] [20] [21]
-Underfull \hbox (badness 10000) in paragraph at lines 1479--1482
+Underfull \hbox (badness 10000) in paragraph at lines 1483--1486
 \T1/ptm/m/n/10 Method that han-dles the score cal-cu-la-tion for each ar-ray ty
 pe. It ap-plies
  []
@@ -1040,19 +1048,19 @@ pe. It ap-plies
 [22] [23] <diagram.png, id=467, 2218.2875pt x 3128.68875pt>
 File: diagram.png Graphic file (type png)
  <use diagram.png>
-Package pdftex.def Info: diagram.png used on input line 1667.
+Package pdftex.def Info: diagram.png used on input line 1671.
 (pdftex.def)             Requested size: 2218.28212pt x 3128.68117pt.
 File: diagram.png Graphic file (type png)
 
 <use diagram.png>
-Package pdftex.def Info: diagram.png used on input line 1667.
+Package pdftex.def Info: diagram.png used on input line 1671.
 (pdftex.def)             Requested size: 452.96788pt x 638.85515pt.
  [24 <./diagram.png (PNG copy)>]
 Chapter 6.
 [25
 
 ]
-Overfull \hbox (10.03215pt too wide) in paragraph at lines 1939--1940
+Overfull \hbox (10.03215pt too wide) in paragraph at lines 1943--1944
 []\T1/pcr/m/n/10 xml:...sciencegoal.PerformanceParameters.TemporalParameters.al
 lowedMargin 
  []
@@ -1060,7 +1068,7 @@ lowedMargin
 [26] [27] [28] [29] [30]
 Chapter 7.
 
-Underfull \hbox (badness 10000) in paragraph at lines 2734--2746
+Underfull \hbox (badness 10000) in paragraph at lines 2738--2750
 
  []
 
@@ -1141,22 +1149,22 @@ Underfull \hbox (badness 10000) in paragraph at lines 53--54
 [37
 
 ])
-Package atveryend Info: Empty hook `BeforeClearDocument' on input line 2772.
-Package atveryend Info: Empty hook `AfterLastShipout' on input line 2772.
+Package atveryend Info: Empty hook `BeforeClearDocument' on input line 2776.
+Package atveryend Info: Empty hook `AfterLastShipout' on input line 2776.
  (./gWTO2.aux)
-Package atveryend Info: Executing hook `AtVeryEndDocument' on input line 2772.
-Package atveryend Info: Executing hook `AtEndAfterFileList' on input line 2772.
+Package atveryend Info: Executing hook `AtVeryEndDocument' on input line 2776.
+Package atveryend Info: Executing hook `AtEndAfterFileList' on input line 2776.
 
 Package rerunfilecheck Info: File `gWTO2.out' has not changed.
 (rerunfilecheck)             Checksum: 3552D68BF8395D8EC2920EC28CCD8B75;2312.
-Package atveryend Info: Empty hook `AtVeryVeryEnd' on input line 2772.
+Package atveryend Info: Empty hook `AtVeryVeryEnd' on input line 2776.
  ) 
 Here is how much of TeX's memory you used:
- 9512 strings out of 495034
- 132675 string characters out of 6181677
- 236151 words of memory out of 5000000
- 12216 multiletter control sequences out of 15000+600000
- 66023 words of font info for 73 fonts, out of 8000000 for 9000
+ 9543 strings out of 495034
+ 133251 string characters out of 6181677
+ 236284 words of memory out of 5000000
+ 12239 multiletter control sequences out of 15000+600000
+ 66316 words of font info for 74 fonts, out of 8000000 for 9000
  15 hyphenation exceptions out of 8191
  36i,19n,45p,1237b,561s stack positions out of 5000i,500n,10000p,200000b,80000s
 {/usr/share/texlive/texmf-dist/fonts/enc/dvips/base/8r.enc}</usr/share/texliv
@@ -1176,7 +1184,7 @@ etic/uhvbo8a.pfb></usr/share/texlive/texmf-dist/fonts/type1/urw/helvetic/uhvr8a
 .pfb></usr/share/texlive/texmf-dist/fonts/type1/urw/times/utmb8a.pfb></usr/shar
 e/texlive/texmf-dist/fonts/type1/urw/times/utmr8a.pfb></usr/share/texlive/texmf
 -dist/fonts/type1/urw/times/utmri8a.pfb>
-Output written on gWTO2.pdf (41 pages, 1423157 bytes).
+Output written on gWTO2.pdf (41 pages, 1423318 bytes).
 PDF statistics:
  738 PDF objects out of 1000 (max. 8388607)
  660 compressed objects within 7 object streams

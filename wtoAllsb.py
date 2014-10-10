@@ -547,7 +547,7 @@ class WtoDatabase(object):
             lon = convert_deg(
                 coord.findall(val + 'longitude')[0].pyval,
                 coord.findall(val + 'longitude')[0].attrib['unit'])
-            lat = dec = convert_deg(
+            lat = convert_deg(
                 coord.findall(val + 'latitude')[0].pyval,
                 coord.findall(val + 'latitude')[0].attrib['unit'])
             eph = ephem.Galactic(pd.np.radians(lon), pd.np.radians(lat))
@@ -730,8 +730,26 @@ class WtoDatabase(object):
             qc_intendeduse, qc_ra, qc_dec, qc_use, qc_radius, qc_radius_unit = (
                 None, None, None, None, None, None
             )
-        ra = coord.findall(val + 'longitude')[0].pyval
-        dec = coord.findall(val + 'latitude')[0].pyval
+        coord_type = coord.attrib['system']
+        if coord_type == 'J2000':
+            ra = convert_deg(coord.findall(val + 'longitude')[0].pyval,
+                             coord.findall(val + 'longitude')[0].attrib['unit'])
+            dec = convert_deg(coord.findall(val + 'latitude')[0].pyval,
+                              coord.findall(val + 'latitude')[0].attrib['unit'])
+        elif coord_type == 'galactic':
+            lon = convert_deg(
+                coord.findall(val + 'longitude')[0].pyval,
+                coord.findall(val + 'longitude')[0].attrib['unit'])
+            lat = convert_deg(
+                coord.findall(val + 'latitude')[0].pyval,
+                coord.findall(val + 'latitude')[0].attrib['unit'])
+            eph = ephem.Galactic(pd.np.radians(lon), pd.np.radians(lat))
+            ra = pd.np.degrees(eph.to_radec()[0])
+            dec = pd.np.degrees(eph.to_radec()[1])
+        else:
+            print "coord type is %s, deal with it" % coord_type
+            ra = 0
+            dec = 0
         if solarsystem == 'Ephemeris':
             ephemeris = fs.sourceEphemeris.pyval
         else:
@@ -913,7 +931,7 @@ def twelvem_sbs(qa0, sciencegoals, schedblocks, sgtargets, projects, wto_path):
         elif not sg[1].isPhaseII:
             # Is PhaseI, create fake SBs
             print "Create Fake"
-            SB_UID = 'SB_T'
+            SB_UID = 'SB_TE'
             sbcomplete = 0
 
             if sg[1].two_12m:
@@ -1000,30 +1018,30 @@ def twelvem_sbs(qa0, sciencegoals, schedblocks, sgtargets, projects, wto_path):
         lambda r: True if (r['minAR'] <= 3.73 and r['maxAR'] >= 3.73) else
         False, axis=1)
 
-    # df[
-    #    [u'SG_ID', u'SB', u'RA', u'DEC', u'repFreq_x', u'minAR', u'maxAR',
-    #     u'AR_x', u'LAS_x', u'completion', u'estimatedTime_x', u'bestConf',
-    #     u'OBSPROJECT_UID', u'sg_name', u'band', u'estimatedTime_y',
-    #     u'eExt12Time', u'eComp12Time', u'eACATime', u'eTPTime', u'ARcor',
-    #     u'LAScor', u'sensitivity', u'useACA', u'useTP', u'isTimeConstrained',
-    #     u'polarization', u'type', u'hasSB', u'two_12m', u'num_targets',
-    #     u'isPhaseII', u'PRJ_NAME', u'CODE', u'PRJ_SCIENTIFIC_RANK',
-    #     u'PRJ_LETTER_GRADE', u'PRJ_STATUS', u'EXEC', u'C34_7', u'C34_6',
-    #     u'C34_5', u'C34_4', u'C34_3', u'C34_2', u'C34_1']]
-    # df.columns = pd.Index(
-    #     [u'SG_ID', u'SB (int. id)', u'RA', u'DEC', u'repFreq',
-    #      u'ArrayMinAR (100GHz)', u'ArrayMaxAR (100GHz)', u'SG AR', u'SG LAS',
-    #      u'completion factor', u'Conf. Estimated Time', u'bestConf',
-    #      u'OBSPROJECT_UID', u'sg_name', u'band', u'SG EstimatedTime',
-    #      u'SG Ext12Time', u'SG Comp12Time', u'SG ACATime', u'SG TPTime',
-    #      u'AR (100GHz)', u'LAS (100GHz)', u'sensitivity', u'useACA', u'useTP',
-    #      u'isTimeConstrained', u'polarization', u'type', u'hasSB',
-    #      u'two_12m?',
-    #      u'num_targets', u'isPhaseII', u'PRJ_NAME', u'CODE',
-    #      u'PRJ_SCIENTIFIC_RANK', u'PRJ_LETTER_GRADE', u'PRJ_STATUS', u'EXEC',
-    #      u'C34_7', u'C34_6', u'C34_5', u'C34_4', u'C34_3', u'C34_2',
-    #      u'C34_1'],
-    #     dtype='object')
+    df_sg_pro = df_sg_pro[
+        [u'SG_ID', u'SB', u'RA', u'DEC', u'repFreq_x', u'minAR', u'maxAR',
+         u'AR_x', u'LAS_x', u'completion', u'estimatedTime_x', u'bestConf',
+         u'OBSPROJECT_UID', u'sg_name', u'band', u'estimatedTime_y',
+         u'eExt12Time', u'eComp12Time', u'eACATime', u'eTPTime', u'ARcor',
+         u'LAScor', u'sensitivity', u'useACA', u'useTP', u'isTimeConstrained',
+         u'polarization', u'type', u'hasSB', u'two_12m', u'num_targets',
+         u'isPhaseII', u'PRJ_NAME', u'CODE', u'PRJ_SCIENTIFIC_RANK',
+         u'PRJ_LETTER_GRADE', u'PRJ_STATUS', u'EXEC', u'C34_7', u'C34_6',
+         u'C34_5', u'C34_4', u'C34_3', u'C34_2', u'C34_1']]
+    df_sg_pro.columns = pd.Index(
+        [u'SG_ID', u'SB (int. id)', u'RA', u'DEC', u'repFreq',
+         u'ArrayMinAR (100GHz)', u'ArrayMaxAR (100GHz)', u'SG AR', u'SG LAS',
+         u'completion factor', u'Conf. Estimated Time', u'bestConf',
+         u'OBSPROJECT_UID', u'sg_name', u'band', u'SG EstimatedTime',
+         u'SG Ext12Time', u'SG Comp12Time', u'SG ACATime', u'SG TPTime',
+         u'AR (100GHz)', u'LAS (100GHz)', u'sensitivity', u'useACA', u'useTP',
+         u'isTimeConstrained', u'polarization', u'type', u'hasSB',
+         u'two_12m?',
+         u'num_targets', u'isPhaseII', u'PRJ_NAME', u'CODE',
+         u'PRJ_SCIENTIFIC_RANK', u'PRJ_LETTER_GRADE', u'PRJ_STATUS', u'EXEC',
+         u'C34_7', u'C34_6', u'C34_5', u'C34_4', u'C34_3', u'C34_2',
+         u'C34_1'],
+        dtype='object')
     return df_sg_pro
 
 

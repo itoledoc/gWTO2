@@ -14,7 +14,7 @@
 
 
 \title{gWTO2 Documentation (Draft)}
-\date{August 04, 2014}
+\date{September 29, 2014}
 \release{2.0RC}
 \author{itoledo@alma.cl}
 \newcommand{\sphinxlogo}{}
@@ -113,6 +113,8 @@
 \def\PYGZlb{[}
 \def\PYGZrb{]}
 \makeatother
+
+\renewcommand\PYGZsq{\textquotesingle}
 
 \begin{document}
 
@@ -791,7 +793,9 @@ yet, and it rises as the SB gets closer to completion.
 \item {} 
 \textbf{SB Grade/Cycle Score}
 \phantomsection\label{algorithm:equation-gA}\begin{gather}
-\begin{split}\rm{Score}_{\rm{grade}} = 10 ; \rm{if\ grade\ is\ A}\end{split}\label{algorithm-gA}
+\begin{split}\rm{Score}_{\rm{grade}} = 10 ; \rm{if\ grade\ is\ A\ and\ Cycle\ 2}\end{split}\label{algorithm-gA}
+\end{gather}\begin{gather}
+\begin{split}\rm{Score}_{\rm{grade}} = 9 ; \rm{if\ grade\ is\ A\ and\ Cycle\ 1}\end{split}\notag
 \end{gather}\phantomsection\label{algorithm:equation-gBc1}\begin{gather}
 \begin{split}\rm{Score}_{\rm{grade}} = 8  ; \rm{if\ grade\ is\ B\ and\ Cycle\ 1}\end{split}\label{algorithm-gBc1}
 \end{gather}\phantomsection\label{algorithm:equation-gBc2}\begin{gather}
@@ -2695,7 +2699,7 @@ to the path where you are running the script from
 
 \begin{notice}{note}{Note:}
 \textbf{Latest update:}
-July 28, 2014
+September 29, 2014
 
 \textbf{Latest changes in the code:}
 \begin{enumerate}
