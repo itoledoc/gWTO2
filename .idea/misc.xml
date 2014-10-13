@@ -1,15 +1,15 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <project version="4">
   <component name="ProjectResources">
-    <resource url="Alma/ObsPrep/ObsReview" location="$PROJECT_DIR$/../wto/schemas/ObsReview.xsd" />
-    <resource url="Alma/ObsPrep/ObsProject" location="$PROJECT_DIR$/../wto/schemas/ObsProject.xsd" />
+    <resource url="Alma/ObsPrep/SchedBlock" location="$PROJECT_DIR$/../wto/schemas/SchedBlock.xsd" />
+    <resource url="Alma/ObsPrep/ProjectStatus" location="$PROJECT_DIR$/../wto/schemas/ProjectStatus.xsd" />
+    <resource url="ObsProject" location="$PROJECT_DIR$/../wto/schemas/ObsProject.xsd" />
     <resource url="Alma/ObsPrep/ObsAttachment" location="$PROJECT_DIR$/../wto/schemas/ObsAttachment.xsd" />
+    <resource url="Alma/ValueTypes" location="$PROJECT_DIR$/../wto/schemas/ValueTypes.xsd" />
+    <resource url="Alma/ObsPrep/ObsProject" location="$PROJECT_DIR$/../wto/schemas/ObsProject.xsd" />
+    <resource url="Alma/ObsPrep/ObsReview" location="$PROJECT_DIR$/../wto/schemas/ObsReview.xsd" />
     <resource url="Alma/ObsPrep/ObsProposal" location="$PROJECT_DIR$/../wto/schemas/ObsProposal.xsd" />
     <resource url="Alma/CommonEntity" location="$PROJECT_DIR$/../wto/schemas/CommonEntity.xsd" />
-    <resource url="Alma/ObsPrep/SchedBlock" location="$PROJECT_DIR$/../wto/schemas/SchedBlock.xsd" />
-    <resource url="ObsProject" location="$PROJECT_DIR$/../wto/schemas/ObsProject.xsd" />
-    <resource url="Alma/ObsPrep/ProjectStatus" location="$PROJECT_DIR$/../wto/schemas/ProjectStatus.xsd" />
-    <resource url="Alma/ValueTypes" location="$PROJECT_DIR$/../wto/schemas/ValueTypes.xsd" />
   </component>
   <component name="ProjectRootManager" version="2" project-jdk-name="Python 2.7.6 (~/anaconda/bin/python)" project-jdk-type="Python SDK" />
 </project>

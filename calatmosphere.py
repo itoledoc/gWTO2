@@ -1,4 +1,6 @@
 #!/usr/bin/env python
+from __future__ import print_function
+
 __author__ = 'itoledo'
 
 import cx_Oracle
@@ -16,8 +18,8 @@ def query_atm(uid, cursor):
         'DBMS_LOB.substr(SB_GAIN_VAL), DBMS_LOB.substr(FREQUENCY_RANGE_VAL) '
         'FROM SCHEDULING_AOS.ASDM_CALATMOSPHERE '
         'WHERE ARCHIVE_UID = \'%s\'' % uid)
-    print sql
-    print "Executing QUERY, please wait..."
+    print(sql)
+    print("Executing QUERY, please wait...")
     cursor.execute(sql)
     df = pd.DataFrame(
         cursor.fetchall(),
@@ -83,7 +85,7 @@ def main():
         exit()
 
     if options.filet not in ['csv', 'xls']:
-        print "-f must be csv or xls"
+        print("-f must be csv or xls")
         exit()
 
     conx_string = 'almasu/alma4dba@ALMA_ONLINE.OSF.CL'
@@ -94,7 +96,7 @@ def main():
     cursor.close()
     connection.close()
     if len(df) == 0:
-        print "The specified SB was not found on the archive"
+        print("The specified SB was not found on the archive")
         exit()
 
     table = df.apply(lambda r: extract_val(r), axis=1)
