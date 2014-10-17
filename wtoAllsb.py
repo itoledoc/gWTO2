@@ -240,6 +240,10 @@ class WtoDatabase(object):
         # Download and read obsprojects and obsprosal
         number = self.projects.__len__()
         c = 1
+        call('cp /home/itoledo/Downloads/export/ObsProject/*xml /home/itoledo/'
+             '.wto_all/obsxml/.', shell=True)
+        call('cp /home/itoledo/Downloads/export/SchedBlock/*xml /home/itoledo/'
+             '.wto_all/sbxml/.', shell=True)
         for r in self.projects.iterrows():
             xmlfilename, obsproj = self.get_projectxml(
                 r[1].CODE, r[1].PRJ_STATUS, number, c)
@@ -294,8 +298,9 @@ class WtoDatabase(object):
                 "WHERE ARCHIVE_UID = '%s'" % self.projects.ix[
                     code, 'OBSPROJECT_UID'])
             obsproj = True
+            xmlfilename = code + '.xml'
         else:
-            print("Downloading Project %s obsproposal.xml, status %s. (%s/%s)" %
+            print("Reading Project %s obsproject.xml, status %s. (%s/%s)" %
                   (code, self.projects.ix[code, 'PRJ_STATUS'], c, n))
             self.cursor.execute(
                 "SELECT TIMESTAMP, XMLTYPE.getClobVal(xml) "
@@ -303,13 +308,17 @@ class WtoDatabase(object):
                 "WHERE ARCHIVE_UID = '%s'" % self.projects.ix[
                     code, 'OBSPROPOSAL_UID'])
             obsproj = False
+            xmlfilename = self.projects.ix[
+                code, 'OBSPROJECT_UID'].replace('://', '___').replace('/', '_') + '.xml'
+            self.projects.loc[code, 'xmlfile'] = xmlfilename
+            return xmlfilename, obsproj
         try:
             data = self.cursor.fetchall()[0]
         except IndexError:
             print "Project %s not found on archive?" % self.projects.ix[code]
             return 0
         xml_content = data[1].read()
-        xmlfilename = code + '.xml'
+
         self.projects.loc[code, 'timestamp'] = data[0]
         filename = self.obsxml + xmlfilename
         io_file = open(filename, 'w')
@@ -360,14 +369,15 @@ class WtoDatabase(object):
     def read_obsproposal(self, xml, code):
 
         try:
-            obsparse = ObsProposal(xml, self.obsxml)
+            obsparse = ObsProject(xml, self.obsxml)
         except KeyError:
-            print("Something went wrong while trying to parse %s" % xml)
+            print("Something went wrong while trying to parse obsprop %s" % xml)
             return 0
 
         prj_version = None
         staff_note = None
         is_calibration = None
+        print xml
         obsproject_uid = obsparse.data.ObsProjectRef.attrib['entityId']
         is_ddt = None
 
@@ -466,6 +476,8 @@ class WtoDatabase(object):
                          'two_12m', 'num_targets', 'isPhaseII'],
                 index=[sg_id]
             )
+
+        isObsproj = True
 
         if isObsproj:
             oussg_list = obsprog.ObsPlan.findall(prj + 'ObsUnitSet')
@@ -1085,10 +1097,10 @@ class ObsProject(object):
         io_file = open(path + xml_file)
         tree = objectify.parse(io_file)
         io_file.close()
-        data = tree.getroot()
-        self.status = data.attrib['status']
-        for key in data.__dict__:
-            self.__setattr__(key, data.__dict__[key])
+        self.data = tree.getroot()
+        self.status = self.data.attrib['status']
+        for key in self.data.__dict__:
+            self.__setattr__(key, self.data.__dict__[key])
 
     def assoc_sched_blocks(self):
         """
