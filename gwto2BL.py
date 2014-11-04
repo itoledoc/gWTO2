@@ -495,7 +495,8 @@ class BLMainWindow(QMainWindow, Ui_BLMainWindow):
         self.bl_sheet.setSortingEnabled(True)
         self.bl_sheet.sortByColumn(0, Qt.DescendingOrder)
         self.bl_sheet.resizeRowsToContents()
-        self.connect(self.bl_sheet, SIGNAL("doubleClicked(QModelIndex)"), self.hola)
+        self.connect(self.bl_sheet, SIGNAL("doubleClicked(QModelIndex)"),
+                     self.hola)
         for column in range(26):
             if column in [1, 2, 3, 4, 5, 6, 7, 25, 26]:
                 self.bl_sheet.resizeColumnToContents(column)
@@ -598,7 +599,7 @@ class MyStdTableModel(QAbstractTableModel):
             elif col in [9, 19, 20, 25]:
                 return QVariant(QString("%1").arg(sb[col], 0, 'f', 1))
             elif col in [14, 15]:
-                return QVariant(QString("%1").arg(sb[col], 0, 'i', 0))
+                return QVariant(QString("%1").arg(sb[col], 0, 10))
 
             return QVariant(str(self.arraydata[index.row()][index.column()]))
         elif role == Qt.TextAlignmentRole:
@@ -695,7 +696,7 @@ class MyTcTableModel(QAbstractTableModel):
             elif col in [9, 19, 20, 25]:
                 return QVariant(QString("%1").arg(sb[col], 0, 'f', 1))
             elif col in [14, 15]:
-                return QVariant(QString("%1").arg(sb[col], 0, 'i', 0))
+                return QVariant(QString("%1").arg(sb[col], 0, 10))
 
             return QVariant(str(self.arraydata[index.row()][index.column()]))
         elif role == Qt.TextAlignmentRole:
@@ -783,7 +784,7 @@ class MyPolTableModel(QAbstractTableModel):
             elif col in [9, 19, 20, 25]:
                 return QVariant(QString("%1").arg(sb[col], 0, 'f', 1))
             elif col in [14, 15]:
-                return QVariant(QString("%1").arg(sb[col], 0, 'i', 0))
+                return QVariant(QString("%1").arg(sb[col], 0, 10))
 
             return QVariant(str(self.arraydata[index.row()][index.column()]))
         elif role == Qt.TextAlignmentRole:
