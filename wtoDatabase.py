@@ -18,8 +18,8 @@ from lxml import objectify
 from subprocess import call
 import arrayResolution2p as ARes
 
-conx_string = 'almasu/alma4dba@ALMA_ONLINE.OSF.CL'
-conx_string_sco = 'almasu/alma4dba@ALMA_ONLINE.SCO.CL'
+conx_string = os.environ['CON_STR']
+
 prj = '{Alma/ObsPrep/ObsProject}'
 val = '{Alma/ValueTypes}'
 sbl = '{Alma/ObsPrep/SchedBlock}'

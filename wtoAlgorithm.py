@@ -791,6 +791,8 @@ def observable(solarSystem, sourcename, RA, DEC, horizon, isQuery, ephemeris,
         return 0, 0, 0, 0, 0, 0, 0, 0, False
 
     if solarSystem != 'Unspecified':
+        ra = 0
+        dec = 0
         if solarSystem in SSO and solarSystem == sourcename:
             obj = eval('ephem.' + solarSystem + '()')
             obj.compute(alma)

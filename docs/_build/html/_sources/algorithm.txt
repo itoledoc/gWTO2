@@ -304,16 +304,33 @@ Score and ranking
 
 #. **SB Condition Score**
 
-   .. math:: \rm{Score}_{\rm{cond}} = 10 \left(1- (\rm{frac}-1)^{2}\right) \rm{pwv}_{\rm{close}}
+   If :math:`\rm{frac} < 1`:
+
+   .. math:: \rm{Score}_{\rm{cond}} = 10 \left(1- (\rm{frac}-1)^{10}\right) \rm{pwv}_{\rm{close}}
       :label: frac_und_1
+
+   If :math:`\rm{frac} = 1`:
+
+   .. math:: \rm{Score}_{\rm{cond}} = 10; \rm{frac = 1}
+      :label: frac_1
+
+   If :math:`1.3 > \rm{frac} > 1`:
+
+   .. math:: \rm{Score}_{\rm{cond}} = 10 \left(1 - (\frac{\rm{frac} -1}{0.3})^{3}\right) \rm{pwv}_{\rm{close}}
+      :label: frac_over_1
+
+   Where :math:`\rm{pwv}_{\rm{close}}`
 
    .. math:: \rm{pwv}_{\rm{close}} = 1 - \left|\frac{\rm{pwv} - \rm{maxPWV}}{6}\right|
       :label: pwv_close
 
-   .. math:: \rm{Score}_{\rm{cond}} = 10
-      :label: frac_1
+   .. figure:: figure_2.png
+      :align: center
+      :scale: 50%
 
-   .. math::
+      The condition scoring funtion in 3D, dependant on frac and pwv.
+
+
 #. **SB Total Score**
 
 .. _check-obs:

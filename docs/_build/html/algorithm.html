@@ -399,15 +399,23 @@ is 2.8 arcsec, with a minimun acceptable resolution
 <p><span class="eqno">(10)</span><img src="_images/math/2c1d5fd1552b6905c768e20a054538d3e3ef7889.png" alt="\rm{Score}_{\rm{executive}} = 10; \rm{default\ to\ all\ executives}"/></p>
 </div></li>
 <li><p class="first"><strong>SB Condition Score</strong></p>
+<p>If <img class="math" src="_images/math/5452acd7d56ad59a7504044fdd80434e670b431c.png" alt="\rm{frac} &lt; 1"/>:</p>
 <div class="math" id="equation-frac_und_1">
-<p><span class="eqno">(11)</span><img src="_images/math/cc8e87b683a3e8249ec5f9033e212168cef73297.png" alt="\rm{Score}_{\rm{cond}} = 10 \left(1- (\rm{frac}-1)^{2}\right) \rm{pwv}_{\rm{close}}"/></p>
-</div><div class="math" id="equation-pwv_close">
-<p><span class="eqno">(12)</span><img src="_images/math/4a19a66710bf0700ee34ef70234672b8646532b8.png" alt="\rm{pwv}_{\rm{close}} = 1 - \left|\frac{\rm{pwv} - \rm{maxPWV}}{6}\right|"/></p>
-</div><div class="math" id="equation-frac_1">
-<p><span class="eqno">(13)</span><img src="_images/math/625197f93d7a4b52f313747921340152070fd0de.png" alt="\rm{Score}_{\rm{cond}} = 10"/></p>
-</div><div class="math">
-<p><img src="_images/math/b606edea521a130e1064a48a5147e4930dc8b55c.png" alt=""/></p>
-</div></li>
+<p><span class="eqno">(11)</span><img src="_images/math/d55f4d0a29b5d40cba1f9d0a17b6d2cde84fde1f.png" alt="\rm{Score}_{\rm{cond}} = 10 \left(1- (\rm{frac}-1)^{10}\right) \rm{pwv}_{\rm{close}}"/></p>
+</div><p>If <img class="math" src="_images/math/65f86ed988a8b1faa1593bf6c613661922d33b95.png" alt="\rm{frac} = 1"/>:</p>
+<div class="math" id="equation-frac_1">
+<p><span class="eqno">(12)</span><img src="_images/math/d4f155d4244aece28c847b7ff0a94f4647dbe79c.png" alt="\rm{Score}_{\rm{cond}} = 10; \rm{frac = 1}"/></p>
+</div><p>If <img class="math" src="_images/math/f1a1f06f76b1694ad5035a6937d2f1b3d61fa164.png" alt="1.3 &gt; \rm{frac} &gt; 1"/>:</p>
+<div class="math" id="equation-frac_over_1">
+<p><span class="eqno">(13)</span><img src="_images/math/57a4d7e551fa32640efa3399eb09d3db53c7f9fb.png" alt="\rm{Score}_{\rm{cond}} = 10 \left(1 - (\frac{\rm{frac} -1}{0.3})^{3}\right) \rm{pwv}_{\rm{close}}"/></p>
+</div><p>Where <img class="math" src="_images/math/840b3aa8a3db57b4b8dc07722f85c46042a38556.png" alt="\rm{pwv}_{\rm{close}}"/></p>
+<div class="math" id="equation-pwv_close">
+<p><span class="eqno">(14)</span><img src="_images/math/4a19a66710bf0700ee34ef70234672b8646532b8.png" alt="\rm{pwv}_{\rm{close}} = 1 - \left|\frac{\rm{pwv} - \rm{maxPWV}}{6}\right|"/></p>
+</div><div class="figure align-center">
+<a class="reference internal image-reference" href="_images/figure_2.png"><img alt="_images/figure_2.png" src="_images/figure_2.png" style="width: 418.5px; height: 316.5px;" /></a>
+<p class="caption">The condition scoring funtion in 3D, dependant on frac and pwv.</p>
+</div>
+</li>
 <li><p class="first"><strong>SB Total Score</strong></p>
 </li>
 </ol>
@@ -436,7 +444,7 @@ is 2.8 arcsec, with a minimun acceptable resolution
   <div role="contentinfo">
     <p>
         &copy; Copyright 2014, ALMA/I. Toledo.
-      Last updated on Sep 29, 2014.
+      Last updated on Nov 04, 2014.
     </p>
   </div>
 

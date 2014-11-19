@@ -14,7 +14,7 @@
 
 
 \title{gWTO2 Documentation (Draft)}
-\date{September 29, 2014}
+\date{November 04, 2014}
 \release{2.0RC}
 \author{itoledo@alma.cl}
 \newcommand{\sphinxlogo}{}
@@ -842,13 +842,29 @@ is 2.8 arcsec, with a minimun acceptable resolution
 \end{gather}
 \item {} 
 \textbf{SB Condition Score}
+
+If \(\rm{frac} < 1\):
 \phantomsection\label{algorithm:equation-frac_und_1}\begin{gather}
-\begin{split}\rm{Score}_{\rm{cond}} = 10 \left(1- (\rm{frac}-1)^{2}\right) \rm{pwv}_{\rm{close}}\end{split}\label{algorithm-frac_und_1}
-\end{gather}\phantomsection\label{algorithm:equation-pwv_close}\begin{gather}
-\begin{split}\rm{pwv}_{\rm{close}} = 1 - \left|\frac{\rm{pwv} - \rm{maxPWV}}{6}\right|\end{split}\label{algorithm-pwv_close}
-\end{gather}\phantomsection\label{algorithm:equation-frac_1}\begin{gather}
-\begin{split}\rm{Score}_{\rm{cond}} = 10\end{split}\label{algorithm-frac_1}
+\begin{split}\rm{Score}_{\rm{cond}} = 10 \left(1- (\rm{frac}-1)^{10}\right) \rm{pwv}_{\rm{close}}\end{split}\label{algorithm-frac_und_1}
 \end{gather}
+If \(\rm{frac} = 1\):
+\phantomsection\label{algorithm:equation-frac_1}\begin{gather}
+\begin{split}\rm{Score}_{\rm{cond}} = 10; \rm{frac = 1}\end{split}\label{algorithm-frac_1}
+\end{gather}
+If \(1.3 > \rm{frac} > 1\):
+\phantomsection\label{algorithm:equation-frac_over_1}\begin{gather}
+\begin{split}\rm{Score}_{\rm{cond}} = 10 \left(1 - (\frac{\rm{frac} -1}{0.3})^{3}\right) \rm{pwv}_{\rm{close}}\end{split}\label{algorithm-frac_over_1}
+\end{gather}
+Where \(\rm{pwv}_{\rm{close}}\)
+\phantomsection\label{algorithm:equation-pwv_close}\begin{gather}
+\begin{split}\rm{pwv}_{\rm{close}} = 1 - \left|\frac{\rm{pwv} - \rm{maxPWV}}{6}\right|\end{split}\label{algorithm-pwv_close}
+\end{gather}\begin{figure}[htbp]
+\centering
+\capstart
+
+\scalebox{0.500000}{\includegraphics{figure_2.png}}
+\caption{The condition scoring funtion in 3D, dependant on frac and pwv.}\end{figure}
+
 \item {} 
 \textbf{SB Total Score}
 
@@ -2699,7 +2715,7 @@ to the path where you are running the script from
 
 \begin{notice}{note}{Note:}
 \textbf{Latest update:}
-September 29, 2014
+November 04, 2014
 
 \textbf{Latest changes in the code:}
 \begin{enumerate}
