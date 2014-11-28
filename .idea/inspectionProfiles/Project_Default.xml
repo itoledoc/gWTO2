@@ -20,25 +20,6 @@
         </list>
       </option>
     </inspection_tool>
-    <inspection_tool class="PyUnresolvedReferencesInspection" enabled="true" level="WARNING" enabled_by_default="true">
-      <option name="ignoredIdentifiers">
-        <value>
-          <list size="11">
-            <item index="0" class="java.lang.String" itemvalue="cx_Oracle.connect" />
-            <item index="1" class="java.lang.String" itemvalue="wtoDatabase.ObsProject.*" />
-            <item index="2" class="java.lang.String" itemvalue="numpy.radians" />
-            <item index="3" class="java.lang.String" itemvalue="numpy.degrees" />
-            <item index="4" class="java.lang.String" itemvalue="float.loc" />
-            <item index="5" class="java.lang.String" itemvalue="numpy.deg2rad" />
-            <item index="6" class="java.lang.String" itemvalue="cx_Oracle" />
-            <item index="7" class="java.lang.String" itemvalue="numpy.abs" />
-            <item index="8" class="java.lang.String" itemvalue="numpy.arccos" />
-            <item index="9" class="java.lang.String" itemvalue="numpy.arcsin" />
-            <item index="10" class="java.lang.String" itemvalue="bool.values" />
-          </list>
-        </value>
-      </option>
-    </inspection_tool>
     <inspection_tool class="SpellCheckingInspection" enabled="true" level="TYPO" enabled_by_default="true">
       <option name="processCode" value="false" />
       <option name="processLiterals" value="false" />

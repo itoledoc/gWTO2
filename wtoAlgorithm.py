@@ -480,18 +480,21 @@ class WtoAlgorithm(WtoDatabase):
             arcorr = ar * corr
             lascorr = las * corr
             if 0.9 * arcorr <= self.array_ar <= 1.1 * arcorr:
-                sb_array_score = 10
+                sb_array_score = 10.
 
-            elif 0.9 * arcorr > self.array_ar >= 0.7 * arcorr:
-                sb_array_score = 9.0
-            elif self.array_ar < 0.7 * arcorr and not points:
-                l = 0.7 * arcorr - aminar
-                sb_array_score = ((self.array_ar - aminar) / l) * 8.5
-            elif self.array_ar < 0.7 * arcorr and points:
-                sb_array_score = 8.5
-            elif self.array_ar > 1.1 * arcorr:
-                l = arcorr * 1.1 - amaxar
-                s = 10. / l
+            elif 0.9 * arcorr > self.array_ar >= 0.8 * arcorr:
+                sb_array_score = 8.0
+            elif 1.2 * arcorr >= self.array_ar > 1.1 * arcorr:
+                sb_array_score = 8.0
+
+            elif self.array_ar < 0.8 * arcorr and not points:
+                l = 0.8 * arcorr - aminar
+                sb_array_score = ((self.array_ar - aminar) / l) * 8.0
+            elif self.array_ar < 0.8 * arcorr and points:
+                sb_array_score = 8.0
+            elif self.array_ar > 1.2 * arcorr:
+                l = arcorr * 1.2 - amaxar
+                s = 8. / l
                 sb_array_score = (self.array_ar - amaxar) * s
             else:
                 print("What happened with?")
