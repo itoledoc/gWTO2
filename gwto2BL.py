@@ -344,7 +344,7 @@ class BLMainWindow(QMainWindow, Ui_BLMainWindow):
         self.lst_spin.setTime(
             QTime(lst_time.hour, lst_time.minute, lst_time.second))
         self.datas.query_arrays()
-        arrays = self.datas.bl_arrays.AV1.values
+        arrays = self.datas.bl_arrays.SE_ARRAYNAME.unique()
         c = 1
         self.blarrays_combo.addItem(_fromUtf8(""))
         self.blarrays_combo.setItemText(
@@ -359,6 +359,7 @@ class BLMainWindow(QMainWindow, Ui_BLMainWindow):
         self.antennas_spin.setReadOnly(True)
         self.datas.array_name = self.blarrays_combo.currentText()
         self.datas.set_bl_prop(array_name=self.datas.array_name)
+        print self.datas.ruv
         self.pop = ArrayCheck2(ruv=self.datas.ruv, num_ant=self.datas.num_ant)
         self.pop.show()
         ret = self.pop.exec_()

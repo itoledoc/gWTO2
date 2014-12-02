@@ -41,6 +41,7 @@ c_mks = 2.99792458e8
 # tsys = (1+g)*(t_rx + t_sky*0.95 + 0.05*270) / (0.95 * np.exp(-tau*airmass))
 
 
+# noinspection PyUnresolvedReferences
 class WtoAlgorithm(WtoDatabase):
     """
     Inherits from WtoDatabase, adds the methods for selection and scoring.
@@ -658,23 +659,12 @@ class WtoAlgorithm(WtoDatabase):
 
 
         """
-        a = str(
-            "with t1 as ( "
-            "select se.SE_TIMESTAMP ts1, sa.SLOG_ATTR_VALUE av1, se.SE_ID se1 "
-            "from ALMA.SHIFTLOG_ENTRIES se, ALMA.SLOG_ENTRY_ATTR sa "
-            "WHERE se.SE_TYPE=7 and se.SE_TIMESTAMP > SYSDATE - 1/1. "
-            "and sa.SLOG_SE_ID = se.SE_ID and sa.SLOG_ATTR_TYPE = 32 "
-            "and se.SE_LOCATION='OSF-AOS'), "
-            "t2 as ( "
-            "select sa.SLOG_ATTR_VALUE av2, se.SE_ID se2 "
-            "from ALMA.SHIFTLOG_ENTRIES se, ALMA.SLOG_ENTRY_ATTR sa "
-            "WHERE se.SE_TYPE=7 and se.SE_TIMESTAMP > SYSDATE - 1/1. "
-            "and sa.SLOG_SE_ID = se.SE_ID and sa.SLOG_ATTR_TYPE = 39 "
-            "and se.SE_LOCATION='OSF-AOS' "
-            ") "
-            "select t1.*, t2.av2 from t1,t2 where t1.se1 = t2.se2 "
-            "and av2 = 'BL'"
-        )
+        a = str("select se.SE_TIMESTAMP ts1, sa.SLOG_ATTR_VALUE av1, "
+                "se.SE_ARRAYNAME, se.SE_ID se1 from ALMA.SHIFTLOG_ENTRIES se, "
+                "ALMA.SLOG_ENTRY_ATTR sa "
+                "WHERE se.SE_TYPE=7 and se.SE_TIMESTAMP > SYSDATE - 1/1. "
+                "and sa.SLOG_SE_ID = se.SE_ID and sa.SLOG_ATTR_TYPE = 31 "
+                "and se.SE_LOCATION='OSF-AOS' and se.SE_CORRELATORTYPE = 'BL'")
         try:
             self.cursor.execute(a)
             self.bl_arrays = pd.DataFrame(
@@ -684,25 +674,14 @@ class WtoAlgorithm(WtoDatabase):
         except ValueError:
             self.bl_arrays = pd.DataFrame(
                 columns=pd.Index(
-                    [u'TS1', u'AV1', u'SE1', u'AV2'], dtype='object'))
+                    [u'TS1', u'AV1', u'SE_ARRAYNAME', u'SE1'], dtype='object'))
             print("No BL arrays have been created in the last 6 hours.")
-        b = str(
-            "WITH t1 AS ( "
-            "select se.SE_TIMESTAMP ts1, sa.SLOG_ATTR_VALUE av1, se.SE_ID se1 "
-            "from ALMA.SHIFTLOG_ENTRIES se, ALMA.SLOG_ENTRY_ATTR sa "
-            "WHERE se.SE_TYPE=7 and se.SE_TIMESTAMP > SYSDATE - 1/1. "
-            "and sa.SLOG_SE_ID = se.SE_ID and sa.SLOG_ATTR_TYPE = 32 "
-            "and se.SE_LOCATION='OSF-AOS'), "
-            "t2 as ( "
-            "select sa.SLOG_ATTR_VALUE av2, se.SE_ID se2 "
-            "from ALMA.SHIFTLOG_ENTRIES se, ALMA.SLOG_ENTRY_ATTR sa "
-            "WHERE se.SE_TYPE=7 and se.SE_TIMESTAMP > SYSDATE - 1/1. "
-            "and sa.SLOG_SE_ID = se.SE_ID and sa.SLOG_ATTR_TYPE = 39 "
-            "and se.SE_LOCATION='OSF-AOS' "
-            ") "
-            "select t1.*, t2.av2 from t1,t2 where t1.se1 = t2.se2 "
-            "and av2 = 'ACA'"
-        )
+        b = str("select se.SE_TIMESTAMP ts1, sa.SLOG_ATTR_VALUE av1, "
+                "se.SE_ARRAYNAME, se.SE_ID se1 from ALMA.SHIFTLOG_ENTRIES se, "
+                "ALMA.SLOG_ENTRY_ATTR sa "
+                "WHERE se.SE_TYPE=7 and se.SE_TIMESTAMP > SYSDATE - 1/1. "
+                "and sa.SLOG_SE_ID = se.SE_ID and sa.SLOG_ATTR_TYPE = 31 "
+                "and se.SE_LOCATION='OSF-AOS' and se.SE_CORRELATORTYPE = 'ACA'")
         try:
             self.cursor.execute(b)
             self.aca_arrays = pd.DataFrame(
@@ -712,7 +691,7 @@ class WtoAlgorithm(WtoDatabase):
         except ValueError:
             self.aca_arrays = pd.DataFrame(
                 columns=pd.Index(
-                    [u'TS1', u'AV1', u'SE1', u'AV2'], dtype='object'))
+                    [u'TS1', u'AV1', u'SE_ARRAYNAME', u'SE1'], dtype='object'))
             print("No ACA arrays have been created in the last 6 hours.")
 
     def set_bl_prop(self, array_name):
@@ -724,13 +703,19 @@ class WtoAlgorithm(WtoDatabase):
         # In case a bl_array is selected
         if (array_name is not None and len(self.bl_arrays) != 0
                 and array_name not in self.defarrays):
-            id1 = self.bl_arrays.query('AV1 == "%s"' % array_name).iloc[0].SE1
+            id1 = self.bl_arrays.query(
+                'SE_ARRAYNAME == "%s"' % array_name).iloc[0].SE1
 
-            a = str("SELECT SLOG_ATTR_VALUE FROM ALMA.SLOG_ENTRY_ATTR "
-                    "WHERE SLOG_ATTR_TYPE = 31 "
-                    "AND SLOG_SE_ID=%d" % id1)
-            self.cursor.execute(a)
-            ap = pd.DataFrame(self.cursor.fetchall(), columns=['antenna'])
+            # a = str("SELECT SLOG_ATTR_VALUE FROM ALMA.SLOG_ENTRY_ATTR "
+            #        "WHERE SLOG_ATTR_TYPE = 31 "
+            #        "AND SLOG_SE_ID=%d" % id1)
+            # self.cursor.execute(a)
+            # ap = pd.DataFrame(self.cursor.fetchall(), columns=['antenna'])
+
+            ap = self.bl_arrays.query(
+                'SE_ARRAYNAME == "%s" and SE1 == %d' % (array_name, id1)
+            )[['AV1']]
+            ap.rename(columns={'AV1': 'antenna'}, inplace=True)
             ap = ap[ap.antenna.str.contains('CM') == False]
             conf = pd.merge(self.antpad, ap,
                             left_on='antenna', right_on='antenna')
