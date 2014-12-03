@@ -1,8 +1,8 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <ArrayConfigurations
     xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:type="ArrayConfigurations">
-    <AntennaOnPad antenna="DA55" pad="S309" start="2014-10-18T17:30:05.796-03:00">
-        <MetrologyCoefficients AN0="4.99" AW0="-3.58" version="1"/>
+    <AntennaOnPad antenna="DA55" pad="A060" start="2014-12-03T11:48:49.778-03:00">
+        <MetrologyCoefficients AN0="0.0" AW0="0.0" version="0"/>
     </AntennaOnPad>
     <AntennaOnPad antenna="DA45" pad="A030" start="2014-11-28T16:34:57.164-03:00">
         <MetrologyCoefficients AN0="4.981" AW0="1.819" version="1"/>
