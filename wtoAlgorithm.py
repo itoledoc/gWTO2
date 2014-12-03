@@ -800,7 +800,7 @@ def observable(solarSystem, sourcename, RA, DEC, horizon, isQuery, ephemeris,
             try:
                 ra, dec, ephe = read_ephemeris(ephemeris, alma.date)
             except TypeError:
-                print ephemeris, sourcename
+                print(ephemeris, sourcename)
                 ephe = False
             if not ephe:
                 alma.date = dtemp
