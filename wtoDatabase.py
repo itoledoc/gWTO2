@@ -106,6 +106,25 @@ class WtoDatabase(object):
             "FROM SCHEDULING_AOS.SCHEDBLOCK sb, SCHEDULING_AOS.OBSUNIT ou "
             "WHERE sb.SCHEDBLOCKID = ou.OBSUNITID AND sb.CSV = 0")
 
+        self.execbal_sql = str(
+            "select ALMA.mv_obsproject.cycle, ALMA.mv_obsproject.executive,"
+            "sum(ALMA.mv_schedblock.USED_TIME) / 3600,"
+            "sum(ALMA.mv_schedblock.TIME) / 3600 "
+            "from ALMA.mv_schedblock join ALMA.mv_obsproject "
+            "on ALMA.mv_schedblock.prj_ref = ALMA.mv_obsproject.PRJ_ARCHIVE_UID"
+            " join ALMA.obs_project_status "
+            "on ALMA.obs_project_status.DOMAIN_ENTITY_ID "
+            "= ALMA.mv_obsproject.PRJ_ARCHIVE_UID "
+            "where (ALMA.obs_project_status.domain_entity_state !='Canceled' "
+            "and ALMA.obs_project_status.domain_entity_state !='Rejected' "
+            "and ALMA.obs_project_status.domain_entity_state !='CSVReady') "
+            "and (ALMA.mv_obsproject.CYCLE='2013.1' or "
+            "     ALMA.mv_obsproject.CYCLE='2013.A' or "
+            "     ALMA.mv_obsproject.CYCLE='2012.1' or "
+            "     ALMA.mv_obsproject.CYCLE='2012.A') "
+            "and mv_schedblock.requested_array = 'TWELVE-M' "
+            "group by ALMA.mv_obsproject.cycle, ALMA.mv_obsproject.executive")
+
         # Global Oracle Connection
         self.connection = cx_Oracle.connect(conx_string)
         self.cursor = self.connection.cursor()
@@ -258,6 +277,11 @@ class WtoDatabase(object):
         self.obsproject.to_pickle(
             self.path + self.preferences.obsproject_table)
 
+        self.cursor.execute(self.execbal_sql)
+        self.balance = pd.DataFrame(
+            self.cursor.fetchall(), columns=['CYCLE', 'EXEC', 'usedTime',
+                                             'totalTime'])
+
     def update(self, connect=True):
 
         """
@@ -265,6 +289,12 @@ class WtoDatabase(object):
         :param connect:
         :return:
         """
+
+        self.cursor.execute(self.execbal_sql)
+        self.balance = pd.DataFrame(
+            self.cursor.fetchall(), columns=['CYCLE', 'EXEC', 'usedTime',
+                                             'totalTime'])
+
         self.cursor.execute(self.sqlsched_proj)
         self.scheduling_proj = pd.DataFrame(
             self.cursor.fetchall(),

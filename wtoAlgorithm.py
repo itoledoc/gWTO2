@@ -9,6 +9,7 @@ __author__ = 'itoledo'
 
 from datetime import datetime
 from datetime import timedelta
+import numpy as np
 
 import pandas as pd
 import ephem
@@ -17,6 +18,17 @@ from lxml import objectify
 from wtoDatabase import WtoDatabase
 import ruvTest as rUV
 
+confDf = pd.DataFrame(
+    [('C34-1', 3.73, 2.49, 1.62, 1.08, 0.81, 0.57)],
+    columns=['Conf', 'ALMA_RB_03', 'ALMA_RB_04', 'ALMA_RB_06', 'ALMA_RB_07',
+             'ALMA_RB_08', 'ALMA_RB_09'],
+    index=['C34-1'])
+confDf.ix['C34-2'] = ('C34-2', 2.04, 1.36, 0.89, 0.59, 0.44, 0.31)
+confDf.ix['C34-3'] = ('C34-3', 1.4, 0.93, 0.61, 0.4, 0.3, 0.21)
+confDf.ix['C34-4'] = ('C34-4', 1.11, 0.74, 0.48, 0.32, 0.24, 0.17)
+confDf.ix['C34-5'] = ('C34-5', 0.75, 0.50, 0.33, 0.22, 0.16, 0.12)
+confDf.ix['C34-6'] = ('C34-6', 0.57, 0.38, 0.25, 0.16, 0.12, 0.09)
+confDf.ix['C34-7'] = ('C34-7', 0.41, 0.27, 0.18, 0.12, None, None)
 
 pd.options.display.width = 200
 pd.options.display.max_columns = 55
@@ -384,18 +396,19 @@ class WtoAlgorithm(WtoDatabase):
                     r['arrayMinAR'], r['arrayMaxAR'], r['LAS'],
                     r['grade'], r['repfreq'], r['DEC'], r['EXEC'], array,
                     r['frac'], r['maxPWVC'], r['CODE'], r['isPointSource'],
-                    r['name']),
+                    r['name'], r['HA']),
                 axis=1)
             scores = pd.DataFrame(scores.values.tolist(), index=scores.index)
             scores.columns = pd.Index(
                 [u'sb_cond_score', u'sb_array_score', u'sb_completion_score',
+                 u'sb_ha_scorer',
                  u'sb_exec_score', u'sb_science_score', u'sb_grade_score',
                  u'arcorr', u'score', u'lascorr'])
         else:
             scores = pd.DataFrame(
                 columns=pd.Index(
                     [u'sb_cond_score', u'sb_array_score',
-                     u'sb_completion_score', u'sb_exec_score',
+                     u'sb_completion_score', u'sb_ha_scorer', u'sb_exec_score',
                      u'sb_science_score', u'sb_grade_score', u'arcorr',
                      u'score', u'lascorr']))
         if array == '12m':
@@ -410,7 +423,7 @@ class WtoAlgorithm(WtoDatabase):
 
     def calculate_score(self, ecount, tcount, srank, ar, aminar, amaxar,
                         las, grade, repfreq, dec, execu, array,
-                        frac, maxpwvc, code, points, name):
+                        frac, maxpwvc, code, points, name, ha):
 
         """
         Please go to the :ref:`Score and ranking <score>` section for an
@@ -472,7 +485,7 @@ class WtoAlgorithm(WtoDatabase):
         # set array score
         if array == '7m' or array == 'tp':
             sb_array_score = 10.
-            arcorr = 0.
+            arcorr_or = 0.
             lascorr = 0.
         else:
             c_bmax = 0.4001 / pd.np.cos(pd.np.radians(-23.0262015) -
@@ -480,22 +493,26 @@ class WtoAlgorithm(WtoDatabase):
             c_freq = repfreq / 100.
             corr = c_freq / c_bmax
             arcorr = ar * corr
+            arcorr_or = arcorr
             lascorr = las * corr
 
             if name.endswith('_TC'):
-                arcorr = (aminar + amaxar) / 2.
+                arcorr = 0.9 * amaxar
+                arcorr_or = arcorr
+
+            if arcorr > 3.73:
+                arcorr = 3.73
 
             if 0.9 * arcorr <= self.array_ar <= 1.1 * arcorr:
                 sb_array_score = 10.
 
-            elif 0.9 * arcorr > self.array_ar >= 0.8 * arcorr:
-                sb_array_score = 8.0
-            elif 1.2 * arcorr >= self.array_ar > 1.1 * arcorr:
+            elif 0.8 * arcorr > self.array_ar >= 1.2 * arcorr:
                 sb_array_score = 8.0
 
             elif self.array_ar < 0.8 * arcorr and not points:
                 l = 0.8 * arcorr - aminar
                 sb_array_score = ((self.array_ar - aminar) / l) * 8.0
+
             elif self.array_ar < 0.8 * arcorr and points:
                 sb_array_score = 8.0
             elif self.array_ar > 1.2 * arcorr:
@@ -505,6 +522,18 @@ class WtoAlgorithm(WtoDatabase):
             else:
                 print("What happened with?")
                 sb_array_score = -1.
+
+            narray = 0.
+            for a in confDf['ALMA_RB_03'].values:
+                if aminar < a < amaxar:
+                    narray += 1
+
+            if narray == 0:
+                print "Warning, no oficial configuration for %s" % name
+
+            elif narray == 1 and sb_array_score < 8.5:
+                sb_array_score = 9.
+
         # set exec score:
         sb_exec_score = self.exec_prio[execu]
 
@@ -525,15 +554,20 @@ class WtoAlgorithm(WtoDatabase):
             else:
                 sb_cond_score = 0.
 
+        sb_ha_scorer = ((np.cos(np.radians((ha + 1) * 15.)) - 0.3)
+                        /
+                        (1 - 0.3)) * 10.
+
         score = (0.35 * sb_cond_score +
                  0.20 * sb_array_score +
-                 0.15 * sb_completion_score +
-                 0.10 * sb_exec_score +
+                 0.10 * sb_completion_score +
+                 0.05 * sb_exec_score +
                  0.05 * sb_science_score +
-                 0.15 * sb_grade_score)
+                 0.15 * sb_grade_score +
+                 0.10 * sb_ha_scorer)
         return (sb_cond_score, sb_array_score, sb_completion_score,
-                sb_exec_score, sb_science_score, sb_grade_score, arcorr, score,
-                lascorr)
+                sb_ha_scorer, sb_exec_score, sb_science_score, sb_grade_score,
+                arcorr_or, score, lascorr)
 
     def check_observability(self, array):
 

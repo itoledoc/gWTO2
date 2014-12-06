@@ -49,6 +49,9 @@ def computeBL(AR, freq):
 
     BLmax = 61800 / (freq * AR)
 
+    if BLmax < 165.6:
+        BLmax = 165.6
+
     return (BLmax)
 
 
