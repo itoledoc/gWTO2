@@ -472,7 +472,7 @@ class WtoAlgorithm(WtoDatabase):
         # set array score
         if array == '7m' or array == 'tp':
             sb_array_score = 10.
-            arcorr = 0.
+            arcorr_or = 0.
             lascorr = 0.
         else:
             c_bmax = 0.4001 / pd.np.cos(pd.np.radians(-23.0262015) -
@@ -480,10 +480,15 @@ class WtoAlgorithm(WtoDatabase):
             c_freq = repfreq / 100.
             corr = c_freq / c_bmax
             arcorr = ar * corr
+            arcorr_or = arcorr
             lascorr = las * corr
 
             if name.endswith('_TC'):
-                arcorr = (aminar + amaxar) / 2.
+                arcorr = 0.9 * amaxar
+                arcorr_or = arcorr
+
+            if arcorr > 3.73:
+                arcorr = 3.73
 
             if 0.9 * arcorr <= self.array_ar <= 1.1 * arcorr:
                 sb_array_score = 10.
@@ -532,8 +537,8 @@ class WtoAlgorithm(WtoDatabase):
                  0.05 * sb_science_score +
                  0.15 * sb_grade_score)
         return (sb_cond_score, sb_array_score, sb_completion_score,
-                sb_exec_score, sb_science_score, sb_grade_score, arcorr, score,
-                lascorr)
+                sb_exec_score, sb_science_score, sb_grade_score, arcorr_or,
+                score, lascorr)
 
     def check_observability(self, array):
 
