@@ -11,6 +11,5 @@
     <resource url="Alma/ObsPrep/ObsProposal" location="$PROJECT_DIR$/../wto/schemas/ObsProposal.xsd" />
     <resource url="Alma/CommonEntity" location="$PROJECT_DIR$/../wto/schemas/CommonEntity.xsd" />
   </component>
-  <component name="ProjectRootManager" version="2" project-jdk-name="Python 2.7.6 (~/anaconda/bin/python)" project-jdk-type="Python SDK" />
+  <component name="ProjectRootManager" version="2" project-jdk-name="Python 2.7.8 (~/anaconda/bin/python)" project-jdk-type="Python SDK" />
 </project>
-

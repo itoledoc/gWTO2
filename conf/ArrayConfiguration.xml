@@ -29,7 +29,7 @@
         <MetrologyCoefficients AN0="2.18" AW0="0.76" version="1"/>
     </AntennaOnPad>
     <AntennaOnPad antenna="DV21" pad="A003" start="2014-12-04T15:37:53.440-03:00">
-        <MetrologyCoefficients AN0="31.255" AW0="16.35" version="1"/>
+        <MetrologyCoefficients AN0="28.2925" AW0="19.6025" version="3"/>
     </AntennaOnPad>
     <AntennaOnPad antenna="CM02" pad="J502" start="2012-10-01T13:41:40.833-04:00">
         <MetrologyCoefficients AN0="0.0" AW0="0.0" version="0"/>
@@ -100,8 +100,8 @@
     <AntennaOnPad antenna="DA53" pad="A069" start="2014-11-07T19:57:31.642-03:00">
         <MetrologyCoefficients AN0="0.0" AW0="0.0" version="0"/>
     </AntennaOnPad>
-    <AntennaOnPad antenna="DA60" pad="P404" start="2014-08-29T16:41:45.397-04:00">
-        <MetrologyCoefficients AN0="0.0" AW0="0.0" version="0"/>
+    <AntennaOnPad antenna="DA60" pad="A036" start="2014-12-06T12:18:48.346-03:00">
+        <MetrologyCoefficients AN0="0.84" AW0="6.667563" version="2"/>
     </AntennaOnPad>
     <AntennaOnPad antenna="CM05" pad="J506" start="2012-10-01T13:55:34.238-04:00">
         <MetrologyCoefficients AN0="0.0" AW0="0.0" version="0"/>
@@ -140,7 +140,7 @@
         <MetrologyCoefficients AN0="-5.3398" AW0="4.3841" version="1"/>
     </AntennaOnPad>
     <AntennaOnPad antenna="DV02" pad="A010" start="2014-12-02T16:14:53.672-03:00">
-        <MetrologyCoefficients AN0="12.2875" AW0="17.6925" version="1"/>
+        <MetrologyCoefficients AN0="10.05" AW0="22.005" version="2"/>
     </AntennaOnPad>
     <AntennaOnPad antenna="DV19" pad="A033" start="2014-11-23T17:57:28.049-03:00">
         <MetrologyCoefficients AN0="19.0425" AW0="0.155" version="1"/>
@@ -164,7 +164,7 @@
         <MetrologyCoefficients AN0="3.69" AW0="10.94" version="1"/>
     </AntennaOnPad>
     <AntennaOnPad antenna="DA59" pad="A021" start="2014-01-29T12:42:22.283-03:00">
-        <MetrologyCoefficients AN0="-2.99" AW0="-0.86" version="1"/>
+        <MetrologyCoefficients AN0="-10.4734" AW0="-2.509" version="2"/>
     </AntennaOnPad>
     <AntennaOnPad antenna="DV13" pad="A027" start="2014-11-16T10:22:36.745-03:00">
         <MetrologyCoefficients AN0="-13.3925" AW0="1.3125" version="1"/>

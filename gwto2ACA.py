@@ -58,6 +58,16 @@ class ACAMainWindow(QMainWindow, Ui_ACAMainWindow):
         self.datas.date = self.date_datetime.dateTime().toPyDateTime()
         self.datas.num_ant = self.antennas_spin.value()
 
+        try:
+            self.current_pwv = Wto.pd.read_csv(
+                self.datas.wto_path + 'conf/pwv_data.txt')
+            pwv_n = setpwv(self.current_pwv.tail(1).values[0, 2])
+            self.datas.set_pwv(pwv_n)
+            self.pwv_spin.setValue(pwv_n)
+
+        except IOError:
+            print("No online wvr file, but don't worry")
+
     @pyqtSignature("bool")
     def on_actionAll_SBs_triggered(self, checked):
         """
@@ -329,6 +339,17 @@ class ACAMainWindow(QMainWindow, Ui_ACAMainWindow):
             QTime(date.time().hour, date.time().minute, date.time().second))
         self.datas.date = date
         self.datas.alma.date = self.datas.date
+
+        try:
+            self.current_pwv = Wto.pd.read_csv(
+                self.datas.wto_path + 'conf/pwv_data.txt')
+            pwv_n = setpwv(self.current_pwv.tail(1).values[0, 2])
+            self.datas.set_pwv(pwv_n)
+            self.pwv_spin.setValue(pwv_n)
+
+        except IOError:
+            print("No online wvr file, but don't worry")
+
         lst = self.datas.alma.sidereal_time()
         lst_time = Wto.datetime.strptime(str(lst), '%H:%M:%S.%f').time()
         self.lst_spin.setTime(
@@ -551,3 +572,19 @@ class MyStdTableModel(QAbstractTableModel):
         if order == Qt.DescendingOrder:
             self.arraydata.reverse()
         self.emit(SIGNAL("layoutChanged()"))
+
+
+def setpwv(p0):
+    e1 = "%.2f" % Wto.pd.np.around(p0, decimals=2)
+    e = e1[-1]
+    c = e1[:-1]
+    if 0 <= int(e) < 3:
+        e = '0'
+        p = float(c + e)
+    elif 3 <= int(e) < 7:
+        e = '5'
+        p = float(c + e)
+    else:
+        p = float(c) + 0.1
+
+    return Wto.pd.np.around(p, decimals=2)

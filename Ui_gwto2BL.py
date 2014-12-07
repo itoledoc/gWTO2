@@ -123,14 +123,14 @@ class Ui_BLMainWindow(object):
         self.minha_spin = QtGui.QSpinBox(self.OptionsFrame)
         self.minha_spin.setMinimum(-12)
         self.minha_spin.setMaximum(12)
-        self.minha_spin.setProperty("value", -5)
+        self.minha_spin.setProperty("value", -4)
         self.minha_spin.setObjectName(_fromUtf8("minha_spin"))
         self.gridLayout_6.addWidget(self.minha_spin, 1, 3, 1, 1)
 
         self.maxha_spin = QtGui.QSpinBox(self.OptionsFrame)
         self.maxha_spin.setMinimum(-12)
         self.maxha_spin.setMaximum(12)
-        self.maxha_spin.setProperty("value", 3)
+        self.maxha_spin.setProperty("value", 4)
         self.maxha_spin.setObjectName(_fromUtf8("maxha_spin"))
         self.gridLayout_6.addWidget(self.maxha_spin, 1, 5, 1, 1)
 

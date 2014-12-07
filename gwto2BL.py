@@ -62,7 +62,18 @@ class BLMainWindow(QMainWindow, Ui_BLMainWindow):
         self.datas.num_ant = self.antennas_spin.value()
         self.datas.set_bl_prop(array_name=None)
         self.array_ar_spin.setValue(self.datas.array_ar)
-    
+
+        try:
+            self.current_pwv = Wto.pd.read_csv(
+                self.datas.wto_path + 'conf/pwv_data.txt')
+            pwv_n = setpwv(self.current_pwv.tail(1).values[0, 2])
+            self.datas.set_pwv(pwv_n)
+            self.pwv_spin.setValue(pwv_n)
+
+        except IOError:
+            print("No online wvr file, but don't worry")
+
+
     @pyqtSignature("int")
     def on_maxha_spin_valueChanged(self, p0):
         """
@@ -343,6 +354,19 @@ class BLMainWindow(QMainWindow, Ui_BLMainWindow):
         lst_time = Wto.datetime.strptime(str(lst), '%H:%M:%S.%f').time()
         self.lst_spin.setTime(
             QTime(lst_time.hour, lst_time.minute, lst_time.second))
+
+        try:
+            self.current_pwv = Wto.pd.read_csv(
+                self.datas.wto_path + 'conf/pwv_data.txt')
+
+            pwv_n = setpwv(self.current_pwv.tail(1).values[0, 2])
+            self.datas.set_pwv(pwv_n)
+            self.pwv_spin.setProperty("value", pwv_n)
+
+        except IOError:
+            print('conf/pwv_data.txt')
+            print("No online wvr file, but don't worry")
+
         self.datas.query_arrays()
         arrays = self.datas.bl_arrays.SE_ARRAYNAME.unique()
         c = 1
@@ -825,3 +849,19 @@ class MyPolTableModel(QAbstractTableModel):
         if order == Qt.DescendingOrder:
             self.arraydata.reverse()
         self.emit(SIGNAL("layoutChanged()"))
+
+
+def setpwv(p0):
+    e1 = "%.2f" % Wto.pd.np.around(p0, decimals=2)
+    e = e1[-1]
+    c = e1[:-1]
+    if 0 <= int(e) < 3:
+        e = '0'
+        p = float(c + e)
+    elif 3 <= int(e) < 7:
+        e = '5'
+        p = float(c + e)
+    else:
+        p = float(c) + 0.1
+
+    return Wto.pd.np.around(p, decimals=2)
