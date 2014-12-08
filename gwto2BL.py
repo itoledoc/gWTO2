@@ -361,7 +361,7 @@ class BLMainWindow(QMainWindow, Ui_BLMainWindow):
 
             pwv_n = setpwv(self.current_pwv.tail(1).values[0, 2])
             self.datas.set_pwv(pwv_n)
-            self.pwv_spin.setProperty("value", pwv_n)
+            self.pwv_spin.setValue(pwv_n)
 
         except IOError:
             print('conf/pwv_data.txt')
@@ -398,7 +398,8 @@ class BLMainWindow(QMainWindow, Ui_BLMainWindow):
             self.stdarrays_combo.setCurrentIndex(1)
             self.blarrays_combo.setCurrentIndex(0)
             self.on_stdarrays_combo_activated()
-        print(self.datas.array_name, self.datas.array_ar, self.datas.num_ant)
+        print(self.datas.array_name, self.datas.array_ar, self.datas.num_ant,
+              self.datas.pwv)
 
     # noinspection PyArgumentList
     @pyqtSignature("")
