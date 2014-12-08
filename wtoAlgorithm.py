@@ -506,7 +506,7 @@ class WtoAlgorithm(WtoDatabase):
             if 0.9 * arcorr <= self.array_ar <= 1.1 * arcorr:
                 sb_array_score = 10.
 
-            elif 0.8 * arcorr > self.array_ar >= 1.2 * arcorr:
+            elif 0.8 * arcorr < self.array_ar <= 1.2 * arcorr:
                 sb_array_score = 8.0
 
             elif self.array_ar < 0.8 * arcorr and not points:
