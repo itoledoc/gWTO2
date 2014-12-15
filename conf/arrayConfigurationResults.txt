@@ -1,33 +1,33 @@
 === Array Configuration Summary ==== 
 
-Input file : 2014-12-03.cfg 
-Nant : 36 
+Input file : 2014-12-15.cfg 
+Nant : 34 
 Declination (Degree): -23.00 
 Duration : 2h 
 Frequency (GHz) : 100.0 
 Minimum Proj. BL (meters) : 14.635928 
-Maximum Proj. BL (meters) : 390.001390 
-RMS (meters) : 138.32 
+Maximum Proj. BL (meters) : 289.860140 
+RMS (meters) : 105.02 
 Shadowing fraction (%): 0.0 
-minor beam (arcsec) : 1.5441 
-major beam (arcsec) : 2.6463 
-Spatial resolution (arcsec) : 2.0214 
+minor beam (arcsec) : 2.2216 
+major beam (arcsec) : 2.9261 
+Spatial resolution (arcsec) : 2.5496 
 Weighting : briggs 
-Sidelobe level (%) : 9.0 
-PA beam (degree): 99.6 
+Sidelobe level (%) : 6.8 
+PA beam (degree): 60.3 
 LAS (arcsec) : 25.3486 
 
 === metric in testing....
-# Voronoi Perimeter Critical radius (%) : 48.0 
-# Voronoi Area Critical radius (%) : 48.0 
-# Voronoi Index  : 2.34 
-# Voronoi Zero   : -2.94 
+# Voronoi Perimeter Critical radius (%) : 62.0 
+# Voronoi Area Critical radius (%) : 62.0 
+# Voronoi Index  : 3.71 
+# Voronoi Zero   : -3.33 
 
-Matching with  ACA-std.cfg:  17.0 %   (uv-overlap: 14.6 m -- 32.1 m)
-Matching with    C34-1.cfg:  56.3 %   (uv-overlap: 14.7 m -- 165.6 m)
-Matching with    C34-2.cfg:  68.2 %   (uv-overlap: 14.6 m -- 303.6 m)
-Matching with    C34-3.cfg:  63.1 %   (uv-overlap: 21.0 m -- 390.0 m)
-Matching with    C34-4.cfg:  56.2 %   (uv-overlap: 21.0 m -- 390.0 m)
-Matching with    C34-5.cfg:  48.5 %   (uv-overlap: 25.9 m -- 390.0 m)
-Matching with    C34-6.cfg:  35.6 %   (uv-overlap: 42.1 m -- 390.0 m)
-Matching with    C34-7.cfg:  30.4 %   (uv-overlap: 42.1 m -- 390.0 m)
+Matching with  ACA-std.cfg:  19.7 %   (uv-overlap: 14.6 m -- 32.1 m)
+Matching with    C34-1.cfg:  62.4 %   (uv-overlap: 14.7 m -- 165.6 m)
+Matching with    C34-2.cfg:  65.6 %   (uv-overlap: 14.6 m -- 289.9 m)
+Matching with    C34-3.cfg:  54.4 %   (uv-overlap: 21.0 m -- 289.9 m)
+Matching with    C34-4.cfg:  47.8 %   (uv-overlap: 21.0 m -- 289.9 m)
+Matching with    C34-5.cfg:  40.6 %   (uv-overlap: 25.9 m -- 289.9 m)
+Matching with    C34-6.cfg:  26.3 %   (uv-overlap: 42.1 m -- 289.9 m)
+Matching with    C34-7.cfg:  22.8 %   (uv-overlap: 42.1 m -- 289.9 m)

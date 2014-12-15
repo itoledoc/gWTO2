@@ -776,6 +776,7 @@ class WtoAlgorithm(WtoDatabase):
                 lines = io_file.readlines()
                 self.array_ar = float(lines[13].split(':')[1])
                 self.num_ant = int(lines[3].split(':')[1])
+                print self.num_ant
                 self.num_bl = self.num_ant * (self.num_ant - 1.) / 2.
                 io_file.close()
                 ac = rUV.ac.ArrayConfigurationCasaFile()

@@ -303,12 +303,22 @@ class BLMainWindow(QMainWindow, Ui_BLMainWindow):
             self.datas.array_name = None
             self.antennas_spin.setReadOnly(False)
             self.datas.set_bl_prop(array_name=None)
+            self.array_ar_spin.setValue(self.datas.array_ar)
+            self.antennas_spin.setValue(self.datas.num_ant)
+            self.pop = ArrayCheck2(ruv=self.datas.ruv, num_ant=self.datas.num_ant)
+            self.pop.show()
+            ret = self.pop.exec_()
+            if ret:
+                self.datas.array_ar = self.pop.array_ar
+                self.datas.num_ant = self.pop.num_ant
+                self.array_ar_spin.setValue(self.datas.array_ar)
+                self.antennas_spin.setValue(self.datas.num_ant)
         else:
             self.datas.set_bl_prop(array_name=str(self.datas.array_name))
-        self.array_ar_spin.setValue(self.datas.array_ar)
-        self.antennas_spin.setValue(self.datas.num_ant)
-        self.pop = ArrayCheck2(ruv=self.datas.ruv, num_ant=self.datas.num_ant)
-        self.pop.show()
+            self.array_ar_spin.setValue(self.datas.array_ar)
+            self.antennas_spin.setValue(self.datas.num_ant)
+            self.pop = ArrayCheck2(ruv=self.datas.ruv, num_ant=self.datas.num_ant)
+            self.pop.show()
         print(self.datas.array_name, self.datas.array_ar, self.datas.num_ant)
 
     @pyqtSignature("QString")
