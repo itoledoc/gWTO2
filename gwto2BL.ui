@@ -264,7 +264,7 @@
                </property>
                <item>
                 <property name="text">
-                 <string>Current Conf.</string>
+                 <string>Default Conf.</string>
                 </property>
                </item>
                <item>

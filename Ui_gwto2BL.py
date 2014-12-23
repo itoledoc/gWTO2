@@ -414,7 +414,7 @@ class Ui_BLMainWindow(object):
         self.stdarrays_combo.setItemText(
             0, _translate("BLMainWindow", " ", None))
         self.stdarrays_combo.setItemText(
-            1, _translate("BLMainWindow", "Current Conf.", None))
+            1, _translate("BLMainWindow", "Default Conf.", None))
         self.stdarrays_combo.setItemText(
             2, _translate("BLMainWindow", "C34-1", None))
         self.stdarrays_combo.setItemText(

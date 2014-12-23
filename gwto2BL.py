@@ -299,7 +299,7 @@ class BLMainWindow(QMainWindow, Ui_BLMainWindow):
         self.antennas_spin.setReadOnly(True)
         self.blarrays_combo.setCurrentIndex(0)
 
-        if self.datas.array_name == 'Current Conf.':
+        if self.datas.array_name == 'Default Conf.':
             self.datas.array_name = None
             self.antennas_spin.setReadOnly(False)
             self.datas.set_bl_prop(array_name=None)
