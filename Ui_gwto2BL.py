@@ -267,7 +267,7 @@ class Ui_BLMainWindow(object):
         self.gridLayout_7.addWidget(self.antennas_spin, 1, 6, 1, 1)
 
         self.array_ar_spin = QtGui.QDoubleSpinBox(self.ArraysFrame)
-        self.array_ar_spin.setMinimum(0.01)
+        self.array_ar_spin.setMinimum(0.0)
         self.array_ar_spin.setSingleStep(0.1)
         self.array_ar_spin.setProperty("value", 0.0)
         self.array_ar_spin.setReadOnly(True)
@@ -385,7 +385,7 @@ class Ui_BLMainWindow(object):
         self.retranslateUi(BLMainWindow)
         self.tabWidget.setCurrentIndex(0)
         QtCore.QMetaObject.connectSlotsByName(BLMainWindow)
-        self.stdarrays_combo.setCurrentIndex(1)
+        self.stdarrays_combo.setCurrentIndex(0)
 
     def retranslateUi(self, BLMainWindow):
         BLMainWindow.setWindowTitle(

@@ -60,8 +60,9 @@ class BLMainWindow(QMainWindow, Ui_BLMainWindow):
         self.datas.date = self.date_datetime.dateTime().toPyDateTime()
         self.changed_date = True
         self.datas.num_ant = self.antennas_spin.value()
-        self.datas.set_bl_prop(array_name=None)
-        self.array_ar_spin.setValue(self.datas.array_ar)
+        # self.datas.set_bl_prop(array_name=None)
+        self.datas.array_ar = None
+        self.array_ar_spin.setValue(0.)
 
         try:
             self.current_pwv = Wto.pd.read_csv(
@@ -418,14 +419,22 @@ class BLMainWindow(QMainWindow, Ui_BLMainWindow):
         Slot documentation goes here.
         """
         # TODO: not implemented yet
+        if self.datas.array_ar == None:
+            QMessageBox.about(self, "Please select an Array first!!",
+                              "Press OK and then select an array")
+            return 0
+
+        if self.changed_date:
+            self.datas.update()
+            self.changed_date = False
+        else:
+            QMessageBox.about(self, "Using cache (no status updates)",
+                              "It is safe to continue by pressing OK")
+
         progress = QProgressDialog(self)
         progress.setLabelText('Running WTO2...')
         progress.show()
         progress.setAutoClose(True)
-        QCoreApplication.processEvents()
-        if self.changed_date:
-            self.datas.update()
-            self.changed_date = False
         QCoreApplication.processEvents()
         print(
             self.datas.date, self.datas.pwv, self.datas.minha, self.datas.maxha,
@@ -433,6 +442,7 @@ class BLMainWindow(QMainWindow, Ui_BLMainWindow):
             self.datas.num_ant
         )
         QCoreApplication.processEvents()
+
         self.datas.selector('12m')
         self.datas.scorer('12m')
         std12 = self.datas.score12m.sort(
