@@ -419,7 +419,7 @@ class BLMainWindow(QMainWindow, Ui_BLMainWindow):
         Slot documentation goes here.
         """
         # TODO: not implemented yet
-        if self.datas.array_ar == None:
+        if self.datas.array_ar is None:
             QMessageBox.about(self, "Please select an Array first!!",
                               "Press OK and then select an array")
             return 0
@@ -445,6 +445,9 @@ class BLMainWindow(QMainWindow, Ui_BLMainWindow):
 
         self.datas.selector('12m')
         self.datas.scorer('12m')
+        self.datas.all12m.to_excel(self.datas.path + '/all12m.xls')
+        self.datas.all12m.to_csv(self.datas.path + '/all12m.csv')
+        self.datas.score12m.to_csv(self.datas.path + '/score12m.csv')
         std12 = self.datas.score12m.sort(
             'score', ascending=False).query(
                 'isPolarization == False and isTimeConstrained == False')[

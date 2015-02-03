@@ -581,7 +581,8 @@ class WtoAlgorithm(WtoDatabase):
         alma1.date = self.date
         print(alma1.date)
         if array == '12m':
-            fs_arr = self.fieldsource.query('arraySB == "TWELVE-M"')
+            fs_arr = self.fieldsource.query(
+                'arraySB == "TWELVE-M" and isQuery == False')
         elif array == '7m':
             fs_arr = self.fieldsource.query('arraySB == "ACA" or '
                                             'arraySB == "SEVEN-M"')
