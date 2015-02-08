@@ -74,7 +74,6 @@ class BLMainWindow(QMainWindow, Ui_BLMainWindow):
         except IOError:
             print("No online wvr file, but don't worry")
 
-
     @pyqtSignature("int")
     def on_maxha_spin_valueChanged(self, p0):
         """
@@ -306,7 +305,8 @@ class BLMainWindow(QMainWindow, Ui_BLMainWindow):
             self.datas.set_bl_prop(array_name=None)
             self.array_ar_spin.setValue(self.datas.array_ar)
             self.antennas_spin.setValue(self.datas.num_ant)
-            self.pop = ArrayCheck2(ruv=self.datas.ruv, num_ant=self.datas.num_ant)
+            self.pop = ArrayCheck2(ruv=self.datas.ruv,
+                                   num_ant=self.datas.num_ant)
             self.pop.show()
             ret = self.pop.exec_()
             if ret:
@@ -318,7 +318,8 @@ class BLMainWindow(QMainWindow, Ui_BLMainWindow):
             self.datas.set_bl_prop(array_name=str(self.datas.array_name))
             self.array_ar_spin.setValue(self.datas.array_ar)
             self.antennas_spin.setValue(self.datas.num_ant)
-            self.pop = ArrayCheck2(ruv=self.datas.ruv, num_ant=self.datas.num_ant)
+            self.pop = ArrayCheck2(ruv=self.datas.ruv,
+                                   num_ant=self.datas.num_ant)
             self.pop.show()
         print(self.datas.array_name, self.datas.array_ar, self.datas.num_ant)
 
