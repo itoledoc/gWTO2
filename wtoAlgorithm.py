@@ -632,6 +632,10 @@ class WtoAlgorithm(WtoDatabase):
             fs_2g.DEC.mean())
         dec.columns = pd.Index([u'DEC'])
 
+        ra = pd.DataFrame(
+            fs_2g.RA.mean())
+        ra.columns = pd.Index([u'RA'])
+
         fs_3 = pd.merge(allup, etime, right_index=True, left_index=True,
                         how='left')
         fs_4 = pd.merge(fs_3, elevation, right_index=True,
@@ -640,6 +644,8 @@ class WtoAlgorithm(WtoDatabase):
                         left_index=True, how='left')
 
         self.sb_summary.loc[dec.index, 'DEC'] = dec.loc[dec.index, 'DEC']
+        self.sb_summary.loc[dec.index, 'RA'] = ra.loc[dec.index, 'RA']
+
         self.obser_prop = pd.merge(fs_5, lsts, right_index=True,
                                    left_index=True, how='left')
         self.old_date = self.date
@@ -856,6 +862,7 @@ def observable(solarSystem, sourcename, RA, DEC, horizon, isQuery, ephemeris,
             dec = obj.dec
             elev = obj.alt
             neverup = obj.neverup
+            print sourcename, ra, dec, elev
 
         else:
             alma.date = dtemp
@@ -916,7 +923,7 @@ def observable(solarSystem, sourcename, RA, DEC, horizon, isQuery, ephemeris,
 
     alma.date = dtemp
     alma.horizon = ephem.degrees(str(horizon))
-    return str(ra), pd.np.degrees(dec), pd.np.degrees(elev),\
+    return pd.np.degrees(ra), pd.np.degrees(dec), pd.np.degrees(elev),\
         remaining.total_seconds() / 3600., rise, sets, lstr, lsts, obs
 
 
