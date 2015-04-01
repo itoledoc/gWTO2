@@ -506,6 +506,10 @@ class WtoDatabase(object):
         for pid in sbpartid:
             sblist = self.sciencegoals.ix[pid].SBS
             for sb in sblist.split(','):
+                sta = self.sbstates.query(
+                    'DOMAIN_ENTITY_ID == @sb').DOMAIN_ENTITY_STATE.values[0]
+                if sta in self.states:
+                    continue
                 self.row_schedblocks(sb, pid, new=new)
                 new = False
             print "%d/%d ScienceGoals SBs ingested" % (c, sizel)
