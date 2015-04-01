@@ -294,7 +294,7 @@ class WtoAlgorithm(WtoDatabase):
         sel.loc[(sel.SB_state != "Phase2Submitted") &
                 (sel.SB_state != "FullyObserved") &
                 (sel.SB_state != "Deleted") &
-                (sel.SB_stete != "Canceled") &
+                (sel.SB_state != "Canceled") &
                 (sel.PRJ_state != "Phase2Submitted") &
                 (sel.PRJ_state != "Completed"), 'sel_st'] = True
         sel.loc[
