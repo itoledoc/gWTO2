@@ -71,7 +71,7 @@ class BLMainWindow(QMainWindow, Ui_BLMainWindow):
             self.datas.set_pwv(pwv_n)
             self.pwv_spin.setValue(pwv_n)
 
-        except IOError:
+        except [IOError, ValueError]:
             print("No online wvr file, but don't worry")
 
     @pyqtSignature("int")

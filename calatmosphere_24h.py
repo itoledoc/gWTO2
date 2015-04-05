@@ -34,6 +34,76 @@ def query_atm(cursor):
     return df
 
 
+def query_phase(cursor):
+
+    site = ephem.Observer()
+    day = Time(ephem.date(site.date - 1.).datetime(), format='datetime',
+               scale='utc').mjd * 24 * 3600
+    print('%d' % (day * 1E9))
+    sql = str(
+        'SELECT ARCHIVE_UID, BASEBAND_NAME_ENUMV, RECEIVER_BAND_ENUMV,'
+        'ATM_PHASE_CORRECTION_ENUMV, CAL_DATA_ID,'
+        'DIRECTION_VAL, FREQUENCY_RANGE_VAL,'
+        'ANTENNA_NAMES_VAL,'
+        'BASELINE_LENGTHS_VAL, AMPLI_VAL,'
+        'PHASE_R_M_S_VAL,'
+        'POLARIZATION_TYPES_VAL, '
+        'DECORRELATION_FACTOR_VAL,'
+        'NUM_BASELINE, NUM_RECEPTOR,'
+        'PHASE_VAL, START_VALID_TIME '
+        'FROM SCHEDULING_AOS.ASDM_CALPHASE '
+        'WHERE START_VALID_TIME > %d' % (day * 1E9))
+    print(sql)
+    print("Executing QUERY, please wait...")
+    cursor.execute(sql)
+    df = []
+    for value in cursor:
+        r = list(value)
+        for i in [5, 6, 7, 8, 9, 10, 11, 12, 15]:
+            r[i] = value[i].read()
+
+        df.append(r)
+    df = pd.DataFrame(
+        pd.np.array(df),
+        columns=['UID', 'BB', 'BAND', 'ATM_CORR', 'SCAN_ID', 'DIRECTION',
+                 'FREQ_RANGE_VAL', 'ANTENNAS', 'BLLENGTH', 'AMPLI_VAL',
+                 'PHASERMS_VAL', 'POL_VAL', 'DECORR_VAL', 'NBASEL', 'NPOL',
+                 'PHASE_VAL', 'TIME'])
+    return df
+
+
+def query_delay(cursor):
+
+    site = ephem.Observer()
+    day = Time(ephem.date(site.date - 1.).datetime(), format='datetime',
+               scale='utc').mjd * 24 * 3600
+    print('%d' % (day * 1E9))
+    sql = str(
+        'SELECT ARCHIVE_UID, ANTENNA_NAME, ATM_PHASE_CORRECTION_ENUMV,'
+        'BASEBAND_NAME_ENUMV, RECEIVER_BAND_ENUMV, CAL_DATA_ID,'
+        'REF_ANTENNA_NAME,'
+        'DELAY_OFFSET_VAL, POLARIZATION_TYPES_VAL,'
+        'START_VALID_TIME, NUM_RECEPTOR, NUM_SIDEBAND, DELAY_ERROR_VAL '
+        'FROM SCHEDULING_AOS.ASDM_CALDELAY '
+        'WHERE START_VALID_TIME > %d' % (day * 1E9))
+    print(sql)
+    print("Executing QUERY, please wait...")
+    cursor.execute(sql)
+    df = []
+    for value in cursor:
+        r = list(value)
+        for i in [7, 8, 12]:
+            r[i] = value[i].read()
+        df.append(r)
+
+    df = pd.DataFrame(
+        pd.np.array(df),
+        columns=['UID', 'ANTENNA', 'ATM_CORR', 'BB', 'BAND', 'SCAN', 'REF_ANT',
+                 'DELAY_OFF', 'POL_T', 'TIME', 'NUM_RECEP', 'NUM_SB',
+                 'DELAY_ERR'])
+    return df
+
+
 def extract_atmval(ser):
 
     pol = ser.POL_VAL.split(' ')
@@ -96,7 +166,7 @@ def main():
 
     table = df.apply(lambda r: extract_atmval(r), axis=1)
 
-    table.to_excel('day_atmosphere.xls')
+    table.to_csv('day_atmosphere.cvs')
 
     exit()
 
