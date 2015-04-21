@@ -702,14 +702,20 @@ class WtoDatabase(object):
             delay = str(delayparam.attrib['entityPartId'])
         except AttributeError:
             delay = None
-        scienceparam = xml.data.ScienceParameters
-        science = str(scienceparam.attrib['entityPartId'])
-        integrationtime = scienceparam.integrationTime.pyval
-        integrationtime_unit = scienceparam.integrationTime.attrib['unit']
-        integrationtime = convert_tsec(integrationtime, integrationtime_unit)
-        subscandur = scienceparam.subScanDuration.pyval
-        subscandur_unit = scienceparam.subScanDuration.attrib['unit']
-        subscandur = convert_tsec(subscandur, subscandur_unit)
+
+        try:
+            scienceparam = xml.data.ScienceParameters
+            science = str(scienceparam.attrib['entityPartId'])
+            integrationtime = scienceparam.integrationTime.pyval
+            integrationtime_unit = scienceparam.integrationTime.attrib['unit']
+            integrationtime = convert_tsec(integrationtime, integrationtime_unit)
+            subscandur = scienceparam.subScanDuration.pyval
+            subscandur_unit = scienceparam.subScanDuration.attrib['unit']
+            subscandur = convert_tsec(subscandur, subscandur_unit)
+        except AttibuteError:
+            science = ''
+            integrationtime = 0
+            subscandur = 0
 
         repfreq = schedconstr.representativeFrequency.pyval
         ra = schedconstr.representativeCoordinates.findall(
