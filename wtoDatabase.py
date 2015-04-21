@@ -712,7 +712,7 @@ class WtoDatabase(object):
             subscandur = scienceparam.subScanDuration.pyval
             subscandur_unit = scienceparam.subScanDuration.attrib['unit']
             subscandur = convert_tsec(subscandur, subscandur_unit)
-        except AttibuteError:
+        except AttributeError:
             science = ''
             integrationtime = 0
             subscandur = 0
