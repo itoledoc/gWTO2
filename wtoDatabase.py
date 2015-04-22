@@ -90,7 +90,7 @@ class WtoDatabase(object):
             "OR PRJ_LETTER_GRADE='C') "
             "AND obs2.OBS_PROJECT_ID = obs1.PRJ_ARCHIVE_UID")
         self.sqlsched_proj = str(
-            "SELECT * FROM SCHEDULING_INT.OBSPROJECT "
+            "SELECT * FROM SCHEDULING_AOS.OBSPROJECT "
             "WHERE regexp_like (CODE, '^201[23].*\.[AST]')")
         self.sqlstates = str(
             "SELECT DOMAIN_ENTITY_STATE,DOMAIN_ENTITY_ID,OBS_PROJECT_ID "
@@ -103,7 +103,7 @@ class WtoDatabase(object):
             "sb.SCHEDBLOCK_CTRL_EXEC_COUNT,sb.SCHEDBLOCK_CTRL_STATE,"
             "sb.MIN_ANG_RESOLUTION,sb.MAX_ANG_RESOLUTION,"
             "ou.OBSUNIT_PROJECT_UID "
-            "FROM SCHEDULING_INT.SCHEDBLOCK sb, SCHEDULING_INT.OBSUNIT ou "
+            "FROM SCHEDULING_AOS.SCHEDBLOCK sb, SCHEDULING_AOS.OBSUNIT ou "
             "WHERE sb.SCHEDBLOCKID = ou.OBSUNITID AND sb.CSV = 0")
 
         self.execbal_sql = str(
