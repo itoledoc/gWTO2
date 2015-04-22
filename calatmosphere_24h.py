@@ -17,17 +17,26 @@ def query_atm(cursor):
     sql = str(
         'SELECT ARCHIVE_UID, ANTENNA_NAME, RECEIVER_BAND_ENUMV,'
         'baseband_name_enumv, CAL_DATA_ID,'
-        'DBMS_LOB.substr(T_REC_VAL), DBMS_LOB.substr(T_SYS_VAL),'
-        'SYSCAL_TYPE_ENUMV, DBMS_LOB.substr(POLARIZATION_TYPES_VAL),'
-        'DBMS_LOB.substr(SB_GAIN_VAL), DBMS_LOB.substr(FREQUENCY_RANGE_VAL),'
+        'T_REC_VAL, T_SYS_VAL,'
+        'SYSCAL_TYPE_ENUMV, POLARIZATION_TYPES_VAL,'
+        'SB_GAIN_VAL, FREQUENCY_RANGE_VAL,'
         'START_VALID_TIME '
         'FROM SCHEDULING_AOS.ASDM_CALATMOSPHERE '
         'WHERE START_VALID_TIME > %d' % (day * 1E9))
     print(sql)
     print("Executing QUERY, please wait...")
     cursor.execute(sql)
+
+    df = []
+
+    for value in cursor:
+        r = list(value)
+        for i in [5, 6, 8, 9, 10]:
+            r[i] = value[i].read()
+        df.append(r)
+
     df = pd.DataFrame(
-        cursor.fetchall(),
+        pd.np.array(df),
         columns=['UID', 'ANTENNA', 'BAND', 'BB', 'SCAN_ID', 'TREC_VAL',
                  'TSYS_VAL', 'CALTYPE', 'POL_VAL', 'SBGAIN_VAL',
                  'FREQ_RANGE_VAL', 'START_VALID_TIME'])
