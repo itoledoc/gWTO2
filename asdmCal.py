@@ -186,7 +186,7 @@ def query_phase(cursor, uid):
 def trans_phase(row):
 
     l = []
-    pol = row.POL_VAL.split(' ')
+    pol = row.POL_VAL.split()
     numpol = int(pol[2])
     namepol = []
     for i in range(numpol):
@@ -196,23 +196,29 @@ def trans_phase(row):
     date = to_timestamp(row.TIME)
     nbl = int(row.NBASEL)
 
-    az = pd.np.rad2deg(float(row.DIRECTION.split()[3]))
-    el = pd.np.rad2deg(float(row.DIRECTION.split()[4]))
-    freq_min = float(row.FREQ_RANGE_VAL.split()[3]) * 1E-9
-    freq_max = float(row.FREQ_RANGE_VAL.split()[4]) * 1E-9
+    az = pd.np.rad2deg(float(strip_val(row.DIRECTION)[2]))
+    el = pd.np.rad2deg(float(strip_val(row.DIRECTION)[3]))
+    freq_min = float(strip_val(row.FREQ_RANGE_VAL)[2]) * 1E-9
+    freq_max = float(strip_val(row.FREQ_RANGE_VAL)[3]) * 1E-9
 
-    ant_list = row.ANTENNAS.split()[4:-1]
+    ant_list = strip_val(row.ANTENNAS)[3:]
+    bllength = strip_val(row.BLLENGTH)
+    phaserms_val = strip_val(row.PHASERMS_VAL)
+    ampli_val = strip_val(row.AMPLI_VAL)
+    decorr_val = strip_val(row.DECORR_VAL)
+    phase_val = strip_val(row.PHASE_VAL)
+
     for b in range(nbl):
         ant1 = ant_list[b * 2].replace('\"', '')
         ant2 = ant_list[b * 2 + 1].replace('\"', '')
-        bll = float(row.BLLENGTH.split()[3 + b])
+        bll = float(bllength[2 + b])
         for p in range(numpol):
             phrms = pd.np.rad2deg(
-                float(row.PHASERMS_VAL.split()[(4 + b) + p * nbl]))
-            amp = float(row.AMPLI_VAL.split()[(4 + b) + p * nbl])
-            decorr = float(row.DECORR_VAL.split()[(4 + b) + p * nbl])
+                float(phaserms_val[(3 + b) + p * nbl]))
+            amp = float(ampli_val[(3 + b) + p * nbl])
+            decorr = float(decorr_val[(3 + b) + p * nbl])
             phase = pd.np.rad2deg(
-                float(row.PHASE_VAL.split()[(4 + b) + p * nbl]))
+                float(phase_val[(3 + b) + p * nbl]))
             l.append([row.UID, date, row.CALDATA_ID, namepol[p], row.BB,
                       row.BAND, az, el, row.ATM_CORR, freq_min, freq_max, ant1,
                       ant2, bll, phrms, amp, decorr, phase])
@@ -544,9 +550,23 @@ def trans_point(row):
     return pd.Series(out, index=names)
 
 
-def query_stl(c):
+def query_stl(cursor):
 
-    pass
+    sql = str(
+        'SELECT SE_ID, SE_SUBJECT, SE_TIMESTAMP, SE_START, SE_ARRAYENTRY_ID,'
+        'SE_ARRAYNAME, SE_ARRAYTYPE, SE_ARRAYFAMILY, SE_CORRELATORTYPE, '
+        'SE_PROJECT_CODE, SE_SB_ID, SE_EB_UID, SE_STATUS, SE_TYPE, SE_SB_CODE '
+        'FROM ALMA.SHIFTLOG_ENTRIES '
+        'WHERE SE_TIMESTAMP >  '
+        'to_date(\'2015-04-01 00:00:00\', \'YYYY-MM-DD HH24:MI:SS\') '
+        'AND SE_LOCATION = \'OSF-AOS\''
+    )
+    print(sql)
+    print("Executing QUERY for QA1, please wait...")
+    cursor.execute(sql)
+
+    return pd.DataFrame(cursor.fetchall(),
+                        columns=[rec[0] for rec in cursor.description])
 
 
 def strip_val(s):
