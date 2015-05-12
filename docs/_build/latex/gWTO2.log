@@ -1,11 +1,11 @@
-This is pdfTeX, Version 3.1415926-2.6-1.40.14 (TeX Live 2014/dev) (format=pdflatex 2014.8.31)  4 NOV 2014 01:40
+This is pdfTeX, Version 3.14159265-2.6-1.40.15 (TeX Live 2014) (preloaded format=pdflatex 2015.2.7)  11 FEB 2015 15:28
 entering extended mode
  restricted \write18 enabled.
  %&-line parsing enabled.
 **gWTO2.tex
 (./gWTO2.tex
 LaTeX2e <2011/06/27>
-Babel <3.9h> and hyphenation patterns for 2 languages loaded.
+Babel <3.9k> and hyphenation patterns for 2 languages loaded.
 (./sphinxmanual.cls
 Document Class: sphinxmanual 2009/06/02 Document class (Sphinx manual)
 (/usr/share/texlive/texmf-dist/tex/latex/base/report.cls
@@ -256,13 +256,13 @@ File: t1enc.def 2005/09/27 v1.99g Standard LaTeX file
 LaTeX Font Info:    Redeclaring font encoding T1 on input line 43.
 )<<t1.cmap>>)
 (/usr/share/texlive/texmf-dist/tex/generic/babel/babel.sty
-Package: babel 2013/12/03 3.9h The Babel package
+Package: babel 2014/03/24 3.9k The Babel package
 
 (/usr/share/texlive/texmf-dist/tex/generic/babel-english/english.ldf
 Language: english 2012/08/20 v3.3p English support from the babel system
 
 (/usr/share/texlive/texmf-dist/tex/generic/babel/babel.def
-File: babel.def 2013/12/03 3.9h Babel common definitions
+File: babel.def 2014/03/24 3.9k Babel common definitions
 \babel@savecnt=\count88
 \U@D=\dimen103
 )
@@ -662,7 +662,7 @@ Package graphics Info: Driver file: pdftex.def on input line 91.
 \Gin@req@height=\dimen133
 \Gin@req@width=\dimen134
 )
-(/usr/share/texlive/texmf-dist/tex/plain/misc/pdfcolor.tex)
+(/usr/share/texlive/texmf-dist/tex/generic/pdftex/pdfcolor.tex)
 \distancetoright=\skip71
 \py@argswidth=\skip72
 \py@noticelength=\skip73
@@ -754,7 +754,7 @@ Package hyperref Info: Bookmarks ON on input line 4688.
 
 (/usr/share/texlive/texmf-dist/tex/latex/url/url.sty
 \Urlmuskip=\muskip11
-Package: url 2006/04/12  ver 3.3  Verb mode for urls, etc.
+Package: url 2013/09/16  ver 3.4  Verb mode for urls, etc.
 )
 LaTeX Info: Redefining \url on input line 5041.
 \XeTeXLinkMargin=\dimen137
@@ -1171,10 +1171,10 @@ Package rerunfilecheck Info: File `gWTO2.out' has not changed.
 Package atveryend Info: Empty hook `AtVeryVeryEnd' on input line 2792.
  ) 
 Here is how much of TeX's memory you used:
- 9553 strings out of 495034
- 133421 string characters out of 6181677
- 236376 words of memory out of 5000000
- 12245 multiletter control sequences out of 15000+600000
+ 9566 strings out of 495025
+ 133601 string characters out of 6181516
+ 238324 words of memory out of 5000000
+ 12262 multiletter control sequences out of 15000+600000
  66316 words of font info for 74 fonts, out of 8000000 for 9000
  15 hyphenation exceptions out of 8191
  36i,19n,45p,1237b,561s stack positions out of 5000i,500n,10000p,200000b,80000s
@@ -1195,7 +1195,7 @@ etic/uhvbo8a.pfb></usr/share/texlive/texmf-dist/fonts/type1/urw/helvetic/uhvr8a
 .pfb></usr/share/texlive/texmf-dist/fonts/type1/urw/times/utmb8a.pfb></usr/shar
 e/texlive/texmf-dist/fonts/type1/urw/times/utmr8a.pfb></usr/share/texlive/texmf
 -dist/fonts/type1/urw/times/utmri8a.pfb>
-Output written on gWTO2.pdf (41 pages, 1636059 bytes).
+Output written on gWTO2.pdf (41 pages, 1636068 bytes).
 PDF statistics:
  744 PDF objects out of 1000 (max. 8388607)
  664 compressed objects within 7 object streams
