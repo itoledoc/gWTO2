@@ -689,7 +689,7 @@ class WtoAlgorithm(WtoDatabase):
 
         :param pwv:
         """
-        self.pwv = min(pwn, key=lambda x: abs - pwv)
+        self.pwv = min(pwn, key=lambda x: abs(x - pwv))
 
     def set_date(self, date):
         """
