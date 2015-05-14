@@ -1,33 +1,57 @@
 === Array Configuration Summary ==== 
 
-Input file : 2014-12-15.cfg 
-Nant : 34 
+Input file : 2015-05-12.cfg 
+Nant : 38 
 Declination (Degree): -23.00 
 Duration : 2h 
 Frequency (GHz) : 100.0 
-Minimum Proj. BL (meters) : 14.635928 
-Maximum Proj. BL (meters) : 289.860140 
-RMS (meters) : 105.02 
+Minimum Proj. BL (meters) : 15.426496 
+Maximum Proj. BL (meters) : 558.246522 
+RMS (meters) : 232.99 
 Shadowing fraction (%): 0.0 
-minor beam (arcsec) : 2.2216 
-major beam (arcsec) : 2.9261 
-Spatial resolution (arcsec) : 2.5496 
+minor beam (arcsec) : 1.0865 
+major beam (arcsec) : 1.1996 
+Spatial resolution (arcsec) : 1.1416 
 Weighting : briggs 
-Sidelobe level (%) : 6.8 
-PA beam (degree): 60.3 
-LAS (arcsec) : 25.3486 
+Sidelobe level (%) : 5.6 
+PA beam (degree): 70.8 
+LAS (arcsec) : 24.0495 
 
-=== metric in testing....
-# Voronoi Perimeter Critical radius (%) : 62.0 
-# Voronoi Area Critical radius (%) : 62.0 
-# Voronoi Index  : 3.71 
-# Voronoi Zero   : -3.33 
+Critical Pads [%priority] : 
+A082 [100.00 %]  A078 [98.67 %]  A083 [50.01 %]  A079 [47.71 %]  A081 [45.49 %]  A084 [39.73 %]  A077 [35.80 %]  A085 [35.08 %]  A075 [31.10 %]  A087 [28.74 %]  
 
-Matching with  ACA-std.cfg:  19.7 %   (uv-overlap: 14.6 m -- 32.1 m)
-Matching with    C34-1.cfg:  62.4 %   (uv-overlap: 14.7 m -- 165.6 m)
-Matching with    C34-2.cfg:  65.6 %   (uv-overlap: 14.6 m -- 289.9 m)
-Matching with    C34-3.cfg:  54.4 %   (uv-overlap: 21.0 m -- 289.9 m)
-Matching with    C34-4.cfg:  47.8 %   (uv-overlap: 21.0 m -- 289.9 m)
-Matching with    C34-5.cfg:  40.6 %   (uv-overlap: 25.9 m -- 289.9 m)
-Matching with    C34-6.cfg:  26.3 %   (uv-overlap: 42.1 m -- 289.9 m)
-Matching with    C34-7.cfg:  22.8 %   (uv-overlap: 42.1 m -- 289.9 m)
+=== metric in testing....===
+
+# Voronoi Perimeter Critical radius (%) : 80.0 
+# Voronoi Area Critical radius (%) : 80.0 
+# Voronoi Index  : 2.64 
+# Voronoi Zero   : -3.06 
+
+=== Matching with standard configurations ===
+
+Matching with  ACA-std.cfg:   1.6 %   (uv-overlap: 15.4 m -- 32.1 m)
+Matching with  ACA-std.cfg: SNR   41.9 % (uvrange: x 0.55, total: x 4.42), AR fraction 1739.0 % , LAS fraction   56.1 % 
+
+Matching with    C34-1.cfg:  34.0 %   (uv-overlap: 15.4 m -- 165.6 m)
+Matching with    C34-1.cfg: SNR   53.3 % (uvrange: x 0.73, total: x 1.12), AR fraction  337.0 % , LAS fraction   95.5 % 
+
+Matching with    C34-2.cfg:  53.9 %   (uv-overlap: 15.4 m -- 303.6 m)
+Matching with    C34-2.cfg: SNR   73.1 % (uvrange: x 1.04, total: x 1.12), AR fraction  183.9 % , LAS fraction   94.9 % 
+
+Matching with    C34-3.cfg:  72.2 %   (uv-overlap: 21.0 m -- 442.7 m)
+Matching with    C34-3.cfg: SNR   94.5 % (uvrange: x 1.11, total: x 1.12), AR fraction  126.1 % , LAS fraction  136.1 % 
+
+Matching with    C34-4.cfg:  75.5 %   (uv-overlap: 21.0 m -- 558.2 m)
+Matching with    C34-4.cfg: SNR   98.7 % (uvrange: x 1.12, total: x 1.12), AR fraction  100.0 % , LAS fraction  136.1 % 
+
+Matching with    C34-5.cfg:  67.8 %   (uv-overlap: 25.9 m -- 558.2 m)
+Matching with    C34-5.cfg: SNR   83.5 % (uvrange: x 1.12, total: x 1.12), AR fraction   68.1 % , LAS fraction  167.8 % 
+
+Matching with    C34-6.cfg:  55.4 %   (uv-overlap: 42.1 m -- 558.2 m)
+Matching with    C34-6.cfg: SNR   73.3 % (uvrange: x 1.11, total: x 1.12), AR fraction   51.2 % , LAS fraction  272.8 % 
+
+Matching with    C34-7.cfg:  51.8 %   (uv-overlap: 42.1 m -- 558.2 m)
+Matching with    C34-7.cfg: SNR   67.3 % (uvrange: x 1.11, total: x 1.12), AR fraction   37.0 % , LAS fraction  272.8 % 
+
+(Matching: the higher the better) 
+Note that the SNR is not a direct ratio  but a composite parameter.
