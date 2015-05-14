@@ -824,10 +824,10 @@ class WtoAlgorithm(WtoDatabase):
                 self.num_bl = self.num_ant * (self.num_ant - 1.) / 2.
                 self.num_ant = 34
 
-            if len(self.ruv) > 33. * 17.:
-                self.ruv = self.ruv[-561:]
-                self.num_bl = len(self.ruv)
-                self.num_ant = 34
+            # if len(self.ruv) > 33. * 17.:
+            #    self.ruv = self.ruv[-561:]
+            #    self.num_bl = len(self.ruv)
+            #    self.num_ant = 34
 
 
 # noinspection PyPep8Naming
