@@ -539,7 +539,7 @@ class BLMainWindow(QMainWindow, Ui_BLMainWindow):
         print(std12.head(10))
         std12n = std12.to_records(index=False)
         header = std12n.dtype.names
-        self.tmstd12 = MyStdTableModel(std12n, header, self)
+        self.tmstd12 = MyStdTableModel(std12n, header, self.datas.array_ar, self)
         self.bl_sheet.setModel(self.tmstd12)
         self.bl_sheet.verticalHeader().setStretchLastSection(False)
         self.bl_sheet.setSortingEnabled(True)
@@ -596,13 +596,14 @@ class BLMainWindow(QMainWindow, Ui_BLMainWindow):
 
 # noinspection PyMethodOverriding
 class MyStdTableModel(QAbstractTableModel):
-    def __init__(self, datain, headerdata, parent=None):
+    def __init__(self, datain, headerdata, res, parent=None):
         """ datain: a list of lists
             headerdata: a list of strings
         """
         QAbstractTableModel.__init__(self, parent)
         self.arraydata = datain
         self.headerdata = headerdata
+        self.res = 0.9 * res
 
     def rowCount(self, parent):
         try:
@@ -664,8 +665,9 @@ class MyStdTableModel(QAbstractTableModel):
                 c = QVariant(QColor(235, 245, 255))
             else:
                 c = QVariant(QColor(250, 250, 250))
-            if sb[19] < 8.5 and sb[26] == False:
-                c = QVariant(QColor(255, 255, 0))
+            # if sb[19] >= 8.5 and sb[23] <= 0.75 * 1.15:
+            if sb[22] >= 0.75 * 1.15: 
+                c = QVariant(QColor(130, 250, 82))
             if sb[20] == 0:
                 c = QVariant(QColor(255, 110, 110))
             return c
