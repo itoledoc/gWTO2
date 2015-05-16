@@ -666,7 +666,7 @@ class MyStdTableModel(QAbstractTableModel):
             else:
                 c = QVariant(QColor(250, 250, 250))
             # if sb[19] >= 8.5 and sb[23] <= 0.75 * 1.15:
-            if sb[22] >= 0.75 * 1.15: 
+            if sb[22] >= 0.78: 
                 c = QVariant(QColor(130, 250, 82))
             if sb[20] == 0:
                 c = QVariant(QColor(255, 110, 110))
