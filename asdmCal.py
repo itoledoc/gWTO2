@@ -225,7 +225,9 @@ def trans_phase(row):
     return l
 
 
-def query_delay(cursor, uid):
+def query_delay(cursor, time):
+
+    mjdt = tomjd(time) - 6 * 3600 * 1E9
 
     sql = str(
         'SELECT ARCHIVE_UID, ANTENNA_NAME, ATM_PHASE_CORRECTION_ENUMV,'
@@ -234,7 +236,9 @@ def query_delay(cursor, uid):
         'DELAY_OFFSET_VAL, POLARIZATION_TYPES_VAL,'
         'START_VALID_TIME, NUM_RECEPTOR, NUM_SIDEBAND, DELAY_ERROR_VAL '
         'FROM SCHEDULING_AOS.ASDM_CALDELAY '
-        'WHERE ARCHIVE_UID = \'%s\'' % uid)
+        'WHERE START_VALID_TIME > %f AND START_VALID_TIME <%f' %
+        (mjdt, tomjd(time))
+    )
     print(sql)
     print("Executing QUERY, please wait...")
     cursor.execute(sql)
@@ -307,7 +311,22 @@ def query_antennas(cursor, uid):
         pd.np.array(df),
         columns=['UID', 'ANTENNA_ID', 'POSITION_VAL', 'ANTENNA', 'PAD_ID'])
 
-    return df
+    return df.apply(lambda x: trans_ant(x), axis=1)
+
+
+def trans_ant(row):
+
+    position = strip_val(row['POSITION_VAL'])
+    x = float(position[2])
+    y = float(position[3])
+    z = float(position[4])
+
+    out = [
+        row['UID'], row['ANTENNA_ID'], row['ANTENNA'], row['PAD_ID'],
+        x, y, z]
+    names = ['UID', 'ANTENNA_ID', 'ANTENNA', 'PAD_ID', 'X', 'Y', 'Z']
+
+    return pd.Series(out, index=names)
 
 
 def query_flags(cursor, uid):
@@ -325,22 +344,29 @@ def query_flags(cursor, uid):
         r = list(value)
         for i in [4, 5]:
             r[i] = value[i].read()
+        ant = strip_val(r[5])
+        r[5] = ant[2]
+        r[6] = to_timestamp(r[6])
+        r[7] = to_timestamp(r[7])
+        r.append(int(ant[1]))
         df.append(r)
 
     df = pd.DataFrame(
         pd.np.array(df),
         columns=['UID', 'FLAG_ID', 'NUM_ANTENNA', 'REASON', 'SPW_ID',
-                 'ANTENNA_ID', 'START_TIME', 'END_TIME']
+                 'ANTENNA_ID', 'START_TIME', 'END_TIME', 'CHECK_NA']
     )
 
-    return df
+    df['delta'] = df.END_TIME - df.START_TIME
+
+    return df.sort(['START_TIME', 'ANTENNA_ID'])
 
 
 def query_subscans(cursor, uid):
 
     sql = str(
         'SELECT ARCHIVE_UID, SCAN_NUMBER, SUBSCAN_NUMBER, START_TIME, END_TIME,'
-        'FIELD_NAME '
+        'FIELD_NAME, SUBSCAN_INTENT_ENUMV '
         'FROM SCHEDULING_AOS.ASDM_SUBSCAN '
         'WHERE ARCHIVE_UID = \'%s\'' % uid
     )
@@ -351,13 +377,21 @@ def query_subscans(cursor, uid):
     df = []
     for value in cursor:
         r = list(value)
+        r[1] = int(r[1])
+        r[2] = int(r[2])
         df.append(r)
 
     df = pd.DataFrame(
         pd.np.array(df),
         columns=['UID', 'SCAN', 'SUBSCAN', 'START_TIME', 'END_TIME',
-                 'FIELD_NAME']
+                 'FIELD_NAME', 'INTENT']
     )
+
+    df.START_TIME = df.apply(
+        lambda row: to_timestamp(row['START_TIME']), axis=1)
+    df.END_TIME = df.apply(
+        lambda row: to_timestamp(row['END_TIME']), axis=1)
+    df['delta'] = df.END_TIME - df.START_TIME
 
     return df
 
@@ -385,7 +419,22 @@ def query_station(cursor, uid):
         columns=['PAD_ID', 'UID', 'POSITION', 'PAD_NAME']
     )
 
-    return df
+    return df.apply(lambda x: trans_stat(x), axis=1)
+
+
+def trans_stat(row):
+
+    position = strip_val(row['POSITION'])
+    x = float(position[2])
+    y = float(position[3])
+    z = float(position[4])
+
+    out = [
+        row['UID'], row['PAD_ID'], row['PAD_NAME'],
+        x, y, z]
+    names = ['UID', 'PAD_ID', 'PAD', 'X', 'Y', 'Z']
+
+    return pd.Series(out, index=names)
 
 
 def query_scans(cursor, uid):
@@ -409,11 +458,13 @@ def query_scans(cursor, uid):
 
     df = pd.DataFrame(
         pd.np.array(df),
-        columns=['UID', 'SCAN', 'NUM_SUBCAN', 'NUM_FIELD', 'START_TIME',
+        columns=['UID', 'SCAN', 'NUM_SUBSCAN', 'NUM_FIELD', 'START_TIME',
                  'END_TIME', 'SCAN_INTENT', 'FIELD_NAME']
     )
 
-    df.SCAN = df.SCAN.astype(float)
+    df.SCAN = df.SCAN.astype(int)
+    df.NUM_SUBSCAN = df.NUM_SUBSCAN.astype(int)
+    df.NUM_FIELD = df.NUM_FIELD.astype(int)
     df.SCAN_INTENT = df.SCAN_INTENT.str.split().apply(
         lambda x: x[3].split('<')[0])
     df.FIELD_NAME = df.FIELD_NAME.str.split().apply(
@@ -493,7 +544,8 @@ def query_point(cursor, uid, q1=False):
             'POLARIZATION_TYPES_VAL, BEAM_WIDTH_VAL, FREQUENCY_RANGE_VAL,'
             'START_VALID_TIME, DIRECTION_VAL '
             'FROM SCHEDULING_AOS.ASDM_CALPOINTING '
-            'WHERE START_VALID_TIME > %d' % (t - 5 * 3600. * 1E9)
+            'WHERE START_VALID_TIME > %d AND START_VALID_TIME < %d' %
+            (t - 7 * 3600. * 1E9, t)
         )
 
         print(sql)
@@ -550,7 +602,119 @@ def trans_point(row):
     return pd.Series(out, index=names)
 
 
-def query_stl(cursor):
+def query_focus(cursor, time):
+
+    mjdt = tomjd(time) - 6 * 3600 * 1E9
+
+    sql = str(
+        'SELECT ARCHIVE_UID, ANTENNA_NAME, RECEIVER_BAND_ENUMV, CAL_DATA_ID,'
+        'START_VALID_TIME, OFFSET_VAL, OFFSET_ERROR_VAL, FREQUENCY_RANGE_VAL, '
+        'AMBIENT_TEMPERATURE, POINTING_DIRECTION_VAL '
+        'FROM SCHEDULING_AOS.ASDM_CALFOCUS '
+        'WHERE START_VALID_TIME > %f AND START_VALID_TIME <%f' %
+        (mjdt, tomjd(time))
+    )
+
+    print(sql)
+    print("Executing QUERY for QA0, please wait...")
+    cursor.execute(sql)
+
+    df = []
+    for value in cursor:
+            r = list(value)
+            for i in [5, 6, 7, 9]:
+                r[i] = value[i].read()
+            df.append(r)
+
+    df = pd.DataFrame(
+        pd.np.array(df),
+        columns=['UID', 'ANTENNA', 'BAND', 'CALDATA_ID', 'START_TIME',
+                 'OFFSET_VAL', 'OFFSET_ERR', 'FREQ_RANG', 'TEMP', 'DIRECTION'
+                 ]
+    )
+
+    df.START_TIME = df.apply(lambda x: to_timestamp(x['START_TIME']), axis=1)
+
+    return df.apply(lambda x: trans_focus(x), axis=1)
+
+
+def trans_focus(row):
+
+    offset = strip_val(row['OFFSET_VAL'])
+    offs_err = strip_val(row['OFFSET_ERR'])
+    freq = strip_val(row['FREQ_RANG'])
+    direc = strip_val(row['DIRECTION'])
+
+    off_x = float(offset[3])
+    off_x_err = float(offs_err[3])
+    off_y = float(offset[4])
+    off_y_err = float(offs_err[4])
+    off_z = float(offset[5])
+    off_z_err = float(offs_err[5])
+
+    freq_min = float(freq[2])
+    freq_max = float(freq[3])
+
+    az = pd.np.rad2deg(float(direc[2]))
+    el = pd.np.rad2deg(float(direc[3]))
+
+    out = [
+        row['UID'], row['START_TIME'], row['CALDATA_ID'], row['ANTENNA'],
+        row['BAND'], freq_min, freq_max, az, el, off_x, off_x_err, off_y,
+        off_y_err, off_z, off_z_err, row['TEMP']
+    ]
+
+    names =[
+        'UID', 'START_TIME', 'CALDATA_ID', 'ANTENNA', 'BAND', 'FREQ_MIN',
+        'FREQ_MAX', 'AZ', 'EL', 'OFF_X', 'ERR_X', 'OFF_Y', 'ERR_Y',
+        'OFF_Z', 'ERR_Z', 'TEMP'
+    ]
+    return pd.Series(out, index=names)
+
+
+def query_field(cursor, uid):
+
+    sql =str(
+        'SELECT ARCHIVE_UID, FIELD_ID, FIELD_NAME, SOURCE_ID, '
+        'REFERENCE_DIR_VAL '
+        'FROM SCHEDULING_AOS.ASDM_FIELD '
+        'WHERE ARCHIVE_UID = \'%s\'' % uid
+    )
+
+    print(sql)
+    print("Executing QUERY for QA0, please wait...")
+    cursor.execute(sql)
+
+    df = []
+    for value in cursor:
+        r = list(value)
+        for i in [4]:
+            r[i] = value[i].read()
+        df.append(r)
+
+    df = pd.DataFrame(
+        pd.np.array(df),
+        columns=['UID', 'FIELD_ID', 'FIELD_NAME', 'SOURCE_ID', 'DIRECTION']
+    )
+
+    return df.apply(lambda x: trans_field(x), axis=1)
+
+def trans_field(row):
+
+    direc = strip_val(row['DIRECTION'])
+    ra = pd.np.rad2deg(float(direc[3]))
+    dec = pd.np.rad2deg(float(direc[4]))
+
+    out = [
+        row['UID'], row['FIELD_ID'], row['FIELD_NAME'], int(row['SOURCE_ID']),
+        ra, dec
+    ]
+    names = ['UID', 'FIELD_ID', 'FIELD_NAME', 'SOURCE_ID', 'RA', 'DEC']
+
+    return pd.Series(out, index=names)
+
+
+def query_stl(cursor, timed):
 
     sql = str(
         'SELECT SE_ID, SE_SUBJECT, SE_TIMESTAMP, SE_START, SE_ARRAYENTRY_ID,'
@@ -558,16 +722,82 @@ def query_stl(cursor):
         'SE_PROJECT_CODE, SE_SB_ID, SE_EB_UID, SE_STATUS, SE_TYPE, SE_SB_CODE '
         'FROM ALMA.SHIFTLOG_ENTRIES '
         'WHERE SE_TIMESTAMP >  '
-        'to_date(\'2015-04-01 00:00:00\', \'YYYY-MM-DD HH24:MI:SS\') '
-        'AND SE_LOCATION = \'OSF-AOS\''
+        'to_date(\'%s\', \'YYYY-MM-DD HH24:MI:SS\') '
+        'AND SE_LOCATION = \'OSF-AOS\'' % timed
     )
     print(sql)
-    print("Executing QUERY for QA1, please wait...")
+    print("Executing QUERY for SLT, please wait...")
     cursor.execute(sql)
 
     return pd.DataFrame(cursor.fetchall(),
                         columns=[rec[0] for rec in cursor.description])
 
+
+def query_main(cursor, uid):
+
+    sql = str(
+        'SELECT ARCHIVE_UID, TIME, CONFIG_DESCRIPTION_ID, NUM_ANTENNA, '
+        'SUBSCAN_NUMBER, SCAN_NUMBER, FIELD_ID, TIME_SAMPLING_ENUMV '
+        'FROM SCHEDULING_AOS.ASDM_MAIN '
+        'WHERE ARCHIVE_UID = \'%s\'' % uid
+    )
+
+    print(sql)
+    print("Executing QUERY for QA0, please wait...")
+    cursor.execute(sql)
+
+    df = []
+    for value in cursor:
+        r = list(value)
+        df.append(r)
+
+    df = pd.DataFrame(
+        pd.np.array(df),
+        columns=['UID', 'TIME', 'CONF', 'NUM_ANTENNA', 'SUBSCAN_NUM',
+                 'SCAN_NUM', 'FIELD_ID', 'TIME_SAMPLE']
+    )
+
+    df.TIME = df.apply(lambda x: to_timestamp(x['TIME']), axis=1)
+    df.NUM_ANTENNA = df.NUM_ANTENNA.astype(int)
+    df.SUBSCAN_NUM = df.SUBSCAN_NUM.astype(int)
+    df.SCAN_NUM = df.SCAN_NUM.astype(int)
+
+    return df.sort(['SCAN_NUM', 'SUBSCAN_NUM'])
+
+
+def query_receiver(cursor, uid):
+    pass
+
+
+def query_spw(cursor, uid):
+    pass
+
+
+def query_wvr(cursor, uid):
+    sql = str(
+        'SELECT ARCHIVE_UID, ANTENNA_NAME, CAL_DATA_ID, WATER, '
+        'START_VALID_TIME '
+        'FROM SCHEDULING_AOS.ASDM_CALWVR '
+        'WHERE ARCHIVE_UID = \'%s\'' % uid
+    )
+
+    print(sql)
+    print("Executing QUERY for QA0, please wait...")
+    cursor.execute(sql)
+
+    df = []
+    for value in cursor:
+        r = list(value)
+        df.append(r)
+
+    df = pd.DataFrame(
+        pd.np.array(df),
+        columns=['UID', 'ANTENNA', 'CALDATA_ID', 'PWV', 'START_TIME']
+    )
+
+    df.START_TIME = df.apply(lambda x: to_timestamp(x['START_TIME']), axis=1)
+    df.PWV = df.PWV.astype(float)
+    return df.sort('START_TIME')
 
 def strip_val(s):
 
@@ -577,3 +807,7 @@ def strip_val(s):
 def tosec(val):
 
     return pd.np.rad2deg(float(val)) * 3600.
+
+def tomjd(val):
+    t = Time(val, format='isot')
+    return t.mjd * 1E9 * 3600 * 24
