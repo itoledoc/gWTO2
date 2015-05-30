@@ -1003,7 +1003,7 @@ def read_ephemeris(ephemeris, date):
                 ra = ephem.hours(ra_temp.replace(' ', ':'))
                 dec = ephem.degrees(dec_temp.replace(' ', ':'))
                 ephe = True
-                print(ra, dec, ephe)
+                print(ra, dec, ephe, now)
                 return pd.np.degrees(ra), pd.np.degrees(dec), ephe
 
 
