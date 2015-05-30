@@ -845,6 +845,7 @@ def observable(solarSystem, sourcename, RA, DEC, horizon, isQuery, ephemeris,
     :param alma:
     :return:
     """
+    ephe = False
     dtemp = alma.date
     alma.horizon = ephem.degrees(str(horizon))
     if isQuery:
@@ -872,6 +873,7 @@ def observable(solarSystem, sourcename, RA, DEC, horizon, isQuery, ephemeris,
         elif solarSystem == 'Ephemeris':
             try:
                 ra, dec, ephe = read_ephemeris(ephemeris, alma.date)
+                ephe = True
             except TypeError:
                 print(ephemeris, sourcename)
                 ephe = False
