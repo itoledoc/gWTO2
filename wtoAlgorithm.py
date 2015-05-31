@@ -952,7 +952,7 @@ def observable(solarSystem, sourcename, RA, DEC, horizon, isQuery, ephemeris,
     alma.date = dtemp
     alma.horizon = ephem.degrees(str(horizon))
     if ephe:
-        print pd.np.degrees(ra), ra
+        print sourcename, pd.np.degrees(ra), ra
     return pd.np.degrees(ra), pd.np.degrees(dec), pd.np.degrees(elev),\
         remaining.total_seconds() / 3600., rise, sets, lstr, lsts, obs
 
