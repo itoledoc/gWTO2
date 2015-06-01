@@ -628,7 +628,7 @@ class WtoAlgorithm(WtoDatabase):
             columns=['RA', 'DEC', 'elev', 'remaining', 'rise', 'sets', 'lstr',
                      'lsts', 'observable'])
         fs_1 = pd.merge(
-            fs_arr[['fieldRef', 'SB_UID', 'isQuery']],
+            fs_arr[['fieldRef', 'SB_UID', 'isQuery', 'name']],
             df_fs, left_index=True, right_index=True,
             how='left')
         self.fs_1 = fs_1.copy()
