@@ -657,7 +657,7 @@ class WtoAlgorithm(WtoDatabase):
         allup.columns = pd.Index([u'up'])
         fs_2 = pd.merge(fs_1, allup, left_on='SB_UID', right_index=True,
                         how='left')
-        fs_2g = fs_2.query('isQuery == False').groupby('SB_UID')
+        fs_2g = fs_2.query('isQuery == False and name not in @donotuse').groupby('SB_UID')
         etime = pd.DataFrame(
             fs_2g.remaining.min()[fs_2g.remaining.min() > 1.5])
         etime.columns = pd.Index([u'etime'])
