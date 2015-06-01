@@ -631,7 +631,7 @@ class WtoAlgorithm(WtoDatabase):
             fs_arr[['fieldRef', 'SB_UID', 'isQuery', 'name', 'intendedUse']],
             df_fs, left_index=True, right_index=True,
             how='left')
-        self.fs_1 = fs_1.copy()
+
         donotuse = [
             'Pointing Template (Cal Group)',
             'Pointing Template (Science Group)', 'Amplitude', 'Phase',
@@ -649,6 +649,7 @@ class WtoAlgorithm(WtoDatabase):
             'Pluto_Jul11-21', 'Pluto_Jul21-Aug01', 'Pluto_Aug01-11',
             'Pluto_Aug11-21', 'Pluto_Aug21-Sep01', 'Pluto_Sep01-11',
             'Pluto_Sep11-Sep21', 'Pluto_Sep21-Oct01']
+        self.fs_1 = fs_1.query('isQuery == False and name not in @donotuse').copy()
         fs_1g = fs_1.query(
             'isQuery == False and name not in @donotuse').groupby('SB_UID')
         allup = pd.DataFrame(
