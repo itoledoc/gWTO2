@@ -631,6 +631,7 @@ class WtoAlgorithm(WtoDatabase):
             fs_arr[['fieldRef', 'SB_UID', 'isQuery']],
             df_fs, left_index=True, right_index=True,
             how='left')
+        self.fs_1 = fs_1.copy()
         fs_1g = fs_1.query('isQuery == False').groupby('SB_UID')
         allup = pd.DataFrame(
             fs_1g.observable.mean())
