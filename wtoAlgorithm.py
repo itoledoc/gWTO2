@@ -632,7 +632,25 @@ class WtoAlgorithm(WtoDatabase):
             df_fs, left_index=True, right_index=True,
             how='left')
         self.fs_1 = fs_1.copy()
-        fs_1g = fs_1.query('isQuery == False').groupby('SB_UID')
+        donotuse = [
+            'Pointing Template (Cal Group)',
+            'Pointing Template (Science Group)', 'Amplitude', 'Phase',
+            'Bandpass', 'J0423 Bandpass', 'J2258 2nd Bandpass',
+            'Pointing', 'Check source', 'Phase calibrator', 'J1427-4206',
+            'Bandpass calibrator', 'AmpAux_3', 'AmpAux_1', 'PhaseCal',
+            'Calibrator: ', 'Polarization', 'AmpCheck1', 'AmpCheck2',
+            'Polarization calibrator', 'Delay', 'Focus', 'Amplitude query',
+            'calibrator_J1256', 'J192451-291428', 'J1911-2006', 'CheckSource',
+            'Check', 'check', 'J0854+201', 'phase_and_checksource',
+            'phase_and_checksource queries', 'phase+and_checksource',
+            'Bandpass_3C279', 'Field Check source ', 'Phase 2', 'Phase 3',
+            'Phase P', 'Bandpass (J1924-2914)', 'Pluto_May21-Jun01',
+            'Pluto_Jun11-21', 'Pluto_Jun21-Jul01', 'Pluto_Jul01-11',
+            'Pluto_Jul11-21', 'Pluto_Jul21-Aug01', 'Pluto_Aug01-11',
+            'Pluto_Aug11-21', 'Pluto_Aug21-Sep01', 'Pluto_Sep01-11',
+            'Pluto_Sep11-Sep21', 'Pluto_Sep21-Oct01']
+        fs_1g = fs_1.query(
+            'isQuery == False and name not in @donotuse').groupby('SB_UID')
         allup = pd.DataFrame(
             fs_1g.observable.mean())
         allup.columns = pd.Index([u'up'])
