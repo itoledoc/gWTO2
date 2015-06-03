@@ -456,7 +456,7 @@ def query_scans(cursor, uid):
             try:
                 r[i] = value[i].read()
             except AttributeError:
-                r[i] = None
+                r[i] = 'Null'
         df.append(r)
 
     df = pd.DataFrame(
