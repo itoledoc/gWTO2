@@ -464,7 +464,7 @@ def query_scans(cursor, uid):
         columns=['UID', 'SCAN', 'NUM_SUBSCAN', 'NUM_FIELD', 'START_TIME',
                  'END_TIME', 'SCAN_INTENT', 'FIELD_NAME']
     )
-
+    print df.tail()
     df.SCAN = df.SCAN.astype(int)
     df.NUM_SUBSCAN = df.NUM_SUBSCAN.astype(int)
     df.NUM_FIELD = df.NUM_FIELD.astype(int)
