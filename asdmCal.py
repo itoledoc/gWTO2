@@ -453,7 +453,10 @@ def query_scans(cursor, uid):
     for value in cursor:
         r = list(value)
         for i in [6, 7]:
-            r[i] = value[i].read()
+            try:
+                r[i] = value[i].read()
+            except AttributeError:
+                r[i] = None
         df.append(r)
 
     df = pd.DataFrame(
