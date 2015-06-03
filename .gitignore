@@ -113,4 +113,10 @@ crashlytics-build.properties
 # Temporary data
 .ipynb_checkpoints/
 
+.eric4project
+
+conf/default.txt.cfg
+conf/pwv_data.txt
+
+
 
