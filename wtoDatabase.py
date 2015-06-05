@@ -445,10 +445,10 @@ class WtoDatabase(object):
         self.obsproject.to_pickle(
             self.path + self.preferences.obsproject_table)
         new = self.obsproject[['DOMAIN_ENTITY_STATE']]
-        i = ori != new
-        if len(new[i.values]) > 0:
+        # i = ori != new
+        if len(new[new != ori]) > 0:
             print("Detected PRJ state changes: ")
-            print(new[i.values])
+            print(new[new != ori])
         else:
             print("No PRJ states changes.")
         self.create_summary()
