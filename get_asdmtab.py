@@ -172,9 +172,9 @@ def main():
         '/users/aod/data/' + dire + '/scienceparam.csv', index=False)
     cal_amp.to_csv('/users/aod/data/' + dire + '/cal_amp.csv', index=False)
 
-    uidout = uid.replace('uid://A002/','').replace('/','_') + '/'
+    uidout = uid.replace('uid://A002/','').replace('/','_')
 
-    os.system("sed \'s/^dire.*/dire <- \"%s/\"/g\' /users/aod/data/QAOrep.Rmd > /users/aod/data/QA0rep.Rmd" % uidout)
+    os.system("sed \'s/^dire.*/dire <- \"%s\/\"/g\' /users/aod/data/QAOrep.Rmd > /users/aod/data/QA0rep.Rmd" % uidout)
 
 if __name__ == '__main__':
     main()
