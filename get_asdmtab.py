@@ -175,6 +175,7 @@ def main():
     uidout = uid.replace('uid://A002/','').replace('/','_')
 
     os.system("sed \'s/^dire.*/dire <- \"%s\/\"/g\' /users/aod/data/QAOrep.Rmd > /users/aod/data/QA0rep.Rmd" % uidout)
+    os.system("Rscript -e \"library(knitr); knit(\'/users/aod/data/QA0rep.Rmd\')\"")
 
 if __name__ == '__main__':
     main()
