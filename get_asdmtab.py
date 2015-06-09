@@ -120,43 +120,43 @@ def main():
     dire = '_'.join(uid.split('/')[-2:])
 
     try:
-        os.mkdir('data/' + dire)
+        os.mkdir('/users/aod/data/' + dire)
     except OSError:
-        shutil.rmtree('data/' + dire)
-        os.mkdir('data/' + dire)
+        shutil.rmtree('/users/aod/data/' + dire)
+        os.mkdir('/users/aod/data/' + dire)
 
-    point_eb[0].to_csv('data/' + dire + '/point_qa0.csv', index=False)
+    point_eb[0].to_csv('/users/aod/data/' + dire + '/point_qa0.csv', index=False)
     antenas = dfant.ANTENNA.unique()
     point_eb[1].query('ANTENNA in @antenas').to_csv(
-        'data/' + dire + '/point_qa1.csv', index=False)
-    dfant.to_csv('data/' + dire + '/antennas.csv', index=False)
+        '/users/aod/data/' + dire + '/point_qa1.csv', index=False)
+    dfant.to_csv('/users/aod/data/' + dire + '/antennas.csv', index=False)
     try:
-        dfph.to_csv('data/' + dire + '/phase.csv', index=False)
+        dfph.to_csv('/users/aod/data/' + dire + '/phase.csv', index=False)
     except:
         print("No Phase DATA. FAIL this SB if there wasn't actually any "
               "phase data")
 
-    dfwvr.to_csv('data/' + dire + '/wvr.csv', index=False)
+    dfwvr.to_csv('/users/aod/data/' + dire + '/wvr.csv', index=False)
     try:
-        dfscan.to_csv('data/' + dire + '/scan.csv', index=False)
+        dfscan.to_csv('/users/aod/data/' + dire + '/scan.csv', index=False)
     except:
         print("No scan data! Can't perform QA0 for you in EB %s, sorry!!" % uid)
 
-    dfatm.to_csv('data/' + dire + '/atmosphere.csv', index=False)
+    dfatm.to_csv('/users/aod/data/' + dire + '/atmosphere.csv', index=False)
     dfdel.query('ANTENNA in @antenas').to_csv(
-        'data/' + dire + '/delay.csv', index=False)
-    dfmain.to_csv('data/' + dire + '/main.csv', index=False)
-    dfield.to_csv('data/' + dire + '/field.csv', index=False)
+        '/users/aod/data/' + dire + '/delay.csv', index=False)
+    dfmain.to_csv('/users/aod/data/' + dire + '/main.csv', index=False)
+    dfield.to_csv('/users/aod/data/' + dire + '/field.csv', index=False)
     dffoc.query('ANTENNA in @antenas').to_csv(
-        'data/' + dire + '/focus.csv', index=False)
-    dfsubs.to_csv('data/' + dire + '/subscans.csv', index=False)
-    dfflag.to_csv('data/' + dire + '/flags.csv', index=False)
-    dfcal.to_csv('data/' + dire + '/caldata.csv', index=False)
+        '/users/aod/data/' + dire + '/focus.csv', index=False)
+    dfsubs.to_csv('/users/aod/data/' + dire + '/subscans.csv', index=False)
+    dfflag.to_csv('/users/aod/data/' + dire + '/flags.csv', index=False)
+    dfcal.to_csv('/users/aod/data/' + dire + '/caldata.csv', index=False)
     slt_eb.query('SE_EB_UID == @uid').to_csv(
-        'data/' + dire + '/slt.csv', index=False)
+        '/users/aod/data/' + dire + '/slt.csv', index=False)
     sbuid = slt_eb.query('SE_EB_UID == @uid').SE_SB_ID.values[0]
     datas.summary_sb.query("SB_UID == @sbuid").to_csv(
-        'data/' + dire + '/sbsum.csv', index=False)
+        '/users/aod/data/' + dire + '/sbsum.csv', index=False)
     scpar = datas.scienceparam.query('SB_UID == @sbuid').paramRef.unique()
     otar = datas.orederedtar.query('SB_UID == @sbuid').targetId.unique()
     tar = datas.target.query(
@@ -167,10 +167,10 @@ def main():
         datas.target.query(
             'SB_UID == @sbuid and paramRef in @scpar and targetId in @otar'
         )[['fieldRef', 'paramRef']], on='fieldRef').to_csv(
-        'data/' + dire + '/fieldsource.csv', index=False)
+        '/users/aod/data/' + dire + '/fieldsource.csv', index=False)
     datas.scienceparam.query('SB_UID == @sbuid').to_csv(
-        'data/' + dire + '/scienceparam.csv', index=False)
-    cal_amp.to_csv('data/' + dire + '/cal_amp.csv', index=False)
+        '/users/aod/data/' + dire + '/scienceparam.csv', index=False)
+    cal_amp.to_csv('/users/aod/data/' + dire + '/cal_amp.csv', index=False)
 
 if __name__ == '__main__':
     main()
