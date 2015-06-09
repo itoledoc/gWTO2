@@ -175,7 +175,9 @@ def main():
     uidout = uid.replace('uid://A002/','').replace('/','_')
 
     os.system("sed \'s/^dire.*/dire <- \"%s\/\"/g\' /users/aod/data/QAOrep.Rmd > /users/aod/data/QA0rep.Rmd" % uidout)
-    os.system("Rscript -e \"library(knitr); knit(\'/users/aod/data/QA0rep.Rmd\', output=\'/users/aod/data/QA0rep.pdf\')\"")
+    os.system("Rscript -e \"library(knitr); knit(\'/users/aod/data/QA0rep.Rmd\', output=\'/users/aod/data/QA0rep.md\')")
+    os.system('/usr/lib/rstudio-server/bin/pandoc/pandoc /users/aod/data/QA0rep.md --to latex --from markdown+autolink_bare_uris+ascii_identifiers+tex_math_single_backslash --output /users/aod/data/QA0rep.tex --template /data1/home/aod/R/x86_64-redhat-linux-gnu-library/3.1/rmarkdown/rmd/latex/default.tex --number-sections --highlight-style tango --latex-engine pdflatex')
+    os.system('/usr/lib/rstudio-server/bin/pandoc/pandoc /users/aod/data/QA0rep.md --to latex --from markdown+autolink_bare_uris+ascii_identifiers+tex_math_single_backslash --output /users/aod/data/QA0rep.pdf --template /data1/home/aod/R/x86_64-redhat-linux-gnu-library/3.1/rmarkdown/rmd/latex/default.tex --number-sections --highlight-style tango --latex-engine pdflatex')
 
 if __name__ == '__main__':
     main()
