@@ -646,7 +646,7 @@ class WtoAlgorithm(WtoDatabase):
             'phase_and_checksource queries', 'phase+and_checksource',
             'Bandpass_3C279', 'Field Check source ', 'Phase 2', 'Phase 3',
             'Phase P', 'Bandpass (J1924-2914)', 'Pluto_May21-Jun01',
-            'Pluto_Jun11-21', 'Pluto_Jun21-Jul01', 'Pluto_Jul01-11',
+            'Pluto_Jun01-11', 'Pluto_Jun21-Jul01', 'Pluto_Jul01-11',
             'Pluto_Jul11-21', 'Pluto_Jul21-Aug01', 'Pluto_Aug01-11',
             'Pluto_Aug11-21', 'Pluto_Aug21-Sep01', 'Pluto_Sep01-11',
             'Pluto_Sep11-Sep21', 'Pluto_Sep21-Oct01']
