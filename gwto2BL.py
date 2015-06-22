@@ -667,8 +667,8 @@ class MyStdTableModel(QAbstractTableModel):
                 c = QVariant(QColor(250, 250, 250))
             # if sb[19] >= 8.5 and sb[23] <= 0.75 * 1.15:
             # changed line to reflect not longer observable in C34-6
-            if sb[22] > 0.57 and sb[0] > 0:
-                c = QVariant(QColor(130, 250, 82))
+            # if sb[22] > 0.57 and sb[0] > 0:
+            #    c = QVariant(QColor(130, 250, 82))
             if sb[20] == 0:
                 c = QVariant(QColor(255, 110, 110))
             return c
