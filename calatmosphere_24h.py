@@ -135,7 +135,7 @@ def extract_atmval(ser):
         c += 1
     freqmin = float(ser.FREQ_RANGE_VAL.split(' ')[3]) * 1E-9
     freqmax = float(ser.FREQ_RANGE_VAL.split(' ')[4]) * 1E-9
-    date = Time(ser.START_VALID_TIME * 1E-9 / 3600 / 24, format='mjd')
+    date = Time(float(ser.START_VALID_TIME) * 1E-9 / 3600 / 24, format='mjd')
 
     out = [ser.UID, ser.ANTENNA, ser.BAND, ser.BB,
            int(ser.SCAN_ID.split('_')[-1]), freqmin, freqmax,
