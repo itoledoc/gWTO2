@@ -88,8 +88,8 @@
     <AntennaOnPad antenna="DA42" pad="A082" start="2015-05-02T16:00:13.865-04:00">
         <MetrologyCoefficients AN0="0.0" AW0="0.0" version="0"/>
     </AntennaOnPad>
-    <AntennaOnPad antenna="DA52" pad="A035" start="2012-10-25T19:04:52.759-03:00">
-        <MetrologyCoefficients AN0="11.55" AW0="-4.0843" version="2"/>
+    <AntennaOnPad antenna="DA52" pad="A105" start="2015-06-24T15:38:41.257-04:00">
+        <MetrologyCoefficients AN0="0.0" AW0="0.0" version="0"/>
     </AntennaOnPad>
     <AntennaOnPad antenna="LA01" pad="W210" start="2014-12-15T11:45:16.248-03:00">
         <MetrologyCoefficients AN0="0.0" AW0="0.0" version="0"/>
