@@ -279,7 +279,8 @@ class WtoAlgorithm(WtoDatabase):
 
         sel['sel_trans'] = False
 
-        sel.loc[(sel.transmission > self.transmission), 'sel_trans'] = True
+        sel.loc[(sel.transmission > self.transmission or sel.maxPWVC >= self.pwv),
+                'sel_trans'] = True
 
         print("SBs with a transmission higher than %2.1f: %d" %
               (self.transmission,
