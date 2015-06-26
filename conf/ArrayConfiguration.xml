@@ -22,8 +22,8 @@
     <AntennaOnPad antenna="CM12" pad="J504" start="2012-09-28T10:26:03.025-03:00">
         <MetrologyCoefficients AN0="0.0" AW0="0.0" version="0"/>
     </AntennaOnPad>
-    <AntennaOnPad antenna="DA57" pad="A017" start="2014-12-28T15:23:26.212-03:00">
-        <MetrologyCoefficients AN0="-1.276" AW0="-8.302" version="1"/>
+    <AntennaOnPad antenna="DA57" pad="A113" start="2015-06-25T14:54:12.246-04:00">
+        <MetrologyCoefficients AN0="0.0" AW0="0.0" version="0"/>
     </AntennaOnPad>
     <AntennaOnPad antenna="DA43" pad="A079" start="2015-05-06T13:41:15.295-04:00">
         <MetrologyCoefficients AN0="-7.84" AW0="6.01" version="1"/>
@@ -73,8 +73,8 @@
     <AntennaOnPad antenna="DA41" pad="A137" start="2014-12-01T15:13:03.887-03:00">
         <MetrologyCoefficients AN0="-0.3861" AW0="15.1957" version="1"/>
     </AntennaOnPad>
-    <AntennaOnPad antenna="DV09" pad="A081" start="2015-05-10T11:02:21.358-04:00">
-        <MetrologyCoefficients AN0="15.79" AW0="-4.48" version="1"/>
+    <AntennaOnPad antenna="DV09" pad="A007" start="2015-06-26T12:20:44.886-04:00">
+        <MetrologyCoefficients AN0="0.0" AW0="0.0" version="0"/>
     </AntennaOnPad>
     <AntennaOnPad antenna="PM02" pad="T702" start="2014-06-02T17:39:19.690-04:00">
         <MetrologyCoefficients AN0="0.0" AW0="0.0" version="0"/>
@@ -176,7 +176,7 @@
         <MetrologyCoefficients AN0="-8.017" AW0="7.47" version="1"/>
     </AntennaOnPad>
     <AntennaOnPad antenna="DV07" pad="A112" start="2015-06-22T13:13:16.056-04:00">
-        <MetrologyCoefficients AN0="0.0" AW0="0.0" version="0"/>
+        <MetrologyCoefficients AN0="30.3" AW0="-11.8" version="1"/>
     </AntennaOnPad>
     <AntennaOnPad antenna="DV16" pad="A077" start="2015-05-06T13:43:51.380-04:00">
         <MetrologyCoefficients AN0="-6.245" AW0="2.27" version="4"/>
@@ -194,7 +194,7 @@
         <MetrologyCoefficients AN0="-26.33" AW0="-3.47" version="2"/>
     </AntennaOnPad>
     <AntennaOnPad antenna="DV05" pad="A084" start="2015-06-23T13:18:23.751-04:00">
-        <MetrologyCoefficients AN0="0.0" AW0="0.0" version="0"/>
+        <MetrologyCoefficients AN0="4.88" AW0="0.11" version="1"/>
     </AntennaOnPad>
     <AntennaOnPad antenna="DA48" pad="A043" start="2014-11-26T16:19:39.305-03:00">
         <MetrologyCoefficients AN0="3.44" AW0="-4.88" version="1"/>
