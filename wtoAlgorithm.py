@@ -556,7 +556,7 @@ class WtoAlgorithm(WtoDatabase):
                     narray += 1
 
             if narray == 0:
-                print "Warning, no oficial configuration for %s" % name
+                print "Warning, no official configuration for %s" % name
 
             elif narray == 1 and sb_array_score < 8.5:
                 sb_array_score = 9.
