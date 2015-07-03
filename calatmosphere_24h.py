@@ -179,5 +179,53 @@ def main():
 
     exit()
 
+def array_score(array, array_ar, repfreq, dec, aminar, amaxar, ar, las, compact):
+    if array == '7m' or array == 'tp':
+        sb_array_score = 10.
+        arcorr_or = 0.
+        lascorr = 0.
+    else:
+        c_bmax = 0.4001 / pd.np.cos(pd.np.radians(-23.0262015) -
+                                    pd.np.radians(dec)) + 0.6103
+        c_freq = repfreq / repfreq
+        corr = c_freq / c_bmax
+        arcorr = ar * corr
+        arcorr_or = arcorr
+        lascorr = las * corr
+
+        if compact:
+            arcorr = 0.9 * amaxar
+            arcorr_or = arcorr
+
+        if arcorr > corr * 3.73 * 100 / repfreq:
+            print array_ar, repfreq, dec, arcorr, corr * 3.73 * 100 / repfreq
+            arcorr = corr * 3.73 * 100 / repfreq
+
+        else:
+            print array_ar, repfreq, dec, arcorr, arcorr
+
+        if 0.9 * arcorr <= array_ar <= 1.1 * arcorr:
+            sb_array_score = 10.
+
+        elif 0.8 * arcorr < array_ar <= 1.2 * arcorr:
+            sb_array_score = 8.0
+
+        elif array_ar < 0.8 * arcorr:  # and not points:
+            l = 0.8 * arcorr - aminar
+            sb_array_score = ((array_ar - aminar) / l) * 8.0
+
+        # elif self.array_ar < 0.8 * arcorr and points:
+        #     sb_array_score = 8.0
+        elif array_ar > 1.2 * arcorr:
+            l = arcorr * 1.2 - amaxar
+            s = 8. / l
+            sb_array_score = (array_ar - amaxar) * s
+        else:
+            print("What happened with?")
+            sb_array_score = -1.
+
+    return sb_array_score / 10.
+
+
 if __name__ == '__main__':
     main()
