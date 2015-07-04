@@ -17,6 +17,7 @@ from lxml import objectify
 
 from wtoDatabase import WtoDatabase
 import ruvTest as rUV
+from scipy.stats import rayleigh
 
 confDf = pd.DataFrame(
     [('C34-1', 3.73, 2.49, 1.62, 1.08, 0.81, 0.57)],
@@ -214,10 +215,27 @@ class WtoAlgorithm(WtoDatabase):
 
         sel['sel_array'] = False
 
+        # Patch for hybrid configuration, C34-6 & C34-7
+
+        self.ruv.sort()
+        ruv6 = self.ruv[self.ruv < 1091.].copy()
+        x = np.linspace(0, ruv6.max() + 100., 1000)
+        param = rayleigh.fit(ruv6)
+        maxl6 = np.min([ruv6.max(), rayleigh.interval(0.992, loc=param[0], scale=param[1])[1]])
+        self.ruv6 = ruv6.copy()
+        self.res6 = 61800 / (100. * maxl6)
+        self.blnum6 = len(ruv6)
+        if self.blnum6 < 591:
+            self.ruv6 = self.ruv.copy()
+            self.res6 = self.array_ar
+        print self.blnum6, self.res6
+
         if array == '12m':
             sel.loc[
-                (sel.arrayMinAR < self.array_ar) &
-                (sel.arrayMaxAR > self.array_ar), 'sel_array'] = True
+                ((sel.arrayMinAR <= self.array_ar) & (sel.arrayMaxAR >= self.array_ar)) |
+                ((sel.arrayMinAR <= self.res6) & (sel.arrayMaxAR >= self.res6)) |
+                ((sel.arrayMinAR >= self.array_ar) & (sel.arrayMaxAR <= self.res6))
+                , 'sel_array'] = True
 
             print("SBs for current 12m Array AR: %d. "
                   "(AR=%.2f, #bl=%d, #ant=%d)" %
@@ -226,14 +244,15 @@ class WtoAlgorithm(WtoDatabase):
 
             sel['blmax'] = sel.apply(
                 lambda row: rUV.computeBL(row['AR'], row['repfreq']), axis=1)
+            sel['blmin'] = sel.apply(
+                lambda row: rUV.computeBL(row['LAS'], row['repfreq']), axis=1)
 
             if self.array_name is not None:
                 sel['blfrac'] = sel.apply(
                     lambda row: (33. * 17) / (1. * len(
-                        self.ruv[self.ruv < row['blmax']]))
+                        self.ruv[(self.ruv <= row['blmax'])]))
                     if (row['isPointSource'] == False)
-                    else (33. * 17) /
-                         (self.num_ant * (self.num_ant - 1) / 2.),
+                    else (33. * 17) / len(self.ruv[(self.ruv <= row['blmax'])]),
                     axis=1)
             else:
                 sel['blfrac'] = sel.apply(
@@ -530,22 +549,27 @@ class WtoAlgorithm(WtoDatabase):
             if arcorr > 3.73:
                 arcorr = 3.73
 
-            if 0.9 * arcorr <= self.array_ar <= 1.1 * arcorr:
+            if aminar >= self.array_ar:
+                array_ar = self.res6
+            else:
+                array_ar = self.array_ar
+
+            if 0.9 * arcorr <= array_ar <= 1.1 * arcorr:
                 sb_array_score = 10.
 
-            elif 0.8 * arcorr < self.array_ar <= 1.2 * arcorr:
+            elif 0.8 * arcorr < array_ar <= 1.2 * arcorr:
                 sb_array_score = 8.0
 
-            elif self.array_ar < 0.8 * arcorr:  # and not points:
+            elif array_ar < 0.8 * arcorr:  # and not points:
                 l = 0.8 * arcorr - aminar
-                sb_array_score = ((self.array_ar - aminar) / l) * 8.0
+                sb_array_score = ((array_ar - aminar) / l) * 8.0
 
             # elif self.array_ar < 0.8 * arcorr and points:
             #     sb_array_score = 8.0
-            elif self.array_ar > 1.2 * arcorr:
+            elif array_ar > 1.2 * arcorr:
                 l = arcorr * 1.2 - amaxar
                 s = 8. / l
-                sb_array_score = (self.array_ar - amaxar) * s
+                sb_array_score = (array_ar - amaxar) * s
             else:
                 print("What happened with?")
                 sb_array_score = -1.

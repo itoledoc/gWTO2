@@ -46,8 +46,11 @@ def computeBL(AR, freq):
     """
     compute the BL in meter for a resolution AR (applying a Briggs correction
     """
+    try:
+        BLmax = 61800 / (freq * AR)
+    except ZeroDivisionError:
+        return 0.
 
-    BLmax = 61800 / (freq * AR)
 
     if BLmax < 165.6:
         BLmax = 165.6
