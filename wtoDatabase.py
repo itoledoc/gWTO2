@@ -1035,7 +1035,12 @@ class WtoDatabase(object):
         qa0group = self.qa0.groupby(['SCHEDBLOCKUID', 'QA0STATUS'])
         qa0count = qa0group.QA0STATUS.count().unstack()
         qpass = qa0count[["Pass"]]
-        qunset = qa0count[["Unset"]]
+        try:
+            qunset = qa0count[["Unset"]]
+        except AttributeError:
+            qa0count['Pass'] = 0
+            qunset = qa0count[["Unset"]]
+
 
         df4 = pd.merge(
             df3, qpass, left_index=True, right_index=True, how='left',
