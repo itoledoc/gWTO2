@@ -1038,7 +1038,7 @@ class WtoDatabase(object):
         try:
             qunset = qa0count[["Unset"]]
         except KeyError:
-            qa0count['Pass'] = 0
+            qa0count['Unset'] = 0
             qunset = qa0count[["Unset"]]
 
 
