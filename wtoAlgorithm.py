@@ -217,18 +217,19 @@ class WtoAlgorithm(WtoDatabase):
 
         # Patch for hybrid configuration, C34-6 & C34-7
 
-        self.ruv.sort()
-        ruv6 = self.ruv[self.ruv < 1091.].copy()
-        x = np.linspace(0, ruv6.max() + 100., 1000)
-        param = rayleigh.fit(ruv6)
-        maxl6 = np.min([ruv6.max(), rayleigh.interval(0.992, loc=param[0], scale=param[1])[1]])
-        self.ruv6 = ruv6.copy()
-        self.res6 = 61800 / (100. * maxl6)
-        self.blnum6 = len(ruv6)
-        if self.blnum6 < 591:
-            self.ruv6 = self.ruv.copy()
-            self.res6 = self.array_ar
-        print self.blnum6, self.res6
+        if array == '12m':
+            self.ruv.sort()
+            ruv6 = self.ruv[self.ruv < 1091.].copy()
+            x = np.linspace(0, ruv6.max() + 100., 1000)
+            param = rayleigh.fit(ruv6)
+            maxl6 = np.min([ruv6.max(), rayleigh.interval(0.992, loc=param[0], scale=param[1])[1]])
+            self.ruv6 = ruv6.copy()
+            self.res6 = 61800 / (100. * maxl6)
+            self.blnum6 = len(ruv6)
+            if self.blnum6 < 591:
+                self.ruv6 = self.ruv.copy()
+                self.res6 = self.array_ar
+            print self.blnum6, self.res6
 
         if array == '12m':
             sel.loc[
