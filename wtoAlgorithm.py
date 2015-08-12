@@ -548,6 +548,9 @@ class WtoAlgorithm(WtoDatabase):
 
             if arcorr > 3.73:
                 arcorr = 3.73
+            if arcorr < 0.41:
+                arcorr = 0.41
+                amaxar = 0.44
 
             if aminar > self.array_ar and amaxar >= self.res6:
                 array_ar = self.res6
