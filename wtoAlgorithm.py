@@ -376,7 +376,12 @@ class WtoAlgorithm(WtoDatabase):
             self.select12m = sel.query(
                 'sel_array == True and sel_trans == True and sel_ha == True '
                 'and sel_el == True and sel_st == True and sel_exe == True and '
-                'frac < 2.1')
+                'tsysfrac < 2.1')
+            #print sel.query(
+            #    'sel_array == True and sel_trans == True and sel_ha == True '
+            #    'and sel_el == True and sel_st == True and sel_exe == True and '
+            #    'frac >= 2.1')
+
 
             self.all12m = sel
             print("SBs with 'frac' < 2.1: %d" % len(self.select12m))
