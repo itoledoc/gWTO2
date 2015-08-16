@@ -980,11 +980,17 @@ class WtoDatabase(object):
                                      maxarC * corr)
         else:
             if sbnum == 1:
+                maxarEc = maxarE * corr
+                if maxarEc < 0.44:
+                    maxarEc = 0.44
                 self.newar.ix[sbuidE] = (minarE, maxarE, minarE * corr,
-                                         maxarE * corr)
+                                         maxarEc)
             if sbnum == 2:
+                maxarEc = maxarE * corr
+                if maxarEc < 0.44:
+                    maxarEc = 0.44
                 self.newar.ix[sbuidE] = (minarE, maxarE, minarE * corr,
-                                         maxarE * corr)
+                                         maxarEc)
                 self.newar.ix[sbuidC] = (minarC, maxarC, minarC * corr,
                                          maxarC * corr)
 

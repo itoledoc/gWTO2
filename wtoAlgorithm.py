@@ -550,7 +550,6 @@ class WtoAlgorithm(WtoDatabase):
                 arcorr = 3.73
             if arcorr < 0.41:
                 arcorr = 0.41
-                amaxar = 0.44
 
             if aminar > self.array_ar and amaxar >= self.res6:
                 array_ar = self.res6
@@ -615,12 +614,13 @@ class WtoAlgorithm(WtoDatabase):
                         (1 - 0.3)) * 10.
 
         score = (0.35 * sb_cond_score +
-                 0.20 * sb_array_score +
-                 0.10 * sb_completion_score +
+                 0.05 * sb_array_score +
+                 0.20 * sb_completion_score +
                  0.05 * sb_exec_score +
                  0.05 * sb_science_score +
-                 0.15 * sb_grade_score +
+                 0.20 * sb_grade_score +
                  0.10 * sb_ha_scorer)
+# 0.35, 0.20, 0.10, 0.05, 0.05, 0.15, 0.10
         return (sb_cond_score, sb_array_score, sb_completion_score,
                 sb_ha_scorer, sb_exec_score, sb_science_score, sb_grade_score,
                 arcorr_or, score, lascorr)
