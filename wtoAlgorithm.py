@@ -253,7 +253,8 @@ class WtoAlgorithm(WtoDatabase):
                     lambda row: (33. * 17) / (1. * len(
                         self.ruv[(self.ruv <= row['blmax'])]))
                     if (row['isPointSource'] == False)
-                    else (33. * 17) / (self.num_ant * (self.num_ant - 1) / 2.), axis=1)
+                    else (33. * 17) / (self.num_ant * (self.num_ant - 1) / 2.),
+                    axis=1)
             else:
                 sel['blfrac'] = sel.apply(
                     lambda row: (33. * 17) / (1. * len(
