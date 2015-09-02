@@ -1,12 +1,3 @@
-"""
-wtoAlgorithm.py: the gWTO selector and scorer library.
-======================================================
-This library contains the classes and functions required to select and rank
-SBs from the information that is stored in a WtoDatabse object.
-"""
-
-__author__ = 'itoledo'
-
 from datetime import datetime
 from datetime import timedelta
 import numpy as np
@@ -18,6 +9,15 @@ from lxml import objectify
 from wtoDatabase import WtoDatabase
 import ruvTest as rUV
 from scipy.stats import rayleigh
+
+"""
+wtoAlgorithm.py: the gWTO selector and scorer library.
+======================================================
+This library contains the classes and functions required to select and rank
+SBs from the information that is stored in a WtoDatabse object.
+"""
+
+__author__ = 'itoledo'
 
 confDf = pd.DataFrame(
     [('C34-1', 3.73, 2.49, 1.62, 1.08, 0.81, 0.57)],
@@ -79,7 +79,7 @@ c_mks = 2.99792458e8
 # tsys = (1+g)*(t_rx + t_sky*0.95 + 0.05*270) / (0.95 * np.exp(-tau*airmass))
 
 
-# noinspection PyUnresolvedReferences
+# noinspection PyUnresolvedReferences,PyTypeChecker
 class WtoAlgorithm(WtoDatabase):
     """
     Inherits from WtoDatabase, adds the methods for selection and scoring.
@@ -220,23 +220,26 @@ class WtoAlgorithm(WtoDatabase):
         if array == '12m':
             self.ruv.sort()
             ruv6 = self.ruv[self.ruv < 1091.].copy()
-            x = np.linspace(0, ruv6.max() + 100., 1000)
+            # x = np.linspace(0, ruv6.max() + 100., 1000)
             param = rayleigh.fit(ruv6)
-            maxl6 = np.min([ruv6.max(), rayleigh.interval(0.992, loc=param[0], scale=param[1])[1]])
+            maxl6 = np.min([ruv6.max(), rayleigh.interval(0.992, loc=param[0],
+                                                          scale=param[1])[1]])
             self.ruv6 = ruv6.copy()
             self.res6 = 61800 / (100. * maxl6)
             self.blnum6 = len(ruv6)
             if self.blnum6 < 591:
                 self.ruv6 = self.ruv.copy()
-                self.res6 = self.array_ar
+                self.res6 = 0.571
             print self.blnum6, self.res6
 
         if array == '12m':
             sel.loc[
-                ((sel.arrayMinAR <= self.array_ar) & (sel.arrayMaxAR >= self.array_ar)) |
-                ((sel.arrayMinAR <= self.res6) & (sel.arrayMaxAR >= self.res6)) |
-                ((sel.arrayMinAR >= self.array_ar) & (sel.arrayMaxAR <= self.res6))
-                , 'sel_array'] = True
+                ((sel.arrayMinAR <= self.array_ar) &
+                 (sel.arrayMaxAR >= self.array_ar)) |
+                ((sel.arrayMinAR <= self.res6) &
+                 (sel.arrayMaxAR >= self.res6)) |
+                ((sel.arrayMinAR >= self.array_ar) &
+                 (sel.arrayMaxAR <= self.res6)), 'sel_array'] = True
 
             print("SBs for current 12m Array AR: %d. "
                   "(AR=%.2f, #bl=%d, #ant=%d)" %
@@ -299,7 +302,8 @@ class WtoAlgorithm(WtoDatabase):
 
         sel['sel_trans'] = False
 
-        sel.loc[(sel.transmission > self.transmission) | (sel.maxPWVC >= self.pwv),
+        sel.loc[(sel.transmission > self.transmission) |
+                (sel.maxPWVC >= self.pwv),
                 'sel_trans'] = True
 
         print("SBs with a transmission higher than %2.1f: %d" %
@@ -378,11 +382,10 @@ class WtoAlgorithm(WtoDatabase):
                 'sel_array == True and sel_trans == True and sel_ha == True '
                 'and sel_el == True and sel_st == True and sel_exe == True and '
                 'tsysfrac < 2.1')
-            #print sel.query(
-            #    'sel_array == True and sel_trans == True and sel_ha == True '
-            #    'and sel_el == True and sel_st == True and sel_exe == True and '
-            #    'frac >= 2.1')
-
+            # print sel.query(
+            #   'sel_array == True and sel_trans == True and sel_ha == True '
+            #   'and sel_el == True and sel_st == True and sel_exe == True and '
+            #   'frac >= 2.1')
 
             self.all12m = sel
             print("SBs with 'frac' < 2.1: %d" % len(self.select12m))
@@ -447,8 +450,7 @@ class WtoAlgorithm(WtoDatabase):
                     r['execount'], r['Total'], r['scienceRank'], r['AR'],
                     r['arrayMinAR'], r['arrayMaxAR'], r['LAS'],
                     r['grade'], r['repfreq'], r['DEC'], r['EXEC'], array,
-                    r['frac'], r['maxPWVC'], r['CODE'], r['isPointSource'],
-                    r['name'], r['HA']),
+                    r['frac'], r['maxPWVC'], r['CODE'], r['name'], r['HA']),
                 axis=1)
             scores = pd.DataFrame(scores.values.tolist(), index=scores.index)
             scores.columns = pd.Index(
@@ -473,9 +475,10 @@ class WtoAlgorithm(WtoDatabase):
             self.scoretp = pd.merge(
                 self.selecttp, scores, left_on='SB_UID', right_index=True)
 
+    # noinspection PyUnboundLocalVariable
     def calculate_score(self, ecount, tcount, srank, ar, aminar, amaxar,
                         las, grade, repfreq, dec, execu, array,
-                        frac, maxpwvc, code, points, name, ha):
+                        frac, maxpwvc, code, name, ha):
 
         """
         Please go to the :ref:`Score and ranking <score>` section for an
@@ -615,8 +618,7 @@ class WtoAlgorithm(WtoDatabase):
             else:
                 sb_cond_score = 0.
 
-        sb_ha_scorer = ((np.cos(np.radians((ha + 1) * 15.)) - 0.3)
-                        /
+        sb_ha_scorer = ((np.cos(np.radians((ha + 1) * 15.)) - 0.3) /
                         (1 - 0.3)) * 10.
 
         score = (0.35 * sb_cond_score +
@@ -626,7 +628,7 @@ class WtoAlgorithm(WtoDatabase):
                  0.05 * sb_science_score +
                  0.20 * sb_grade_score +
                  0.10 * sb_ha_scorer)
-# 0.35, 0.20, 0.10, 0.05, 0.05, 0.15, 0.10
+        # 0.35, 0.20, 0.10, 0.05, 0.05, 0.15, 0.10
         return (sb_cond_score, sb_array_score, sb_completion_score,
                 sb_ha_scorer, sb_exec_score, sb_science_score, sb_grade_score,
                 arcorr_or, score, lascorr)
@@ -669,6 +671,8 @@ class WtoAlgorithm(WtoDatabase):
             how='left')
 
         #  Libes 636-654 + donotuse query, workaround for multiple field sources
+
+        # noinspection PyUnusedLocal
         donotuse = [
             'Pointing Template (Cal Group)',
             'Pointing Template (Science Group)', 'Amplitude', 'Phase',
@@ -833,8 +837,8 @@ class WtoAlgorithm(WtoDatabase):
         :param array_name:
         """
         # In case a bl_array is selected
-        if (array_name is not None and len(self.bl_arrays) != 0
-                and array_name not in self.defarrays):
+        if (array_name is not None and len(self.bl_arrays) != 0 and
+                array_name not in self.defarrays):
             id1 = self.bl_arrays.query(
                 'SE_ARRAYNAME == "%s"' % array_name).iloc[0].SE1
 
@@ -933,7 +937,7 @@ def observable(solarSystem, sourcename, RA, DEC, horizon, isQuery, ephemeris,
             try:
                 ra, dec, ephe = read_ephemeris(ephemeris, alma.date)
             except TypeError:
-                #print(ephemeris, sourcename)
+                # print(ephemeris, sourcename)
                 ephe = False
             if not ephe:
                 alma.date = dtemp
