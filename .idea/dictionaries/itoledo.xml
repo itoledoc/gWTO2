@@ -2,10 +2,16 @@
   <dictionary name="itoledo">
     <words>
       <w>airmass</w>
+      <w>arcorr</w>
       <w>dataframes</w>
+      <w>donotuse</w>
+      <w>frac</w>
       <w>gwto</w>
       <w>itoledo</w>
+      <w>libes</w>
+      <w>linspace</w>
       <w>multisource</w>
+      <w>sourcename</w>
       <w>tebb</w>
       <w>tsys</w>
     </words>
