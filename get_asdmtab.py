@@ -54,6 +54,7 @@ def main():
          'SE_CORRELATORTYPE', 'SE_ID_y', 'SE_SUBJECT']
     ].sort('START_TIME', ascending=False)
 
+    print slt_eb
     print slt_eb.query('SE_EB_UID == @uid')
     timeu = slt_eb.ix[uid, 'START_TIME']
     tmjd = timeu.strftime('%Y-%m-%dT%H:%M:%S.%s')

@@ -669,7 +669,7 @@ class MyStdTableModel(QAbstractTableModel):
             # changed line to reflect not longer observable in C34-6
             # if sb[22] > 0.57 and sb[0] > 0:
             #    c = QVariant(QColor(130, 250, 82))
-            if sb[16] > 1.3:
+            if sb[16] > 1.3 and sb[18] > 1.3:
                 c = QVariant(QColor(255, 110, 110))
             return c
         elif role == Qt.FontRole:
